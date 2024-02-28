@@ -1,59 +1,28 @@
-Received: from mail-oa1-f49.google.com (mail-oa1-f49.google.com [209.85.160.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47EF114C5B6
-	for <iwd@lists.linux.dev>; Tue, 27 Feb 2024 22:03:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3831220DC8
+	for <iwd@lists.linux.dev>; Wed, 28 Feb 2024 06:26:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709071399; cv=none; b=L9ruTusEDTw3rqz6G6j4FtaOIqU1dHMTJ8LNYC+jjcIsAbqTJntw6NSDJ4IWyBSMnzPp+U6yXjxhjvPMvMVM2jrM2OkhAW7an1Ih96vrGoTXhdZIDxBEG6KKYbC5kLNk0bxYc99d5l3osIgacfCYpNNDbMiXTkSY5Zu89Mvdv0U=
+	t=1709101595; cv=none; b=Qm877lu2p+pZnER7qhoH2AR42DlTr3hc5iSiNAumXSVMbdv+XuUepPKPFLnrDZpIzBe5MHKIXPS60LfD7d8y0oFf5Bm5FVuMx1cd5K5+eU3NdgC64h1g9ArKYlwciv+3G+hK6OCGpk8UIv6NZb7/kb6OyO2vhYJ03OnEyMEGEAI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709071399; c=relaxed/simple;
-	bh=J3aJCafLzbdczO3QAdaNzAK2myOEM4lq+r3md/MhAYs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=c3UYp2ii+fNpfKaadYq2KNMuJ9Z68ttLP/+g9sXiamfrEDTTdXF4gY7OGTVeH1K+qnR2BKDcCGb5w2cFkJXy6abDm5tbiUXV8WupH/zwvRCybz6emZXI1AZ4gr5vMyeD/4oBuPdmThC7vQKnFWDcvr8VhxrxkHFJ0F5AtmImbtw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KvIOvFIT; arc=none smtp.client-ip=209.85.160.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KvIOvFIT"
-Received: by mail-oa1-f49.google.com with SMTP id 586e51a60fabf-22007fe465bso1597362fac.1
-        for <iwd@lists.linux.dev>; Tue, 27 Feb 2024 14:03:18 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1709071397; x=1709676197; darn=lists.linux.dev;
-        h=content-transfer-encoding:in-reply-to:from:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=bY/n7sXsWKbJs24mnqi1Ws5DFgyK85c4F/wkj3/477g=;
-        b=KvIOvFIT5VXmINdll37WcsZYOe6HXQ4cyVTDQjdHlSPfvO2UCF5GypoHvbnIVdFr0j
-         +Q36mTBrLt+QwrnMe+GZvDjCvfVJAVN7F44Dz3JMWzV4k1psinJWpisb8RunCR6QA5Cv
-         YUI69y4w7E8h7GB1yuG1HKOL4IWJ0i5MMvJTded6l7FU2RM6d9SicDiM+yfQ/ejGxy+W
-         PLTfbaisn/xOl5LxTvBys4s46sXQfobJgNU0S6yIqPAM58pO1Iq1mZ0HpaSiBZCrSDd0
-         l+6TbQjPVBVubd6Y2jkfujjg9xq75bKXlTGAlyvDUKdlc6Bf/ONEzQo0QpsAGM52yD00
-         yrFQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709071397; x=1709676197;
-        h=content-transfer-encoding:in-reply-to:from:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=bY/n7sXsWKbJs24mnqi1Ws5DFgyK85c4F/wkj3/477g=;
-        b=kmn9c21El33QSNxo5Ijw4c5rTSgZg8Kor8OS7spA1MYDJBmpNans8WvFtNFj4+PxPZ
-         5q12E0QU0ioQeyMFJHcRLjZGonzn4JnPjOYfXYvttxHNHwijr6riPEwN211Jne2v+YQV
-         uZG0NIIYrWn/GBFouP5MtWzqI78+wVmSQR9KZDjVU0rbvgJGvNLnqs6J/HhhBUN2cOzA
-         J4rREHVoC9HIjyz712NH6mWVf9f75pUcaVWMZ3PmRpJ+CUB0OPdma+njLRQO3CKbsJqI
-         5WE2ifSdeFqXV13Y2CM8YJulPu4oCLmqQuK8AiPirXmrnRf8ffAZ8QAXhwvsp2L2q3MQ
-         aFmQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXo/BoXZKhq/kLK4+Vr8psNoZOKIUA9gQYZM7Q0G+msXKoGOwVYBsViQqXRPtgrH44ycvT0PC+DvudH0Xxu5k9Jxgki
-X-Gm-Message-State: AOJu0YyxUfFTUUQAwZnXtLbFjNUyxyTXpxb/gxBNVhbZARvJgnXbLcUX
-	d7wFj3nlFFBl16SYO+oKr5ZFR8gzcqYMXr62H4+0vIs/U5W7o1FH
-X-Google-Smtp-Source: AGHT+IHRy9Rson5YQ+vyy5ewbCWGaIuO9AVhDxEuAfkFvkdPpD5T4TGNT/9G8FCUkmypMcXP8KaxmA==
-X-Received: by 2002:a05:6870:514f:b0:21f:828:7a7c with SMTP id z15-20020a056870514f00b0021f08287a7cmr14639095oak.6.1709071397382;
-        Tue, 27 Feb 2024 14:03:17 -0800 (PST)
-Received: from [192.168.1.22] (070-114-247-242.res.spectrum.com. [70.114.247.242])
-        by smtp.googlemail.com with ESMTPSA id nw15-20020a056870bb0f00b0021ebd810c92sm2255317oab.41.2024.02.27.14.03.16
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 27 Feb 2024 14:03:17 -0800 (PST)
-Message-ID: <e764060c-8289-4c6f-88e2-73457a7629b5@gmail.com>
-Date: Tue, 27 Feb 2024 16:03:16 -0600
+	s=arc-20240116; t=1709101595; c=relaxed/simple;
+	bh=fZ5cFxAy1tMLCzSRXexPtimiPLZO+1RML0azjDx1Xag=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:Cc:From:
+	 In-Reply-To:Content-Type; b=p2K0RwMh0xxojM39PEYJS7EeZLV/MAZTlC6P8JGH5uyeebfeGC7QFtoMwOSZORLPXG0j9jYz8rVxAlD42wPzROsosnFJjDOCsl0/RW1f6Ej/QG+DJ404NZlMltlziP+33WcgxjD6z0Tb6XyBSmMh9SO+phKpQ7KaPulTZOlZwdg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
+Received: from [192.168.0.224] (ip5f5aedb1.dynamic.kabel-deutschland.de [95.90.237.177])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pmenzel)
+	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 8F58B61E5FE04;
+	Wed, 28 Feb 2024 07:26:23 +0100 (CET)
+Message-ID: <259df0b0-4961-4818-8342-e87117074048@molgen.mpg.de>
+Date: Wed, 28 Feb 2024 07:26:24 +0100
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
@@ -61,26 +30,113 @@ List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/2] crypto: fix uninitialized variable coverity warning
+Subject: Re: [PATCH] eap-wsc: Silence static analysis
+To: Denis Kenzior <denkenz@gmail.com>
+References: <20240227212521.1510693-1-denkenz@gmail.com>
 Content-Language: en-US
-To: James Prestwood <prestwoj@gmail.com>, iwd@lists.linux.dev
-References: <20240227211618.318442-1-prestwoj@gmail.com>
-From: Denis Kenzior <denkenz@gmail.com>
-In-Reply-To: <20240227211618.318442-1-prestwoj@gmail.com>
+Cc: iwd@lists.linux.dev
+From: Paul Menzel <pmenzel@molgen.mpg.de>
+In-Reply-To: <20240227212521.1510693-1-denkenz@gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-Hi James,
+Dear Denis,
 
-On 2/27/24 15:16, James Prestwood wrote:
-> Same as for aes_siv_decrypt, check num_ads before calling memcpy.
+
+Thank you for your patch.
+
+Am 27.02.24 um 22:25 schrieb Denis Kenzior:
+> static analysis complains that authenticator is used uninitialized.
+> This isn't strictly true as memory region is reserved for the
+> authenticator using the contents of the passed in structure.  This
+> region is then overwritten once the authenticator is actually computed
+> by authenticator_put().  Silence this warning by explicitly setting
+> authenticator bytes to 0.
+
+Too bad. Out of curiosity. What static analyzer is this?
+
+For the commit message summary, I would be more specific. Maybe:
+
+Zero authenticator bytes to fix static analysis warning
+
 > ---
->   src/crypto.c | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
+>   src/eap-wsc.c | 17 +++++++++++++++++
+>   1 file changed, 17 insertions(+)
 > 
+> diff --git a/src/eap-wsc.c b/src/eap-wsc.c
+> index 65a97da4ee5e..789a20f032b9 100644
+> --- a/src/eap-wsc.c
+> +++ b/src/eap-wsc.c
+> @@ -695,6 +695,8 @@ static void eap_wsc_send_m5(struct eap_state *eap,
+>   	size_t encrypted_len;
+>   	bool r;
+>   
+> +	memset(m5.authenticator, 0, sizeof(m5.authenticator));
+> +
+>   	memcpy(m5es.e_snonce1, wsc->local_snonce1, sizeof(wsc->local_snonce1));
+>   	pdu = wsc_build_m5_encrypted_settings(&m5es, &pdu_len);
+>   	explicit_bzero(m5es.e_snonce1, sizeof(wsc->local_snonce1));
+> @@ -797,6 +799,8 @@ static void eap_wsc_send_m3(struct eap_state *eap,
+>   	uint8_t *pdu;
+>   	size_t pdu_len;
+>   
+> +	memset(m3.authenticator, 0, sizeof(m3.authenticator));
+> +
+>   	len = strlen(wsc->device_password);
+>   
+>   	/* WSC 2.0.5, Section 7.4:
+> @@ -975,6 +979,8 @@ static void eap_wsc_r_send_m8(struct eap_state *eap,
+>   	unsigned int auth_types =
+>   		wsc->m1->auth_type_flags & wsc->m2->auth_type_flags;
+>   
+> +	memset(m8.authenticator, 0, sizeof(m8.authenticator));
+> +
+>   	if (auth_types & WSC_AUTHENTICATION_TYPE_OPEN)
+>   		memcpy(&creds[creds_cnt++], &wsc->open_cred,
+>   			sizeof(struct wsc_credential));
+> @@ -1022,6 +1028,9 @@ static void eap_wsc_r_handle_m7(struct eap_state *eap,
+>   	struct wsc_m7_encrypted_settings m7es;
+>   	enum wsc_configuration_error error = WSC_CONFIGURATION_ERROR_NO_ERROR;
+>   
+> +	memset(m7es.authenticator, 0, sizeof(m7es.authenticator));
+> +	memset(m7.authenticator, 0, sizeof(m7.authenticator));
+> +
+>   	/* Spec unclear what to do here, see comments in eap_wsc_send_nack */
+>   	if (wsc_parse_m7(pdu, len, &m7, &encrypted) != 0)
+>   		goto send_nack;
+> @@ -1084,6 +1093,9 @@ static void eap_wsc_r_send_m6(struct eap_state *eap,
+>   	size_t encrypted_len;
+>   	bool r;
+>   
+> +	memset(m6es.authenticator, 0, sizeof(m6es.authenticator));
+> +	memset(m6.authenticator, 0, sizeof(m6.authenticator));
+> +
+>   	memcpy(m6es.r_snonce2, wsc->local_snonce2, sizeof(wsc->local_snonce2));
+>   	pdu = wsc_build_m6_encrypted_settings(&m6es, &pdu_len);
+>   	explicit_bzero(m6es.r_snonce2, sizeof(wsc->local_snonce2));
+> @@ -1123,6 +1135,8 @@ static void eap_wsc_r_handle_m5(struct eap_state *eap,
+>   	struct wsc_m5_encrypted_settings m5es;
+>   	enum wsc_configuration_error error = WSC_CONFIGURATION_ERROR_NO_ERROR;
+>   
+> +	memset(m5es.authenticator, 0, sizeof(m5es.authenticator));
+> +
+>   	/* Spec unclear what to do here, see comments in eap_wsc_send_nack */
+>   	if (wsc_parse_m5(pdu, len, &m5, &encrypted) != 0)
+>   		goto send_nack;
+> @@ -1188,6 +1202,9 @@ static void eap_wsc_r_send_m4(struct eap_state *eap,
+>   	size_t len_half1;
+>   	struct iovec iov[4];
+>   
+> +	memset(m4es.authenticator, 0, sizeof(m4es.authenticator));
+> +	memset(m4.authenticator, 0, sizeof(m4.authenticator));
+> +
+>   	memcpy(m4es.r_snonce1, wsc->local_snonce1, sizeof(wsc->local_snonce1));
+>   	pdu = wsc_build_m4_encrypted_settings(&m4es, &pdu_len);
+>   	explicit_bzero(m4es.r_snonce1, sizeof(wsc->local_snonce1));
 
-Both applied, thanks.
+Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
 
-Regards,
--Denis
 
+Kind regards,
+
+Paul
