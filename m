@@ -1,63 +1,63 @@
-Received: from mail-qk1-f178.google.com (mail-qk1-f178.google.com [209.85.222.178])
+Received: from mail-qk1-f173.google.com (mail-qk1-f173.google.com [209.85.222.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA7E9383BB
-	for <iwd@lists.linux.dev>; Thu, 29 Feb 2024 17:07:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38AF844C67
+	for <iwd@lists.linux.dev>; Thu, 29 Feb 2024 17:07:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709226464; cv=none; b=AaVFt75KimVa9E4O4gEufYhjeZakPYyK80uF+tfgQPDYVLndTifILfTudfjUi2akmi95KboidYR5eCZZ6bZhlEJOpNMyGHfXI3xgMmztQ9SJZ1Zj+DKo0yqFMauG9L8OmHO3mFdInkwrq6/igeXFXAkMHHqBFQGPtXhJhJkPSCg=
+	t=1709226465; cv=none; b=MJ6rvxtLGlBS3Ra4h+Fmfp1VnwJ24BItMGdgiGR1HkNJyI2VN7jRPNDRivAQ51BjdlZNjNfyuoYlCqwJ+C5JgjE4+nj8hfHXQIxVdbDg3KRgp5Ku3oSMRIQFI2ugGKa+FdmZgOjBrWDpakLAdmcy8daEbHmIMwd7x/0pROUYeRE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709226464; c=relaxed/simple;
-	bh=h+bX4uGDutM1ahDxTS9DW1x27pFEZGjaq+PUwrVQmpc=;
+	s=arc-20240116; t=1709226465; c=relaxed/simple;
+	bh=KVN1bP/yeL4LK1R49P0e73OyCnnnO/vmBbGyJUiLm3U=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=Wm1QGio8cj+O5UPo0A09yhm2JIS5XUyKVZKUsZ+FGg6nv/9dAYGWjtz8RMdMVy5k/cO1mUrkxC/cqHC9RjuWdDwTbnl23EuykjXjoSxPCOD494bbOz3ERny9nFRu4Ktkt5uUZYzPWPWFhTbpqt8V7aZd9ZONtWg0JPy7WgWj6y0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=K65Fmppt; arc=none smtp.client-ip=209.85.222.178
+	 MIME-Version; b=jzPSrO9rxY0IC1AWqLZ6BQyEKp5KxX0LVaTJjJMe1JouLXLxqq1COhti8JiV/McwlBoyfa0zSuX5M9hoH2fb2bWGUOU277JOlDn4vNI1N1v3z4SZbdXxpp1XhzmhpuGJJQwNrUu0QSd0IEVPL+OKx2z2rybekRnPYCeKQuKG724=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OPptkHFQ; arc=none smtp.client-ip=209.85.222.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="K65Fmppt"
-Received: by mail-qk1-f178.google.com with SMTP id af79cd13be357-787a8430006so75961285a.3
-        for <iwd@lists.linux.dev>; Thu, 29 Feb 2024 09:07:42 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OPptkHFQ"
+Received: by mail-qk1-f173.google.com with SMTP id af79cd13be357-7810827e54eso82979985a.2
+        for <iwd@lists.linux.dev>; Thu, 29 Feb 2024 09:07:43 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1709226461; x=1709831261; darn=lists.linux.dev;
+        d=gmail.com; s=20230601; t=1709226463; x=1709831263; darn=lists.linux.dev;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=w6EMShpKJ/FoFa0YaCkbQ7zfmuuUiOmt9NCtAM7SPes=;
-        b=K65FmpptUGdm0bmo+xQv531kDb5TQSLiOYy7Vtgl4jLbPPccOTES3FH38Ave4IXcfd
-         xNJhw7hs15/7GKXwGEFIlyQ3qN9fnoBO0TTGKx5q4W4CsI4OXKO+hStOw8HZofM+HxBJ
-         068IO3Q5s2skchnPQUEDVqrvJIM1w3eUxBBXWXptjt9eGx9Od359yfeyB/eJd35ZoEF6
-         CXim1exyUL04nK9KWvrrSWH1smUQhyiay6gm4Kbmwuy4fVir71goczKPjizMDGpwXbBk
-         wXORawoTDq5ixawBA5SKF013ug5CY0ALOB7+PpvbnzsOneeieAZz87tij0lfXY/3vf0d
-         eFbQ==
+        bh=/kPc538jMHlw80x3kzgQQjRTP1WDceWAn4v2CFdyVm4=;
+        b=OPptkHFQhsa4TLGqDBuK9rpimU/XgXe5Sda5fjz/T4Mil2a3DiSN4zc7vWUpbv1jQw
+         iGyrxqLN3oZvQs6VYiV8Eub9X8oi9Qz/ArdvRVbIUeE/59V1RFrxXNLIKqkQe4cmEwuI
+         O7rvfGQ/uRMx+3dsTJISx4wBL5bzyvTjAEQCV7yxoD2BhRm9tsw99xgr/FPwZeffYVlg
+         LjtQe/SuDn1A8Jcz5y+eZLiaYesRnUHGjWWw9S3Bmge1GmbCYl+66duJCr9g24dNtx5C
+         3u2yK5wb1ssQPmxcGRvz3C0ln+GrXr3SttGjer7vWsPHLeCBjrI6ecGuYaF3PxOmVHi9
+         iDkA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709226461; x=1709831261;
+        d=1e100.net; s=20230601; t=1709226463; x=1709831263;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=w6EMShpKJ/FoFa0YaCkbQ7zfmuuUiOmt9NCtAM7SPes=;
-        b=HU9cpZcJVnEa2VxLudT98Gy/BSAOgu34/aAbYOWig7xec77OxrvjoiB/UnGA43ztSM
-         maeAyhq+6CWbMhqOzP3V/vZN5y0fO3NsOfT6wySxFUBuw1PFRSkEJNbCN+hm0jlK+goP
-         HuOsvMcOCwmxMzRz8zF/AwYUorx3OQH5FoTiryVaWvbIIIjKD84Z8foAwlie3nEcUEar
-         svfvD8UKwgSFRvDJmNV+BeWs7DEgS41fdaM/QCdq5FKEzEXnBEgzoH/cZvDaDDMWAneb
-         0C2bq8qGgzKW/CXNIO8r/pKj+nRNuf5zxzDSZp5K/naKTGMRv7nadPZ5aWx6TYPUlgwd
-         b8Tg==
-X-Gm-Message-State: AOJu0YwgCOy/2RD/dFQT7NwQ0hvxTy2Blmo6Url++UVvUfPO6AIvhZqS
-	9BkzbmkfteOV3UFQcbnYUnbuKRcP+xHjrOyvY9dX0jZjXonAqivnCxtXwZLT
-X-Google-Smtp-Source: AGHT+IEjoo6tzZ80FkwGAyj5736gpsk3qjvfRslcZ7e/5IUIy39RALEvl6W85sGxfqUe3I3WfH2QEg==
-X-Received: by 2002:a05:620a:1367:b0:787:e5e8:84d0 with SMTP id d7-20020a05620a136700b00787e5e884d0mr2730677qkl.36.1709226461472;
-        Thu, 29 Feb 2024 09:07:41 -0800 (PST)
+        bh=/kPc538jMHlw80x3kzgQQjRTP1WDceWAn4v2CFdyVm4=;
+        b=EGuewKR9f1sJ/Md4yMdUnuv4wiX3I8ODk8WasLNiMI92b9vxG0Y48JSCBJZuJ7jyQU
+         yhai9FVu4ruz3incwifZnobmpBPbSzalTQBt0Mz/Wabo640brroRR+Qhm4Gg8lvTaFQK
+         eAaPR+0saDpAVV7ww9QgI51lPrIC6TKhgDLu2Pf23rRRoM2wUNs0RibTROF5icBlnyxU
+         cqDc564ATQ8VrPmHfIFprtKlXvMBIv/LQYVz4YowKdDFo+vPxrLFsOdfjBZzUgpI+gJV
+         7s5MsySlh9ArxExMtD+icljvNiENtWROQmUykddsdbRilaqrYmaJiZ1k/okoL0jJ0xku
+         5BJA==
+X-Gm-Message-State: AOJu0YzFT8NiPWGReaw6vIv5o/vZ8I/JvLx7aUJ6ezkOyZgeRybAa7c0
+	+IMqUZ9biRJfQGCHxjaK3mmhQoIkPTdk97UhI3bD79149u7kTxJyYh5AfQiq
+X-Google-Smtp-Source: AGHT+IFZUuCQnOYEbPYickkSD6wqsmfMdKd/bCjbhWNTUoDY/NobLbl4ESTb7j8p6lqiNdl0mtDd/Q==
+X-Received: by 2002:a05:620a:228d:b0:787:3769:d747 with SMTP id o13-20020a05620a228d00b007873769d747mr2555320qkh.59.1709226462713;
+        Thu, 29 Feb 2024 09:07:42 -0800 (PST)
 Received: from LOCLAP699.rst-01.locus ([208.195.13.130])
-        by smtp.gmail.com with ESMTPSA id pj36-20020a05620a1da400b00787fd080d28sm697415qkn.74.2024.02.29.09.07.40
+        by smtp.gmail.com with ESMTPSA id pj36-20020a05620a1da400b00787fd080d28sm697415qkn.74.2024.02.29.09.07.41
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 29 Feb 2024 09:07:40 -0800 (PST)
+        Thu, 29 Feb 2024 09:07:42 -0800 (PST)
 From: James Prestwood <prestwoj@gmail.com>
 To: iwd@lists.linux.dev
 Cc: James Prestwood <prestwoj@gmail.com>,
 	Alex Radocea <alex@supernetworks.org>
-Subject: [PATCH 2/5] auto-t: Add frame fuzzing test
-Date: Thu, 29 Feb 2024 09:07:31 -0800
-Message-Id: <20240229170734.1498918-2-prestwoj@gmail.com>
+Subject: [PATCH 3/5] p2putil: fix crash/remove side effect parsing adv service info
+Date: Thu, 29 Feb 2024 09:07:32 -0800
+Message-Id: <20240229170734.1498918-3-prestwoj@gmail.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240229170734.1498918-1-prestwoj@gmail.com>
 References: <20240229170734.1498918-1-prestwoj@gmail.com>
@@ -69,153 +69,61 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add a test to validate a crash found by Alex Radocea when sending
-a fuzzed beacon frame.
+The input queue pointer was being initialized unconditionally so if
+parsing fails the out pointer is still set after the queue is
+destroyed. This causes a crash during cleanup.
 
-Co-authored-by: Alex Radocea <alex@supernetworks.org>
+Instead use a temporary pointer while parsing and only after parsing
+has finished do we set the out pointer.
+
+Reported-By: Alex Radocea <alex@supernetworks.org>
 ---
- autotests/testFrameFuzzing/fake_ap.py         | 72 +++++++++++++++++++
- autotests/testFrameFuzzing/hw.conf            |  7 ++
- .../testFrameFuzzing/test_frame_fuzzing.py    | 37 ++++++++++
- 3 files changed, 116 insertions(+)
- create mode 100644 autotests/testFrameFuzzing/fake_ap.py
- create mode 100644 autotests/testFrameFuzzing/hw.conf
- create mode 100644 autotests/testFrameFuzzing/test_frame_fuzzing.py
+ src/p2putil.c | 13 ++++++++-----
+ 1 file changed, 8 insertions(+), 5 deletions(-)
 
-diff --git a/autotests/testFrameFuzzing/fake_ap.py b/autotests/testFrameFuzzing/fake_ap.py
-new file mode 100644
-index 00000000..8ee369de
---- /dev/null
-+++ b/autotests/testFrameFuzzing/fake_ap.py
-@@ -0,0 +1,72 @@
-+import unittest
-+import sys
-+import sys
-+import os
-+from scapy.layers.dot11 import *
-+from scapy.arch import str2mac, get_if_raw_hwaddr
-+from time import time, sleep
-+from threading import Thread
+diff --git a/src/p2putil.c b/src/p2putil.c
+index 5313b34c..faf151a5 100644
+--- a/src/p2putil.c
++++ b/src/p2putil.c
+@@ -541,7 +541,8 @@ static void p2p_clear_advertised_service_descriptor(void *data)
+ static bool extract_p2p_advertised_service_info(const uint8_t *attr, size_t len,
+ 						void *data)
+ {
+-	struct l_queue **out = data;
++	struct l_queue **q = data;
++	struct l_queue *out = NULL;
+ 
+ 	while (len) {
+ 		struct p2p_advertised_service_descriptor *desc;
+@@ -557,11 +558,11 @@ static bool extract_p2p_advertised_service_info(const uint8_t *attr, size_t len,
+ 		if (!l_utf8_validate((const char *) attr + 7, name_len, NULL))
+ 			goto error;
+ 
+-		if (!*out)
+-			*out = l_queue_new();
++		if (!out)
++			out = l_queue_new();
+ 
+ 		desc = l_new(struct p2p_advertised_service_descriptor, 1);
+-		l_queue_push_tail(*out, desc);
++		l_queue_push_tail(out, desc);
+ 
+ 		desc->advertisement_id = l_get_le32(attr + 0);
+ 		desc->wsc_config_methods = l_get_be16(attr + 4);
+@@ -572,10 +573,12 @@ static bool extract_p2p_advertised_service_info(const uint8_t *attr, size_t len,
+ 		len -= 7 + name_len;
+ 	}
+ 
++	*q = out;
 +
-+def if_hwaddr(iff):
-+    return str2mac(get_if_raw_hwaddr(iff)[1])
-+
-+def config_mon(iface, channel):
-+  """set the interface in monitor mode and then change channel using iw"""
-+  os.system("ip link set dev %s down" % iface)
-+  os.system("iw dev %s set type monitor" % iface)
-+  os.system("ip link set dev %s up" % iface)
-+  os.system("iw dev %s set channel %d" % (iface, channel))
-+
-+class AP:
-+    def __init__(self, ssid, psk, mac=None, mode="stdio", iface="wlan0", channel=1):
-+        self.channel = channel
-+        self.iface = iface
-+        self.mode = mode
-+        if self.mode == "iface":
-+            if not mac:
-+              mac = if_hwaddr(iface)
-+            config_mon(iface, channel)
-+        if not mac:
-+          raise Exception("Need a mac")
-+        else:
-+          self.mac = mac
-+        self.boottime = time()
-+
-+    def get_radiotap_header(self):
-+        return RadioTap()
-+
-+    def dot11_beacon(self, contents):
-+        evil_packet = (
-+            self.get_radiotap_header()
-+            / Dot11(
-+                subtype=8, addr1="ff:ff:ff:ff:ff:ff", addr2=self.mac, addr3=self.mac
-+            )
-+            / Dot11Beacon(cap=0x3101)
-+            / contents
-+        )
-+        self.sendp(evil_packet)
-+
-+    def run(self, contents):
-+        interval = 0.05
-+        num_beacons = 100
-+
-+        while num_beacons:
-+            self.dot11_beacon(contents)
-+            sleep(interval)
-+            num_beacons -= 1
-+
-+    def start(self, contents):
-+       self.thread = Thread(target=self.run, args=(contents,))
-+       self.thread.start()
-+
-+    def stop(self):
-+       self.thread.join()
-+
-+    def sendp(self, packet, verbose=False):
-+        if self.mode == "stdio":
-+            x = packet.build()
-+            sys.stdout.buffer.write(struct.pack("<L", len(x)) + x)
-+            sys.stdout.buffer.flush()
-+            return
-+        assert self.mode == "iface"
-+        sendp(packet, iface=self.iface, verbose=False)
-diff --git a/autotests/testFrameFuzzing/hw.conf b/autotests/testFrameFuzzing/hw.conf
-new file mode 100644
-index 00000000..0500b51d
---- /dev/null
-+++ b/autotests/testFrameFuzzing/hw.conf
-@@ -0,0 +1,7 @@
-+[SETUP]
-+num_radios=2
-+start_iwd=0
-+hwsim_medium=yes
-+
-+[rad1]
-+reserve=true
-diff --git a/autotests/testFrameFuzzing/test_frame_fuzzing.py b/autotests/testFrameFuzzing/test_frame_fuzzing.py
-new file mode 100644
-index 00000000..9def7684
---- /dev/null
-+++ b/autotests/testFrameFuzzing/test_frame_fuzzing.py
-@@ -0,0 +1,37 @@
-+#! /usr/bin/python3
-+
-+import unittest
-+import sys
-+import sys
-+import os
-+from fake_ap import AP
-+
-+sys.path.append('../util')
-+from iwd import IWD
-+
-+# Probe frame that causes IWD to crash
-+beacon=b'\xdd\nPo\x9a\t\x0e\x00\x00\x19\x10\x00\xdd/Po\x9a\t\x0c\x02\x00\x00\xdd\x05\x03\x03\x03Po\x9a\x10\x00\x0b\x05\x0e\x00\x00\x00\x00\x0b\x05\x00\x00\x00\xdd\x05\x00\x03\x03\x03\x03\x00\x00\x00\xdd\x05\x03\x03\x03\x03\x03'
-+
-+class Test(unittest.TestCase):
-+    def test_beacon_crash(self):
-+        wd = IWD(True)
-+
-+        devs = wd.list_devices()
-+
-+        self.assertEqual(len(devs), 1)
-+
-+        devs[0].autoconnect = True
-+
-+        os.system("iw phy rad1 interface add wlan1 type managed")
-+
-+        ap = AP("evilAP", "password1234", mode="iface", iface="wlan1", channel=4)
-+        ap.start(beacon)
-+
-+        condition = "obj.scanning == True"
-+        wd.wait_for_object_condition(devs[0], condition)
-+
-+        condition = "obj.scanning == False"
-+        wd.wait_for_object_condition(devs[0], condition)
-+
-+if __name__ == '__main__':
-+    unittest.main(exit=True)
+ 	return true;
+ 
+ error:
+-	l_queue_destroy(*out, p2p_clear_advertised_service_descriptor);
++	l_queue_destroy(out, p2p_clear_advertised_service_descriptor);
+ 	return false;
+ }
+ 
 -- 
 2.34.1
 
