@@ -1,62 +1,62 @@
-Received: from mail-qv1-f46.google.com (mail-qv1-f46.google.com [209.85.219.46])
+Received: from mail-qv1-f48.google.com (mail-qv1-f48.google.com [209.85.219.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1118316062E
-	for <iwd@lists.linux.dev>; Thu, 29 Feb 2024 18:12:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F04347A14D
+	for <iwd@lists.linux.dev>; Thu, 29 Feb 2024 18:12:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709230345; cv=none; b=RdIj/4ESqB8hez/yG/ygGH0VUZ4KRmeBjLuU0h/8JT6B3xjASXGaYGLtdQ4R/29414HRVEaYrS725sjM+nFyfj8ToJcf0DF0OKKNLeVW23SExNMMoQKVDMLSgnMfdsaD3UFwfLb8XQc8kivyBGRFVTdzC89gDoMjLKuufC8mXP8=
+	t=1709230346; cv=none; b=PN2FdAXt6xOwfvRJRhVdJ3ah9g+IpHTrzJX/NV3HM+I7DUh0y7ZWJ8clULCyVDTubrUeZG3p3nDeRINjjM18FlgqwFxC/w1sOfiR06AUGZbkkCi8FVTkr5ifaXfpuruScc7HtPFMsg6uwKDN9Ki7+d8uo0kg6kuWF968uAqtL/Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709230345; c=relaxed/simple;
-	bh=l9orJplI/D/vl66mVZVSCCO5Tka1bOjCGi3o1gPFM8E=;
+	s=arc-20240116; t=1709230346; c=relaxed/simple;
+	bh=D9qaCwOs2WfvFweRi46JlUNqo4Im3anMYizu90zR5OM=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=GVe1fM/imz7ecencAk32QuxrfFaOkGAsQxG+Hwc0zk7jxHcXYsuxa9AjlzzdtGN2ZObmOgZtN9vEi1+31Gc2T0FhBS9Q9dz9iL5uXf67lVv9B7u0lmtaonx3loByyfkHVGX8S376+6bgJjmSNooU7/bJ3my/jMCVPAAVcN4UCPE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=msCbtiVj; arc=none smtp.client-ip=209.85.219.46
+	 MIME-Version; b=W0gzWD08vr6noCEH2P2I9Y8C+yspzOaPxQNKS5jIHGtq5nQgI99pQZ0NoNEEB4+XAAGZ/b6qu3pF6ckrZe/fugKhGEWaU1hOo/8I5gmczeC+GSWyiOdPDc8qd8sBeyhq1pv9/D1YCMYcan8RRWp+Ze6L/Irjnt/gaW7EA3/DM5A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GW7mxOgQ; arc=none smtp.client-ip=209.85.219.48
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="msCbtiVj"
-Received: by mail-qv1-f46.google.com with SMTP id 6a1803df08f44-690508d70e3so2294466d6.1
-        for <iwd@lists.linux.dev>; Thu, 29 Feb 2024 10:12:23 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GW7mxOgQ"
+Received: by mail-qv1-f48.google.com with SMTP id 6a1803df08f44-68ee2c0a237so9657236d6.1
+        for <iwd@lists.linux.dev>; Thu, 29 Feb 2024 10:12:24 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1709230342; x=1709835142; darn=lists.linux.dev;
+        d=gmail.com; s=20230601; t=1709230343; x=1709835143; darn=lists.linux.dev;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=15I/CPKcuBVHku9lovFCh7EpGd8mdbZT2xvInBpTlNA=;
-        b=msCbtiVjjOj32+neFSPTGz8sDQao37NlY5b2M/0nadY5L6ltMNwJMYioyXO+m8jmIf
-         El+mbx/Y+MssP/ZJoSIEfAC1ZvWhUdTvSZbkqeq6ima9eMWRIhOYgZp38mVY7vpnx4zG
-         t/TvUbxjb/exhbiOqHFVXT/oLnhcALvQtmCRu3tiTzzTOv9aMx8PwJZFycJeG7sE6RGa
-         9PcpBRQwB/iSe37Q2R+7sgH0RIIeK0oCd3QWvBkMYo+DWAW4f7APygk5zTKFDUwxs8QA
-         D5zSXdMWsdywGGYnsiP0FgNmGXSqfFy66A8bySk/hNJrc0LJ5NAgh2XbLDELsfcX7c0y
-         9j6A==
+        bh=Sc0k+IPPi4zpQnvnZ9sLDHJ5NbYazm4LKQBcmJ3HcdE=;
+        b=GW7mxOgQb1QbCudeFD+Fgp/xKm52qdu2/6Vw7RjSQ6FLZOvZbdgUJMEAneeBlCqqrT
+         aYqrBGV4ssUnRoYskrTbIWFr9ctd0O7TWqIkpih5CH4HPYrsi9K2zZKMnVQubzRTUpLW
+         8ekGmaIabdTbBtQxJEi3CJq8ooPbG5Il73dX8T3U2odrC7iBJw1KAM749AFCNFGGo0E8
+         nKgCQSuRjeol5MMd95raqyT5/1KOT14ru3dUHv7jsxjXGSLN9+U5dGAGDsD+mqLj0O3y
+         sk98QCrTc0n+gV1xK0qdTAYK5m+IfvYTMkoGfIJ0/d3U7lZCSyxWU/3rM3DRDCPWz6BS
+         hmoA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709230342; x=1709835142;
+        d=1e100.net; s=20230601; t=1709230343; x=1709835143;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=15I/CPKcuBVHku9lovFCh7EpGd8mdbZT2xvInBpTlNA=;
-        b=DYOgZhNG5Ki4DymcmnqvQm9NVYWMBmIzbrYbWIoWLV9Qb9M2P3H62I66k/KAr/C1YG
-         hYxPadSCc6JQPCER4yVV82qdhgAcMYWk2t+/ZEDlZuokeIWkzxytzkaAT7VeYsz+7OiZ
-         rZWmpQVs2SGU6pSuuo20K+qoXyxXi+SOciEYBLA5tEK3yPsqoq1A8caOWYwsWCi+H+6x
-         IYu6KRpRs6F5siPXVg+9+/nLkGpMAQo/O27jkRzjEgEJHHXGYZN3ibjbJwFh17Po449l
-         9do/2yOlGRWr9savDCog0qtC13oxKVVGOj5Znftfy33Qz/6bfqd+jac2gFNLkkKPfsEy
-         DakQ==
-X-Gm-Message-State: AOJu0YwBQrgEuJLz9BDF1wxeJmiTwr2KjHBkBpFIXSH+viH1VUt6reZu
-	hGiq8Gmx/JuXTONgZR3xq3mEqtBhwcbNOG+FBfKmg3PIzhb0rPqa3kqX9gm/
-X-Google-Smtp-Source: AGHT+IEIg6m1I1u/x8x+OO5JG1ZACQgtIkhDTSq+iokmbKdjPq5p+kde4qOU+wLZQwn3J0YAJSBivQ==
-X-Received: by 2002:a05:6214:88a:b0:68f:e5e1:8464 with SMTP id cz10-20020a056214088a00b0068fe5e18464mr3065476qvb.20.1709230342473;
-        Thu, 29 Feb 2024 10:12:22 -0800 (PST)
+        bh=Sc0k+IPPi4zpQnvnZ9sLDHJ5NbYazm4LKQBcmJ3HcdE=;
+        b=Mdx/FVQ+GCwJJMsMwqNRP4yyr4QZWVl5UPMsGCce9moU2LiEd+JZZaQFH/tJ2n3/lf
+         w+LmzYB+EaHoCFykeg+us+wLERcZ6DFIIteNLZNAMlVfWNE3rrJ1qFehadJdoZs8V9Mg
+         GdGsmZRk1uPTki1nhrbyUTmm7uG2/HTWKiy4ZMN6KGP5JH91TZ5GSMvpB2AP0nTMImZ2
+         gLiTrMNsf9l2gBh891pWQ+dyvZYTxK4P4o7PbOLT+jm86Uu/sBmPBAybu29HyWHk8woT
+         LzjCP/x7aD00Fkzxi2mI2bDBqdr7hSdKb+wmZ4a8Pvy0P9OC4T3WYPITGnX3fLrC2ugL
+         tOoA==
+X-Gm-Message-State: AOJu0YwjElHBiAuQv1sf0Okyg6cLYbxZ9Xjm/znf30/eaZNPX2AGgRcX
+	J9wI0zoT4oiZxZiRXJoyG1IIbCrj5HhURgWt5m+FmQgQmuElDKtubU5vopsz
+X-Google-Smtp-Source: AGHT+IGYx1X6e66i+NXTlXZ+vM5tbX+ly7Vr04W2sKlpgViobqJSw+cDy0aVySjKKzW9eoR8EX/8fw==
+X-Received: by 2002:a05:6214:4119:b0:68f:71b5:b234 with SMTP id kc25-20020a056214411900b0068f71b5b234mr4170608qvb.23.1709230343545;
+        Thu, 29 Feb 2024 10:12:23 -0800 (PST)
 Received: from LOCLAP699.rst-01.locus ([208.195.13.130])
-        by smtp.gmail.com with ESMTPSA id mf15-20020a0562145d8f00b0068cc0b46682sm994209qvb.4.2024.02.29.10.12.21
+        by smtp.gmail.com with ESMTPSA id mf15-20020a0562145d8f00b0068cc0b46682sm994209qvb.4.2024.02.29.10.12.22
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 29 Feb 2024 10:12:22 -0800 (PST)
+        Thu, 29 Feb 2024 10:12:23 -0800 (PST)
 From: James Prestwood <prestwoj@gmail.com>
 To: iwd@lists.linux.dev
 Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 2/5] ap: allow va_end to get called in ap_handshake_event
-Date: Thu, 29 Feb 2024 10:12:14 -0800
-Message-Id: <20240229181217.1503555-2-prestwoj@gmail.com>
+Subject: [PATCH 3/5] nl80211util: check l_genl_attr_recurse return in extract_nested
+Date: Thu, 29 Feb 2024 10:12:15 -0800
+Message-Id: <20240229181217.1503555-3-prestwoj@gmail.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240229181217.1503555-1-prestwoj@gmail.com>
 References: <20240229181217.1503555-1-prestwoj@gmail.com>
@@ -68,25 +68,27 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Caught by static analysis, va_end was never being called since the
-REKEY_COMPLETE event was returning early.
+Caught by static analysis, the recurse operation return was not being
+checked.
 ---
- src/ap.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ src/nl80211util.c | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
 
-diff --git a/src/ap.c b/src/ap.c
-index ee3c4dca..25d1b8a3 100644
---- a/src/ap.c
-+++ b/src/ap.c
-@@ -1484,7 +1484,7 @@ static void ap_handshake_event(struct handshake_state *hs,
- 	}
- 	case HANDSHAKE_EVENT_REKEY_COMPLETE:
- 		ap_set_sta_rekey_timer(ap, sta);
--		return;
-+		break;
- 	default:
- 		break;
- 	}
+diff --git a/src/nl80211util.c b/src/nl80211util.c
+index 0f45c905..3f9a43ac 100644
+--- a/src/nl80211util.c
++++ b/src/nl80211util.c
+@@ -136,9 +136,7 @@ static bool extract_nested(const void *data, uint16_t len, void *o)
+ 	const struct l_genl_attr *outer = data;
+ 	struct l_genl_attr *nested = o;
+ 
+-	l_genl_attr_recurse(outer, nested);
+-
+-	return true;
++	return l_genl_attr_recurse(outer, nested);
+ }
+ 
+ static bool extract_u8(const void *data, uint16_t len, void *o)
 -- 
 2.34.1
 
