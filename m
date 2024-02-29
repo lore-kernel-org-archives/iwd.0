@@ -1,62 +1,62 @@
-Received: from mail-qv1-f48.google.com (mail-qv1-f48.google.com [209.85.219.48])
+Received: from mail-oi1-f174.google.com (mail-oi1-f174.google.com [209.85.167.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F04347A14D
-	for <iwd@lists.linux.dev>; Thu, 29 Feb 2024 18:12:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4298716062E
+	for <iwd@lists.linux.dev>; Thu, 29 Feb 2024 18:12:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709230346; cv=none; b=PN2FdAXt6xOwfvRJRhVdJ3ah9g+IpHTrzJX/NV3HM+I7DUh0y7ZWJ8clULCyVDTubrUeZG3p3nDeRINjjM18FlgqwFxC/w1sOfiR06AUGZbkkCi8FVTkr5ifaXfpuruScc7HtPFMsg6uwKDN9Ki7+d8uo0kg6kuWF968uAqtL/Y=
+	t=1709230347; cv=none; b=Q+nW6dtz2XhXd3cM9h0rVBtiYVDSs01ini3pO2FUAimMf086kHcgfq4sanVwhDaQOfFFbOpd3Z7R2tWzM8CrjAXhPQaNp6dwXm9c9rlZVe84ZtuFizA0mcJk/HHG3agVjzIeNkTH+ugOK1RAgqmDPVlUNPRYUC5AFOlg+sHZ0rQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709230346; c=relaxed/simple;
-	bh=D9qaCwOs2WfvFweRi46JlUNqo4Im3anMYizu90zR5OM=;
+	s=arc-20240116; t=1709230347; c=relaxed/simple;
+	bh=DWiOEHAar973PghSXAZgRxP/Hftyl595KVjHNKnCjeU=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=W0gzWD08vr6noCEH2P2I9Y8C+yspzOaPxQNKS5jIHGtq5nQgI99pQZ0NoNEEB4+XAAGZ/b6qu3pF6ckrZe/fugKhGEWaU1hOo/8I5gmczeC+GSWyiOdPDc8qd8sBeyhq1pv9/D1YCMYcan8RRWp+Ze6L/Irjnt/gaW7EA3/DM5A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GW7mxOgQ; arc=none smtp.client-ip=209.85.219.48
+	 MIME-Version; b=NR42/McolRzPCU8ANXphPm5ay3n0S/qt3SeBjEajkWOtd/B5aF+ttgbYZeZdeVnduoU+YYiXj8xlGaBGU7JMx7lyWkxoS8pLRpI9JQKk5bRLrXdYxc+9kWEX0U6ABacPfVpA7rUtAePjSbnbjOemA2mTsVKRVYdqnjQ2LmU03Sk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hlMjpiAA; arc=none smtp.client-ip=209.85.167.174
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GW7mxOgQ"
-Received: by mail-qv1-f48.google.com with SMTP id 6a1803df08f44-68ee2c0a237so9657236d6.1
-        for <iwd@lists.linux.dev>; Thu, 29 Feb 2024 10:12:24 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hlMjpiAA"
+Received: by mail-oi1-f174.google.com with SMTP id 5614622812f47-3c1a7d51fb5so990095b6e.1
+        for <iwd@lists.linux.dev>; Thu, 29 Feb 2024 10:12:26 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1709230343; x=1709835143; darn=lists.linux.dev;
+        d=gmail.com; s=20230601; t=1709230345; x=1709835145; darn=lists.linux.dev;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Sc0k+IPPi4zpQnvnZ9sLDHJ5NbYazm4LKQBcmJ3HcdE=;
-        b=GW7mxOgQb1QbCudeFD+Fgp/xKm52qdu2/6Vw7RjSQ6FLZOvZbdgUJMEAneeBlCqqrT
-         aYqrBGV4ssUnRoYskrTbIWFr9ctd0O7TWqIkpih5CH4HPYrsi9K2zZKMnVQubzRTUpLW
-         8ekGmaIabdTbBtQxJEi3CJq8ooPbG5Il73dX8T3U2odrC7iBJw1KAM749AFCNFGGo0E8
-         nKgCQSuRjeol5MMd95raqyT5/1KOT14ru3dUHv7jsxjXGSLN9+U5dGAGDsD+mqLj0O3y
-         sk98QCrTc0n+gV1xK0qdTAYK5m+IfvYTMkoGfIJ0/d3U7lZCSyxWU/3rM3DRDCPWz6BS
-         hmoA==
+        bh=ZjqAu03B4BDxAKqLbGFRDggUMZqATfnkNUiiCO8E6f4=;
+        b=hlMjpiAAbUOMMexBZZpw9Zh8798T9gHqo2vU1tkiabLGSMXSuij4sVTMt7YwtVRejD
+         qZq7qGmEmiTe+1M2Qi4ewaI08Z33ysGb8AdrNnInWbm82V6LioFr6/9AgJaxdmz0RNnB
+         On8lr5q6nOSFF951TXdPR/DpQADdswXYDG6uFUeBvpT9NKkRqw8CZ938oWCEGGQ2ztgN
+         q0v/7qr/1nZJ38lz7ogbwC87G52KDV8M3HVYb+jBkiYWbclhnaFDQw60WRC2FEUaDxdn
+         +dDCrQB/lUnVZQK3ebPyXXBvLDmImj1vywbmgQDlo1JTXWmAMGr9wEkLsblFN6XY4CA6
+         T4JA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709230343; x=1709835143;
+        d=1e100.net; s=20230601; t=1709230345; x=1709835145;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=Sc0k+IPPi4zpQnvnZ9sLDHJ5NbYazm4LKQBcmJ3HcdE=;
-        b=Mdx/FVQ+GCwJJMsMwqNRP4yyr4QZWVl5UPMsGCce9moU2LiEd+JZZaQFH/tJ2n3/lf
-         w+LmzYB+EaHoCFykeg+us+wLERcZ6DFIIteNLZNAMlVfWNE3rrJ1qFehadJdoZs8V9Mg
-         GdGsmZRk1uPTki1nhrbyUTmm7uG2/HTWKiy4ZMN6KGP5JH91TZ5GSMvpB2AP0nTMImZ2
-         gLiTrMNsf9l2gBh891pWQ+dyvZYTxK4P4o7PbOLT+jm86Uu/sBmPBAybu29HyWHk8woT
-         LzjCP/x7aD00Fkzxi2mI2bDBqdr7hSdKb+wmZ4a8Pvy0P9OC4T3WYPITGnX3fLrC2ugL
-         tOoA==
-X-Gm-Message-State: AOJu0YwjElHBiAuQv1sf0Okyg6cLYbxZ9Xjm/znf30/eaZNPX2AGgRcX
-	J9wI0zoT4oiZxZiRXJoyG1IIbCrj5HhURgWt5m+FmQgQmuElDKtubU5vopsz
-X-Google-Smtp-Source: AGHT+IGYx1X6e66i+NXTlXZ+vM5tbX+ly7Vr04W2sKlpgViobqJSw+cDy0aVySjKKzW9eoR8EX/8fw==
-X-Received: by 2002:a05:6214:4119:b0:68f:71b5:b234 with SMTP id kc25-20020a056214411900b0068f71b5b234mr4170608qvb.23.1709230343545;
-        Thu, 29 Feb 2024 10:12:23 -0800 (PST)
+        bh=ZjqAu03B4BDxAKqLbGFRDggUMZqATfnkNUiiCO8E6f4=;
+        b=hOIKrJgRESxWbC5jnEiK+ZCDIGcDvW5CgwbnaljI8UQVM4uueXrUJtO4dH108/4KIy
+         +gD7fZmelOT3Uo6KzACpgP0vEZa53z5eq1X8IiuyfZADAS9ajHdr5xWt9YydVLS3iLyM
+         sEVxcQLSLUUfO4lDuQqWJqDhvoPdSTeG4Q9BnqR39N+9YvEp7mHk9Knw9mudBIOO5E1n
+         e73Y5pUkSfYlGfAXkTaIfXKLPsl4rw0zwl1xcFdIxC0jZecFwnGI/Ndh5FUwebem25j5
+         JH73KHlmw3F4WymMQX3b/zK/ldVsebk5j4bW0lknGI1giaV49SBLAXOVUUKgUHp6AyRL
+         VqTg==
+X-Gm-Message-State: AOJu0YwQWFI2vb4fBYRk/f1kcak/6jHthLhk1oNiPcom8kAujPpCllxs
+	5RwJdR8DgCOWAp1EwtQY3MtWAs3jqRPWjb2/yFW3XDEnWa+BWk4yAK0NlTat
+X-Google-Smtp-Source: AGHT+IFMFT+Ewy+y4uU/LxK8rbvdWBqtN2/EFO02m7ZaJqcBN0EKZ8phCtc/P+lEkV2ssJ8REEK9AA==
+X-Received: by 2002:a05:6358:7f0a:b0:17b:ee6f:b6b1 with SMTP id p10-20020a0563587f0a00b0017bee6fb6b1mr937614rwn.31.1709230344579;
+        Thu, 29 Feb 2024 10:12:24 -0800 (PST)
 Received: from LOCLAP699.rst-01.locus ([208.195.13.130])
-        by smtp.gmail.com with ESMTPSA id mf15-20020a0562145d8f00b0068cc0b46682sm994209qvb.4.2024.02.29.10.12.22
+        by smtp.gmail.com with ESMTPSA id mf15-20020a0562145d8f00b0068cc0b46682sm994209qvb.4.2024.02.29.10.12.23
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 29 Feb 2024 10:12:23 -0800 (PST)
+        Thu, 29 Feb 2024 10:12:24 -0800 (PST)
 From: James Prestwood <prestwoj@gmail.com>
 To: iwd@lists.linux.dev
 Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 3/5] nl80211util: check l_genl_attr_recurse return in extract_nested
-Date: Thu, 29 Feb 2024 10:12:15 -0800
-Message-Id: <20240229181217.1503555-3-prestwoj@gmail.com>
+Subject: [PATCH 4/5] ap: verify ATTR_MAC exists in NEW_STATION
+Date: Thu, 29 Feb 2024 10:12:16 -0800
+Message-Id: <20240229181217.1503555-4-prestwoj@gmail.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240229181217.1503555-1-prestwoj@gmail.com>
 References: <20240229181217.1503555-1-prestwoj@gmail.com>
@@ -68,27 +68,42 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Caught by static analysis, the recurse operation return was not being
-checked.
+Caught by static analysis, if ATTR_MAC was not in the message there
+would be a memcpy with uninitialized bytes. In addition there is no
+reason to memcpy twice. Instead 'mac' can be a const pointer which
+both verifies it exists and removes the need for a second memcpy.
 ---
- src/nl80211util.c | 4 +---
- 1 file changed, 1 insertion(+), 3 deletions(-)
+ src/ap.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/src/nl80211util.c b/src/nl80211util.c
-index 0f45c905..3f9a43ac 100644
---- a/src/nl80211util.c
-+++ b/src/nl80211util.c
-@@ -136,9 +136,7 @@ static bool extract_nested(const void *data, uint16_t len, void *o)
- 	const struct l_genl_attr *outer = data;
- 	struct l_genl_attr *nested = o;
+diff --git a/src/ap.c b/src/ap.c
+index 25d1b8a3..a6f8f306 100644
+--- a/src/ap.c
++++ b/src/ap.c
+@@ -2963,7 +2963,7 @@ static void ap_handle_new_station(struct ap_state *ap, struct l_genl_msg *msg)
+ 	uint16_t type;
+ 	uint16_t len;
+ 	const void *data;
+-	uint8_t mac[6];
++	const uint8_t *mac = NULL;
+ 	uint8_t *assoc_rsne = NULL;
  
--	l_genl_attr_recurse(outer, nested);
--
--	return true;
-+	return l_genl_attr_recurse(outer, nested);
- }
+ 	if (!l_genl_attr_init(&attr, msg))
+@@ -2983,12 +2983,12 @@ static void ap_handle_new_station(struct ap_state *ap, struct l_genl_msg *msg)
+ 			if (len != 6)
+ 				goto cleanup;
  
- static bool extract_u8(const void *data, uint16_t len, void *o)
+-			memcpy(mac, data, 6);
++			mac = data;
+ 			break;
+ 		}
+ 	}
+ 
+-	if (!assoc_rsne)
++	if (!assoc_rsne || !mac)
+ 		goto cleanup;
+ 
+ 	/*
 -- 
 2.34.1
 
