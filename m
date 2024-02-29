@@ -1,62 +1,63 @@
-Received: from mail-qk1-f180.google.com (mail-qk1-f180.google.com [209.85.222.180])
+Received: from mail-qt1-f179.google.com (mail-qt1-f179.google.com [209.85.160.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BB04383BB
-	for <iwd@lists.linux.dev>; Thu, 29 Feb 2024 17:07:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 677B038DEA
+	for <iwd@lists.linux.dev>; Thu, 29 Feb 2024 17:07:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709226466; cv=none; b=hNu+ZyEgwCZYe/rUOBYqLEqjwD5ob3F6kIPUBgiRFqoIChWZp0vKjnEiehnwnTTHtg/7aByWpg4mnLSFhHta544Ql/aS7WCXzENxAh2nRCGnSIHiJAxGznAWHvOK6e1HBPof0mDXgmpQbYkY7SIR+zGZukVP/3Y8sXOBRhP3SRE=
+	t=1709226467; cv=none; b=NjlJgrU/7oCvHcjD8vM6PkJZLddteUC2JuE9CvY17luvUgWTfdBgJkKIJzNIRM8qmtqsl44vsALl/BP/22LELoUWEzZIY4+QB9jTs7fHI85gGav2IP51AcIjaY4m55J8I19cWyZJ87kUMvj1NhC7Pg7uI6cUsyqhDB8adCYPIlc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709226466; c=relaxed/simple;
-	bh=tE1oPQWVihS3KgRcp0W7qjXXYgvg9I24Pc0Q3cXcVcE=;
+	s=arc-20240116; t=1709226467; c=relaxed/simple;
+	bh=wRYzg7yNMn9DQbF3UoF29TqwcvPYF9V6bNpt/QXS8wU=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=dlUiz39NWoZ/NOqC7QiEQykBo5Z1BsprkMps/U5k1ykT2VS0283gitmz/2guybaDo3whMz6Jjg1yFGyar7+p0XhuVCmBDiR2STeCvHfTq+jcmKMAcEoO375DoMJ//aCHUQmgyD1jbJ/zVIG78H3kpnK01iHAQE41e4kB1GTS91g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=d8IAmtCY; arc=none smtp.client-ip=209.85.222.180
+	 MIME-Version; b=XlQG6EJcGFrHpt6P/JkpwPoUflp3/K8XIQY1V0vZnGYqcJK8eBJfr9tBMx/Bls4XQ+Rp/+l0jj50gPwPS97GKp6TfgTkHyHlAEO+aPbFZIV1StWyTB4PmbigYwZlvB/8obrMiULj6FbY0gNpxrsWsxkc2gyWCR0/N898fldmaAs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=by5ESrh1; arc=none smtp.client-ip=209.85.160.179
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="d8IAmtCY"
-Received: by mail-qk1-f180.google.com with SMTP id af79cd13be357-787a843003eso76958985a.0
-        for <iwd@lists.linux.dev>; Thu, 29 Feb 2024 09:07:44 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="by5ESrh1"
+Received: by mail-qt1-f179.google.com with SMTP id d75a77b69052e-42e4f706847so7495601cf.2
+        for <iwd@lists.linux.dev>; Thu, 29 Feb 2024 09:07:46 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1709226464; x=1709831264; darn=lists.linux.dev;
+        d=gmail.com; s=20230601; t=1709226465; x=1709831265; darn=lists.linux.dev;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=yf773ksS3tov4wwzk+sbY6n8l5P0JeUuOe0/KuXJYJw=;
-        b=d8IAmtCY6nik40iix8NsWSyGN/N6kYCsHnlUgL/ajtfQcaW/3QOoswtUF7l0PxPws7
-         9JwdnEQ9ATbEoC15qN31+fUGxJw9ub1teVs5aaWfruOnkF1igaZik0MromR4UeZdfdh/
-         mZsNjBIUfKamxeJJwxiuBKPxtRsrzHeBNyz2gy9iE0KTmZ+CUcopE6mod8nxVuuazKa/
-         Vmn4TPNe8bt6akRrvyitxyCLaPB2WV7n2phYLUW058bU+os5ulHvkwUFSZ+t0bGjQBv6
-         OKV8RMrx12lLYkH1N4MFy62UjFpWGGYSZuQjwZ2FpJXxzLAaxbNhmD5kwO7FF6PR84bn
-         x/RQ==
+        bh=rDPK0JaDzZBZaoki4cfQ9zQ9FiyzXFmTKABH146snPQ=;
+        b=by5ESrh1VlDkoVWKSwypjWdWsW5ujZI2Wg8wsOioVna2kJvUh5KVN2XMkKyDMnFkIH
+         4Msei4gcH9n1QnVbhZDqMJNzEZNWPS7N/jaVWixD5JXjukTKDVb1vdKcgTYHihz2QpFS
+         ucT/YwTpJd9wohxjJLZbkrZESOgFMMmiTI2O1mX5KBiGBG9VSai1hnDWqXvvt0Qmen1F
+         FtBRt5qugyI44UQfOItCNk/IHiCldEv7D2yKcewJJ/UrhYCLvi6bhjELNV0GMyHkqDJn
+         lkseb4+8sm1ZRIdFiNrmZoWx7yCg8O0qY2a2zc9x9KKTszM1KItbRDJ7gQsmKNfYgJUS
+         96aw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709226464; x=1709831264;
+        d=1e100.net; s=20230601; t=1709226465; x=1709831265;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=yf773ksS3tov4wwzk+sbY6n8l5P0JeUuOe0/KuXJYJw=;
-        b=kfKh9og86RcBMIedRjtpngpdH/kD58RLy3GeJMVd6GL8CB/naw/h2eW1YNR2RgKoMM
-         bmDhxYrVz0vySkD2jf6t29sSEShdR1BfwPSq4mLMAQAMQZ1jprRT7wWMrjxt3tGTKb8z
-         Y3Y+OonjkTVowBlXZfhdjifL39Yn80ciSxvdJ/dThwttsZ+jfdh5kM7Ma25ZF08+HtM7
-         KgyIzzwaBJo2u7BjLkmGSTrEN+FEZBc0m24GGuM4ipdfW19wF+RdBYCy+MMTEDu+L/U4
-         VjDse+nWz4kWYQUjmqjbsvwmf9i16yB35KXflqIXDIXh2xv+dsoXA7YuUr/o/r230Xgx
-         pDlg==
-X-Gm-Message-State: AOJu0YwxFVotNJ8PwNK7GRM7LcJsxkqY0guQ18QSkfdUIQdiT0XncRdK
-	yUeGBhg7cCG/fF/oqyr9j8+4O+w+tyO3xqrNo6qx6hj1y7UewTv0pcQlNPDY
-X-Google-Smtp-Source: AGHT+IHF0xkLYLOgsw2XWbFRj69US14RZ1yYMSAxg/a7E2yb+nFf9zQ3a0waoJRFzmfAjHIKh0azqw==
-X-Received: by 2002:a05:620a:2944:b0:787:fd70:77 with SMTP id n4-20020a05620a294400b00787fd700077mr2415119qkp.40.1709226463837;
-        Thu, 29 Feb 2024 09:07:43 -0800 (PST)
+        bh=rDPK0JaDzZBZaoki4cfQ9zQ9FiyzXFmTKABH146snPQ=;
+        b=tXOGJYFjSnBcyByTvJgOPKGrNRAFXAsXdJ/5b4KVULgGCNoho46nyI/wg1rjkNTzh8
+         fcjC60IegirNoBKPOLl6ZOSHPgUt8KhlNZ0eZ16uu79uDfUn6FIHXalpoOa/D4GsPEqt
+         LcD61ltp6d52sOBp2rM2vT7l/4DcZfoVEDFcSAV1YVLMVqCyVJM/QrvTZhsUmzSTqcbB
+         ttFNqBGZFjoaEZ7Znb/izEfPqN4C6xwIwq9yEjMSicUAZtf4yXrrC+5UDw5bveRlINF/
+         6M0r9YUtvKM09TIlr7od4UHja54mSh3LqHd/DLTi84Qb4LIHRuODnPYVoQVTrtUBXnpl
+         J4Fg==
+X-Gm-Message-State: AOJu0YwtY95DcanHdHxAq86heePAsKG6MLuCMAdqCkI6+izank2Z4DZt
+	7Gd/7rRVbX4j47AFWhgfZqhBTVta/NmlMdvgtlmtf3RGa58kiCbusXiDWo3b
+X-Google-Smtp-Source: AGHT+IGS8hKFIeKbUX3fCViPPScbjsmqaR2KGKtPPVZHlKdot3sLMj3yu6arKPJJGgbkiubaWncAhQ==
+X-Received: by 2002:ac8:6b06:0:b0:42e:b981:6f9a with SMTP id w6-20020ac86b06000000b0042eb9816f9amr2343528qts.45.1709226465107;
+        Thu, 29 Feb 2024 09:07:45 -0800 (PST)
 Received: from LOCLAP699.rst-01.locus ([208.195.13.130])
-        by smtp.gmail.com with ESMTPSA id pj36-20020a05620a1da400b00787fd080d28sm697415qkn.74.2024.02.29.09.07.42
+        by smtp.gmail.com with ESMTPSA id pj36-20020a05620a1da400b00787fd080d28sm697415qkn.74.2024.02.29.09.07.44
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 29 Feb 2024 09:07:43 -0800 (PST)
+        Thu, 29 Feb 2024 09:07:44 -0800 (PST)
 From: James Prestwood <prestwoj@gmail.com>
 To: iwd@lists.linux.dev
-Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 4/5] p2putil: initialize all parsing structures to zero
-Date: Thu, 29 Feb 2024 09:07:33 -0800
-Message-Id: <20240229170734.1498918-4-prestwoj@gmail.com>
+Cc: James Prestwood <prestwoj@gmail.com>,
+	Alex Radocea <alex@supernetworks.org>
+Subject: [PATCH 5/5] p2putil: check length of client info description
+Date: Thu, 29 Feb 2024 09:07:34 -0800
+Message-Id: <20240229170734.1498918-5-prestwoj@gmail.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240229170734.1498918-1-prestwoj@gmail.com>
 References: <20240229170734.1498918-1-prestwoj@gmail.com>
@@ -68,170 +69,27 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Since these are all stack variables they are not zero initialized.
-If parsing fails there may be invalid pointers within the structures
-which can get dereferenced by p2p_clear_*
+A length check was missing which could cause a out of bounds read.
+
+Co-authored-by: Alex Radocea <alex@supernetworks.org>
 ---
- src/p2putil.c | 34 +++++++++++++++++-----------------
- 1 file changed, 17 insertions(+), 17 deletions(-)
+ src/p2putil.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
 diff --git a/src/p2putil.c b/src/p2putil.c
-index faf151a5..c90810e5 100644
+index c90810e5..d1f114d0 100644
 --- a/src/p2putil.c
 +++ b/src/p2putil.c
-@@ -776,7 +776,7 @@ done:
- /* Section 4.2.1 */
- int p2p_parse_beacon(const uint8_t *pdu, size_t len, struct p2p_beacon *out)
- {
--	struct p2p_beacon d = {};
-+	struct p2p_beacon d = {0};
- 	int r;
+@@ -376,6 +376,9 @@ static bool extract_p2p_group_info(const uint8_t *attr, size_t len,
+ 		desc = l_new(struct p2p_client_info_descriptor, 1);
+ 		l_queue_push_tail(*out, desc);
  
- 	r = p2p_parse_attrs(pdu, len,
-@@ -797,7 +797,7 @@ int p2p_parse_beacon(const uint8_t *pdu, size_t len, struct p2p_beacon *out)
- int p2p_parse_probe_req(const uint8_t *pdu, size_t len,
- 			struct p2p_probe_req *out)
- {
--	struct p2p_probe_req d = {};
-+	struct p2p_probe_req d = {0};
- 	int r;
- 
- 	r = p2p_parse_attrs(pdu, len,
-@@ -828,7 +828,7 @@ int p2p_parse_probe_req(const uint8_t *pdu, size_t len,
- int p2p_parse_probe_resp(const uint8_t *pdu, size_t len,
- 				struct p2p_probe_resp *out)
- {
--	struct p2p_probe_resp d = {};
-+	struct p2p_probe_resp d = {0};
- 	int r;
- 
- 	r = p2p_parse_attrs(pdu, len,
-@@ -853,7 +853,7 @@ int p2p_parse_probe_resp(const uint8_t *pdu, size_t len,
- int p2p_parse_association_req(const uint8_t *pdu, size_t len,
- 				struct p2p_association_req *out)
- {
--	struct p2p_association_req d = {};
-+	struct p2p_association_req d = {0};
- 	int r;
- 
- 	r = p2p_parse_attrs(pdu, len,
-@@ -876,7 +876,7 @@ int p2p_parse_association_req(const uint8_t *pdu, size_t len,
- int p2p_parse_association_resp(const uint8_t *pdu, size_t len,
- 				struct p2p_association_resp *out)
- {
--	struct p2p_association_resp d = {};
-+	struct p2p_association_resp d = {0};
- 	int r;
- 
- 	r = p2p_parse_attrs(pdu, len,
-@@ -939,7 +939,7 @@ int p2p_parse_disassociation(const uint8_t *pdu, size_t len,
- int p2p_parse_go_negotiation_req(const uint8_t *pdu, size_t len,
- 					struct p2p_go_negotiation_req *out)
- {
--	struct p2p_go_negotiation_req d = {};
-+	struct p2p_go_negotiation_req d = {0};
- 	int r;
- 	struct p2p_go_intent_attr go_intent;
- 	uint8_t *wsc_data;
-@@ -1001,7 +1001,7 @@ error:
- int p2p_parse_go_negotiation_resp(const uint8_t *pdu, size_t len,
- 					struct p2p_go_negotiation_resp *out)
- {
--	struct p2p_go_negotiation_resp d = {};
-+	struct p2p_go_negotiation_resp d = {0};
- 	int r;
- 	struct p2p_go_intent_attr go_intent;
- 	uint8_t *wsc_data;
-@@ -1062,7 +1062,7 @@ error:
- int p2p_parse_go_negotiation_confirmation(const uint8_t *pdu, size_t len,
- 				struct p2p_go_negotiation_confirmation *out)
- {
--	struct p2p_go_negotiation_confirmation d = {};
-+	struct p2p_go_negotiation_confirmation d = {0};
- 	int r;
- 
- 	if (len < 1)
-@@ -1096,7 +1096,7 @@ error:
- int p2p_parse_invitation_req(const uint8_t *pdu, size_t len,
- 				struct p2p_invitation_req *out)
- {
--	struct p2p_invitation_req d = {};
-+	struct p2p_invitation_req d = {0};
- 	int r;
- 	uint8_t *wsc_data;
- 	ssize_t wsc_len;
-@@ -1151,7 +1151,7 @@ error:
- int p2p_parse_invitation_resp(const uint8_t *pdu, size_t len,
- 				struct p2p_invitation_resp *out)
- {
--	struct p2p_invitation_resp d = {};
-+	struct p2p_invitation_resp d = {0};
- 	int r;
- 
- 	if (len < 1)
-@@ -1185,7 +1185,7 @@ error:
- int p2p_parse_device_disc_req(const uint8_t *pdu, size_t len,
- 				struct p2p_device_discoverability_req *out)
- {
--	struct p2p_device_discoverability_req d = {};
-+	struct p2p_device_discoverability_req d = {0};
- 	int r;
- 
- 	if (len < 1)
-@@ -1210,7 +1210,7 @@ int p2p_parse_device_disc_req(const uint8_t *pdu, size_t len,
- int p2p_parse_device_disc_resp(const uint8_t *pdu, size_t len,
- 				struct p2p_device_discoverability_resp *out)
- {
--	struct p2p_device_discoverability_resp d = {};
-+	struct p2p_device_discoverability_resp d = {0};
- 	int r;
- 
- 	if (len < 1)
-@@ -1234,7 +1234,7 @@ int p2p_parse_device_disc_resp(const uint8_t *pdu, size_t len,
- int p2p_parse_provision_disc_req(const uint8_t *pdu, size_t len,
- 				struct p2p_provision_discovery_req *out)
- {
--	struct p2p_provision_discovery_req d = {};
-+	struct p2p_provision_discovery_req d = {0};
- 	int r;
- 	uint8_t *wsc_data;
- 	ssize_t wsc_len;
-@@ -1309,7 +1309,7 @@ error:
- int p2p_parse_provision_disc_resp(const uint8_t *pdu, size_t len,
- 				struct p2p_provision_discovery_resp *out)
- {
--	struct p2p_provision_discovery_resp d = {};
-+	struct p2p_provision_discovery_resp d = {0};
- 	int r;
- 	uint8_t *wsc_data;
- 	ssize_t wsc_len;
-@@ -1389,7 +1389,7 @@ error:
- int p2p_parse_notice_of_absence(const uint8_t *pdu, size_t len,
- 				struct p2p_notice_of_absence *out)
- {
--	struct p2p_notice_of_absence d = {};
-+	struct p2p_notice_of_absence d = {0};
- 	int r;
- 
- 	if (len < 1)
-@@ -1411,7 +1411,7 @@ int p2p_parse_notice_of_absence(const uint8_t *pdu, size_t len,
- int p2p_parse_presence_req(const uint8_t *pdu, size_t len,
- 				struct p2p_presence_req *out)
- {
--	struct p2p_presence_req d = {};
-+	struct p2p_presence_req d = {0};
- 	int r;
- 
- 	if (len < 1)
-@@ -1437,7 +1437,7 @@ int p2p_parse_presence_req(const uint8_t *pdu, size_t len,
- int p2p_parse_presence_resp(const uint8_t *pdu, size_t len,
- 				struct p2p_presence_resp *out)
- {
--	struct p2p_presence_resp d = {};
-+	struct p2p_presence_resp d = {0};
- 	int r;
- 
- 	if (len < 1)
++		if (desc_len < 24)
++			goto error;
++
+ 		memcpy(desc->device_addr, attr + 0, 6);
+ 		memcpy(desc->interface_addr, attr + 6, 6);
+ 		desc->device_caps = attr[12];
 -- 
 2.34.1
 
