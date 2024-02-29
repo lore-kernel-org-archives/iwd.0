@@ -1,120 +1,103 @@
-Received: from mail-qv1-f44.google.com (mail-qv1-f44.google.com [209.85.219.44])
+Received: from mail-oo1-f52.google.com (mail-oo1-f52.google.com [209.85.161.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70AEA13C9D6
-	for <iwd@lists.linux.dev>; Thu, 29 Feb 2024 19:57:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83FF2160644
+	for <iwd@lists.linux.dev>; Thu, 29 Feb 2024 20:36:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709236627; cv=none; b=h0LSmrmmkwOaXUDIFkf2JGD5tQw5YFg1XqPfqXORB75yO87SpKSd55uwyzfVUrb39rMuknOTaDooR93Zm/+qrNvzFgTSwiRTAlJJfXx8TsirxU3KTg8A9g6//OAflfNxXJ9iyaYsKXdglPA+mxdONTfi955WYYyScZNhf6K0iWM=
+	t=1709239007; cv=none; b=Ldsg+RdL1LFtYCfa98ePUkM8EJE9SA9dxBBa8d9b2BCLp5sjjyffE6+LuC265sAomGEKmjo8p6//glPJs6JlB3Kl3JVcFqJQLViiQKUHi7+szmkE6IxIaplzy+PNvdcS27EuzSxAKnWPG0faxabJgH3OXwKrlp4ybit4vlm4Rs8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709236627; c=relaxed/simple;
-	bh=4ZPHYtF2lZp8KlJh20QDp9KyPYsVommORINWSAsimjQ=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=R1yDlVHNiyOLXICAvyRKaqq2iVICHFi0lHzba1F1g5VH/7n5Q5FcVjG8phpl1vJSNnOIEYaFO0aclO5QolPg3YHeDLf5sbboAjBhDOMxW9qe1seI1ly27u077nx3yhfW1m22l7Q8IEYKjhKBGV0ZKmYyquW8ch0iOLVsGtQD7Kw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=F/v76ctT; arc=none smtp.client-ip=209.85.219.44
+	s=arc-20240116; t=1709239007; c=relaxed/simple;
+	bh=Ffq/hrKMA2NkaUfg7U9RHLR37ZUZ8tytKae+aEJdYXk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=gR3t2K3P6UXo5F4JfXxW4u6um2xOFUeEBo/iFzDfla/5V0/7KEkzI/UqNsVgoAzBrMWekrwQmeNVNEP0BGjrlV5lQA7lYn6eqwO3T9EAVHGklkXWXN3B+bjzTqegAFYkRDugn/ASGILyzmlCTc8FRY6rtqjtm/zd7zoFIjU6GNA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SE2tBUCg; arc=none smtp.client-ip=209.85.161.52
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="F/v76ctT"
-Received: by mail-qv1-f44.google.com with SMTP id 6a1803df08f44-690105304b4so5939896d6.3
-        for <iwd@lists.linux.dev>; Thu, 29 Feb 2024 11:57:06 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SE2tBUCg"
+Received: by mail-oo1-f52.google.com with SMTP id 006d021491bc7-5a0d96012d0so705983eaf.3
+        for <iwd@lists.linux.dev>; Thu, 29 Feb 2024 12:36:45 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1709236625; x=1709841425; darn=lists.linux.dev;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=rAP58aQhdTqjdso4EZqlUDeMAq4mYbwCGtw+edEHokY=;
-        b=F/v76ctTNkBeppJr+LOFN5wDZsQHtnK19JZVvq/nJMcfkaprObnHIAi3qPIBq7MNYS
-         H+yUQQITjMTmI84R0m8FhqLw81h5looMAJd0LLg4qK3zrcqR6bJBhpflGomWcSiJrI7c
-         0xvu/S0+6QhYXBj+QL38nqOSPmvswDyR7wLLG/Pn3qKOYnSMkmBlxsgzb8N1meAsYlHC
-         p5gofpkxKPGKV/p28oBp202jlzFffACwCAZlbFRSmJyGe7KQVjR1MIs0WH+dyUKSfiUn
-         tjwNhtSktc6wwLApOyKQ3lkHfaoBoFRHyBZ5gaNShj7G0uBX6lbi447lY/a/GIU7wJFk
-         AhpQ==
+        d=gmail.com; s=20230601; t=1709239004; x=1709843804; darn=lists.linux.dev;
+        h=content-transfer-encoding:in-reply-to:from:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=F6vpM1lHnmZ9BwHzAi27ZmgPL8IZY17coPQRhKnw+k0=;
+        b=SE2tBUCgRctVf3UzW7NLggEF+h/SBFfilIpNmlrzIV8joY5Wlb4JL73c1kDVv14HG1
+         9vbHMKdj6HV3cF2lh7PhB/UWIWyOsFJJSsc+mP9HfIrgZZknARvIt8R5k2y9P8adKC8h
+         1DDB13OC9DvrTJxvP954HTpKbAtr8BwJw17iYX/Na/06pAhZz9QrA33ZSniGF2fv0u9Q
+         yF+CuqocNE/tPge2vdVY/+83qaBzU3uG4pgw8OGMyMQMs/aqhvcjgqtrZHTFJzb20xjc
+         VnCKYH7iNRzXUFpHy0g/182Lu8pfEcytITuupnee2IiBAFN/nxRC0pOfpPN/6X8IqFlj
+         VNwA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709236625; x=1709841425;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=rAP58aQhdTqjdso4EZqlUDeMAq4mYbwCGtw+edEHokY=;
-        b=AFc/MnT9HhmeZEwcciNaF2OiXW/0rb9RopK3dlVaRuDx5jLHR+nKzqkEBtcpY1wDEv
-         T4f6x6LK2GIQzhDKjePd75LeVrljLYrYGzLfXhxM2Itr0iF9vMhZVv3ZjuA0ltCNdD80
-         DgGstlL7ZZWgLSGwQVZAG062QhVdr8q+m1snlLF1DIJboNWk3C/88HkSWhVrLUlYzf27
-         l+86pH3qxmArKAUCU4BB/lI3B2VHD4HF10wMkW742v1GcyfFyQGu7rwTnCwyHFkYg/jP
-         1/mgj+O4j0guOrWL/RdVSTFkK6NGR/QlgA4zINYYeCSvuW98pgwMvK7OaId5F7kfYSbN
-         haLQ==
-X-Gm-Message-State: AOJu0YzDlWvknRFMzaVqFTVgOGRP6XqB6GMISYNT3oN9Uzi7DRx+qnLC
-	Ngt8Ykb3RU6D8u+ecIS3ND1pASW8NrQOWNHIrQ0+zn11mOPIEGh4EUYLwhKe
-X-Google-Smtp-Source: AGHT+IGcIOKtWQTQcnYAwxgIEijH6oYfdVP44B4g/jXIwa7KY6so2o0z40xU5ccsiDZBM9ZBJGSmHA==
-X-Received: by 2002:a0c:8f19:0:b0:690:524b:8d2a with SMTP id z25-20020a0c8f19000000b00690524b8d2amr913321qvd.52.1709236624901;
-        Thu, 29 Feb 2024 11:57:04 -0800 (PST)
-Received: from LOCLAP699.rst-01.locus ([208.195.13.130])
-        by smtp.gmail.com with ESMTPSA id qo17-20020a056214591100b00690459b2271sm1064468qvb.24.2024.02.29.11.57.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 29 Feb 2024 11:57:04 -0800 (PST)
-From: James Prestwood <prestwoj@gmail.com>
-To: iwd@lists.linux.dev
-Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH] build: Create ell directory for ell/ell.h target
-Date: Thu, 29 Feb 2024 11:56:54 -0800
-Message-Id: <20240229195654.1579749-1-prestwoj@gmail.com>
-X-Mailer: git-send-email 2.34.1
+        d=1e100.net; s=20230601; t=1709239004; x=1709843804;
+        h=content-transfer-encoding:in-reply-to:from:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=F6vpM1lHnmZ9BwHzAi27ZmgPL8IZY17coPQRhKnw+k0=;
+        b=wKe1s9ubWpkXUyEmmqEkKqghT+UbaRErA6CH3Ksp9s1cQZ4Hz5CKvIkSiHtLN8gSK5
+         aEqG8pos9roGE4iIN2H0PhCI02euWyY/bX2uUcNJUJ4CIEkin33iDth6GhWdH7uteZtG
+         UwlSas8yd6FIzVbwSkUgJ1AX5hC7kshOeGMByhg2bqDnl36H1Wht3yB+wTwh5VAqCFet
+         tCTGf9taRrMwRLqV6iU/5SnEVnTJRzjeYpyA/Et55Z/m30JeKjefTLu+2md1ZtDvjkfp
+         0/bhsuYk8GWRGG854UF7C5Sd9XG5lhuZqXT8G2KStRNgXLR/dDxaLZ9AAqqPzPj9o0dM
+         WSJw==
+X-Forwarded-Encrypted: i=1; AJvYcCUcNFV9QzTQOB7G29vvFTeMma5eNNNSE2zZYXVm9z//VqP+Urdu6hYJh/jPk7ihs2724yfDD/I8MCNmjcWE1vQDKuxe
+X-Gm-Message-State: AOJu0Ywrw8945oMFj0UFLhp73LBOdRXA7GHjdQSDn1OwM5csZc8Dp/yZ
+	dfKSOodQ+pQkEGIu+2coTLRmvPsLvXPwYWrtPZ7OJqa37YfM6Jbc
+X-Google-Smtp-Source: AGHT+IHaW+f9oF2+hK62DfhfCaF5Vz4NmVmLhWh9SED338Tn99ByJyXsGe6chzlG5slhgyFJNi78yg==
+X-Received: by 2002:a4a:ea1c:0:b0:5a0:f725:654d with SMTP id x28-20020a4aea1c000000b005a0f725654dmr1099381ood.2.1709239004552;
+        Thu, 29 Feb 2024 12:36:44 -0800 (PST)
+Received: from [192.168.1.22] (070-114-247-242.res.spectrum.com. [70.114.247.242])
+        by smtp.googlemail.com with ESMTPSA id v18-20020a4a2552000000b005a0c9264b9asm428186ooe.39.2024.02.29.12.36.44
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 29 Feb 2024 12:36:44 -0800 (PST)
+Message-ID: <3d6b96bb-d111-415c-8203-0dfba01d6a60@gmail.com>
+Date: Thu, 29 Feb 2024 14:36:43 -0600
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/5] auto-t: end process_io on HUP signal, detect process
+ crash
+Content-Language: en-US
+To: James Prestwood <prestwoj@gmail.com>, iwd@lists.linux.dev
+References: <20240229170734.1498918-1-prestwoj@gmail.com>
+From: Denis Kenzior <denkenz@gmail.com>
+In-Reply-To: <20240229170734.1498918-1-prestwoj@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Both ell/shared and ell/internal targets first create the ell/
-directory within IWD. This apparently was just luck that one of
-these always finished first in parallel builds. On my system at
-least when building using dpkg-buildpackage IWD fails to build
-due to the ell/ directory missing. From the logs it appears that
-both the shared/internal targets were started but didn't complete
-(or at least create the directory) before the ell/ell.h target:
+Hi James,
 
-make[1]: Entering directory '/home/jprestwood/tmp/iwd'
-/usr/bin/mkdir -p ell
-/usr/bin/mkdir -p ell
-echo -n > ell/ell.h
-/usr/bin/mkdir -p src
-/bin/bash: line 1: ell/ell.h: No such file or directory
-make[1]: *** [Makefile:4028: ell/ell.h] Error 1
+On 2/29/24 11:07, James Prestwood wrote:
+> When HUP is received the IO read callback was never completing which
+> caused it to block indefinitely until waited for. This didn't matter
+> for most transient processes but for IWD, hostapd, wpa_supplicant
+> it would cause test-runner to hang if the process crashed.
+> 
+> Detecting a crash is somewhat hacky because we have no process
+> management like systemd and the return code isn't reliable as some
+> processes return non-zero under normal circumstances. So to detect
+> a crash the process output is being checked for the string:
+> "++++++++ backtrace ++++++++". This isn't 100% reliable obviously
+> since its dependent on how the binary is compiled, but even if the
+> crash itself isn't detected any test should still fail if written
+> correctly.
+> 
+> Doing this allows auto-tests to handle IWD crashes gracefully by
+> failing the test, printing the exception (event without debugging)
+> and continue with other tests.
+> ---
+>   tools/utils.py | 10 +++++++---
+>   1 file changed, 7 insertions(+), 3 deletions(-)
+> 
 
-Creating the ell/ directory within the ell/ell.h target solve
-the issue. For reference this is the configure command dpkg
-is using:
+All applied, thanks.
 
-./configure --build=x86_64-linux-gnu \
-	--prefix=/usr \
-	--includedir=/usr/include \
-	--mandir=/usr/share/man \
-	--infodir=/usr/share/info \
-	--sysconfdir=/etc \
-	--localstatedir=/var \
-	--disable-option-checking \
-	--disable-silent-rules \
-	--libdir=/usr/lib/x86_64-linux-gnu \
-	--runstatedir=/run \
-	--disable-maintainer-mode \
-	--disable-dependency-tracking \
-	--enable-tools \
-	--enable-dbus-policy
----
- Makefile.am | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/Makefile.am b/Makefile.am
-index 5ed6ab37..be287572 100644
---- a/Makefile.am
-+++ b/Makefile.am
-@@ -710,6 +710,7 @@ ell/internal: Makefile
- 	done > $@
- 
- ell/ell.h: Makefile
-+	$(AM_V_at)$(MKDIR_P) ell
- 	$(AM_V_at)echo -n > $@
- 	$(AM_V_GEN)for f in $(ell_headers) ; do \
- 		echo "#include <$$f>" >> $@ ; \
--- 
-2.34.1
+Regards,
+-Denis
 
