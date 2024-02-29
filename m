@@ -1,65 +1,61 @@
-Received: from mail-qt1-f176.google.com (mail-qt1-f176.google.com [209.85.160.176])
+Received: from mail-qv1-f44.google.com (mail-qv1-f44.google.com [209.85.219.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65C907A14D
-	for <iwd@lists.linux.dev>; Thu, 29 Feb 2024 18:12:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70AEA13C9D6
+	for <iwd@lists.linux.dev>; Thu, 29 Feb 2024 19:57:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709230348; cv=none; b=aYzxBWCLY6idNWvMX1+Hmpi8cmuURVaVTY0A0C19M41f/at56paEVUWajuWm7+FOtofDHFPL+ZABjbqp6qTWU79EkZSANKE8/mEm/VwmmjcHwtnND2XiY0ygIUeb6OQ5lFuRnFSMnmtK3r7SWLi6Hco17nghLDLYPQsR7E5Da2M=
+	t=1709236627; cv=none; b=h0LSmrmmkwOaXUDIFkf2JGD5tQw5YFg1XqPfqXORB75yO87SpKSd55uwyzfVUrb39rMuknOTaDooR93Zm/+qrNvzFgTSwiRTAlJJfXx8TsirxU3KTg8A9g6//OAflfNxXJ9iyaYsKXdglPA+mxdONTfi955WYYyScZNhf6K0iWM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709230348; c=relaxed/simple;
-	bh=Nq5BxIQ2iQOPy0RDMFtf/L0ikATR0G+NwkOvknD+sPg=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=iSGXyl6VMHd4xjO05vyfnnACoLQuQCG9zZGaP2BAs9CbsEY3YC3iuUSU8v0FfQ7LYYLrlFTjT7sCByBCisLmel7Lso2F6dLV44X7RoMw8YHhDflQH7HgKw/FCJszPYjxi7HgZxQ/KCUsAC4V6MkkBchVzBq3CmAe8sAnNs31UPk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GswkniKX; arc=none smtp.client-ip=209.85.160.176
+	s=arc-20240116; t=1709236627; c=relaxed/simple;
+	bh=4ZPHYtF2lZp8KlJh20QDp9KyPYsVommORINWSAsimjQ=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=R1yDlVHNiyOLXICAvyRKaqq2iVICHFi0lHzba1F1g5VH/7n5Q5FcVjG8phpl1vJSNnOIEYaFO0aclO5QolPg3YHeDLf5sbboAjBhDOMxW9qe1seI1ly27u077nx3yhfW1m22l7Q8IEYKjhKBGV0ZKmYyquW8ch0iOLVsGtQD7Kw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=F/v76ctT; arc=none smtp.client-ip=209.85.219.44
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GswkniKX"
-Received: by mail-qt1-f176.google.com with SMTP id d75a77b69052e-42e885c8885so5289231cf.2
-        for <iwd@lists.linux.dev>; Thu, 29 Feb 2024 10:12:27 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="F/v76ctT"
+Received: by mail-qv1-f44.google.com with SMTP id 6a1803df08f44-690105304b4so5939896d6.3
+        for <iwd@lists.linux.dev>; Thu, 29 Feb 2024 11:57:06 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1709230346; x=1709835146; darn=lists.linux.dev;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ibns01NBkL1xPU+v4AK+lmGTo+9X6/v8xLW9qDyfV7I=;
-        b=GswkniKXnsTzjycuCIdH9vphjAeg2CXDM6R337Rbak2chdg3MMHAqXWDHJVSOwrJHL
-         Q3hJYHoYfTl/iMpXGu6mtCU/9pl+XtgexJx9bxJVXbBeXMCQR/ej2NUPvoOtrTV3tibL
-         CpL5rGOz5sQJ3Y6yhJRmUvQxMMjRaJW1ZQ07/aOZxir3q5oK6PkmANKA1FhfAUptCVIE
-         o31gDZZuM348RGSjaYdpymyRlz0AKZ8ghSND/KM6p7ne3BFS7sYZQMtjEqZeUEs00SH4
-         F2OjvJhUtcM8TjHVD4WITB1GtH1kQmlq0wpXmBcWPDnRxwQmjujBanrZmGBoW1O/+lEa
-         Z3Mg==
+        d=gmail.com; s=20230601; t=1709236625; x=1709841425; darn=lists.linux.dev;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=rAP58aQhdTqjdso4EZqlUDeMAq4mYbwCGtw+edEHokY=;
+        b=F/v76ctTNkBeppJr+LOFN5wDZsQHtnK19JZVvq/nJMcfkaprObnHIAi3qPIBq7MNYS
+         H+yUQQITjMTmI84R0m8FhqLw81h5looMAJd0LLg4qK3zrcqR6bJBhpflGomWcSiJrI7c
+         0xvu/S0+6QhYXBj+QL38nqOSPmvswDyR7wLLG/Pn3qKOYnSMkmBlxsgzb8N1meAsYlHC
+         p5gofpkxKPGKV/p28oBp202jlzFffACwCAZlbFRSmJyGe7KQVjR1MIs0WH+dyUKSfiUn
+         tjwNhtSktc6wwLApOyKQ3lkHfaoBoFRHyBZ5gaNShj7G0uBX6lbi447lY/a/GIU7wJFk
+         AhpQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709230346; x=1709835146;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ibns01NBkL1xPU+v4AK+lmGTo+9X6/v8xLW9qDyfV7I=;
-        b=I+Zi3T29kwgp5YOs4a8mO8KkGozuZ/lXjc+QaF4AovWADkTwEXiGJquoLAEvX39Kuy
-         eqsjjURt7hoZlW9sLvgpUocRZOyTvSKw7dZDlxFYk464W2m+E0jWlxrk6ypiyli8FdX+
-         Y9ogZgPZU5sowdNtCkydaNZGNw6LENQUKnGxFhaQYq6zeoEXcF1lhkUVBM0uQ5H1z45R
-         SL9U/x93v9s8NvwwlCaQ0G3pu5/b1/7a9lM16bNjXmiAxmaWhLoxMQAcokeWYhjlTzvF
-         Cag1LCO2/2iG6IjGKJcJqMjRE9zwU1LTrALRjI/nczt1L7vjPgPs71gt9e780MilzCmp
-         o5Dg==
-X-Gm-Message-State: AOJu0Yz65ceQ87qQoqjN+Ag1YSjc4rYj8ARB8WOLK3K5XAKciNslo4Op
-	Re7Ek+FbdaX2hC4bjV3ii26alC8LeFEQPhtpa63YPRtxeSui0VOkrQSeEtsU
-X-Google-Smtp-Source: AGHT+IHQY7ZBVUVDr04OQEf0XMdLc7GoK38Ptak8oL7DZ1udvF55HvrhItGoF5lca5MuOiMFgz8p2Q==
-X-Received: by 2002:a05:6214:1741:b0:690:4568:55eb with SMTP id dc1-20020a056214174100b00690456855ebmr2579568qvb.40.1709230346007;
-        Thu, 29 Feb 2024 10:12:26 -0800 (PST)
+        d=1e100.net; s=20230601; t=1709236625; x=1709841425;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=rAP58aQhdTqjdso4EZqlUDeMAq4mYbwCGtw+edEHokY=;
+        b=AFc/MnT9HhmeZEwcciNaF2OiXW/0rb9RopK3dlVaRuDx5jLHR+nKzqkEBtcpY1wDEv
+         T4f6x6LK2GIQzhDKjePd75LeVrljLYrYGzLfXhxM2Itr0iF9vMhZVv3ZjuA0ltCNdD80
+         DgGstlL7ZZWgLSGwQVZAG062QhVdr8q+m1snlLF1DIJboNWk3C/88HkSWhVrLUlYzf27
+         l+86pH3qxmArKAUCU4BB/lI3B2VHD4HF10wMkW742v1GcyfFyQGu7rwTnCwyHFkYg/jP
+         1/mgj+O4j0guOrWL/RdVSTFkK6NGR/QlgA4zINYYeCSvuW98pgwMvK7OaId5F7kfYSbN
+         haLQ==
+X-Gm-Message-State: AOJu0YzDlWvknRFMzaVqFTVgOGRP6XqB6GMISYNT3oN9Uzi7DRx+qnLC
+	Ngt8Ykb3RU6D8u+ecIS3ND1pASW8NrQOWNHIrQ0+zn11mOPIEGh4EUYLwhKe
+X-Google-Smtp-Source: AGHT+IGcIOKtWQTQcnYAwxgIEijH6oYfdVP44B4g/jXIwa7KY6so2o0z40xU5ccsiDZBM9ZBJGSmHA==
+X-Received: by 2002:a0c:8f19:0:b0:690:524b:8d2a with SMTP id z25-20020a0c8f19000000b00690524b8d2amr913321qvd.52.1709236624901;
+        Thu, 29 Feb 2024 11:57:04 -0800 (PST)
 Received: from LOCLAP699.rst-01.locus ([208.195.13.130])
-        by smtp.gmail.com with ESMTPSA id mf15-20020a0562145d8f00b0068cc0b46682sm994209qvb.4.2024.02.29.10.12.24
+        by smtp.gmail.com with ESMTPSA id qo17-20020a056214591100b00690459b2271sm1064468qvb.24.2024.02.29.11.57.03
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 29 Feb 2024 10:12:25 -0800 (PST)
+        Thu, 29 Feb 2024 11:57:04 -0800 (PST)
 From: James Prestwood <prestwoj@gmail.com>
 To: iwd@lists.linux.dev
 Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 5/5] ap: bail in ap_del_station if AP is going down
-Date: Thu, 29 Feb 2024 10:12:17 -0800
-Message-Id: <20240229181217.1503555-5-prestwoj@gmail.com>
+Subject: [PATCH] build: Create ell directory for ell/ell.h target
+Date: Thu, 29 Feb 2024 11:56:54 -0800
+Message-Id: <20240229195654.1579749-1-prestwoj@gmail.com>
 X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240229181217.1503555-1-prestwoj@gmail.com>
-References: <20240229181217.1503555-1-prestwoj@gmail.com>
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
@@ -68,26 +64,57 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Caught by static analysis, if this condition is met the AP is going
-down so we cannot continue further accessing the ap object.
----
- src/ap.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+Both ell/shared and ell/internal targets first create the ell/
+directory within IWD. This apparently was just luck that one of
+these always finished first in parallel builds. On my system at
+least when building using dpkg-buildpackage IWD fails to build
+due to the ell/ directory missing. From the logs it appears that
+both the shared/internal targets were started but didn't complete
+(or at least create the directory) before the ell/ell.h target:
 
-diff --git a/src/ap.c b/src/ap.c
-index a6f8f306..b4e7593e 100644
---- a/src/ap.c
-+++ b/src/ap.c
-@@ -455,7 +455,8 @@ static void ap_del_station(struct sta_state *sta, uint16_t reason,
- 		sta->ip_alloc_lease = NULL;
- 		l_dhcp_server_expire_by_mac(ap->netconfig_dhcp, sta->addr);
+make[1]: Entering directory '/home/jprestwood/tmp/iwd'
+/usr/bin/mkdir -p ell
+/usr/bin/mkdir -p ell
+echo -n > ell/ell.h
+/usr/bin/mkdir -p src
+/bin/bash: line 1: ell/ell.h: No such file or directory
+make[1]: *** [Makefile:4028: ell/ell.h] Error 1
+
+Creating the ell/ directory within the ell/ell.h target solve
+the issue. For reference this is the configure command dpkg
+is using:
+
+./configure --build=x86_64-linux-gnu \
+	--prefix=/usr \
+	--includedir=/usr/include \
+	--mandir=/usr/share/man \
+	--infodir=/usr/share/info \
+	--sysconfdir=/etc \
+	--localstatedir=/var \
+	--disable-option-checking \
+	--disable-silent-rules \
+	--libdir=/usr/lib/x86_64-linux-gnu \
+	--runstatedir=/run \
+	--disable-maintainer-mode \
+	--disable-dependency-tracking \
+	--enable-tools \
+	--enable-dbus-policy
+---
+ Makefile.am | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/Makefile.am b/Makefile.am
+index 5ed6ab37..be287572 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -710,6 +710,7 @@ ell/internal: Makefile
+ 	done > $@
  
--		ap_event_done(ap, prev);
-+		if (ap_event_done(ap, prev))
-+			return;
- 	}
- 
- 	/*
+ ell/ell.h: Makefile
++	$(AM_V_at)$(MKDIR_P) ell
+ 	$(AM_V_at)echo -n > $@
+ 	$(AM_V_GEN)for f in $(ell_headers) ; do \
+ 		echo "#include <$$f>" >> $@ ; \
 -- 
 2.34.1
 
