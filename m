@@ -1,91 +1,85 @@
-Received: from mail-pg1-f172.google.com (mail-pg1-f172.google.com [209.85.215.172])
+Received: from mail-oi1-f182.google.com (mail-oi1-f182.google.com [209.85.167.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6B6D20323
-	for <iwd@lists.linux.dev>; Mon,  4 Mar 2024 16:49:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E34C612E2
+	for <iwd@lists.linux.dev>; Mon,  4 Mar 2024 17:45:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709570958; cv=none; b=BeQHlfq2jR2+YnJlSjp0DXwl/VOlA71c8yAesXqNXPCupAv31Y4R1BysXKc9bvfd4TYugd0yT/HU++Ae0giJJYrXKUnWMPVak1/XSAc8kRdsEK92Oi6SChQJa4PQbKMBl8zQdTayK5Z4Co/1KkXPo+Cpjf1YZvO5cIS5dFwL+6w=
+	t=1709574344; cv=none; b=iLPAhps6cB0z0IcYRnxmTiaf3FO6mxS8roTcEtKcJV9u0a75cqezRxIVBzhBJh57VyNEzRB1Rk0uar71WWaTznxb4gj+ylUl2mqEmhKTtlp/osFl8yTgrRz4rcBrE16BnrcYoJvZPCu4GBmIzYArg9G/f+Pj7/Wlm6fdwRvEhyE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709570958; c=relaxed/simple;
-	bh=DoDbaFq/tRaaRrzbG/D5UYTxQx9yveG5Zb+1OZEcJJQ=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=DZoxdrMGwuciOcwSCZ5AsyVg4wGh8+CSs90HfpimaoQMTmKnfsyQACibytMeMFA5TEglzN5y/d3Y1NWTv6YtZSFbNOn/Oc3aRLqO+saot/YqJnobbGauuB8LJGyhwKIsju90fSNk6f4ks+E1OlGqwfo/1hEcLeDsbrDN8yG8ia4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=W3xKJiwi; arc=none smtp.client-ip=209.85.215.172
+	s=arc-20240116; t=1709574344; c=relaxed/simple;
+	bh=zCVJ4v/pypRXPqJ/Rgd+Patyq2XIn8J9rqbeEaZiRng=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=Nfj9uqsU3lVORwmh9L6JMfrGo35aJBlulgXWTVvh8H7nWXc5DKm2DJkIcL1Zot4wXR0hPCt0uyKj+ViwlOWw8/+ulj8vPFi4gsdfBuml1Y696vghm9wfUsDEn2F71AA6WuLQaw1pyPOzv0tWXbhVjzZeOK2euv5LYFsrC6brFCc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VkXJaTgv; arc=none smtp.client-ip=209.85.167.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="W3xKJiwi"
-Received: by mail-pg1-f172.google.com with SMTP id 41be03b00d2f7-5d4d15ec7c5so4202012a12.1
-        for <iwd@lists.linux.dev>; Mon, 04 Mar 2024 08:49:16 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VkXJaTgv"
+Received: by mail-oi1-f182.google.com with SMTP id 5614622812f47-3c1e80e447dso910542b6e.0
+        for <iwd@lists.linux.dev>; Mon, 04 Mar 2024 09:45:41 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1709570956; x=1710175756; darn=lists.linux.dev;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=my3yXByJ/TUzRz7KNXfNC3XtRu9W2osDqJMyGwNvrFg=;
-        b=W3xKJiwi34Wj9JkXcBdRJY/wMwbkU8mC2952cPxTvETAI8UEu+PQ0dLump5FNTir4Z
-         ryIrUf7vvA3ymiB+b+sDfud/5NQw5eJcCtfCPL0lRXwFmLDMOJCq42sYnL+wvzngGPcs
-         LkIo9IdpsWjEZQ1tmw2nnkmCldV8oslcwFpcg61W5jRVmgPtl7ETmVYehmiiLZpEWIuz
-         wkP015yeyBasuxY7mBkXjiw9haFVs7AKU27p9zW+7tvUuuE8iJTo0tIjBID18VgahwzX
-         4yqEkwASkQaLSJ8+5gBxDk556NBlOZXEkLYy4NWn1p6OHC0l98jRSvQ4ENctGNcNL62Z
-         xABQ==
+        d=gmail.com; s=20230601; t=1709574340; x=1710179140; darn=lists.linux.dev;
+        h=content-transfer-encoding:in-reply-to:from:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=dEbpwNlzM6nzkFQivfXnTHpbvy3mePkfS9b/hiFl3Og=;
+        b=VkXJaTgv8RHctu+huMnUz3TPP7d6a0toqXHzCBmu0barhKapsTfLdEK+ePGwRnkyvF
+         Z4JG61KNi8iu3VfZi7mFEVWKRBRFf3kbUYlOXkXiaJsoESk8Uv2uZRJZo2iLPsX2qI+D
+         UTPLePhbmanhv+UaW+IVMrwUB4YaoY6B0X7IjL5APy+pwz1+hBlXuIWaATzstXorykei
+         wo1qmpTcdHa69yI6cOZpXDNu/QER5wlZC7mf+HI0AnebFdYPG8kl2AAI2YMgsPpmLtVz
+         96Yk9r0+Wc7P5TsNplsA8x4Ka1FM6Mcn7eywLYYGodJ+ioHa3Jgu5fjZYu9QLJzWMVJM
+         KqgA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709570956; x=1710175756;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=my3yXByJ/TUzRz7KNXfNC3XtRu9W2osDqJMyGwNvrFg=;
-        b=DBo8aavf4M5TPcoqAfIPsQgMrkhvtDaSaXLAwTwhJNVgU8XMiwygjv1hUPv1lKYVyM
-         Id86OuLQjR5Nhl6GZUBFp1fxHPbMKQeRRd4zdq32/F5IpuL3k4R4PjntKR7Tv20NXoFG
-         dvn1Wad13894pJ061yVlXzwuehktbL6umrD1U2Ho6b6vASVpwbw8VaDdQueQl8cKYb/c
-         IkVOIURJqpLnND0KQLphkJj1OTgyiZ1QyBY/ubPSVtVX6XSa+BFc5E83npxKR8k4RzUO
-         sg2fWXop4EjrnOvDGrDmHtmZmexvnrCkgu9XAgFq8Lz3z6HJZekcS/qJJM9EpvBSL6Ox
-         Lfrw==
-X-Gm-Message-State: AOJu0YwINRPLNjNF1SfXHZiUzP3LkF7f35jwJZ8/1QHt8xNIeNIEhV8I
-	Y/V9iZM14ybqnPIyFTRgvPXjk4560XLmUzxrlUi/7XwIOUr4+tIpwHIse3ni
-X-Google-Smtp-Source: AGHT+IGBdJL9evt/3LqscKdalTwqDpLGD1gew3p6cnJPHq4mj64FGR82w8YyvMsYwAkQBWvLAEewYA==
-X-Received: by 2002:a0c:eb06:0:b0:690:5cf1:e14f with SMTP id j6-20020a0ceb06000000b006905cf1e14fmr7938867qvp.44.1709570934819;
-        Mon, 04 Mar 2024 08:48:54 -0800 (PST)
-Received: from LOCLAP699.rst-02.locus ([208.195.13.130])
-        by smtp.gmail.com with ESMTPSA id qq1-20020a0562142c0100b0068fdc55ec7dsm3858466qvb.68.2024.03.04.08.48.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 04 Mar 2024 08:48:54 -0800 (PST)
-From: James Prestwood <prestwoj@gmail.com>
-To: iwd@lists.linux.dev
-Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 2/5] ie: remove unneeded initialization
-Date: Mon,  4 Mar 2024 08:48:43 -0800
-Message-Id: <20240304164846.1783148-2-prestwoj@gmail.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240304164846.1783148-1-prestwoj@gmail.com>
-References: <20240304164846.1783148-1-prestwoj@gmail.com>
+        d=1e100.net; s=20230601; t=1709574340; x=1710179140;
+        h=content-transfer-encoding:in-reply-to:from:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=dEbpwNlzM6nzkFQivfXnTHpbvy3mePkfS9b/hiFl3Og=;
+        b=MwfsRdrRKKjNHYn5el4FxLx0KxGfgNa+IW5N417WWdb6DjBwsTI5THKyPoch/I/dX+
+         b2hrgnXIhA9WjdubVyn+NUUqmYSQHWViLWUguKR6pqFxryt/C/1dSCUGAOQ6XRwyuU4j
+         ZlTN2O5Z2EA6xEuPL8lJZuGsZJC37lap/dtB7/ZZhcZ0FlKpdm23abTz5Lz2rPM+D+F+
+         xqTLaezpIbT92bHk1EJVI/5z2juzBkT7h1CHu4/VlFDz1I/hwCRKV7eH8y3XyicNflVM
+         omxYqiJEWHIigREH/C3Er7tjEiAM84z6IrsXSbTi+p58G+EN7MzVGhu2LmY19Z09Z+ly
+         QJCQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWBbB8aGKWmAlot4l6TTI78LrP3veVEoquAWA/bbWWJzCRA2Wi655M0XsgHJLyYW5R5FP2H5JExEuA/5LQW2JlUThYH
+X-Gm-Message-State: AOJu0YxXOIQ8eLRRDne4BjLhXgV8lrFTYOcrHlSduKDv2YKR/HC/oYax
+	41QBTWhMS9rL5JbinChvE5OkSxyNqt+BZtrV8vfkmDM1xhmcrjE6
+X-Google-Smtp-Source: AGHT+IEgqAj3Ld2KhcIe4S/n1ykqW2gZqq1EHOe9YwtvbPbOXcIu6oFWVN9t/ZgyuudBIY4FlMdcUA==
+X-Received: by 2002:a05:6808:6391:b0:3c1:ec3d:77da with SMTP id ec17-20020a056808639100b003c1ec3d77damr3816620oib.51.1709574340415;
+        Mon, 04 Mar 2024 09:45:40 -0800 (PST)
+Received: from [192.168.1.22] (070-114-247-242.res.spectrum.com. [70.114.247.242])
+        by smtp.googlemail.com with ESMTPSA id bk1-20020a0568081a0100b003c1e577140asm694089oib.25.2024.03.04.09.45.39
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 04 Mar 2024 09:45:40 -0800 (PST)
+Message-ID: <35abca9b-7c28-46fc-9309-d7a5625279b4@gmail.com>
+Date: Mon, 4 Mar 2024 11:45:38 -0600
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/5] client: remove unneeded initialization
+Content-Language: en-US
+To: James Prestwood <prestwoj@gmail.com>, iwd@lists.linux.dev
+References: <20240304164846.1783148-1-prestwoj@gmail.com>
+From: Denis Kenzior <denkenz@gmail.com>
+In-Reply-To: <20240304164846.1783148-1-prestwoj@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
----
- src/ie.c | 3 ---
- 1 file changed, 3 deletions(-)
+Hi James,
 
-diff --git a/src/ie.c b/src/ie.c
-index a51724aa..86f33f2a 100644
---- a/src/ie.c
-+++ b/src/ie.c
-@@ -1178,9 +1178,6 @@ static int build_ciphers_common(const struct ie_rsn_info *info, uint8_t *to,
- 	countptr = to + pos;
- 	pos += 2;
- 
--	akm_suite = IE_RSN_AKM_SUITE_8021X;
--	count = 0;
--
- 	for (count = 0, akm_suite = IE_RSN_AKM_SUITE_8021X;
- 			akm_suite <= IE_RSN_AKM_SUITE_OSEN;
- 				akm_suite <<= 1) {
--- 
-2.34.1
+On 3/4/24 10:48, James Prestwood wrote:
+> ---
+>   client/display.c | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+
+All applied, thanks.
+
+Regards,
+-Denis
 
