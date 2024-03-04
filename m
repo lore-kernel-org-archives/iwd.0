@@ -1,59 +1,59 @@
-Received: from mail-ot1-f43.google.com (mail-ot1-f43.google.com [209.85.210.43])
+Received: from mail-qv1-f52.google.com (mail-qv1-f52.google.com [209.85.219.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B2693C46C
-	for <iwd@lists.linux.dev>; Mon,  4 Mar 2024 12:23:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 505D61D53F
+	for <iwd@lists.linux.dev>; Mon,  4 Mar 2024 12:30:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709555014; cv=none; b=uJhBpbDDL2lduXpO3WuwjzACXOYAdQQb+4yyRvMgnpDBViqM/2Q+JqnOExJfU8khStrAfCef3idxHCzBvcshNW539LuWfNySHW+ggVUMRHf8VpH5y8pE2RO5TfNtq7FOfumxhGdVduNwp3D5CEPevPClUMjIzC8eQ0sPxzPs4Hc=
+	t=1709555432; cv=none; b=UAtRw/2NYpk0Y1uWivYeJWVaMoCzKil88SPKamAeC8D+VIkok0hfIRlpM0DPRP6uEDF5X1gWgVro8Ey0H1a1wNrVe7hv6kWHcjA22dOpQrBd1Rx9oF/E7PGCbchjvi0urAVCUryxVnUgRvfCMpQb797KLpvT3z9mbeGwd/h7VyQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709555014; c=relaxed/simple;
-	bh=BmcyT3j3lwbNzwo0XAeAfxLJBhcBmpVkSQPKUUKRVeo=;
+	s=arc-20240116; t=1709555432; c=relaxed/simple;
+	bh=+zf5PjQFFUPkcP6YZLDVNeA08w+rk4mrdT4GZmOuMXc=;
 	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=OFKdGY2kPN4sJoWL6KSsl7/YqbxeHYEwFAI0oFEikkVErtQM8oAz3CuO9Ma+n5lQcfCa3XUhujO0lTjaGuyaGKzT/1E4aoDKJ+11z7uE5aexBUpPsw9VRVfpUNAsECPN7QiDnhv/7+2fLxAvdf2JcRWjCuFgTfJ/NGzPUuUz6p4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CFoDpyDn; arc=none smtp.client-ip=209.85.210.43
+	 In-Reply-To:Content-Type; b=l7wxSXFilmOJuPj0DmkSpuUpuhAjfGT2CZpk8+nxDfkAZet8PcGMXzQc+y6JX+SBJ4baMZ+ZYwPwm9kgVfL3eVPm67q5tQ6hbJN5acrEAOpa7P7lU6mT0zQPdb2ovXQMTQSrek5+5z9gXYnc4P5knLyYMLFaYeWEaWymDdlbOOM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SO/jJNFe; arc=none smtp.client-ip=209.85.219.52
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CFoDpyDn"
-Received: by mail-ot1-f43.google.com with SMTP id 46e09a7af769-6e4a0e80d14so3299320a34.1
-        for <iwd@lists.linux.dev>; Mon, 04 Mar 2024 04:23:31 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SO/jJNFe"
+Received: by mail-qv1-f52.google.com with SMTP id 6a1803df08f44-68f5cdca7a3so39855896d6.1
+        for <iwd@lists.linux.dev>; Mon, 04 Mar 2024 04:30:31 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1709555010; x=1710159810; darn=lists.linux.dev;
+        d=gmail.com; s=20230601; t=1709555430; x=1710160230; darn=lists.linux.dev;
         h=content-transfer-encoding:in-reply-to:from:references:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=tQrQ/PEbIzyBEuJSb/1MAnX9+xF/XnwvDFqNyUHj5Es=;
-        b=CFoDpyDnWIWzOegSKGF5i01Fd85vuUqo55+Zg40g7EnqqrrKLySKOpnclXkbnCiOMa
-         9ptubB9DBGpfaIBqRI+vOqQmgnmobgd/DCcWf6yq9Hml7bEIys/+tjVdbHXqXuJghhVR
-         q1ZnYQjDmPHkZQ18gfn76B/f+cAGPwqwNjOuLNLV36HnANDF1hAj+ZQ+ForkpfUk2exf
-         KwbHbJp3MSt/ZewDUv9wQkf4r13qwZtWgI64xYCMkRAj9mbeEc0uhytOLG+VhOtaoaw6
-         Upr/vLEVQKgaRvV+Xv7OwDlqBXWgCCScvLED8p746HKy6JYncMmLEPw86efPheaPT3N9
-         GsgA==
+        bh=NwLDC4qRvwe02xsNAIv3b6tN9UBQcA3oGbE6g8EFlL8=;
+        b=SO/jJNFe6wlN82YZMTE1eG3/kRLfmdf027S/vCwWTqunUNYr1Rw8HX7e/4hJVvT6A8
+         hIuuLyXVcEBcbaoL5vJY2/Usj7qtCqMSTJRo6sTT8Q3HVCcG99aw/eyUWZbCHQZc5LhG
+         dYpzaQZyFOG/zxeimls8DxzT9Zs5WAXkqRKz1Ebe0xh5TWBV638IFexmM2HCdG1Buaum
+         UVcKvpQujuTymKygIpf1ZKiaxAC0oiPi41FCvx72piRMydb1ZLi0LTwE45pj9+RLMemF
+         eb42WWAJxo7WshFfydrJW5fOwubhtQfGX1Ge9u+I6MOBH1uKBZwk8X+IZL6ETsmvLQrY
+         oFzA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709555010; x=1710159810;
+        d=1e100.net; s=20230601; t=1709555430; x=1710160230;
         h=content-transfer-encoding:in-reply-to:from:references:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=tQrQ/PEbIzyBEuJSb/1MAnX9+xF/XnwvDFqNyUHj5Es=;
-        b=Wo873whx3qKDGMgxDWhBtFd5zK20QlFecACWsZg/hHmVKLGgkEmnnSykwKeGyJ/zHX
-         UU85va0VUkJ7BBJi2+VASd8GVoRU8q03+daOTIU5IF/TUcOJX4HJo64gWrx+jBx+5njI
-         f70KAMelO5XMHks8KITvxSk1uSVYLuYm1N/Sh0r/G2J1RxFl2JCfrPnLJP35vblz1J1J
-         hNzimEmhT+M57IiVvECys8c+galSitlDrD5zvSC5LpbYeHKfe8a+Gqihva2qvn8ZNPnN
-         NuOS8hELpspbobrzm39EdjbhuVAftC1YkxFs0WVO1cWVKAH89BnOfY+IU96gn0uUTfCt
-         nfLw==
-X-Forwarded-Encrypted: i=1; AJvYcCV0QfJ4lWv8UOd9Z72TdvN8Jy+QxPWfSMtSc3kA2rEuOM3FLT5kTJnjU0TG4h55oSUWmwRqT+9c+ufCXQGMxJUHGG0Y
-X-Gm-Message-State: AOJu0YxAlcEsvwFfetH+fWmEf+km/5pv6FuGeMZMeGNA0Vd2LWUyG+i3
-	ghUBQEdc1nLszXgMpzE+ZpaiZ6GriUAW3qkJyc5GuWBLaqSetlgz
-X-Google-Smtp-Source: AGHT+IEESJT+msIzky74BMuihMPydDb8F/MZnX3PoxC2UaXylEWZQmFIXXDi2gt4i22XKVX0m0RuTw==
-X-Received: by 2002:a05:6870:9f89:b0:21e:df12:9499 with SMTP id xm9-20020a0568709f8900b0021edf129499mr8897520oab.51.1709555010204;
-        Mon, 04 Mar 2024 04:23:30 -0800 (PST)
+        bh=NwLDC4qRvwe02xsNAIv3b6tN9UBQcA3oGbE6g8EFlL8=;
+        b=HQwl2prvsR4NSLHhImOd53m5K4kvZEgXx4nKhnXWRi0FAiNRpCIMo+f6iMKBJIAQEK
+         XG3zsuKE2Xc4wPdKbv/SwFALKx9buNJFgSev8hE7FOfmIyFZ2PcnK8YP/L9Y1zMcip6/
+         FtO6hIXxPs51vtxNez3J/Ou6yYKWopCWBa+ElysEvt05QkfAF8bNtdQoxUqcRb6sODlZ
+         a7557nWHWPNrHnM68UTu01DaHsrkt+TV2EHnf1cuow5YeU8qp8mdk98RSMTo5aDGUOkg
+         qyma63ww6mtbIbH4HlEbb6eYhBrucraZOFn5472Q8EMAeFTkkJgNyjJSqjzrLIFyX+b0
+         smuA==
+X-Forwarded-Encrypted: i=1; AJvYcCVVpREGuYumR06YLyPhG3Ag6TOx9p0b2gALeMpqm1DbNSQC/hCZ86wxlWWrINqVXMIVpwl+UVDH9ET+QKR+M2bRNeDF
+X-Gm-Message-State: AOJu0Yxshb1I7qFPoj8ACdYkbSLixf7LLSMbfU+dcnv7r08wJq7FExu3
+	I6uY4c4MI/0WRFUMZJBwG/FEdf+6lAaYyqz7br/nVNWBglkkmZ7B
+X-Google-Smtp-Source: AGHT+IFQAXSwC7CWph66o2qslrBcegt+LnGMY50R391Gd4699spNLelUzhVLGhHKgU9hx/Njr1YmSQ==
+X-Received: by 2002:a0c:e7c4:0:b0:690:7345:6799 with SMTP id c4-20020a0ce7c4000000b0069073456799mr4332078qvo.17.1709555430222;
+        Mon, 04 Mar 2024 04:30:30 -0800 (PST)
 Received: from [10.102.4.159] ([208.195.13.130])
-        by smtp.gmail.com with ESMTPSA id vr1-20020a05620a55a100b007881e40ce0bsm1948206qkn.83.2024.03.04.04.23.29
+        by smtp.gmail.com with ESMTPSA id kf9-20020a056214524900b0068fbdafa771sm5063885qvb.5.2024.03.04.04.30.29
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 04 Mar 2024 04:23:29 -0800 (PST)
-Message-ID: <1aebf48a-0ed4-4605-a03b-5f6e0706ed71@gmail.com>
-Date: Mon, 4 Mar 2024 04:23:28 -0800
+        Mon, 04 Mar 2024 04:30:29 -0800 (PST)
+Message-ID: <629785cf-77c3-4b14-ab58-d4b2c75f254a@gmail.com>
+Date: Mon, 4 Mar 2024 04:30:27 -0800
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
@@ -61,90 +61,38 @@ List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: How to connect specifying the BSSID?
+Subject: Re: IPv6 Privacy Extension support?
 Content-Language: en-US
-To: Kentaro Yamaguchi <kentaro.y@gmail.com>, iwd@lists.linux.dev
-References: <CAKbf6axbkp5E1M8Pvm1SbPOQFtzxX8Cdwj9YjbYNy0aekHDHzw@mail.gmail.com>
+To: Hannes von Haugwitz <hannes@vonhaugwitz.com>, iwd@lists.linux.dev
+References: <20240301144608.GA25@magnesium.vonhaugwitz.com>
 From: James Prestwood <prestwoj@gmail.com>
-In-Reply-To: <CAKbf6axbkp5E1M8Pvm1SbPOQFtzxX8Cdwj9YjbYNy0aekHDHzw@mail.gmail.com>
+In-Reply-To: <20240301144608.GA25@magnesium.vonhaugwitz.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-Hi Kentaro,
+Hi Hannes,
 
-On 3/3/24 8:31 PM, Kentaro Yamaguchi wrote:
-> Dear iwd users and developers,
+On 3/1/24 6:46 AM, Hannes von Haugwitz wrote:
+> Hello,
 >
-> With mesh, I would like to check whether it is faster to connect
-> directly to the child device or the parent device.
-> Therefore, please tell me how to connect using iwd from the client and
-> specifying the BSSID.
+> I'm running Debian sid and iwd 2.15.
 >
-> According to the comment made 5 years ago at the link below, there is
-> no way to connect by specifying the BSSID.
-> This has been answered, but is the situation still the same?
-> https://bbs.archlinux.org/viewtopic.php?id=237074&p=5
+> When I enable network configuration and IPv6 in iwd config, the IPv6
+> address contains the embedded interface identifier (i.e. the MAC
+> address), even though IPv6 Privacy Extension is enabled for the device
+> (net.ipv6.conf.wlan0.use_tempaddr = 2).
+>
+> Do I miss something or is there no support for IPv6 Privacy Extension
+> in iwd?
 
-Yes IWD connections are SSID based and IWD chooses the best BSS based on 
-how it ranks.
+I'm not familiar with the privacy extensions specifically, but you can 
+enable MAC address randomization which should hide the MAC for you. You 
+can check the man pages for more details but in main.conf something like:
 
-For testing IWD does have a "developer mode" which lets you connect to 
-BSSID's specifically but this mode isn't something meant for 
-general/production use. But if you only want to test one vs the other 
-you could use it:
-
-# Start IWD in developer mode (-E)
-iwd -E
-# Scan first (developer mode doesn't autoconnect)
-iwctl station wlan0 scan
-iwctl debug wlan0 get-networks
-iwctl wlan0 connect <bssid>
-
-Thanks,
-
-James
-
+[Settings]
+AddressRandomization=network
 >
-> I tried the following, but I was unable to connect due to an error.
-> I know that using wpa_supplicant as the Network Manager backend will
-> work. However, in that case I would like to use IWD because I have
-> problems with 6GHz connectivity.
+> Best regards
 >
-> 1. Specify iwd as wifi.backend of NetworkManager and restart.
-> 2. nmcli device wifi connect [SSID] password [Password]
-> 3. nmcli connection down [SSID]
-> 4. nmcil connection modify [SSID] wifi.bssid [BSSID]
-> 5. nmcli connection up [SSID]
->
-> Error (from journal log)
-> -------------------------------------
-> Mar 01 16:38:48 livazplusNetworkManager[1408]: <info>
-> [1709278728.5365] device (wlp4s0): Activation: starting connection
-> 'Buf-MLO' (019cd427-8f11-4c84-9625-db03895b510b)
-> Mar 01 16:38:48 livazplus NetworkManager[1408]: <info>
-> [1709278728.5367] device (wlp4s0): state change: disconnected ->
-> prepare (reason 'none', sys-iface-state: 'managed')
-> Mar 01 16:38:48 livazplus NetworkManager[1408]: <info>
-> [1709278728.5370] device (wlp4s0): state change: prepare -> failed
-> (reason 'none', sys-iface-state: 'managed')
-> Mar 01 16:38:48 livazplus NetworkManager[1408]: <warn>
-> [1709278728.5374] device (wlp4s0): Activation: failed for connection
-> 'Buf-MLO'
->
-> My environment is below.
-> --------------------------------------
-> Lubuntu 23.10
-> Kernel 6.7.6
-> IWD 2.8
-> NetworkManager 1.44.2
-> Intel BE200
-> [    5.297551] iwlwifi 0000:01:00.0: TLV_FW_FSEQ_VERSION: FSEQ
-> Version: 0.0.4.125
-> [    5.302086] iwlwifi 0000:01:00.0: loaded firmware version
-> 86.fb5c9aeb.0 gl-c0-fm-c0-86.ucode op_mode iwlmvm
-> [    5.764947] iwlwifi 0000:01:00.0: loaded PNVM version 8443a58d
-> --------------------------------------
->
-> Thanks in advance!
-> Kentaro Yamaguchi
+> Hannes
 >
