@@ -1,98 +1,86 @@
-Received: from mail-qv1-f52.google.com (mail-qv1-f52.google.com [209.85.219.52])
+Received: from mail-qv1-f51.google.com (mail-qv1-f51.google.com [209.85.219.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 505D61D53F
-	for <iwd@lists.linux.dev>; Mon,  4 Mar 2024 12:30:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 101591E487
+	for <iwd@lists.linux.dev>; Mon,  4 Mar 2024 16:48:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709555432; cv=none; b=UAtRw/2NYpk0Y1uWivYeJWVaMoCzKil88SPKamAeC8D+VIkok0hfIRlpM0DPRP6uEDF5X1gWgVro8Ey0H1a1wNrVe7hv6kWHcjA22dOpQrBd1Rx9oF/E7PGCbchjvi0urAVCUryxVnUgRvfCMpQb797KLpvT3z9mbeGwd/h7VyQ=
+	t=1709570936; cv=none; b=mkAHup2w0a5knMOxJlgaHzJHkmXfFiVY6cFpUqnS83D7NcDJ3icDE+buSzSi1KHxSyjd/zTDf2aTgjGtE1rhyGAJ9YUGdCGUdKwltK6cVfgYo9jKU37fIB+WFMWoX/DFKRm1O8txlC6/Y00B3Fr5xIh2MlomhIq0xCkTEMRapSE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709555432; c=relaxed/simple;
-	bh=+zf5PjQFFUPkcP6YZLDVNeA08w+rk4mrdT4GZmOuMXc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=l7wxSXFilmOJuPj0DmkSpuUpuhAjfGT2CZpk8+nxDfkAZet8PcGMXzQc+y6JX+SBJ4baMZ+ZYwPwm9kgVfL3eVPm67q5tQ6hbJN5acrEAOpa7P7lU6mT0zQPdb2ovXQMTQSrek5+5z9gXYnc4P5knLyYMLFaYeWEaWymDdlbOOM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SO/jJNFe; arc=none smtp.client-ip=209.85.219.52
+	s=arc-20240116; t=1709570936; c=relaxed/simple;
+	bh=nZpVwVH0BR3YhEBXu280vi0WI9FThxj+xd+dr4gRZSY=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=MY6XNMz2RkvWRRXanyvXn7kHn5C/gc9p8Bp7ZhmaB+cF3cudZVK/R7sSHf6xXs0ekp+T/Ftb3zL551X6BSVN70YUVRIErfITjbSfA4km+ydkaI9PBFVcj+67ZVZgeTxPO2DHhZfruzeaNjEs94nJYhp7zEJ2wIKyXb51bKGqL30=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ce8nPGCn; arc=none smtp.client-ip=209.85.219.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SO/jJNFe"
-Received: by mail-qv1-f52.google.com with SMTP id 6a1803df08f44-68f5cdca7a3so39855896d6.1
-        for <iwd@lists.linux.dev>; Mon, 04 Mar 2024 04:30:31 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ce8nPGCn"
+Received: by mail-qv1-f51.google.com with SMTP id 6a1803df08f44-68fb3a3f1c5so25664196d6.3
+        for <iwd@lists.linux.dev>; Mon, 04 Mar 2024 08:48:54 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1709555430; x=1710160230; darn=lists.linux.dev;
-        h=content-transfer-encoding:in-reply-to:from:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=NwLDC4qRvwe02xsNAIv3b6tN9UBQcA3oGbE6g8EFlL8=;
-        b=SO/jJNFe6wlN82YZMTE1eG3/kRLfmdf027S/vCwWTqunUNYr1Rw8HX7e/4hJVvT6A8
-         hIuuLyXVcEBcbaoL5vJY2/Usj7qtCqMSTJRo6sTT8Q3HVCcG99aw/eyUWZbCHQZc5LhG
-         dYpzaQZyFOG/zxeimls8DxzT9Zs5WAXkqRKz1Ebe0xh5TWBV638IFexmM2HCdG1Buaum
-         UVcKvpQujuTymKygIpf1ZKiaxAC0oiPi41FCvx72piRMydb1ZLi0LTwE45pj9+RLMemF
-         eb42WWAJxo7WshFfydrJW5fOwubhtQfGX1Ge9u+I6MOBH1uKBZwk8X+IZL6ETsmvLQrY
-         oFzA==
+        d=gmail.com; s=20230601; t=1709570934; x=1710175734; darn=lists.linux.dev;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=y6c4ULGYfSqW+RPKDMPo8yq9tibiiE2qSK9J63ajOtY=;
+        b=Ce8nPGCnRVfieK0860agbRtx0qXoAsx5Y79OOHf+4E3sxV/90rkl2/bw1nfLRQo0TQ
+         2VN4RxMFxEbOOseyQMdltJ6ngsACQPLwkHNPoPoyRSU2/Z8EpyAn5Wxb6u6/ykIb5ItC
+         HSzOXUjMLlrFBSNha7apS6C1sdp/RJJUrAkEV58h2cZ1iWrBInR/8qXMrsu2Bv3uLHEL
+         lTr5jQEAIXUHir5R94qrb0mZc0hyQWMIyioPG2n6yRFETP+3yHLxRTuJmkfNUBClUkUh
+         Hzri59+e71dQCU6FW2O+DiBvktbN7Nway7lZUzf7uqzXsJK6swWo+A03Y/63+gaKFYmw
+         /dWw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709555430; x=1710160230;
-        h=content-transfer-encoding:in-reply-to:from:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=NwLDC4qRvwe02xsNAIv3b6tN9UBQcA3oGbE6g8EFlL8=;
-        b=HQwl2prvsR4NSLHhImOd53m5K4kvZEgXx4nKhnXWRi0FAiNRpCIMo+f6iMKBJIAQEK
-         XG3zsuKE2Xc4wPdKbv/SwFALKx9buNJFgSev8hE7FOfmIyFZ2PcnK8YP/L9Y1zMcip6/
-         FtO6hIXxPs51vtxNez3J/Ou6yYKWopCWBa+ElysEvt05QkfAF8bNtdQoxUqcRb6sODlZ
-         a7557nWHWPNrHnM68UTu01DaHsrkt+TV2EHnf1cuow5YeU8qp8mdk98RSMTo5aDGUOkg
-         qyma63ww6mtbIbH4HlEbb6eYhBrucraZOFn5472Q8EMAeFTkkJgNyjJSqjzrLIFyX+b0
-         smuA==
-X-Forwarded-Encrypted: i=1; AJvYcCVVpREGuYumR06YLyPhG3Ag6TOx9p0b2gALeMpqm1DbNSQC/hCZ86wxlWWrINqVXMIVpwl+UVDH9ET+QKR+M2bRNeDF
-X-Gm-Message-State: AOJu0Yxshb1I7qFPoj8ACdYkbSLixf7LLSMbfU+dcnv7r08wJq7FExu3
-	I6uY4c4MI/0WRFUMZJBwG/FEdf+6lAaYyqz7br/nVNWBglkkmZ7B
-X-Google-Smtp-Source: AGHT+IFQAXSwC7CWph66o2qslrBcegt+LnGMY50R391Gd4699spNLelUzhVLGhHKgU9hx/Njr1YmSQ==
-X-Received: by 2002:a0c:e7c4:0:b0:690:7345:6799 with SMTP id c4-20020a0ce7c4000000b0069073456799mr4332078qvo.17.1709555430222;
-        Mon, 04 Mar 2024 04:30:30 -0800 (PST)
-Received: from [10.102.4.159] ([208.195.13.130])
-        by smtp.gmail.com with ESMTPSA id kf9-20020a056214524900b0068fbdafa771sm5063885qvb.5.2024.03.04.04.30.29
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 04 Mar 2024 04:30:29 -0800 (PST)
-Message-ID: <629785cf-77c3-4b14-ab58-d4b2c75f254a@gmail.com>
-Date: Mon, 4 Mar 2024 04:30:27 -0800
+        d=1e100.net; s=20230601; t=1709570934; x=1710175734;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=y6c4ULGYfSqW+RPKDMPo8yq9tibiiE2qSK9J63ajOtY=;
+        b=H9eABtfCDJYFFhNS/zHbHAyjoE4SNM/ifgwNBM+VFxVXH5/tHTL7IzfuEPiXGXUpk5
+         ZX5Hkl9ButKZZnH/XxMeEUlzw4mimHIA0/fYQFBu2hrdL67QuLSs/ULub/W+yQHWB7qV
+         Ml2+GaiVvRzXnFP1F7gJXn9y86X+1Ob99cvUj6jayt95XMn7qTRxcJIgeO+qLMcvISoi
+         snq2kyxn1ikm+xUOg2vdD/r1CV56uJZeqZqFGqUKULXKaOovGlgFA77wIDySV5t16yDp
+         1NUQgLTloYPovlRWGqN7f3aypuH5z9ST/t3CMYUEOBTsfLV9SfEtWIRMAfssoK3cac4I
+         ADLA==
+X-Gm-Message-State: AOJu0YzMAkVrSKeRJCUMa2wG+eR4Not/5oYrZA7g5PlJfTyPHOyEJvhP
+	ahRDnR2tRq8/lzYgEjGBQrw/uFAdE4TlBqE2/tp+ZklGp8qTIVFNXTPKMKNh
+X-Google-Smtp-Source: AGHT+IHRM/GkUq1Vr+0XfqX9ruRsxNkSJBz4dCsX+shgVddlPCNnmICzOgxSesLOOqq12ieuSq2wzg==
+X-Received: by 2002:a05:6214:a4a:b0:690:59a9:2704 with SMTP id ee10-20020a0562140a4a00b0069059a92704mr8724899qvb.20.1709570933637;
+        Mon, 04 Mar 2024 08:48:53 -0800 (PST)
+Received: from LOCLAP699.rst-02.locus ([208.195.13.130])
+        by smtp.gmail.com with ESMTPSA id qq1-20020a0562142c0100b0068fdc55ec7dsm3858466qvb.68.2024.03.04.08.48.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 04 Mar 2024 08:48:53 -0800 (PST)
+From: James Prestwood <prestwoj@gmail.com>
+To: iwd@lists.linux.dev
+Cc: James Prestwood <prestwoj@gmail.com>
+Subject: [PATCH 1/5] client: remove unneeded initialization
+Date: Mon,  4 Mar 2024 08:48:42 -0800
+Message-Id: <20240304164846.1783148-1-prestwoj@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: IPv6 Privacy Extension support?
-Content-Language: en-US
-To: Hannes von Haugwitz <hannes@vonhaugwitz.com>, iwd@lists.linux.dev
-References: <20240301144608.GA25@magnesium.vonhaugwitz.com>
-From: James Prestwood <prestwoj@gmail.com>
-In-Reply-To: <20240301144608.GA25@magnesium.vonhaugwitz.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-Hi Hannes,
+---
+ client/display.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-On 3/1/24 6:46 AM, Hannes von Haugwitz wrote:
-> Hello,
->
-> I'm running Debian sid and iwd 2.15.
->
-> When I enable network configuration and IPv6 in iwd config, the IPv6
-> address contains the embedded interface identifier (i.e. the MAC
-> address), even though IPv6 Privacy Extension is enabled for the device
-> (net.ipv6.conf.wlan0.use_tempaddr = 2).
->
-> Do I miss something or is there no support for IPv6 Privacy Extension
-> in iwd?
+diff --git a/client/display.c b/client/display.c
+index 83214c86..f0f3282a 100644
+--- a/client/display.c
++++ b/client/display.c
+@@ -194,7 +194,7 @@ void display_refresh_set_cmd(const char *family, const char *entity,
+ 
+ 		for (i = 0; i < argc; i++) {
+ 			bool needs_quotes = false;
+-			char *p = argv[i];
++			char *p;
+ 
+ 			for (p = argv[i]; *p != '\0'; p++) {
+ 				if (*p != ' ')
+-- 
+2.34.1
 
-I'm not familiar with the privacy extensions specifically, but you can 
-enable MAC address randomization which should hide the MAC for you. You 
-can check the man pages for more details but in main.conf something like:
-
-[Settings]
-AddressRandomization=network
->
-> Best regards
->
-> Hannes
->
