@@ -1,59 +1,58 @@
-Received: from mail-oi1-f177.google.com (mail-oi1-f177.google.com [209.85.167.177])
+Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63ACC5CDCE
-	for <iwd@lists.linux.dev>; Wed,  6 Mar 2024 12:19:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 735F3EAD4
+	for <iwd@lists.linux.dev>; Thu,  7 Mar 2024 04:10:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709727585; cv=none; b=u4WUqH8QxsmBowEipIcU8S9dbvWLW94TjwFLVy+X6TRvMeEVA+51M+6cXsz2eV4kl2Q772GHgDzTEeQ95FnTjnDQUg3BtRsr+rF52Vg2RObTsEPWFzUxreNdCehEhAWBjskkp5kb1tgDCjK0Vk8j60Q8CKn6Qz0j9JxjjQtQn4Y=
+	t=1709784653; cv=none; b=r/vN3HALAqnG8U6K5ioudQ8eWWmlh66/MJ5P/R7bma0PPfTa5dq7Km8ryutHp7mh/+DlkJdXRI9J2tqPm9tykHpbtwjCYrzCFIPg8yYbAiFIEYyUo91LIne/Q7STfdEerGucapFLUbYHM4dicOV07vXwEDKtigN1/Z8hiZ5Q9n0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709727585; c=relaxed/simple;
-	bh=E/HqaTUqPkBwUfp3NDDSMcBwyV5MlblnI10ypxh9Ib4=;
+	s=arc-20240116; t=1709784653; c=relaxed/simple;
+	bh=WsLryTbfZ4TmjUm30ga1WTUjrY/lMN3Z60WhmjvjLUM=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=rYaay06EWbGH8HzKAOYFGyj/0yl901sxSPmJxeW3VofvW9o6ZILZjjgxdD9p7WEqqLFMV4g/BPGSmOY3q/eWmGjjLpfglbsr9cYU1jzDYyjNX8aOCmrS21gpGeJhTrEwcQAoheTu3V76qYkwPD8N6nmQo8O5TUG/HQu5oywPZDw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZGs+1HT4; arc=none smtp.client-ip=209.85.167.177
+	 In-Reply-To:Content-Type; b=Kcr9Rdl0xrySDwwxrNZLpyYDidCGEmcn6FA1LOupd0PTFOGRiJDCy0fKT3lxsScm7Ia1ISqI03rzAum1A7R3/BLA7oHHT7TXFuLMMw1Eh5EZe8gpHs5UNJlES73FnceIH1aFFb88I+lpmBte82k6EpkW7ouFZRIRANrBIdgmj9w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kpEf+llJ; arc=none smtp.client-ip=209.85.214.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZGs+1HT4"
-Received: by mail-oi1-f177.google.com with SMTP id 5614622812f47-3c1e992f060so2066733b6e.0
-        for <iwd@lists.linux.dev>; Wed, 06 Mar 2024 04:19:44 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kpEf+llJ"
+Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-1dca160163dso3968255ad.3
+        for <iwd@lists.linux.dev>; Wed, 06 Mar 2024 20:10:52 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1709727583; x=1710332383; darn=lists.linux.dev;
+        d=gmail.com; s=20230601; t=1709784652; x=1710389452; darn=lists.linux.dev;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=Jh8aUDKc5QtEIKwMbhSPYl4pJqwYWaNJ/2ZokPCF33M=;
-        b=ZGs+1HT45uI0xklI8A3wInGdYuLSroMtJuAZhRI1Mwj7qPLNHl2Ml+AX1ZclrYWh1d
-         0GNer2C6F2SjYYUZ5Y7SMtNXvO+xv1e1nnvwPJ+S+8MGqA+NmcXkQfNePwAYBGfRgsPa
-         ZcSXlh2SJQhYKCxZmj2KfMnnqLPuqo24Ewnh3G9RwgJJT+PpLj8RhT0ILWfkj8Yq16vI
-         2ux02WGkgUYputOs3TGBLK2lSUb6sXC0xOY+AbLmqZsMtI/WKRty9VI7v90oHz3YORTq
-         sWVYGCuWPiaUYi5oUrGdO/i8iTh8z0kd8oqdBQNcrYaL5jBvsC9fZl6SBI3BpaSAUskv
-         v1JQ==
+        bh=X/DUnVWETDtzXGNsdW2+Hh6Xh0WjRBPPe7PWw00hVWE=;
+        b=kpEf+llJlOWmklSRJlbyeXoi7R4lOWw3Lk1d63U+oqFbp8UXfI9LEcGxzbGvwcXuTu
+         K3FWix6+1EHBGK6d1hu0ry2LWohriSuyhamtMSg/nkuHA5prfeF8xeB+buw/mUBwsLnU
+         uHKQNnA7P3c6nHQmVaOG0f/LjH/ak6l5s5YcX/1qbFz6KWfthZqC+mq8cZ8M0c00uXmn
+         grOFZbZ94UzCZ4U0oQu7HRfR0ebYZittYkWst6f+IjMizIs4qhrRG+OyO0MeX+aQ6Mwh
+         /lGKUWVReQyupKx8pgtjq9IXWX/VPFdj/kxLzYxIoAXLaJmshgZsWRcCuQI8G1lsxQdT
+         XM4A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709727583; x=1710332383;
+        d=1e100.net; s=20230601; t=1709784652; x=1710389452;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Jh8aUDKc5QtEIKwMbhSPYl4pJqwYWaNJ/2ZokPCF33M=;
-        b=lUOqZ001+W0tQMJjmmOL/ERYbWk/F+yMkaDmImq+ZJF+YjNBR/k3pVqr2c0SECIlEW
-         1FePcEyu/l54gUla+Dod+u9nNmlne7lczp3hSSFl9oXgcvi61H5KjktbnTuoS+T8BOeC
-         UIPceO4bH2Xm/zV0euC2Gf/SCkI1jeH99zW10uz5AMEhEDIQam2TZM3F9864vR8e89Z+
-         QzRjE+1ZjtzRY2w4++qmWaIlqi+Os0AZ2rB+lgubSh/m7SbSGHf4A3AfIvO3NNFSpkaA
-         aj9sSpYYxaDE6HIF+XUDWK93VEWwLXj9GC/K/FBgGywfe6nLKWnr0VqQrKrv6uC6j4nX
-         CalA==
-X-Forwarded-Encrypted: i=1; AJvYcCX75XE2omZIBBKKSNH5oLVocTYfT6PZjJaonRGJ6VWl/LQpdtJh785wDudpvlYAVjCHVG1KKQpTLpbhDxeVtFutOlYb
-X-Gm-Message-State: AOJu0Ywu/xBVCt006S+k9ZWESHTql04pHVMkUt4m2ypDDE6ZPZU45Z4b
-	KcKgdaRKWTiBhvj+/b1aR+Qb4IWliSHGn6/nt3b230UalQ8OqcU8hz+ORzZk
-X-Google-Smtp-Source: AGHT+IERBUzGGEWGK6iichDXBPQPm0Fc76aAc1zCleUazEf2V4PNvVtQjie5cq8CgepG8/GfXxLVhg==
-X-Received: by 2002:a05:6808:21a8:b0:3c1:e05f:d2b3 with SMTP id be40-20020a05680821a800b003c1e05fd2b3mr5754319oib.0.1709727583491;
-        Wed, 06 Mar 2024 04:19:43 -0800 (PST)
-Received: from [192.168.254.87] ([50.39.172.77])
-        by smtp.gmail.com with ESMTPSA id a24-20020a631a18000000b005dc491ccdcesm10613108pga.14.2024.03.06.04.19.43
+        bh=X/DUnVWETDtzXGNsdW2+Hh6Xh0WjRBPPe7PWw00hVWE=;
+        b=WaBPL5oF8u/6QXwGmlQAVeS8bC3DAghJgTS9TMMYV0Fxc/W5V/kxljfYA+SxWCAHDK
+         8O48aHwZ4ZIyqI1AXOF8twuIkK0Jnye+wJrQANUgV9lc+An2/TuHceFzzzLYWdO1qYDy
+         Pbsr4J/n8DcndUXuFauxvx860mCzyRTeAZZbAxFKJ3o+XImGw2caV/B+hpGyJ45a4gL2
+         QDxgtXFOFNsbxXZftl2Olobxbae0pn9/3NLrpWOEkjoBteHZbZKs5mOP5D1M+9wyjdfr
+         NAQRilDVzAaxBsHhPKLKVRPgviGC/uM4qdQ7rVdkPmigEN7fss9UAghEQOEPg7akET8b
+         HPfw==
+X-Gm-Message-State: AOJu0Yzbn68x5XBer2eMM7W7S889Jo06LY+C7L6kFMklxxG+UNfs/IPy
+	NiJnTUo8lPIhkhPKRIxVFJVWnHYN7PwyTOcGZdNAppBeOHN+xQsl
+X-Google-Smtp-Source: AGHT+IHfBXaHkFqvjnhaiDGb5pRTbbgTKBAaz3KUus59b76t31Sc2g+8AAbZg03/yn0BgIrxsfu6/Q==
+X-Received: by 2002:a17:902:748c:b0:1dc:f913:797c with SMTP id h12-20020a170902748c00b001dcf913797cmr7629806pll.51.1709784651723;
+        Wed, 06 Mar 2024 20:10:51 -0800 (PST)
+Received: from [192.168.10.12] (M106072137096.v4.enabler.ne.jp. [106.72.137.96])
+        by smtp.gmail.com with ESMTPSA id n4-20020a170903110400b001dc391cc28fsm13349666plh.121.2024.03.06.20.10.50
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 06 Mar 2024 04:19:43 -0800 (PST)
-Message-ID: <047c2dfc-ca69-4117-a3a6-66790b9814db@gmail.com>
-Date: Wed, 6 Mar 2024 04:19:41 -0800
+        Wed, 06 Mar 2024 20:10:51 -0800 (PST)
+Message-ID: <d458ae0e-7930-4192-a72b-9527eff2cc47@gmail.com>
+Date: Thu, 7 Mar 2024 13:10:48 +0900
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
@@ -61,57 +60,54 @@ List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: IPv6 Privacy Extension support?
+Subject: Re: How to connect specifying the BSSID?
 Content-Language: en-US
-To: Grant Erickson <gerickson@nuovations.com>
-Cc: Hannes von Haugwitz <hannes@vonhaugwitz.com>, iwd@lists.linux.dev
-References: <20240301144608.GA25@magnesium.vonhaugwitz.com>
- <629785cf-77c3-4b14-ab58-d4b2c75f254a@gmail.com>
- <20240304193253.GA25@magnesium.vonhaugwitz.com>
- <BBC776B8-57F8-460D-A1CC-FD3B5A522311@nuovations.com>
-From: James Prestwood <prestwoj@gmail.com>
-In-Reply-To: <BBC776B8-57F8-460D-A1CC-FD3B5A522311@nuovations.com>
+To: James Prestwood <prestwoj@gmail.com>
+Cc: iwd@lists.linux.dev
+References: <CAKbf6axbkp5E1M8Pvm1SbPOQFtzxX8Cdwj9YjbYNy0aekHDHzw@mail.gmail.com>
+ <1aebf48a-0ed4-4605-a03b-5f6e0706ed71@gmail.com>
+ <CAKbf6aw-So-y=NuHTo-GqTRmjPR7pN1j8UOmHOvvRETBM-3XoA@mail.gmail.com>
+ <0f64f742-4fbc-4493-9fd8-bd0afdc9f4a7@gmail.com>
+ <CAKbf6aw-YXxxtPFKrQW-42jrzUW5dBMdW-RjQqf4tAr-fkdaFA@mail.gmail.com>
+ <435173fa-ab58-4216-a53f-8ce66ee5b561@gmail.com>
+From: Kentaro Yamaguchi <kentaro.y@gmail.com>
+In-Reply-To: <435173fa-ab58-4216-a53f-8ce66ee5b561@gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-Hi,
+Hi James,
 
-On 3/4/24 1:40 PM, Grant Erickson wrote:
-> On Mar 4, 2024, at 11:32 AM, Hannes von Haugwitz <hannes@vonhaugwitz.com> wrote:
->> On Mon, Mar 04, 2024 at 04:30:27AM -0800, James Prestwood wrote:
->>> I'm not familiar with the privacy extensions specifically, but you can
->>> enable MAC address randomization which should hide the MAC for you. You can
->>> check the man pages for more details but in main.conf something like:
->>>
->>> [Settings]
->>> AddressRandomization=network
->> MAC address randomization hides the physical MAC address but does not
->> prevent device tracking (within the same network). With privacy extension
->> enabled, the IPv6 address is randomly regenerated every few hours.
->>
->> For more details see [RFC_4941].
->>
->> Best regards
->>
->> Hannes
-> James:
->
-> I believe it’s handled in connman with these APIs:
->
->      https://git.kernel.org/pub/scm/network/connman/connman.git/tree/src/ipconfig.c#n528
->
-> with the Linux kernel “use_tempaddr” sysctl setting. I assume iwd would have to replicate this infrastructure, or pull it into ELL and share it that way.
+Thank you for looking at the log.
 
-Hmm, if this is all that's required then shouldn't this already work if 
-Hannes is setting "use_tempaddr" externally to IWD? Of course having 
-this within an IWD profile setting would be nice, but I think there must 
-be more too it than this right?
+After creating the profile, I executed the command and was able to 
+connect to the specified BSSID.
+
+The cause was that the profile was being deleted when connecting to a 
+different BSSID.
 
 Thanks,
 
-James
+Kentaro Yamaguchi
 
-> Best,
+On 2024/03/06 21:14, James Prestwood wrote:
+> Hi Kentaro,
 >
-> Grant
+> On 3/5/24 8:17 PM, Kentaro Yamaguchi wrote:
+>>  Hi James,
+>>
+>> The IWD log is as follows.
+>> I have confirmed that it is possible to connect to the same BSSID 
+>> using a combination of nmcli and wpa_suplicant.
+>>
+> Thanks I see whats going on. There is no network profile so iwctl is 
+> using an agent to ask for the passphrase. Once the passphrase is 
+> obtained IWD still chooses the "best" BSS to connect to. This is a 
+> test API after all.
+>
+> You could drop a network profile into /var/lib/iwd/ then use the debug 
+> API and it should work.
+>
+> Thanks,
+>
+> James
 >
