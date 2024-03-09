@@ -1,113 +1,113 @@
-Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mout-b-210.mailbox.org (mout-b-210.mailbox.org [195.10.208.40])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 735F3EAD4
-	for <iwd@lists.linux.dev>; Thu,  7 Mar 2024 04:10:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BAD64EB55
+	for <iwd@lists.linux.dev>; Sat,  9 Mar 2024 21:19:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.10.208.40
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709784653; cv=none; b=r/vN3HALAqnG8U6K5ioudQ8eWWmlh66/MJ5P/R7bma0PPfTa5dq7Km8ryutHp7mh/+DlkJdXRI9J2tqPm9tykHpbtwjCYrzCFIPg8yYbAiFIEYyUo91LIne/Q7STfdEerGucapFLUbYHM4dicOV07vXwEDKtigN1/Z8hiZ5Q9n0=
+	t=1710019190; cv=none; b=DzgxLg26Ng0+5Fjos+wPaGN45eoQiRPPJ9RL/LqWt3uUCfsnexKVey8wyUl5dEHwEtituwJIGksX/3fBY0gwpdDStT9n3rbYX4kvX0Lx6uiMeVT8w6nNqqUDdWgxdPQFZDWZIMGdX1ok+HS8mp7gJe7/dazSZYGUUyesIuKB6tg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709784653; c=relaxed/simple;
-	bh=WsLryTbfZ4TmjUm30ga1WTUjrY/lMN3Z60WhmjvjLUM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Kcr9Rdl0xrySDwwxrNZLpyYDidCGEmcn6FA1LOupd0PTFOGRiJDCy0fKT3lxsScm7Ia1ISqI03rzAum1A7R3/BLA7oHHT7TXFuLMMw1Eh5EZe8gpHs5UNJlES73FnceIH1aFFb88I+lpmBte82k6EpkW7ouFZRIRANrBIdgmj9w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kpEf+llJ; arc=none smtp.client-ip=209.85.214.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1710019190; c=relaxed/simple;
+	bh=P3Kkd7Tbq2TwaZxyoiThJiXX8hEkLjRdhjb0zfVKDYU=;
+	h=Message-ID:Date:MIME-Version:To:From:Subject:Content-Type; b=bnp7VaxnrMjb5XrgHELxF3J7xMKeQ0cOqPkmNqABiVo5BqjB44gYVgFGgFhsxBAKXbOrkvTGn9w/xQ4ldkPpmLZY2IoyoUrDgpZaxeO6HXHR42SfudsHLxPSC8loLsisLWhDtiu/tdMY6oTaXLUIXV2HUxS7BW8KWtehnuHNhnw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tavla.de; spf=pass smtp.mailfrom=tavla.de; dkim=pass (2048-bit key) header.d=tavla.de header.i=@tavla.de header.b=0thHCN77; arc=none smtp.client-ip=195.10.208.40
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tavla.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tavla.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kpEf+llJ"
-Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-1dca160163dso3968255ad.3
-        for <iwd@lists.linux.dev>; Wed, 06 Mar 2024 20:10:52 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1709784652; x=1710389452; darn=lists.linux.dev;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=X/DUnVWETDtzXGNsdW2+Hh6Xh0WjRBPPe7PWw00hVWE=;
-        b=kpEf+llJlOWmklSRJlbyeXoi7R4lOWw3Lk1d63U+oqFbp8UXfI9LEcGxzbGvwcXuTu
-         K3FWix6+1EHBGK6d1hu0ry2LWohriSuyhamtMSg/nkuHA5prfeF8xeB+buw/mUBwsLnU
-         uHKQNnA7P3c6nHQmVaOG0f/LjH/ak6l5s5YcX/1qbFz6KWfthZqC+mq8cZ8M0c00uXmn
-         grOFZbZ94UzCZ4U0oQu7HRfR0ebYZittYkWst6f+IjMizIs4qhrRG+OyO0MeX+aQ6Mwh
-         /lGKUWVReQyupKx8pgtjq9IXWX/VPFdj/kxLzYxIoAXLaJmshgZsWRcCuQI8G1lsxQdT
-         XM4A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709784652; x=1710389452;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=X/DUnVWETDtzXGNsdW2+Hh6Xh0WjRBPPe7PWw00hVWE=;
-        b=WaBPL5oF8u/6QXwGmlQAVeS8bC3DAghJgTS9TMMYV0Fxc/W5V/kxljfYA+SxWCAHDK
-         8O48aHwZ4ZIyqI1AXOF8twuIkK0Jnye+wJrQANUgV9lc+An2/TuHceFzzzLYWdO1qYDy
-         Pbsr4J/n8DcndUXuFauxvx860mCzyRTeAZZbAxFKJ3o+XImGw2caV/B+hpGyJ45a4gL2
-         QDxgtXFOFNsbxXZftl2Olobxbae0pn9/3NLrpWOEkjoBteHZbZKs5mOP5D1M+9wyjdfr
-         NAQRilDVzAaxBsHhPKLKVRPgviGC/uM4qdQ7rVdkPmigEN7fss9UAghEQOEPg7akET8b
-         HPfw==
-X-Gm-Message-State: AOJu0Yzbn68x5XBer2eMM7W7S889Jo06LY+C7L6kFMklxxG+UNfs/IPy
-	NiJnTUo8lPIhkhPKRIxVFJVWnHYN7PwyTOcGZdNAppBeOHN+xQsl
-X-Google-Smtp-Source: AGHT+IHfBXaHkFqvjnhaiDGb5pRTbbgTKBAaz3KUus59b76t31Sc2g+8AAbZg03/yn0BgIrxsfu6/Q==
-X-Received: by 2002:a17:902:748c:b0:1dc:f913:797c with SMTP id h12-20020a170902748c00b001dcf913797cmr7629806pll.51.1709784651723;
-        Wed, 06 Mar 2024 20:10:51 -0800 (PST)
-Received: from [192.168.10.12] (M106072137096.v4.enabler.ne.jp. [106.72.137.96])
-        by smtp.gmail.com with ESMTPSA id n4-20020a170903110400b001dc391cc28fsm13349666plh.121.2024.03.06.20.10.50
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 06 Mar 2024 20:10:51 -0800 (PST)
-Message-ID: <d458ae0e-7930-4192-a72b-9527eff2cc47@gmail.com>
-Date: Thu, 7 Mar 2024 13:10:48 +0900
+	dkim=pass (2048-bit key) header.d=tavla.de header.i=@tavla.de header.b="0thHCN77"
+Received: from smtp202.mailbox.org (smtp202.mailbox.org [10.196.197.202])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mout-b-210.mailbox.org (Postfix) with ESMTPS id 4TsbLK2m27zDv6D
+	for <iwd@lists.linux.dev>; Sat,  9 Mar 2024 22:11:05 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tavla.de; s=MBO0001;
+	t=1710018665;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=xV8pj0GqQ9RHWrvUTx/mmALcASXGpR75DjWl/6COFfU=;
+	b=0thHCN772BduXvTCYHJ4xyRyQY1gxMrXyxz7xyC5+SibDP2nIkxRMpmjuxEMcLEyQmDLDR
+	TcIbCsmyJ5qn5vW9puPEfRiAzUYSAURx0Xc/Uk8/MkAXbAHkqFJu88OtyMDen67wSA9v4i
+	I5m47UFMxL4NlpJoZ+u3JcL+IP09OZexFjYyELAms1NwVxod7ilug6hmcdo42eeEnGgDSh
+	DJscj2dE63Z7UbcHlEEVi/8wBIGo/cAU4LYjCc3JCp45ac6YoaunOr/pfDSEQ47WWy0uCm
+	F5bx1Xm1yGvOmS/BZRg+X2MabKq8HoOlyCAnku+ON7M4a2Acn3phl+AdRFxftw==
+Message-ID: <07009e2a-3ad7-4a8c-bcbf-a665a19bd03f@tavla.de>
+Date: Sat, 9 Mar 2024 22:11:03 +0100
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: How to connect specifying the BSSID?
-Content-Language: en-US
-To: James Prestwood <prestwoj@gmail.com>
-Cc: iwd@lists.linux.dev
-References: <CAKbf6axbkp5E1M8Pvm1SbPOQFtzxX8Cdwj9YjbYNy0aekHDHzw@mail.gmail.com>
- <1aebf48a-0ed4-4605-a03b-5f6e0706ed71@gmail.com>
- <CAKbf6aw-So-y=NuHTo-GqTRmjPR7pN1j8UOmHOvvRETBM-3XoA@mail.gmail.com>
- <0f64f742-4fbc-4493-9fd8-bd0afdc9f4a7@gmail.com>
- <CAKbf6aw-YXxxtPFKrQW-42jrzUW5dBMdW-RjQqf4tAr-fkdaFA@mail.gmail.com>
- <435173fa-ab58-4216-a53f-8ce66ee5b561@gmail.com>
-From: Kentaro Yamaguchi <kentaro.y@gmail.com>
-In-Reply-To: <435173fa-ab58-4216-a53f-8ce66ee5b561@gmail.com>
+To: iwd@lists.linux.dev
+Content-Language: en-GB
+From: Martin Petzold <martin.petzold@tavla.de>
+Subject: Using bind mount for /var/lib/iwd results in zero directory (and no
+ links) and no connections stored
+Organization: TAVLA Technology GmbH
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-Hi James,
+I want to use bind mounts for /var/lib/iwd. However, I realized that 
+sometimes (quit often and reproducible) a connection is not stored (I am 
+working on an embedded device and we are talking about a single 
+connection). I also realized that the directory has size zero (0) has no 
+links and this is different to my other bind mounts.
 
-Thank you for looking at the log.
+Just now I cannot test, how the situation is on first boot (early). As I 
+said, the situation comes up at some time.
 
-After creating the profile, I executed the command and was able to 
-connect to the specified BSSID.
+This is a fundamental issue for me. What is going wrong?
 
-The cause was that the profile was being deleted when connecting to a 
-different BSSID.
+#####
+
+$ sudo ls -l /var/lib/
+insgesamt 76
+drwxr-xr-x  5 root root 4096 24. Feb 17:05 apt
+drwxr-xr-x  3 root root 4096  8. Feb 2023  bluetooth <- also bind mount 
+with same configuration (files are written)
+drwxr-xr-x  2 root root 4096  3. Jul 2023  dbus
+drwxr-xr-x  7 root root 4096  9. Mär 20:44 dpkg
+drwxr-xr-x  2 root root 4096 22. Feb 2023  git
+drwx------  0 root root    0  9. Mär 20:47 iwd <- bind mount with same 
+configuration (files are NOT written)
+drwxr-xr-x  2 root root 4096  9. Mär 00:00 logrotate
+drwxr-xr-x  2 root root 4096  2. Apr 2023  misc
+drwxr-xr-x  2 root root 4096  3. Jul 2023  pam
+drwx------  3 root root 4096  3. Jul 2023  polkit-1
+drwx------  2 root root 4096  3. Jul 2023  private
+drwxr-xr-x  2 root root 4096  3. Jul 2023  python
+drwxr-xr-x  2 root root 4096  3. Jul 2023  rauc <- also bind mount with 
+same configuration (files are written)
+drwxr-xr-x  3 root root 4096  3. Jul 2023  sudo
+drwxr-xr-x 11 root root 4096  3. Jul 2023  systemd
+drwxr-xr-x  2 tss  tss  4096 30. Nov 2020  tpm
+drwxr-xr-x  3 root root 4096  3. Jul 2023  ucf
+drwxr-xr-x  2 root root 4096 28. Jul 2023  xkb
+
+#####
+
+UUID=09ad77a3-80ed-4e27-8014-aa7bde4da14c       /       ext4 
+defaults        0       1
+LABEL=system  /system   ext4    defaults        0       2
+LABEL=user    /home     ext4    defaults        0       2
+LABEL=boot    /boot/script      ext4    defaults        0       2
+/system/var/lib/bluetooth /var/lib/bluetooth none defaults,bind 0 0
+/system/var/lib/iwd /var/lib/iwd none defaults,bind 0 0
+/system/var/lib/rauc /var/lib/rauc none defaults,bind 0 0
+
+#####
+
+$ sudo iwctl --passphrase "<password>" station "wlan0" connect "<network>"
+
+-> Connection to network is up, but NO connection is saved - no file 
+exist (however, sometimes it is saved. Maybe only at the beginning and 
+then not any more)
+
+#####
 
 Thanks,
 
-Kentaro Yamaguchi
+Martin
 
-On 2024/03/06 21:14, James Prestwood wrote:
-> Hi Kentaro,
->
-> On 3/5/24 8:17 PM, Kentaro Yamaguchi wrote:
->>  Hi James,
->>
->> The IWD log is as follows.
->> I have confirmed that it is possible to connect to the same BSSID 
->> using a combination of nmcli and wpa_suplicant.
->>
-> Thanks I see whats going on. There is no network profile so iwctl is 
-> using an agent to ask for the passphrase. Once the passphrase is 
-> obtained IWD still chooses the "best" BSS to connect to. This is a 
-> test API after all.
->
-> You could drop a network profile into /var/lib/iwd/ then use the debug 
-> API and it should work.
->
-> Thanks,
->
-> James
->
