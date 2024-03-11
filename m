@@ -1,101 +1,105 @@
-Received: from mail-ed1-f45.google.com (mail-ed1-f45.google.com [209.85.208.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mout-b-206.mailbox.org (mout-b-206.mailbox.org [195.10.208.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A24A51C44
-	for <iwd@lists.linux.dev>; Mon, 11 Mar 2024 18:19:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA5AF56451
+	for <iwd@lists.linux.dev>; Mon, 11 Mar 2024 18:47:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.10.208.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710181166; cv=none; b=FMnv+F4iQUqayksXhtB7AaQx+iaD0CmxJCb4VCotPeUlwBGYgQDD8tm27JahBdh7gyZCRCLyE4/fsFN4wyYYUvlb9NYwou5dgpZETko0CJdn7W0Sn+X3pVBt2m9MsRIIwsNiAbEshnj/vn6WDtQrSHu7M1I0ZPjy7VAYrCEeju4=
+	t=1710182875; cv=none; b=f4TkCcxU3eLBDOIZ5/rvqDFiMhEbvIWFB3NDi1AG3KRF/Fh523uFuBquMaM/0gHNTZBt+s/tStCCa76bZC6bW5n7A59YTmIxyh85p/LMAtg6yAA6xU1OT2ggNR0E464oSqntxIKrf91bqurmlYWhO4cQR+r65FVzgnG/i7k8eVY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710181166; c=relaxed/simple;
-	bh=ZrVxUBPX51NJKpfkd+vltKZXGqq8wjBO+u+jqQgX9vc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=AUe7Fp7wrzDaLSXIhGd2Ss0poDvQ99FpiInbUSalkXMHVgenzs2D3/rh5kb4wO/kqey7fRfeOaHJG9Lu8A+JV4Dj5NRA5n8XZ1At8jS7HT11wEq6uxQYM67Fs2RovMebBT4/hi+c6qYd/OjVuAYEAPU/39lD0ygiJMZKipnDyoc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=redpinelabs.com; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=redpinelabs.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-5682ecd1f81so4343917a12.0
-        for <iwd@lists.linux.dev>; Mon, 11 Mar 2024 11:19:24 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710181162; x=1710785962;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=RvKPMyPWfVAbkNTdl5NkjpaoaJLLrE1L7fn0OCyUBCQ=;
-        b=u6s6TIjTCJkAeldhlVEDuCziLPTcTGjfR/LiRzylcYBZoweZErCD759vf+SBGdKm0p
-         ARlf6jmam2HUfFiq5Tn9fuW/RL7+l7eG5lZhjbdi+YOOTuibL4W6q2AuUSihSyFWq4XO
-         9/7abgZkPK3HzphGhN9cMedTAc2QiWhd2W3RtmjOWVjvQtkGY3L3+CRQyz2KfZOdU65t
-         mBcjL83/iFz7PyDfrOrjoNFpD1rZ+au+unB1sQH+d9Ilm1DYjobcnqiwv3/2XuHm9VHn
-         xoyxJoBG9tNkz4KJ4W4onpMWpYSsb+1TY70pZqeiFvULNgIy9UFJAj/6kuc1EHY0YwjJ
-         /YQQ==
-X-Gm-Message-State: AOJu0YzYK3i3V5ZARSB+y/srtfYnqxxWmuNBmwKlNsIA4QPsATEXnodz
-	5rOQmZjTYO2LMrrlQzCkawidKyna0J6OdP9pZLZv8uwdVkbeaJvcdcF3Pe9j83g=
-X-Google-Smtp-Source: AGHT+IE7HtvJtuHTpJ1MpHnMTrEeD9WYBJRw71mfN9nNNOWlAdEfW9HPJ7VK0RyOG8FeJ66rDly6OQ==
-X-Received: by 2002:a50:f68e:0:b0:566:f733:45da with SMTP id d14-20020a50f68e000000b00566f73345damr5412952edn.22.1710181162255;
-        Mon, 11 Mar 2024 11:19:22 -0700 (PDT)
-Received: from mail-ej1-f41.google.com (mail-ej1-f41.google.com. [209.85.218.41])
-        by smtp.gmail.com with ESMTPSA id h19-20020aa7c613000000b005673e29cc0fsm3112451edq.54.2024.03.11.11.19.22
-        for <iwd@lists.linux.dev>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 11 Mar 2024 11:19:22 -0700 (PDT)
-Received: by mail-ej1-f41.google.com with SMTP id a640c23a62f3a-a450bedffdfso614036266b.3
-        for <iwd@lists.linux.dev>; Mon, 11 Mar 2024 11:19:22 -0700 (PDT)
-X-Received: by 2002:a17:906:395b:b0:a45:182e:29ba with SMTP id
- g27-20020a170906395b00b00a45182e29bamr4354302eje.30.1710181161981; Mon, 11
- Mar 2024 11:19:21 -0700 (PDT)
+	s=arc-20240116; t=1710182875; c=relaxed/simple;
+	bh=uZDc/uv9VenbrYa/CfQ0KKTc3foXJ2g1zI0uhPoZJ2Y=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=N82o2bz1g7wwxiHl9ydT33dFxN3YOSR0btkBJZOEX9ir2iAxNQqOfIvVOfbIqWE2VJ/Mu6EEH4VAqy6OVFFMUWv5ybQsyhvgh+ok7Wgu1johIsakCm0rS9ucJ9MFge6hW67uc4EVqHDMGC7pyHsGOsJtNaCACag0wkaqRP/Mq9c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tavla.de; spf=pass smtp.mailfrom=tavla.de; dkim=pass (2048-bit key) header.d=tavla.de header.i=@tavla.de header.b=SQfoC7tS; arc=none smtp.client-ip=195.10.208.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tavla.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tavla.de
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=tavla.de header.i=@tavla.de header.b="SQfoC7tS"
+Received: from smtp202.mailbox.org (smtp202.mailbox.org [10.196.197.202])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mout-b-206.mailbox.org (Postfix) with ESMTPS id 4Ttlv565rxz9tZj;
+	Mon, 11 Mar 2024 19:40:01 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tavla.de; s=MBO0001;
+	t=1710182401;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=mXYbv5xzuu636rpJCAvzCPHryQgMyrOIoY0o5kOw1cc=;
+	b=SQfoC7tS6JmLIFIiEdqHL/BbvCv/fata0gxeiSiwr64oWw/Sc5Zm+0T/yDpyVd95pSevWf
+	pY+9lkGsL4A/F5Gjv+pQiWAmd/gpdrwSxVpG0ybYt6Y74gfiHyhbwbeS6Bhbau3HzgsS4X
+	9EeRekdDE5ltiwC9MCmNol1Idwmf0R/rvbbc0bfzfsphsfs214SrpydA39OjM64vSvBBeh
+	3bax04uNx6mPkJ1B4W7Ss05/JZFSckS38/HYJN6gHvzXkCap8aS6tz/iV9zjurHncK3UXp
+	vAvjpWvyb5HI8XnXuVPOUjioi5VfvPUxrCCggeMCdDdcJQyoc4XLsAcZXMli1A==
+Message-ID: <8405c408-5f80-4f3a-a27c-cc4687632367@tavla.de>
+Date: Mon, 11 Mar 2024 19:40:00 +0100
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <07009e2a-3ad7-4a8c-bcbf-a665a19bd03f@tavla.de> <26f4ecf5-2f67-43f4-b197-9caea5ce9319@tavla.de>
-In-Reply-To: <26f4ecf5-2f67-43f4-b197-9caea5ce9319@tavla.de>
-From: Bryce Johnson <bryce@redpinelabs.com>
-Date: Mon, 11 Mar 2024 12:19:10 -0600
-X-Gmail-Original-Message-ID: <CADXxVSKSA66S+PJLrdZV5mvHn+dYjFJ7K8E=YMNfiUfTHv46+g@mail.gmail.com>
-Message-ID: <CADXxVSKSA66S+PJLrdZV5mvHn+dYjFJ7K8E=YMNfiUfTHv46+g@mail.gmail.com>
 Subject: Re: Using bind mount for /var/lib/iwd results in zero directory (and
  no links) and no connections stored
-To: Martin Petzold <martin.petzold@tavla.de>
+Content-Language: en-GB
+To: Bryce Johnson <bryce@redpinelabs.com>
 Cc: iwd@lists.linux.dev
-Content-Type: text/plain; charset="UTF-8"
+References: <07009e2a-3ad7-4a8c-bcbf-a665a19bd03f@tavla.de>
+ <26f4ecf5-2f67-43f4-b197-9caea5ce9319@tavla.de>
+ <CADXxVSKSA66S+PJLrdZV5mvHn+dYjFJ7K8E=YMNfiUfTHv46+g@mail.gmail.com>
+From: Martin Petzold <martin.petzold@tavla.de>
+Organization: TAVLA Technology GmbH
+In-Reply-To: <CADXxVSKSA66S+PJLrdZV5mvHn+dYjFJ7K8E=YMNfiUfTHv46+g@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Hi Martin,
+My solution in a systemd service is now:
 
-> Is there an iwctl command to drop / forget ALL existing connections?
+ExecStart=-/usr/bin/bash -c '/usr/bin/rm --recursive --force 
+/var/lib/iwd/{*,.*}'
+ExecStart=-/usr/bin/systemctl restart iwd
+
+# bash is required for '{*,.*}'
+
+Am 11.03.24 um 19:19 schrieb Bryce Johnson:
+> Hi Martin,
 >
-> #####
-
-I would be interested if there was a way to do it with iwctl, but I
-have a python script I use to forget all wifi networks, Here is the
-important part:
-
-#!/usr/bin/python3
-
-import dbus
-
-bus = dbus.SystemBus()
-
-try:
-    # IWD forgot section: based on
-https://git.kernel.org/pub/scm/network/wireless/iwd.git/tree/test/list-known-networks
-    manager = dbus.Interface(bus.get_object('net.connman.iwd', '/'),
-                            'org.freedesktop.DBus.ObjectManager')
-
-    for path, interfaces in manager.GetManagedObjects().items():
-        if 'net.connman.iwd.KnownNetwork' not in interfaces:
-            continue
-
-        network = interfaces['net.connman.iwd.KnownNetwork']
-
-        obj = dbus.Interface(bus.get_object('net.connman.iwd', path),
-                            'net.connman.iwd.KnownNetwork')
-        obj.Forget()
-
-        print("%s network forgotten in IWD" % network['Name'])
-
-
-except:
-    print("Skipping IWD forget network")
-    pass
+>> Is there an iwctl command to drop / forget ALL existing connections?
+>>
+>> #####
+> I would be interested if there was a way to do it with iwctl, but I
+> have a python script I use to forget all wifi networks, Here is the
+> important part:
+>
+> #!/usr/bin/python3
+>
+> import dbus
+>
+> bus = dbus.SystemBus()
+>
+> try:
+>      # IWD forgot section: based on
+> https://git.kernel.org/pub/scm/network/wireless/iwd.git/tree/test/list-known-networks
+>      manager = dbus.Interface(bus.get_object('net.connman.iwd', '/'),
+>                              'org.freedesktop.DBus.ObjectManager')
+>
+>      for path, interfaces in manager.GetManagedObjects().items():
+>          if 'net.connman.iwd.KnownNetwork' not in interfaces:
+>              continue
+>
+>          network = interfaces['net.connman.iwd.KnownNetwork']
+>
+>          obj = dbus.Interface(bus.get_object('net.connman.iwd', path),
+>                              'net.connman.iwd.KnownNetwork')
+>          obj.Forget()
+>
+>          print("%s network forgotten in IWD" % network['Name'])
+>
+>
+> except:
+>      print("Skipping IWD forget network")
+>      pass
+>
