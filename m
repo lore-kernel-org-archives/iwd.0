@@ -1,62 +1,62 @@
-Received: from mail-qk1-f175.google.com (mail-qk1-f175.google.com [209.85.222.175])
+Received: from mail-qk1-f180.google.com (mail-qk1-f180.google.com [209.85.222.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA7C161674
-	for <iwd@lists.linux.dev>; Wed, 13 Mar 2024 17:13:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DEC497BAE7
+	for <iwd@lists.linux.dev>; Wed, 13 Mar 2024 17:13:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710350021; cv=none; b=givSSLoRvVC2Ko7H7AiaccbZCnOO9cJ7mC0J2hBBtBlhdStaAfjunbHlWvK9V/GIAYzYAW3yPpmKmI9gjuEhKkUULiCcIi/CiZLL/Vb04e/Cumx4qMj8UqNbeZ3wUtrNen/b0JmcY91F1aAnn4pyD1d5fjUgjFMGqj2/LyBgaCM=
+	t=1710350021; cv=none; b=Jkz9H8KSXLl1NokLhq7MvxpCCdla9xhQz9NeNkM/yZCAg+2Dp+kThjep6wRRbd+zVXixy46LVOudskmjyRJl/Z9dbus5H5u2S3DQVPI4b/PcY41sbWkyLinkVTJkIbdilpRezcXw3cIp77lwxYJXNzGtsXv46wUxxHqJgUqp6XM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1710350021; c=relaxed/simple;
-	bh=sFTQKNf5ZO84V2j7VJzumOiE8EsS7sMgoo117zfDSZQ=;
+	bh=lb9/VaPQdNylr3CnZS/warLCHD/03kqFpnOXWC0cQeg=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=XehDLPdUsADiRLOGwbGhzSFx5PGSazukWsv6IqLXrJOh0GsNAO5YHMRMZv0Llr/GK5Zs/nEAtqvFRUeRgx1JzKqmtc0Uims306zfUulTA/4kzqMhb1YR27osy+NgOR3ASlW34vIoXWmOmX39wc97rHSvMlVN/OVwSj1mitodbYs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hAFYOUhe; arc=none smtp.client-ip=209.85.222.175
+	 MIME-Version; b=TcXjpxTK/Jf8dJWM2zhKCAr6cbtdRIw5jFb6dDADn4v0zXOwA0JfO0LBA2V9a7PUgBRUshYxDdo3FFshEshiDz96E1imRttsepmuGOBvA68wQITd5YBDE9t3pFB5dn5ZC7+f4YJt6ZukOEuZXSPlEz7MXsOXJYpn2xVh65I4kss=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=e8JAEYcc; arc=none smtp.client-ip=209.85.222.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hAFYOUhe"
-Received: by mail-qk1-f175.google.com with SMTP id af79cd13be357-7882e94d408so4659985a.0
-        for <iwd@lists.linux.dev>; Wed, 13 Mar 2024 10:13:38 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="e8JAEYcc"
+Received: by mail-qk1-f180.google.com with SMTP id af79cd13be357-7882b1e87c4so3046685a.1
+        for <iwd@lists.linux.dev>; Wed, 13 Mar 2024 10:13:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1710350017; x=1710954817; darn=lists.linux.dev;
+        d=gmail.com; s=20230601; t=1710350018; x=1710954818; darn=lists.linux.dev;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=I2pOd3LND5n34HOza4BfVKn2HqMkXWPIWVe5Ll/LzXg=;
-        b=hAFYOUhemx9ZSrH/Y9JqqZ2AMAPbFF3s4hb6c9ONX10IhY993c/D6p6vF6WpG1Bc9e
-         FOVEDXaMYe/Vruxjx7ZVjIEDggFxMsdDf7tmURr70PgdNufPZts+F9x0+03EgwQGFO3u
-         2pzUp+1WzGSmeep1BZCqHiAfkvJ0aNfWnZoCFtbnZxzpSV8G6TbAuBU8jjiiPg6H8qyV
-         YO1QsCtpGmXb4wICFVbvwyqzCbpWMd/+nNFEoPdYeGGhnoDnPR5MjK5dm22VLzuR9fKO
-         M7e36feuqksAadD8D9418eSTds2dCqfkhwyvBaxksrnR5BNSZlSlCjRICWyfnAk+qxIC
-         eIuQ==
+        bh=TfggQUFqh8R0OL7pLM6apbCSjclCuBMPEFy6joovcww=;
+        b=e8JAEYccbZpzAv9y7XnaaPJjzEGVPyuX4DJB2+/qFyP8yG2yHuGGjWcoWCgUhUO4ZE
+         N4ldHdayFpx87ssUVdhNrdyQPCX12kt06BhovG0MXlU4ff1544BbW2SP0fYyO2ptg9ft
+         EEZoygJmiEJcMutsOuruY4qWooF5b3uAOJ0yUP3g09vIJDraWEXy8shd8mWtBD1a6zKp
+         rE+lgk2PPzwmVvL+Pr66nx0wLqwEufUV/JQZ4f7upH4P4a7BQj7iusZRvy3mc79oXsw2
+         AIXbUpffitlDSJWmw4WVB5s4wdGuDE8BsOkdcI2xvzhhC7BzRZitIi6hsNwKjTNzJcKU
+         v45w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710350017; x=1710954817;
+        d=1e100.net; s=20230601; t=1710350018; x=1710954818;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=I2pOd3LND5n34HOza4BfVKn2HqMkXWPIWVe5Ll/LzXg=;
-        b=sY+lmZXtvl+1NSUhkIRuveSV/qFQjdaAsy3wTAdZKr4B5i9yH+TG7xEg8tF5uaQ114
-         6U5HkXKJnmvtUWZPV7g29kmdmv1z7qDOojutesejEUJxEdS9ckZSRbpSAi0OE2NF3eTK
-         r7rCAUuIboX3iHbOnzBlYOIs/QXNpeLRMaLU/djtoCtuIO9MqDEHe/Lti5V8tTH5xsOy
-         A3f4By7VQZaYePNgdslfTe7mS9qR5boMQ/ImuSVc9dlIBrF5iEu75kHDRqFL6KqbV5SN
-         8/adshzhrxqzIlIgWiD8FB93nq9zDkgy83zBuFbTmE4cy6D3+Dd5YWGSIRrxZpq6HGfg
-         80iQ==
-X-Gm-Message-State: AOJu0Yy3KZCJ9hkcvJRw1urkN6G9+RBDq5IiqF6hVkUksAwUNa9FD8fW
-	3JIQshqtNE1nG45yXsWItV2CJI8bYdqf7nUs302kdnYliUeaxLAO00GoqrMs
-X-Google-Smtp-Source: AGHT+IH0oMPib90FrxTMSn6Y4BRw3SFIKqswpzmKIzR+UDyt89S86DuIUEoIfkTrtqZDTlmur4kd/w==
-X-Received: by 2002:a05:620a:211c:b0:788:776a:bcfa with SMTP id l28-20020a05620a211c00b00788776abcfamr451928qkl.74.1710350017371;
-        Wed, 13 Mar 2024 10:13:37 -0700 (PDT)
+        bh=TfggQUFqh8R0OL7pLM6apbCSjclCuBMPEFy6joovcww=;
+        b=UcUMz+L8GcQ9y0HcTR0tLnLqQ9DSdZh3SrNEOo3uh7X7waxrSSrBrwxdkBK6fOsYJP
+         49Wbtf2GsAedTJbv2S79M663+rEJWLd8LcUwpCdlPWG6yDajh+1xM4VzpTO7V3kAMPJR
+         lZBRGC/JOpMhIbdVH6N0xzZrJaFzo8szDtHSvxtaz9sA5ltxG9pgN3xpttkHtLwniSZo
+         1e299nIOfGa/oY0Nifby7CnhFa+DF9jdE9NZtvLz7HgUBW4aq7XAB7xa/wAg/ev3TOUw
+         4b6ETR9gv4ZbEg4lgmYkQpXwxbPOIWZlYw+fZNwriZKgYxsh0D3dtBpL9sT6Lt8fkYVJ
+         8TfQ==
+X-Gm-Message-State: AOJu0YxIdVBqWqaw9St+J5tx0tbBBOf4HgqEIabirI4i8EyzwPSkVSos
+	Iw994o3Lh2qROz5ZEvrw7ke4FHwnAmekRF9RTGycuovkE9yom6h80JD3h3BI
+X-Google-Smtp-Source: AGHT+IEQHVwOpFn4q0x9jThNAr1rtY/5qB3I8lJ+vdS772nllnc+EBQ5U6HGHTE9ZjTOFKns/4wGyw==
+X-Received: by 2002:a05:620a:1363:b0:788:2190:d293 with SMTP id d3-20020a05620a136300b007882190d293mr468027qkl.40.1710350018475;
+        Wed, 13 Mar 2024 10:13:38 -0700 (PDT)
 Received: from LOCLAP699.rst-01.locus ([208.195.13.130])
-        by smtp.gmail.com with ESMTPSA id i4-20020ae9ee04000000b007882e204d45sm4927136qkg.37.2024.03.13.10.13.36
+        by smtp.gmail.com with ESMTPSA id i4-20020ae9ee04000000b007882e204d45sm4927136qkg.37.2024.03.13.10.13.37
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 13 Mar 2024 10:13:37 -0700 (PDT)
+        Wed, 13 Mar 2024 10:13:38 -0700 (PDT)
 From: James Prestwood <prestwoj@gmail.com>
 To: iwd@lists.linux.dev
 Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [RFC 2/5] dpp-util: move AAD logic within dpp_append_wrapped_attributes
-Date: Wed, 13 Mar 2024 10:13:08 -0700
-Message-Id: <20240313171311.695830-3-prestwoj@gmail.com>
+Subject: [RFC 3/5] dpp-util: add dpp_append_point
+Date: Wed, 13 Mar 2024 10:13:09 -0700
+Message-Id: <20240313171311.695830-4-prestwoj@gmail.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240313171311.695830-1-prestwoj@gmail.com>
 References: <20240313171311.695830-1-prestwoj@gmail.com>
@@ -68,516 +68,52 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Leaving it up to the caller to calcluate the AAD resulted in lots of
-magic values, and any comments associated are spread out within
-dpp.c. The AAD values can be calculated entirely by the frame
-contents so move that within dpp_append_wrapped_data.
-
-The caller now only needs to pass the frame (after the mpdu header),
-the length, and the offset to where the wrapped data should start.
-The new AAD calculation includes all relavent comments so magic
-offsets are documented.
-
-The reason the entire mmpdu_body is not passed to
-dpp_append_wrapped_attributes (and one byte further) is to future
-proof for DPP encapsulation using TCP. For this, the category byte
-is omitted and only the action byte and further is encapsulated.
-Having dpp_append_wrapped_attributes start at the action byte
-allows it to work regardless of 8021x or TCP encapsulation.
+Any time DPP needs to append a point it has to use a temporary
+buffer to copy into, then copy that into the message buffer.
+Instead of this add a special purpose API to add the type/length
+then copy the data directly into the message buffer.
 ---
- src/dpp-util.c | 167 +++++++++++++++++++++++++++++++++++++++++++++----
- src/dpp-util.h |   5 +-
- src/dpp.c      |  99 +++++++++++++++++------------
- 3 files changed, 218 insertions(+), 53 deletions(-)
+ src/dpp-util.c | 13 +++++++++++++
+ src/dpp-util.h |  2 ++
+ 2 files changed, 15 insertions(+)
 
 diff --git a/src/dpp-util.c b/src/dpp-util.c
-index cfdedbdd..ada7ed96 100644
+index ada7ed96..81f34047 100644
 --- a/src/dpp-util.c
 +++ b/src/dpp-util.c
-@@ -39,6 +39,11 @@
- #include "ell/asn1-private.h"
- #include "src/ie.h"
- 
-+#define DPP_ACTION_VENDOR_SPECIFIC	0x09
-+#define DPP_ACTION_GAS_REQUEST		0x0a
-+#define DPP_ACTION_GAS_RESPONSE		0x0b
-+#define DPP_HDR_LEN			6
-+
- /* WFA Easy Connect v3.0 C.1 Role-specific Elements for NIST p256 */
- static const uint8_t dpp_pkex_initiator_p256[64] = {
- 	/* X */
-@@ -463,22 +468,91 @@ uint8_t *dpp_unwrap_attr(const void *ad0, size_t ad0_len, const void *ad1,
- 	return unwrapped;
+@@ -697,6 +697,19 @@ size_t dpp_append_wrapped_data(const uint8_t *frame, size_t frame_len,
+ 	return attrs_len + 4 + 16;
  }
  
-+static bool dpp_aad(const uint8_t *frame, size_t frame_len, uint8_t *to,
-+			const uint8_t **ad0, size_t *ad0_len,
-+			const uint8_t **ad1, size_t *ad1_len)
++size_t dpp_append_point(uint8_t *to, enum dpp_attribute_type type,
++				struct l_ecc_point *point)
 +{
-+	/* For PKEX frames */
-+	static uint8_t zero = 0;
-+	static uint8_t one = 1;
-+	enum dpp_frame_type type;
-+	/* OUI field (inclusive) */
-+	const uint8_t *start = frame + 1;
++	const struct l_ecc_curve *c = l_ecc_point_get_curve(point);
++	size_t len = l_ecc_curve_get_scalar_bytes(c) * 2;
 +
-+	if (frame_len < 6)
-+		return false;
++	l_put_le16(type, to);
++	l_put_le16(len, to + 2);
++	l_ecc_point_get_data(point, to + 4, len);
 +
-+	type = l_get_u8(frame + 6);
-+
-+	switch (type) {
-+
-+	case DPP_FRAME_AUTHENTICATION_REQUEST:
-+	case DPP_FRAME_AUTHENTICATION_RESPONSE:
-+	case DPP_FRAME_AUTHENTICATION_CONFIRM:
-+	case DPP_FRAME_CONFIGURATION_RESULT:
-+		/*
-+		 * Section 6.3.1.4 Protocol Conventions
-+		 * All other invocations of AES-SIV in the DPP Authentication
-+		 * protocol shall pass a vector of AAD having two components of
-+		 * AAD in the following order:
-+		 *     (1) the DPP header, as defined in Table 34, from the OUI
-+		 *         field (inclusive) to the DPP Frame Type field
-+		 *         (inclusive); and
-+		 *     (2) all octets in a DPP Public Action frame after the DPP
-+		 *         Frame Type field up to and including the last octet
-+		 *         of the last attribute before the Wrapped Data
-+		 *         attribute
-+		 *
-+		 * Note: The configuration result frame uses identical wordage
-+		 *       but is in Section 6.4.1
-+		 */
-+		*ad0 = start;
-+		*ad0_len = DPP_HDR_LEN;
-+		*ad1 = start + DPP_HDR_LEN;
-+		*ad1_len = to - start - DPP_HDR_LEN;
-+		return true;
-+	case DPP_FRAME_PKEX_COMMIT_REVEAL_REQUEST:
-+		/*
-+		 * The AAD for this operation shall consist of two components:
-+		 *     (1) the DPP header, as defined in Table 34, from the OUI
-+		 *         field (inclusive) to the DPP Frame Type field
-+		 *         (inclusive); and
-+		 *     (2) a single octet of the value zero
-+		 */
-+		*ad0 = start;
-+		*ad0_len = DPP_HDR_LEN;
-+		*ad1 = &zero;
-+		*ad1_len = 1;
-+		return true;
-+	case DPP_FRAME_PKEX_COMMIT_REVEAL_RESPONSE:
-+		/*
-+		 * The AAD for this operation shall consist of two components:
-+		 *     (1) the DPP header, as defined in Table 34, from the OUI
-+		 *         field (inclusive) to the DPP Frame Type field
-+		 *         (inclusive); and
-+		 *     (2) a single octet of the value one
-+		 */
-+		*ad0 = start;
-+		*ad0_len = DPP_HDR_LEN;
-+		*ad1 = &one;
-+		*ad1_len = 1;
-+		return true;
-+	default:
-+		return false;
-+	}
++	return len + 4;
 +}
 +
  /*
-- * Encrypt DPP attributes encapsulated in DPP wrapped data.
-- *
-- * ad0/ad0_len - frame specific AD0 component
-- * ad1/ad0_len - frame specific AD1 component
-- * to - buffer to encrypt data.
-- * to_len - size of 'to'
-+ * frame - start of action frame (excluding mpdu header and category)
-+ * frame_len - total frame buffer size
-+ * to - current position of DPP attributes (where wrapped data will start)
-  * key - key used to encrypt
-  * key_len - size of 'key'
-  * num_attrs - number of attributes listed (type, length, data triplets)
-  * ... - List of attributes, Type, Length, and data
+  * EasyConnect 2.0 Table 3. Key and Nonce Length Dependency on Prime Length
   */
--size_t dpp_append_wrapped_data(const void *ad0, size_t ad0_len,
--				const void *ad1, size_t ad1_len,
--				uint8_t *to, size_t to_len,
--				const void *key, size_t key_len,
-+size_t dpp_append_wrapped_data(const uint8_t *frame, size_t frame_len,
-+				uint8_t *to, const void *key, size_t key_len,
- 				size_t num_attrs, ...)
- {
- 	size_t i;
-@@ -488,6 +562,77 @@ size_t dpp_append_wrapped_data(const void *ad0, size_t ad0_len,
- 	struct iovec ad[2];
- 	size_t ad_size = 0;
- 	va_list va;
-+	uint8_t action;
-+	const uint8_t *ad0 = NULL;
-+	const uint8_t *ad1 = NULL;
-+	size_t ad0_len, ad1_len;
-+
-+	/*
-+	 * First determine the frame type. This could be passed in but due to
-+	 * The config protocol using GAS request/response frames not all frames
-+	 * map to a dpp_frame_type enum. Due to this, minimal parsing is done
-+	 * on the frame to determine the type, and in turn the AAD
-+	 * offsets/lengths.
-+	 */
-+	if (frame_len < 1)
-+		return 0;
-+
-+	action = *frame;
-+
-+	switch (action) {
-+	case DPP_ACTION_VENDOR_SPECIFIC:
-+		if (!dpp_aad(frame, frame_len, to, &ad0, &ad0_len,
-+				&ad1, &ad1_len))
-+			return 0;
-+
-+		break;
-+	/*
-+	 * Section 6.4.1 Overview
-+	 *
-+	 * "AAD for use with AES-SIV for protected messages in the DPP
-+	 * Configuration protocol shall consist of all octets in the
-+	 * Query Request and Query Response fields up to the first octet
-+	 * of the Wrapped Data attribute, which is the last attribute in a DPP
-+	 * Configuration frame. When the number of octets of AAD is zero, the
-+	 * number of components of AAD passed to AES-SIV is zero
-+	 */
-+	case DPP_ACTION_GAS_REQUEST:
-+		/*
-+		 * 8.3.2 DPP Configuration Request frame
-+		 * The attributes begin 14 bytes after the action (inclusive)
-+		 */
-+		if (frame_len < 14)
-+			return 0;
-+
-+		/* Start of query request */
-+		ad0 = frame + 14;
-+		/* "up to the first octet of the Wrapped Data attribute" */
-+		ad0_len = to - frame - 14;
-+
-+		if (!ad0_len)
-+			ad0 = NULL;
-+
-+		break;
-+	case DPP_ACTION_GAS_RESPONSE:
-+		/*
-+		 * 8.3.3 DPP Configuration Response frame
-+		 * The attributes begin 18 bytes after the action (inclusive)
-+		 */
-+		if (frame_len < 18)
-+			return 0;
-+
-+		/* Start of query response */
-+		ad0 = frame + 18;
-+		/* "up to the first octet of the Wrapped Data attribute" */
-+		ad0_len = to - frame - 18;
-+
-+		if (!ad0_len)
-+			ad0 = NULL;
-+
-+		break;
-+	default:
-+		return 0;
-+	}
- 
- 	va_start(va, num_attrs);
- 
-@@ -500,7 +645,7 @@ size_t dpp_append_wrapped_data(const void *ad0, size_t ad0_len,
- 
- 	va_end(va);
- 
--	if (to_len < attrs_len + 4 + 16)
-+	if (frame_len - (to - frame) < attrs_len + 4 + 16)
- 		return false;
- 
- 	plaintext = l_malloc(attrs_len);
 diff --git a/src/dpp-util.h b/src/dpp-util.h
-index dc8a894b..387750aa 100644
+index 387750aa..1ff9004d 100644
 --- a/src/dpp-util.h
 +++ b/src/dpp-util.h
-@@ -148,9 +148,8 @@ uint8_t *dpp_unwrap_attr(const void *ad0, size_t ad0_len, const void *ad1,
- 				size_t *unwrapped_len);
- size_t dpp_append_attr(uint8_t *to, enum dpp_attribute_type type,
- 				void *attr, size_t attr_len);
--size_t dpp_append_wrapped_data(const void *ad0, size_t ad0_len, const void *ad1,
--				size_t ad1_len, uint8_t *to, size_t to_len,
--				const void *key, size_t key_len,
-+size_t dpp_append_wrapped_data(const uint8_t *frame, size_t frame_len,
-+				uint8_t *to, const void *key, size_t key_len,
+@@ -151,6 +151,8 @@ size_t dpp_append_attr(uint8_t *to, enum dpp_attribute_type type,
+ size_t dpp_append_wrapped_data(const uint8_t *frame, size_t frame_len,
+ 				uint8_t *to, const void *key, size_t key_len,
  				size_t num_attrs, ...);
++size_t dpp_append_point(uint8_t *to, enum dpp_attribute_type type,
++				struct l_ecc_point *point);
  
  char *dpp_generate_uri(const uint8_t *asn1, size_t asn1_len, uint8_t version,
-diff --git a/src/dpp.c b/src/dpp.c
-index 5aac22a7..d710aa98 100644
---- a/src/dpp.c
-+++ b/src/dpp.c
-@@ -758,6 +758,9 @@ static void dpp_configuration_start(struct dpp_sm *dpp, const uint8_t *addr)
- 	size_t json_len = strlen(json);
- 	uint8_t *ptr = frame;
- 	uint8_t *lptr;
-+	struct mmpdu_header *hdr = (struct mmpdu_header *)frame;
-+
-+	memset(frame, 0, sizeof(frame));
- 
- 	l_getrandom(&dpp->diag_token, 1);
- 
-@@ -779,7 +782,8 @@ static void dpp_configuration_start(struct dpp_sm *dpp, const uint8_t *addr)
- 	 * In this case there is no query request/response fields, nor any
- 	 * attributes besides wrapped data meaning zero AD components.
- 	 */
--	ptr += dpp_append_wrapped_data(NULL, 0, NULL, 0, ptr, sizeof(frame),
-+	ptr += dpp_append_wrapped_data(mmpdu_body(hdr) + 1,
-+			sizeof(frame) - mmpdu_header_len(hdr) - 1, ptr,
- 			dpp->ke, dpp->key_len, 2,
- 			DPP_ATTR_ENROLLEE_NONCE, dpp->nonce_len, dpp->e_nonce,
- 			DPP_ATTR_CONFIGURATION_REQUEST, json_len, json);
-@@ -800,11 +804,15 @@ static void send_config_result(struct dpp_sm *dpp, const uint8_t *to)
- 	uint8_t frame[256];
- 	uint8_t *ptr = frame;
- 	uint8_t zero = 0;
-+	struct mmpdu_header *hdr = (struct mmpdu_header *)frame;
-+
-+	memset(frame, 0, sizeof(frame));
- 
- 	ptr += dpp_build_header(netdev_get_address(dpp->netdev), to,
- 					DPP_FRAME_CONFIGURATION_RESULT, ptr);
--	ptr += dpp_append_wrapped_data(frame + 26, 6, ptr, 0, ptr,
--			sizeof(frame), dpp->ke, dpp->key_len, 2,
-+	ptr += dpp_append_wrapped_data(mmpdu_body(hdr) + 1,
-+			sizeof(frame) - mmpdu_header_len(hdr) - 1, ptr,
-+			dpp->ke, dpp->key_len, 2,
- 			DPP_ATTR_STATUS, (size_t) 1, &zero,
- 			DPP_ATTR_ENROLLEE_NONCE, dpp->nonce_len, dpp->e_nonce);
- 
-@@ -1163,6 +1171,7 @@ static void dpp_send_config_response(struct dpp_sm *dpp, uint8_t status)
- 	size_t json_len;
- 	uint8_t *ptr = frame;
- 	uint8_t *lptr;
-+	struct mmpdu_header *hdr = (struct mmpdu_header *)frame;
- 
- 	memset(frame, 0, sizeof(frame));
- 
-@@ -1205,19 +1214,19 @@ static void dpp_send_config_response(struct dpp_sm *dpp, uint8_t status)
- 		json = dpp_configuration_to_json(dpp->config);
- 		json_len = strlen(json);
- 
--		ptr += dpp_append_wrapped_data(lptr + 2, ptr - lptr - 2,
--						NULL, 0, ptr, sizeof(frame),
--						dpp->ke, dpp->key_len, 2,
--						DPP_ATTR_ENROLLEE_NONCE,
--						dpp->nonce_len, dpp->e_nonce,
--						DPP_ATTR_CONFIGURATION_OBJECT,
--						json_len, json);
-+		ptr += dpp_append_wrapped_data(mmpdu_body(hdr) + 1,
-+				sizeof(frame) - mmpdu_header_len(hdr) - 1,
-+				ptr, dpp->ke, dpp->key_len, 2,
-+				DPP_ATTR_ENROLLEE_NONCE,
-+				dpp->nonce_len, dpp->e_nonce,
-+				DPP_ATTR_CONFIGURATION_OBJECT,
-+				json_len, json);
- 	} else
--		ptr += dpp_append_wrapped_data(lptr + 2, ptr - lptr - 2,
--						NULL, 0, ptr, sizeof(frame),
--						dpp->ke, dpp->key_len, 2,
--						DPP_ATTR_ENROLLEE_NONCE,
--						dpp->nonce_len, dpp->e_nonce);
-+		ptr += dpp_append_wrapped_data(mmpdu_body(hdr) + 1,
-+				sizeof(frame) - mmpdu_header_len(hdr) - 1,
-+				ptr, dpp->ke, dpp->key_len, 2,
-+				DPP_ATTR_ENROLLEE_NONCE,
-+				dpp->nonce_len, dpp->e_nonce);
- 
- 	l_put_le16(ptr - lptr - 2, lptr);
- 
-@@ -1494,7 +1503,6 @@ static void send_authenticate_response(struct dpp_sm *dpp)
- {
- 	uint8_t frame[512];
- 	uint8_t *ptr = frame;
--	uint8_t *attrs;
- 	uint8_t status = DPP_STATUS_OK;
- 	uint64_t r_proto_key[L_ECC_MAX_DIGITS * 2];
- 	uint8_t version = 2;
-@@ -1502,6 +1510,9 @@ static void send_authenticate_response(struct dpp_sm *dpp)
- 	uint8_t wrapped2_plaintext[dpp->key_len + 4];
- 	uint8_t wrapped2[dpp->key_len + 16 + 8];
- 	size_t wrapped2_len;
-+	struct mmpdu_header *hdr = (struct mmpdu_header *)frame;
-+
-+	memset(frame, 0, sizeof(frame));
- 
- 	l_ecc_point_get_data(dpp->own_proto_public, r_proto_key,
- 				sizeof(r_proto_key));
-@@ -1509,7 +1520,6 @@ static void send_authenticate_response(struct dpp_sm *dpp)
- 	ptr += dpp_build_header(netdev_get_address(dpp->netdev),
- 				dpp->peer_addr,
- 				DPP_FRAME_AUTHENTICATION_RESPONSE, ptr);
--	attrs = ptr;
- 	ptr += dpp_append_attr(ptr, DPP_ATTR_STATUS, &status, 1);
- 	ptr += dpp_append_attr(ptr, DPP_ATTR_RESPONDER_BOOT_KEY_HASH,
- 				dpp->own_boot_hash, 32);
-@@ -1538,8 +1548,9 @@ static void send_authenticate_response(struct dpp_sm *dpp)
- 
- 	wrapped2_len += 16;
- 
--	ptr += dpp_append_wrapped_data(frame + 26, 6, attrs, ptr - attrs,
--			ptr, sizeof(frame), dpp->k2, dpp->key_len, 4,
-+	ptr += dpp_append_wrapped_data(mmpdu_body(hdr) + 1,
-+			sizeof(frame) - mmpdu_header_len(hdr) - 1, ptr,
-+			dpp->k2, dpp->key_len, 4,
- 			DPP_ATTR_RESPONDER_NONCE, dpp->nonce_len, dpp->r_nonce,
- 			DPP_ATTR_INITIATOR_NONCE, dpp->nonce_len, dpp->i_nonce,
- 			DPP_ATTR_RESPONDER_CAPABILITIES, (size_t) 1, &dpp->role,
-@@ -1694,23 +1705,25 @@ static void dpp_auth_request_failed(struct dpp_sm *dpp,
- {
- 	uint8_t frame[128];
- 	uint8_t *ptr = frame;
--	uint8_t *attrs;
- 	uint8_t version = 2;
- 	uint8_t s = status;
- 	struct iovec iov;
-+	struct mmpdu_header *hdr = (struct mmpdu_header *)frame;
-+
-+	memset(frame, 0, sizeof(frame));
- 
- 	ptr += dpp_build_header(netdev_get_address(dpp->netdev),
- 				dpp->peer_addr,
- 				DPP_FRAME_AUTHENTICATION_RESPONSE, ptr);
--	attrs = ptr;
- 	ptr += dpp_append_attr(ptr, DPP_ATTR_STATUS, &s, 1);
- 	ptr += dpp_append_attr(ptr, DPP_ATTR_RESPONDER_BOOT_KEY_HASH,
- 				dpp->own_boot_hash, 32);
- 
- 	ptr += dpp_append_attr(ptr, DPP_ATTR_PROTOCOL_VERSION, &version, 1);
- 
--	ptr += dpp_append_wrapped_data(frame + 26, 6, attrs, ptr - attrs,
--			ptr, sizeof(frame) - (ptr - attrs), k1, dpp->key_len, 2,
-+	ptr += dpp_append_wrapped_data(mmpdu_body(hdr) + 1,
-+			sizeof(frame) - mmpdu_header_len(hdr) - 1, ptr,
-+			k1, dpp->key_len, 2,
- 			DPP_ATTR_INITIATOR_NONCE, dpp->nonce_len, dpp->i_nonce,
- 			DPP_ATTR_RESPONDER_CAPABILITIES,
- 			(size_t) 1, &dpp->role);
-@@ -1765,12 +1778,14 @@ static bool dpp_send_authenticate_request(struct dpp_sm *dpp)
- {
- 	uint8_t frame[256];
- 	uint8_t *ptr = frame;
--	uint8_t *attrs;
- 	uint64_t i_proto_key[L_ECC_MAX_DIGITS * 2];
- 	uint8_t version = 2;
- 	struct iovec iov;
- 	struct station *station = station_find(netdev_get_ifindex(dpp->netdev));
- 	struct scan_bss *bss = station_get_connected_bss(station);
-+	struct mmpdu_header *hdr = (struct mmpdu_header *)frame;
-+
-+	memset(frame, 0, sizeof(frame));
- 
- 	/* Got disconnected by the time the peer was discovered */
- 	if (dpp->role == DPP_CAPABILITY_CONFIGURATOR && !bss) {
-@@ -1784,8 +1799,6 @@ static bool dpp_send_authenticate_request(struct dpp_sm *dpp)
- 	ptr += dpp_build_header(netdev_get_address(dpp->netdev),
- 				dpp->peer_addr,
- 				DPP_FRAME_AUTHENTICATION_REQUEST, ptr);
--	attrs = ptr;
--
- 	ptr += dpp_append_attr(ptr, DPP_ATTR_RESPONDER_BOOT_KEY_HASH,
- 				dpp->peer_boot_hash, 32);
- 	ptr += dpp_append_attr(ptr, DPP_ATTR_INITIATOR_BOOT_KEY_HASH,
-@@ -1802,8 +1815,9 @@ static bool dpp_send_authenticate_request(struct dpp_sm *dpp)
- 		ptr += dpp_append_attr(ptr, DPP_ATTR_CHANNEL, pair, 2);
- 	}
- 
--	ptr += dpp_append_wrapped_data(frame + 26, 6, attrs, ptr - attrs,
--			ptr, sizeof(frame), dpp->k1, dpp->key_len, 2,
-+	ptr += dpp_append_wrapped_data(mmpdu_body(hdr) + 1,
-+			sizeof(frame) - mmpdu_header_len(hdr) - 1, ptr,
-+			dpp->k1, dpp->key_len, 2,
- 			DPP_ATTR_INITIATOR_NONCE, dpp->nonce_len, dpp->i_nonce,
- 			DPP_ATTR_INITIATOR_CAPABILITIES,
- 			(size_t) 1, &dpp->role);
-@@ -1857,9 +1871,11 @@ static void dpp_send_commit_reveal_request(struct dpp_sm *dpp)
- 	struct iovec iov;
- 	uint8_t frame[512];
- 	uint8_t *ptr = frame;
--	uint8_t zero = 0;
- 	uint8_t a_pub[L_ECC_POINT_MAX_BYTES];
- 	ssize_t a_len;
-+	struct mmpdu_header *hdr = (struct mmpdu_header *)frame;
-+
-+	memset(frame, 0, sizeof(frame));
- 
- 	a_len = l_ecc_point_get_data(dpp->boot_public, a_pub, sizeof(a_pub));
- 
-@@ -1867,8 +1883,9 @@ static void dpp_send_commit_reveal_request(struct dpp_sm *dpp)
- 					dpp->peer_addr,
- 					DPP_FRAME_PKEX_COMMIT_REVEAL_REQUEST,
- 					ptr);
--	ptr += dpp_append_wrapped_data(frame + 26, 6, &zero, 1, ptr,
--			sizeof(frame), dpp->z, dpp->z_len, 2,
-+	ptr += dpp_append_wrapped_data(mmpdu_body(hdr) + 1,
-+			sizeof(frame) - mmpdu_header_len(hdr) - 1, ptr,
-+			dpp->z, dpp->z_len, 2,
- 			DPP_ATTR_BOOTSTRAPPING_KEY, a_len, a_pub,
- 			DPP_ATTR_INITIATOR_AUTH_TAG, dpp->u_len, dpp->u);
- 
-@@ -2264,13 +2281,14 @@ static void dpp_send_authenticate_confirm(struct dpp_sm *dpp)
- 	struct iovec iov;
- 	uint8_t frame[256];
- 	uint8_t *ptr = frame;
--	uint8_t *attrs;
- 	uint8_t zero = 0;
-+	struct mmpdu_header *hdr = (struct mmpdu_header *)frame;
-+
-+	memset(frame, 0, sizeof(frame));
- 
- 	ptr += dpp_build_header(netdev_get_address(dpp->netdev),
- 					dpp->peer_addr,
- 					DPP_FRAME_AUTHENTICATION_CONFIRM, ptr);
--	attrs = ptr;
- 	ptr += dpp_append_attr(ptr, DPP_ATTR_STATUS, &zero, 1);
- 	ptr += dpp_append_attr(ptr, DPP_ATTR_RESPONDER_BOOT_KEY_HASH,
- 					dpp->peer_boot_hash, 32);
-@@ -2278,8 +2296,9 @@ static void dpp_send_authenticate_confirm(struct dpp_sm *dpp)
- 		ptr += dpp_append_attr(ptr, DPP_ATTR_INITIATOR_BOOT_KEY_HASH,
- 					dpp->own_boot_hash, 32);
- 
--	ptr += dpp_append_wrapped_data(frame + 26, 6, attrs, ptr - attrs, ptr,
--			sizeof(frame), dpp->ke, dpp->key_len, 1,
-+	ptr += dpp_append_wrapped_data(mmpdu_body(hdr) + 1,
-+			sizeof(frame) - mmpdu_header_len(hdr) - 1, ptr,
-+			dpp->ke, dpp->key_len, 1,
- 			DPP_ATTR_INITIATOR_AUTH_TAG, dpp->key_len,
- 			dpp->auth_tag);
- 
-@@ -3301,19 +3320,21 @@ static void dpp_send_commit_reveal_response(struct dpp_sm *dpp,
- {
- 	uint8_t frame[256];
- 	uint8_t *ptr = frame;
--	uint8_t one = 1;
- 	struct iovec iov;
- 	const uint8_t *own_mac = netdev_get_address(dpp->netdev);
- 	uint8_t b_pub[L_ECC_POINT_MAX_BYTES];
- 	size_t b_len;
-+	struct mmpdu_header *hdr = (struct mmpdu_header *)frame;
- 
--	b_len = l_ecc_point_get_data(dpp->boot_public, b_pub, sizeof(b_pub));
-+	memset(frame, 0, sizeof(frame));
- 
-+	b_len = l_ecc_point_get_data(dpp->boot_public, b_pub, sizeof(b_pub));
- 
- 	ptr += dpp_build_header(own_mac, dpp->peer_addr,
- 				DPP_FRAME_PKEX_COMMIT_REVEAL_RESPONSE, ptr);
--	ptr += dpp_append_wrapped_data(frame + 26, 6, &one, 1, ptr,
--			sizeof(frame), dpp->z, dpp->z_len, 2,
-+	ptr += dpp_append_wrapped_data(mmpdu_body(hdr) + 1,
-+			sizeof(frame) - mmpdu_header_len(hdr) - 1, ptr,
-+			dpp->z, dpp->z_len, 2,
- 			DPP_ATTR_BOOTSTRAPPING_KEY, b_len, b_pub,
- 			DPP_ATTR_RESPONDER_AUTH_TAG, v_len, v);
- 
+ 			const uint8_t *mac, const uint32_t *freqs,
 -- 
 2.34.1
 
