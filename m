@@ -1,63 +1,129 @@
-Received: from smtp1.ms.mff.cuni.cz (smtp-in1.ms.mff.cuni.cz [195.113.20.234])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ot1-f52.google.com (mail-ot1-f52.google.com [209.85.210.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DEB147F7A;
-	Wed, 13 Mar 2024 19:54:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.113.20.234
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E16934D135
+	for <iwd@lists.linux.dev>; Wed, 13 Mar 2024 20:12:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710359691; cv=none; b=W3/oHeq98dOuQqZ8LF1XMwM++ESUzT6Fd2EVjZ1r6lsPartB8PxDXBCJ3Cr2hhcXx/WPQiHIHWBZgxT7dLKtGd1Cjr7DS9T/I0ILYvaohalnaB+y/L0rjikky5inhNwyq7imgBuF2/ik5yaENf7l5+kHctbFv1/ys8cIwCHKkoE=
+	t=1710360781; cv=none; b=BEuiPwsryNQNQwdmks2VjiYjcjIYp4KBvOqxVdpX+Q6cAqmP3XrWX/tJfIqk9yO2FVDF/weYLzmvnPvIVct1mqwzTzNT/q5CWljtwSewZ3VLv/fZeDUZjf28ohc5fxwP+XyuK1zXDL1AaaYU/Uqv2d9cFQ2ORrbiCbsCnTBl2Jw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710359691; c=relaxed/simple;
-	bh=j+U9E9lfJdvcOySZsZqHvCJpzYfOaJSbSsP89+NlbHc=;
-	h=Mime-Version:Content-Type:Date:Message-Id:To:From:References:Cc:
-	 Subject:In-Reply-To; b=Li1pTAa8zcksdJ5P8gGJ/xF+lfO+o9HDbrOZxrzVh7zBHy+bWLspLVh8/ij7Fi83UR0tVHCtkSIbxiuQbc6f4yE3m5psYdR6HnQcYRJlThP39um1/Rgyk1SSQev2355/kebeo0P4NqH2l7GmhJq20r4gln993fMtmu5OSazAnQg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=matfyz.cz; spf=pass smtp.mailfrom=matfyz.cz; arc=none smtp.client-ip=195.113.20.234
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=matfyz.cz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=matfyz.cz
-X-SubmittedBy: id balejk@matfyz.cz subject /postalCode=110+2000/O=Univerzita+20Karlova/street=Ovocn+5CxC3+5CxBD+20trh+20560/5/ST=Praha,+20Hlavn+5CxC3+5CxAD+20m+5CxC4+5Cx9Bsto/C=CZ/CN=Karel+20Balej/emailAddress=balejk@matfyz.cz
-	serial F5FD910E8FE2121B897F7E55B84E351D
-	issued by /C=NL/O=GEANT+20Vereniging/CN=GEANT+20Personal+20CA+204
-	auth type TLS.CUNI
-Received: from localhost (koleje-wifi-0013.koleje.cuni.cz [78.128.191.13])
-	(authenticated)
-	by smtp1.ms.mff.cuni.cz (8.16.1/8.16.1) with ESMTPS id 42DJsD9Z080389
-	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=OK);
-	Wed, 13 Mar 2024 20:54:15 +0100 (CET)
-	(envelope-from balejk@matfyz.cz)
+	s=arc-20240116; t=1710360781; c=relaxed/simple;
+	bh=xEydpAbl+UnNX21HEQRz8uun/LLyMM3kGBycf29Y6jk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=l+ifM4XD823FAHhGS1B7r1kMx0qOxGqiRSQNbZpGOOJgpGDW0TL5K7ldqwnIuzaMIsiFDGxH6PWIVjGxiPmPPxPDF+om8OfJyJ8VjhSktENV36CGJJkMFDb/zEcyklLTWS2KaGEz6ajq0Ri4KLzhmr4JvknecWN+q1gK0BMSyVc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TqzOT7XQ; arc=none smtp.client-ip=209.85.210.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TqzOT7XQ"
+Received: by mail-ot1-f52.google.com with SMTP id 46e09a7af769-6e519d73850so132791a34.2
+        for <iwd@lists.linux.dev>; Wed, 13 Mar 2024 13:12:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1710360779; x=1710965579; darn=lists.linux.dev;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=mcoUVHgwLLkW5HjqhzTOaCJXpQUFZkJrmtPUv2eDI9M=;
+        b=TqzOT7XQp0xwXIpdr8kuJtSoxwnTd8AthR7aSuT8qYXnqyvqBnFMhcMf5XySnavTw0
+         Zw5+eb2y6i7xx3pBhck1kxE/AjUd1h6A6AQtC4rlCc+GmnMTM6o93oSe/Xn6E7waW6p8
+         ImLdeeVVEGF7kOAj1XSLqRSSx76rY9G7DhBg9/yezXFpItxRuCtSV89PddmJLFDP6hJR
+         pS9gzd7Zb9CfBNZ2m57yNHM4ud2Li6l0B9j0jH+/2/C+KbBjDyEVcCgksmc/y/D0od4o
+         rZr66Ha5Kov962VvPIT13bTguHbcu51qsBzg5l3jpApB/IBH8jLzJy1o12olIeRitzRP
+         KSHg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1710360779; x=1710965579;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=mcoUVHgwLLkW5HjqhzTOaCJXpQUFZkJrmtPUv2eDI9M=;
+        b=S2SoKWjSYHpoP9LCZdL56vEZHLb5NuXCAOS0xabqKvKkMSssGhxEDIB8bH/pvkni2e
+         BIbPnQRQ/5dWHklEwyPD9dWOPJDwLJxT+PKuaRWFLYsGIC5HVdZW9AV3WlpSyR2+o4oS
+         gTs5GrGwSab9fyYx+Z8CM0qWpmdjmCnjCLQa9e/0dRa9K5xQFaMBXmqJYZ6ekSGJNCCS
+         3LxJqxOoswDB5zFln5nwewiXj9QqHY125ukTmUujx8amlHCTBFBHLdXE8RJSABMPieE5
+         MQw82KWD2vuBqiaj3Fgtl9XC/gQYhZrJurFv3A/Mf82JXxvl0NGZAm3KbygnRE5wQ4fB
+         WzUw==
+X-Forwarded-Encrypted: i=1; AJvYcCWTHcF/YBqH4Vf30HKi1IKP+7gmhALZe0SOcX9eQlXp6R0ip4UCrlNzdpteIeZ6ssAhieXl6GACxdW0ro23zQQdaKDz
+X-Gm-Message-State: AOJu0YwWNwcPGyrHOBt+mNS6JFJ9vwkqFur8rVc03p4X0tgdeguM2Nh0
+	/iegLtFyI9gBSDqAhP9ce2Ik/Vkc3/AbIMyLGmJC9nF+g03HAfR/
+X-Google-Smtp-Source: AGHT+IFSK8EKQA4YLa1BW2O3gR/c6PoFXPU5Py2EL9IBEyYIERWPhz76GtYioIywO8cwI62nqsu0ow==
+X-Received: by 2002:a05:6870:f14e:b0:221:8fd9:284c with SMTP id l14-20020a056870f14e00b002218fd9284cmr4587256oac.1.1710360778906;
+        Wed, 13 Mar 2024 13:12:58 -0700 (PDT)
+Received: from [10.102.4.159] ([208.195.13.130])
+        by smtp.gmail.com with ESMTPSA id x2-20020a0ce0c2000000b00690d36c64d2sm3341355qvk.53.2024.03.13.13.12.55
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 13 Mar 2024 13:12:58 -0700 (PDT)
+Message-ID: <b838e729-dc30-4e18-b928-c34c16b08606@gmail.com>
+Date: Wed, 13 Mar 2024 13:12:54 -0700
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Wed, 13 Mar 2024 20:54:44 +0100
-Message-Id: <CZSVWO3IDZ96.38O0P161Z99XU@matfyz.cz>
-To: "Johannes Berg" <johannes@sipsolutions.net>,
-        "James Prestwood"
- <prestwoj@gmail.com>,
-        "Michael Yartys" <mail@yartys.no>
-From: "Karel Balej" <balejk@matfyz.cz>
-References: <005f998ec59e27633b1b99fdf929e40ccfd401c1.camel@sipsolutions.net>, <f2dcbe55-0f0e-4173-8e21-f899c6fc802a@gmail.com>, <NbWQKmrYDD20KKHeq9TMda2MJFE00-weepZGuSIRzO5BOgMlTbWBkDlNNweA2dhbvF8TK1F_cHbMxblLVNREZa1HZEFt9TVCkTB1jo_5ppc=@yartys.no>, <CZSHRUIJ4RKL.34T4EASV5DNJM@matfyz.cz>, <20231010212240.61637-1-dimitri.ledkov@canonical.com>
-Cc: <alexandre.torgue@foss.st.com>, <davem@davemloft.net>,
-        <dhowells@redhat.com>, <herbert@gondor.apana.org.au>,
-        <keyrings@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
-        <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <linux-modules@vger.kernel.org>,
-        <linux-stm32@st-md-mailman.stormreply.com>, <mcgrof@kernel.org>,
-        <mcoquelin.stm32@gmail.com>, <linux-wireless@vger.kernel.org>,
-        <netdev@vger.kernel.org>, <dimitri.ledkov@canonical.com>,
-        <iwd@lists.linux.dev>, <regressions@lists.linux.dev>
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
 Subject: Re: [REGRESSION] Re: [PATCH] crypto: pkcs7: remove sha1 support
-In-Reply-To: <CZSHRUIJ4RKL.34T4EASV5DNJM@matfyz.cz>
+Content-Language: en-US
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: Johannes Berg <johannes@sipsolutions.net>, Karel Balej
+ <balejk@matfyz.cz>, dimitri.ledkov@canonical.com,
+ alexandre.torgue@foss.st.com, davem@davemloft.net, dhowells@redhat.com,
+ herbert@gondor.apana.org.au, keyrings@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-modules@vger.kernel.org,
+ linux-stm32@st-md-mailman.stormreply.com, mcgrof@kernel.org,
+ mcoquelin.stm32@gmail.com, linux-wireless@vger.kernel.org,
+ netdev@vger.kernel.org, iwd@lists.linux.dev
+References: <CZSHRUIJ4RKL.34T4EASV5DNJM@matfyz.cz>
+ <005f998ec59e27633b1b99fdf929e40ccfd401c1.camel@sipsolutions.net>
+ <f2dcbe55-0f0e-4173-8e21-f899c6fc802a@gmail.com>
+ <20240313194423.GA1111@sol.localdomain>
+From: James Prestwood <prestwoj@gmail.com>
+In-Reply-To: <20240313194423.GA1111@sol.localdomain>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Thank you all for your feedback so far.
+Hi,
 
-Since it seems that this really is a regression on the kernel side, let
-me add the appropriate list to Cc and tag this:
+On 3/13/24 12:44 PM, Eric Biggers wrote:
+> On Wed, Mar 13, 2024 at 10:26:06AM -0700, James Prestwood wrote:
+>> Hi,
+>>
+>> On 3/13/24 1:56 AM, Johannes Berg wrote:
+>>> Not sure why you're CC'ing the world, but I guess adding a few more
+>>> doesn't hurt ...
+>>>
+>>> On Wed, 2024-03-13 at 09:50 +0100, Karel Balej wrote:
+>>>>    and I use iwd
+>>> This is your problem, the wireless stack in the kernel doesn't use any
+>>> kernel crypto code for 802.1X.
+>> Yes, the wireless stack has zero bearing on the issue. I think that's what
+>> you meant by "problem".
+>>
+>> IWD has used the kernel crypto API forever which was abruptly broken, that
+>> is the problem.
+>>
+>> The original commit says it was to remove support for sha1 signed kernel
+>> modules, but it did more than that and broke the keyctl API.
+>>
+> Which specific API is iwd using that is relevant here?
+> I cloned https://kernel.googlesource.com/pub/scm/network/wireless/iwd
+> and grepped for keyctl and AF_ALG, but there are no matches.
 
-#regzbot introduced: 16ab7cb5825f
+IWD uses ELL for its crypto, which uses the AF_ALG API:
 
-Best regards,
-K. B.
+https://git.kernel.org/pub/scm/libs/ell/ell.git/
+
+I believe the failure is when calling:
+
+KEYCTL_PKEY_QUERY enc="x962" hash="sha1"
+
+ From logs Michael posted on the IWD list, the ELL API that fails is:
+
+l_key_get_info (ell.git/ell/key.c:416)
+
+Thanks,
+
+James
+
+>
+> - Eric
