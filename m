@@ -1,90 +1,65 @@
-Received: from mail-qk1-f182.google.com (mail-qk1-f182.google.com [209.85.222.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp1.ms.mff.cuni.cz (smtp-in1.ms.mff.cuni.cz [195.113.20.234])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7666119BA2
-	for <iwd@lists.linux.dev>; Fri, 15 Mar 2024 11:18:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC84C250E5;
+	Fri, 15 Mar 2024 13:09:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.113.20.234
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710501508; cv=none; b=h7Id5oPhy6yP1kjemWo6MWgyz4KmcWuAKHLfFvwPphmB8ijBCHwS9BGqhZCMrWrQtFgvvlANd7FS/1eixF3PPfaO6htDB9Xr1zktzMEhgeGtfP3b8jpC/GUhuzS04imWaAXzNW8pFm80PLTb84oUQZTr0TvkPCz8uinKnvMN7+I=
+	t=1710508178; cv=none; b=L+XC6/4lqr9GcwnczEYs2k4f2pjrypy3Yc9g9feLvclN+Vu9v/Q/ZCK4G8qoo7WwXeZPyqnKV37OxC3X0V0Bf72dc2jC+xw+LQZnZ8gip6NTuzfHfGFeCYWYJv0Qgt1LJhC1sFbTBF75gr1qmBFrrC0bSsBCsA/12u2gQmzqqJA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710501508; c=relaxed/simple;
-	bh=C8c7pv4XiwVMUVsem5h5Q4ABs+4D1iT5FCUer1vEaPM=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=P4DasEKSoIcE9lEwXC7NMQLu4LRZ+fLg1761jBSeKRLfJuHMJIbdjl8fMcmDX4ftrLAv/oz+SXHX8iJxFK1yg1flvoXkDjlilS4JEFWYZETh92QzqsqvUOTgHgdryxlrT6MXDa8uzslsmUjcF1E+TsVS47jHE897YaK8Ja6UBYQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NwTpeuRg; arc=none smtp.client-ip=209.85.222.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NwTpeuRg"
-Received: by mail-qk1-f182.google.com with SMTP id af79cd13be357-789d0c90cadso123214585a.3
-        for <iwd@lists.linux.dev>; Fri, 15 Mar 2024 04:18:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1710501506; x=1711106306; darn=lists.linux.dev;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=9H5LxKffXrPWzGf33UP2hJ7EZDz4gHPYI/8uyiHwUbc=;
-        b=NwTpeuRgUo2ebBn4LLRibtfIvQerN1XROhbXhSKizygqZ7TEDym+dIRjjItNjoeCGt
-         L6V4H4NaGf29WvJtimf/rxh7KBw+90X8+PXKbCHo9qDh6TivGnYi3Xc1lJzBAqfdk5A0
-         jiCPj/Oi/kHxsPbs22zEAYivAGkKkHjEtGw4qV9frauBjbml10ae0dOAmZioIjFV5MTy
-         xNQq1ETr6Eq6pHq7W5UFIk7ZocSTWhJhVfpCZW5WdJbXCKF9GxOJaSBoWhwhgSjhc3x5
-         Eq89ikE6jhjxnSr5jx1OVNUwqiZnS+VXZPViC1a82ZRBfcrA7k6hNtQp5c9iUOSLX+6s
-         4oIg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710501506; x=1711106306;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=9H5LxKffXrPWzGf33UP2hJ7EZDz4gHPYI/8uyiHwUbc=;
-        b=v7GHwEkSKzXtZ5iSl157GcUbOZSZ4EMo9Me/aQndK6AKBdyqwFbQcMBtmzFWY5wVO9
-         6k5U4r6uVO/YVsEP16695nSkFer6Bpc132Vpl1Vi5tWxe7BiYhztujsbqoq1RT8J8wWu
-         LkSTSkq0qV1Myiik1yIsbsL4D8rKGeBfCAWwgnQ2/xcdbw1jAFgIvlK6DwQvegQHt4cA
-         LHje7wNXcqOoeLUrE5Tg6I+uBjuJwpvezMoHesEcd4VgykhSN37fDZoSJP6GCqbEJQPu
-         DcAwIsho9nebdcBIGFrhJVSCSw/Wvxsvvy5wZd30b2ytM3EPkQDyKWm9eRGfOrJAbZDv
-         g/ow==
-X-Gm-Message-State: AOJu0Yx0OrEgQDwYiyuEMdda3Do3ldvxtqzqJm+vokb7a3HrhMCG3YU/
-	NF/6Eti7oZp1ezCUvhc1+1bWJcZfqTwKALVqRPBwmjdaVwVlvYdCL1XMZkci
-X-Google-Smtp-Source: AGHT+IEnjtOdfD/b3Lpdse7XY02edQVsnIX8ju3CJPcNC42voIlpyqfesha3NGAVl1tOWjHuXvyT6Q==
-X-Received: by 2002:a05:620a:13db:b0:789:e70c:a349 with SMTP id g27-20020a05620a13db00b00789e70ca349mr801983qkl.48.1710501506088;
-        Fri, 15 Mar 2024 04:18:26 -0700 (PDT)
-Received: from LOCLAP699.rst-02.locus ([208.195.13.130])
-        by smtp.gmail.com with ESMTPSA id f18-20020ae9ea12000000b007884dd207b8sm1915251qkg.55.2024.03.15.04.18.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 15 Mar 2024 04:18:25 -0700 (PDT)
-From: James Prestwood <prestwoj@gmail.com>
-To: iwd@lists.linux.dev
-Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH] iwmon: fix incorrect mask printing HE capabilities
-Date: Fri, 15 Mar 2024 04:18:21 -0700
-Message-Id: <20240315111821.116213-1-prestwoj@gmail.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1710508178; c=relaxed/simple;
+	bh=W+ABfQLN3KCOvRqGEyd8pg1ypVwpXtU704uye5orKeI=;
+	h=Mime-Version:Content-Type:Date:Message-Id:Cc:Subject:To:From:
+	 References:In-Reply-To; b=hOC77L13jhYUIlX+5DL3jc45i6iPgln2ZcvhNYER7zQKmtFreBjd+UdIUPBjym3riCyvKwERrwTrYfmh1EkseVCkSJSfksLJuzlqMuYGX7eFnSt2wrwrXwyDMqEb/SxDHvI1BysflDilmL2Ynoj+HLge56TkEpp550ZSFkRYu3s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=matfyz.cz; spf=pass smtp.mailfrom=matfyz.cz; arc=none smtp.client-ip=195.113.20.234
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=matfyz.cz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=matfyz.cz
+X-SubmittedBy: id balejk@matfyz.cz subject /postalCode=110+2000/O=Univerzita+20Karlova/street=Ovocn+5CxC3+5CxBD+20trh+20560/5/ST=Praha,+20Hlavn+5CxC3+5CxAD+20m+5CxC4+5Cx9Bsto/C=CZ/CN=Karel+20Balej/emailAddress=balejk@matfyz.cz
+	serial F5FD910E8FE2121B897F7E55B84E351D
+	issued by /C=NL/O=GEANT+20Vereniging/CN=GEANT+20Personal+20CA+204
+	auth type TLS.CUNI
+Received: from localhost (cdwifi-a106.cd-t.cz [213.235.133.106] (may be forged))
+	(authenticated)
+	by smtp1.ms.mff.cuni.cz (8.16.1/8.16.1) with ESMTPS id 42FD8Ug8098517
+	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=OK);
+	Fri, 15 Mar 2024 14:08:33 +0100 (CET)
+	(envelope-from balejk@matfyz.cz)
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Fri, 15 Mar 2024 14:09:01 +0100
+Message-Id: <CZUCJ4CEVXMS.2MML8IFVVTBC9@matfyz.cz>
+Cc: <alexandre.torgue@foss.st.com>, <davem@davemloft.net>,
+        <dhowells@redhat.com>, <herbert@gondor.apana.org.au>,
+        <keyrings@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
+        <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <linux-modules@vger.kernel.org>,
+        <linux-stm32@st-md-mailman.stormreply.com>, <mcgrof@kernel.org>,
+        <mcoquelin.stm32@gmail.com>, <linux-wireless@vger.kernel.org>,
+        <netdev@vger.kernel.org>, <dimitri.ledkov@canonical.com>,
+        <iwd@lists.linux.dev>, "Johannes Berg" <johannes@sipsolutions.net>,
+        "James
+ Prestwood" <prestwoj@gmail.com>,
+        "Michael Yartys" <mail@yartys.no>
+Subject: Re: [REGRESSION] Re: [PATCH] crypto: pkcs7: remove sha1 support
+To: <regressions@lists.linux.dev>
+From: "Karel Balej" <balejk@matfyz.cz>
+References: <005f998ec59e27633b1b99fdf929e40ccfd401c1.camel@sipsolutions.net> <f2dcbe55-0f0e-4173-8e21-f899c6fc802a@gmail.com> <NbWQKmrYDD20KKHeq9TMda2MJFE00-weepZGuSIRzO5BOgMlTbWBkDlNNweA2dhbvF8TK1F_cHbMxblLVNREZa1HZEFt9TVCkTB1jo_5ppc=@yartys.no> <CZSHRUIJ4RKL.34T4EASV5DNJM@matfyz.cz> <20231010212240.61637-1-dimitri.ledkov@canonical.com> <CZSVWO3IDZ96.38O0P161Z99XU@matfyz.cz>
+In-Reply-To: <CZSVWO3IDZ96.38O0P161Z99XU@matfyz.cz>
 
-This was changed from too large of a mask (0xff) in an earlier
-commit but was masking 5 bits instead of 6.
+#regzbot title: SHA1 support removal breaks iwd's ability to connect to edu=
+roam
+#regzbot monitor: https://lore.kernel.org/all/20240313233227.56391-1-ebigge=
+rs@kernel.org/
+#regzbot monitor: https://lore.kernel.org/all/CZSHRUIJ4RKL.34T4EASV5DNJM@ma=
+tfyz.cz/
+#regzbot link: https://lore.kernel.org/iwd/njvxKaPo_CBxsQGaNSRHj8xOSxzk1_j_=
+K-minIe4GCKUMB1qxJT8nPk9SGmfqg7Aepm_5dO7FEofYIYP1g15R9V5dJ0F8bN6O4VthSjzu1g=
+=3D@yartys.no/
 
-Fixes: 121c2c5653 ("monitor: properly mask HE capabilities bitfield")
----
- monitor/nlmon.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/monitor/nlmon.c b/monitor/nlmon.c
-index 6fe63b8d..9fee5bde 100644
---- a/monitor/nlmon.c
-+++ b/monitor/nlmon.c
-@@ -1689,7 +1689,7 @@ static void print_ie_he_capabilities(unsigned int level,
- {
- 	const uint8_t *ptr = data;
- 	uint8_t width_set = bit_field((ptr + 6)[0], 1, 7);
--	uint8_t mask = 0x1f;
-+	uint8_t mask = 0x3f;
- 
- 	const char *he_channel_width_bitfield[] = {
- 		[0] = "40MHz supported (2.4GHz)",
--- 
-2.34.1
-
+Sorry for the tracking mess...
