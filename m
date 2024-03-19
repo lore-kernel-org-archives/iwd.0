@@ -1,71 +1,106 @@
-Received: from out-178.mta1.migadu.com (out-178.mta1.migadu.com [95.215.58.178])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6C0814276
-	for <iwd@lists.linux.dev>; Fri, 15 Mar 2024 22:10:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04BE023772;
+	Tue, 19 Mar 2024 17:20:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710540605; cv=none; b=DBh7hNWMBfG7HwGyo0ZbGHZ7yhoFFlm15JJm1/x9xC7189gLRRHuCCm1gVrdb+Cl9/RmYZxgT44qS+qilHaceUa0pvGFfx+6xKccmcjgSD3lpi0eEx1KOS/fCrdV+rLXoSH/EmcsyA3BJINPlD+M/uieMe6ZtL4Jeq9Jem+48zo=
+	t=1710868859; cv=none; b=u+La8fPnhdWCP/RRn14GLHE/oZ+KNWHW1wD+q92PgNvS29cQADegtyHuFv6UTj2WtOn5vZAcAtbcSBXpO0JS5FXEKuEQ8uDK/PEz4jmtQ/Jp5NBAEBlMNDc+ouVhc77uJPRsT0HThN5Tan9xc09BCxMBPy1+Go1ZoL/VEjyvNWE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710540605; c=relaxed/simple;
-	bh=da+46mGKcQI94zLwJl+SbuQz8oTQObvsmu8QWJYk0hM=;
-	h=MIME-Version:Date:Content-Type:From:Message-ID:Subject:To:Cc:
-	 In-Reply-To:References; b=a2S68ctff/y+F0j1vvgocTbjJngxKJguw7gc2cFsIHAmqZmI4wpD/3YmeOoivkI+L+bXTeK09B1HiMOSnZ0JJIaK/JV0TXs3kpQG8XSR8iHGz3gXRdNmEdLfNM08SzH4nJ4VcJd+9PTod1VghwfNuiVQ02Z9iI6R8bGVc2XQGu4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=craftyguy.net; spf=pass smtp.mailfrom=craftyguy.net; dkim=pass (2048-bit key) header.d=craftyguy.net header.i=@craftyguy.net header.b=pri4TvGF; arc=none smtp.client-ip=95.215.58.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=craftyguy.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=craftyguy.net
+	s=arc-20240116; t=1710868859; c=relaxed/simple;
+	bh=W+xaZQzH47acfNmxkhab6M0XH+dH90+OCLekFxWL1eQ=;
+	h=Mime-Version:Content-Type:Date:Message-Id:Cc:Subject:From:To:
+	 References:In-Reply-To; b=T7YE3a+NbU5v+kDcuEBiOKX5DjcSQQEyLrx8n/LMJ6yoWTzlnNdUgkyHeZFsio3TB9KKgT3K9Ke9h/FH9jCv2xiGhhCdMuxhNWTAMzoYVXUBMMdkCYleKTPRCcya0sIWTgvtnlDzIKYrOJ9UL+2b/FkG3OVxQQKXRwI9ARqRXVQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=I1tyau/v; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=craftyguy.net header.i=@craftyguy.net header.b="pri4TvGF"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="I1tyau/v"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id ADD8BC433F1;
+	Tue, 19 Mar 2024 17:20:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1710868858;
+	bh=W+xaZQzH47acfNmxkhab6M0XH+dH90+OCLekFxWL1eQ=;
+	h=Date:Cc:Subject:From:To:References:In-Reply-To:From;
+	b=I1tyau/vh/IsB5d4T35p5rGs7l3yclkYzgdGt2ZsZrhb4y5dZdQmDm7Y3aG0X9Pg7
+	 Iz18m/HRyCHEUpEvWDC3QeZndw/zIFpW+/AVAUqSUgGKf4UmVHIsS2BJmTP98rfyzW
+	 lNi6pQL6JOJeKzs70c2QMTZGYa1uJhNqQFtvzB4jmNck5Tdvj86sktZZQ+jG3DyPEd
+	 TH87XYCghp4OOCagt8pH81zT0zwqB70g6V562wLOCc5L5YWzxjp/QKEcAOYKTlqKHO
+	 SeVDujjl+tSmnGK3ilLurIqQc00kRxVlcgJbXCrutZx8iR28zx7W9nfXYDzeuuRNJj
+	 cbaWiPMigs3Dw==
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=craftyguy.net;
-	s=key1; t=1710540598;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=da+46mGKcQI94zLwJl+SbuQz8oTQObvsmu8QWJYk0hM=;
-	b=pri4TvGF/jKxsSN39gNOCLRIlfI44pBQ6lOPRbraPByR0f4GQQGq5yDo3Iw0hqB9adObaq
-	iE7c+3VR2i8TjOXWWPrQHcjrX3Fy+HCgrfT5tL14oms6Xn8x+n0ucqhxJQRYF0sB3XK/xm
-	625dlptkt7IUL3BB2YtI4Umv3+j2CNv0xk+4Wf+WT0UhxZrzP+J6gS3iwBdJVXLz7ajng3
-	wYk/roDdFG+QYvfyaoCF5xqtsHF5Zh+VgQRdSENaCDrRQ1CZnav0ZaJPfRvHFohxCdZ/A3
-	rXnfJWgDvMJPI6km4sHP0l8unB/kVK1lScB2IgJbm6QesRPRPMLUryfmeCVL6g==
-Date: Fri, 15 Mar 2024 22:09:55 +0000
-Content-Type: text/plain; charset="utf-8"
+Mime-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: "Clayton Craft" <clayton@craftyguy.net>
-Message-ID: <d000c1684c8fa1bf05cd239353ef6e65038d8ca3@craftyguy.net>
-TLS-Required: No
-Subject: Re: [PATCH] wiphy: include libgen.h to fix implicit def. with musl
- libc
-To: "Denis Kenzior" <denkenz@gmail.com>, "Marcel Holtmann"
- <marcel@holtmann.org>
-Cc: iwd@lists.linux.dev
-In-Reply-To: <8ce688a8-8cc4-4651-a0e5-ca20f86c8888@gmail.com>
-References: <20240212184747.30422-1-clayton@craftyguy.net>
- <8b02ff06-9c2b-4503-8fb8-9784c2628394@gmail.com>
- <152B8E7F-C6D0-4827-AC38-25454FD6BAF7@holtmann.org>
- <f9970105-c1c7-484b-8e13-5ca5f5bae901@gmail.com>
- <34797D3A-D630-4D71-B4E8-BD29E9BB759C@holtmann.org>
- <b1b66222-6594-4775-94ed-2f17810029b1@gmail.com>
- <BC62FEA8-DA18-4084-A5B6-A96C82AE799B@holtmann.org>
- <a64273d2-e585-4e48-a35a-38384b79202c@gmail.com>
- <440488C8-0481-4A8F-BF68-A7F97FAADC8C@holtmann.org>
- <20240314153055.GB8925@craftyguy.net>
- <8ce688a8-8cc4-4651-a0e5-ca20f86c8888@gmail.com>
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=UTF-8
+Date: Tue, 19 Mar 2024 19:20:54 +0200
+Message-Id: <CZXWE5J2QMIN.1L4QKQU7C7UMN@kernel.org>
+Cc: <keyrings@vger.kernel.org>, <linux-wireless@vger.kernel.org>,
+ <iwd@lists.linux.dev>, "James Prestwood" <prestwoj@gmail.com>, "Dimitri
+ John Ledkov" <dimitri.ledkov@canonical.com>, "Karel Balej"
+ <balejk@matfyz.cz>
+Subject: Re: [PATCH] Revert "crypto: pkcs7 - remove sha1 support"
+From: "Jarkko Sakkinen" <jarkko@kernel.org>
+To: "Eric Biggers" <ebiggers@kernel.org>, <linux-crypto@vger.kernel.org>,
+ "Herbert Xu" <herbert@gondor.apana.org.au>
+X-Mailer: aerc 0.15.2
+References: <20240313233227.56391-1-ebiggers@kernel.org>
+In-Reply-To: <20240313233227.56391-1-ebiggers@kernel.org>
 
-March 15, 2024 at 6:49 AM, "Denis Kenzior" <denkenz@gmail.com> wrote:
+On Thu Mar 14, 2024 at 1:32 AM EET, Eric Biggers wrote:
+> From: Eric Biggers <ebiggers@google.com>
+>
+> This reverts commit 16ab7cb5825fc3425c16ad2c6e53d827f382d7c6 because it
+> broke iwd.  iwd uses the KEYCTL_PKEY_* UAPIs via its dependency libell,
+> and apparently it is relying on SHA-1 signature support.  These UAPIs
+> are fairly obscure, and their documentation does not mention which
+> algorithms they support.  iwd really should be using a properly
+> supported userspace crypto library instead.  Regardless, since something
+> broke we have to revert the change.
+>
+> It may be possible that some parts of this commit can be reinstated
+> without breaking iwd (e.g. probably the removal of MODULE_SIG_SHA1), but
+> for now this just does a full revert to get things working again.
+>
+> Reported-by: Karel Balej <balejk@matfyz.cz>
+> Closes: https://lore.kernel.org/r/CZSHRUIJ4RKL.34T4EASV5DNJM@matfyz.cz
+> Cc: Dimitri John Ledkov <dimitri.ledkov@canonical.com>
+> Signed-off-by: Eric Biggers <ebiggers@google.com>
+> ---
+>  crypto/asymmetric_keys/mscode_parser.c    |  3 +
+>  crypto/asymmetric_keys/pkcs7_parser.c     |  4 ++
+>  crypto/asymmetric_keys/public_key.c       |  3 +-
+>  crypto/asymmetric_keys/signature.c        |  2 +-
+>  crypto/asymmetric_keys/x509_cert_parser.c |  8 +++
+>  crypto/testmgr.h                          | 80 +++++++++++++++++++++++
+>  include/linux/oid_registry.h              |  4 ++
+>  kernel/module/Kconfig                     |  5 ++
+>  8 files changed, 107 insertions(+), 2 deletions(-)
+>
+> diff --git a/crypto/asymmetric_keys/mscode_parser.c b/crypto/asymmetric_k=
+eys/mscode_parser.c
+> index 05402ef8964e..8aecbe4637f3 100644
+> --- a/crypto/asymmetric_keys/mscode_parser.c
+> +++ b/crypto/asymmetric_keys/mscode_parser.c
+> @@ -73,10 +73,13 @@ int mscode_note_digest_algo(void *context, size_t hdr=
+len,
+>  	char buffer[50];
+>  	enum OID oid;
+> =20
+>  	oid =3D look_up_OID(value, vlen);
+>  	switch (oid) {
+> +	case OID_sha1:
+> +		ctx->digest_algo =3D "sha1";
+> +		break;
 
+I fully agree with the change BUT...
 
-> Should already be taken care of by ba5a6df2d170 ("wiphy: Remove basenam=
-e() use"). See [1]. Part of iwd 2.15 release.
+IMHO it would make sense to e.g either add inline comment about iwd
+dependency or link to the bug report here.
 
-Oh no, I'm sorry for missing this! Thanks for fixing it :)
+I'd like to think that there is common will to eventually get rid of
+all of SHA-1, and thus in cases where it is not yet possible it would
+make sense to guide what to needs to be done to make it happen, right?
 
--Clayton
+BR, Jarkko
