@@ -1,76 +1,123 @@
-Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
+Received: from madrid.collaboradmins.com (madrid.collaboradmins.com [46.235.227.194])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 279AE3F8F4;
-	Fri, 22 Mar 2024 11:44:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A395E17BAB
+	for <iwd@lists.linux.dev>; Mon, 25 Mar 2024 17:26:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.235.227.194
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711107902; cv=none; b=tCC8bFI8XJoR4T6c6K7iaUiVNGBLkTO0I758ikqMt9bvfO1jzex3KA4oYjiAPglMaWbl2QUG0NTyzAGqu2wPP/w0IgKJw6QNM3QMlBqseglq73iVoh8DaRbreygyyYGj042Xgwe4zbSF85nR9WSNIDKOqXkGwEPch/4lu9CDYKo=
+	t=1711387573; cv=none; b=SvzszFPbDtho3reAY4CocZw0MI0qQcvybyHj/jeRwkNN+w50wTMcjEZpsVpnCYDnVqpCaFG4gcJrjioowLbRd6EOw2vj75OTjXBN6fWWVvPORgtYJ2/23vJWwk6zuW8p8IEllOJwRVD5Oeai1QU9xV28UPUre+/iwmX3xXCzLfA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711107902; c=relaxed/simple;
-	bh=3TzN2Lt6QPOtvQCHtJ7t44fnCg8LERCTZqdH35s6BEY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=E/3xWJZ636Xmd1z9dFFBrxlD3Y2/vBZbQRBIuemvw7sHrGCb+UrWHyUjW02YRnitxc9VIJvOKFX8Ug/4s5NIxaTS1kJTI64oZPAqTUgRZuBo/DP8AYcCIK3GvvGS2O91zfnFllF+U5w5WQuPmsDyiIYLct6nbs/BBzsGUMdSxOE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; arc=none smtp.client-ip=144.6.53.87
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-	id 1rndKP-009XMk-Km; Fri, 22 Mar 2024 19:44:54 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 22 Mar 2024 19:45:09 +0800
-Date: Fri, 22 Mar 2024 19:45:09 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: linux-crypto@vger.kernel.org, keyrings@vger.kernel.org,
-	linux-wireless@vger.kernel.org, iwd@lists.linux.dev,
-	James Prestwood <prestwoj@gmail.com>,
-	Dimitri John Ledkov <dimitri.ledkov@canonical.com>,
-	Karel Balej <balejk@matfyz.cz>
-Subject: Re: [PATCH] Revert "crypto: pkcs7 - remove sha1 support"
-Message-ID: <Zf1vRbvwYvj1KcTS@gondor.apana.org.au>
-References: <20240313233227.56391-1-ebiggers@kernel.org>
+	s=arc-20240116; t=1711387573; c=relaxed/simple;
+	bh=4c96cP52Jcisq4O2sXae4VvdzUShSPS8ypLt+FY9+gk=;
+	h=From:Content-Type:Date:Cc:To:MIME-Version:Message-ID:Subject; b=Tv1VG7wK3hlf/DB9ye3neZTWvHJSGXBcHU0gBb04ZBF0MsfQHvX6WOdr/TGSqoNp55voZNmYSf0bX0s5KzdCy2dzPjdkerEwWznT0fWp2z1NuCFLuNMFqLnHwDdOQeOcXr69IY+pS6FnM2vvYnzTZ+JEe9lwC+3MUNTzDG2rVdE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; arc=none smtp.client-ip=46.235.227.194
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=collabora.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
+Received: from harlem.collaboradmins.com (harlem.collaboradmins.com [IPv6:2a01:4f8:1c0c:5936::1])
+	by madrid.collaboradmins.com (Postfix) with ESMTP id 60C8A37810C0;
+	Mon, 25 Mar 2024 17:26:09 +0000 (UTC)
+From: "Jeremy Whiting" <jeremy.whiting@collabora.com>
+Content-Type: multipart/mixed; boundary="----=_=-_OpenGroupware_org_NGMime-2602023-1711387569.171470-2------"
+X-Forward: 127.0.0.1
+Date: Mon, 25 Mar 2024 17:26:09 +0000
+Cc: "Edmund Smith" <ed.smith@collabora.com>, "Alvaro Soliverez" <alvaro.soliverez@collabora.com>
+To: iwd@lists.linux.dev
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240313233227.56391-1-ebiggers@kernel.org>
+Message-ID: <27b427-6601b380-b-46ef6f80@167641064>
+Subject: ios hotspot fix
+User-Agent: SOGoMail 5.10.0
 
-On Wed, Mar 13, 2024 at 04:32:27PM -0700, Eric Biggers wrote:
-> From: Eric Biggers <ebiggers@google.com>
-> 
-> This reverts commit 16ab7cb5825fc3425c16ad2c6e53d827f382d7c6 because it
-> broke iwd.  iwd uses the KEYCTL_PKEY_* UAPIs via its dependency libell,
-> and apparently it is relying on SHA-1 signature support.  These UAPIs
-> are fairly obscure, and their documentation does not mention which
-> algorithms they support.  iwd really should be using a properly
-> supported userspace crypto library instead.  Regardless, since something
-> broke we have to revert the change.
-> 
-> It may be possible that some parts of this commit can be reinstated
-> without breaking iwd (e.g. probably the removal of MODULE_SIG_SHA1), but
-> for now this just does a full revert to get things working again.
-> 
-> Reported-by: Karel Balej <balejk@matfyz.cz>
-> Closes: https://lore.kernel.org/r/CZSHRUIJ4RKL.34T4EASV5DNJM@matfyz.cz
-> Cc: Dimitri John Ledkov <dimitri.ledkov@canonical.com>
-> Signed-off-by: Eric Biggers <ebiggers@google.com>
-> ---
->  crypto/asymmetric_keys/mscode_parser.c    |  3 +
->  crypto/asymmetric_keys/pkcs7_parser.c     |  4 ++
->  crypto/asymmetric_keys/public_key.c       |  3 +-
->  crypto/asymmetric_keys/signature.c        |  2 +-
->  crypto/asymmetric_keys/x509_cert_parser.c |  8 +++
->  crypto/testmgr.h                          | 80 +++++++++++++++++++++++
->  include/linux/oid_registry.h              |  4 ++
->  kernel/module/Kconfig                     |  5 ++
->  8 files changed, 107 insertions(+), 2 deletions(-)
+------=_=-_OpenGroupware_org_NGMime-2602023-1711387569.171470-2------
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Content-Length: 1631
 
-Patch applied.  Thanks.
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Hello,
+
+In recent testing it has been found that when trying to connect to an i=
+os hotspot some messages are missed by iwd. It seems to be a timing iss=
+ue, doesn't happen every time, but does happen often enough to be a pro=
+blem. In testing the device fails to connect more than half of the atte=
+mpts.
+
+Ed Smith has created a patch that seems to fix the problem here. I've a=
+ttached the patch after rebasing on iwd master.
+
+Here's a bit of background and explanation:
+
+iwd has difficulty in connecting to iOS hotspots as of 2.7 (and not
+fixed according to our testing as of 2.16 - latest at the time this is
+done). This is because of several factors:
+
+
+The iOS hotspot does not repeat its initial EAPOL challenge, where
+most APs will.
+
+
+The iOS hotspot is not reactive to EAPOL-Start (client request to be
+challenged); it sends exactly one challenge, and then the connection
+times out.
+
+
+The iOS hotspot sends its challenge very quickly, more quickly than
+iwd is prepared for. iwd is not ready to receive the challenge
+packet before the association event is fired by the kernel's wifi
+stack, but the iOS hotspot's challenge packet consistently arrives
+before this.
+
+
+This patch moves iwd's frame listener registration for EAPOL back to
+the authenticate event fired by the kernel. At this point, the
+necessary details about what kind of connection we expect to have
+(e.g. are we an AP) are available, but it's not possible for any
+plausible EAPOL packet to arrive yet (because authenticate requires us
+to take action - EAPOL happens after association, which can't happen
+before we respond to authenticate).
+
+thanks,
+Jeremy
+
+------=_=-_OpenGroupware_org_NGMime-2602023-1711387569.171470-2------
+Content-Type: text/x-patch
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="0001-Register-EAPOL-frame-listeners-earlier.patch"
+Content-Length: 2153
+
+RnJvbSBiMTkwMDc0MzEzMTFlNWYzZmUxY2Q0ZTQxNDllYzkwOWM0ZTU3ZmZiIE1vbiBTZXAg
+MTcgMDA6MDA6MDAgMjAwMQpGcm9tOiBFZCBTbWl0aCA8ZWQuc21pdGhAY29sbGFib3JhLmNv
+bT4KRGF0ZTogVGh1LCAyMSBNYXIgMjAyNCAyMTo0Mzo1NyArMDAwMApTdWJqZWN0OiBbUEFU
+Q0hdIFJlZ2lzdGVyIEVBUE9MIGZyYW1lIGxpc3RlbmVycyBlYXJsaWVyCgpJZiB3ZSByZWdp
+c3RlciB0aGUgbWFpbiBFQVBPTCBmcmFtZSBsaXN0ZW5lciBhcyBsYXRlIGFzIHRoZSBhc3Nv
+Y2lhdGUKZXZlbnQsIGl0IG1heSBub3Qgb2JzZXJ2ZSBwdGtfMV9vZl80LiBUaGlzIGRlZmVh
+dHMgaGFuZGxpbmcgZm9yIGVhcmx5Cm1lc3NhZ2VzIGluIGVhcG9sX3J4X3BhY2tldCwgd2hp
+Y2ggb25seSBzZWVzIG1lc3NhZ2VzIG9uY2UgaXQgaGFzIGJlZW4KcmVnaXN0ZXJlZC4KCklm
+IHdlIG1vdmUgcmVnaXN0cmF0aW9uIHRvIHRoZSBhdXRoZW50aWNhdGUgZXZlbnQsIHRoZW4g
+dGhlIEVBUE9MCmZyYW1lIGxpc3RlbmVycyBzaG91bGQgb2JzZXJ2ZSBhbGwgbWVzc2FnZXMs
+IHdpdGhvdXQgYW55IHBvc3NpYmxlCnJhY2VzLiBOb3RlIHRoYXQgdGhlIG1lc3NhZ2VzIGFy
+ZSBub3QgYWN0dWFsbHkgcHJvY2Vzc2VkIHVudGlsCmVhcG9sX3N0YXJ0KCkgaXMgY2FsbGVk
+LCBhbmQgd2UgaGF2ZW4ndCBtb3ZlZCB0aGF0IGNhbGwgc2l0ZS4gQWxsCnRoYXQncyBjaGFu
+Z2luZyBoZXJlIGlzIGhvdyBlYXJseSBFQVBPTCBtZXNzYWdlcyBjYW4gYmUgb2JzZXJ2ZWQu
+Ci0tLQogc3JjL25ldGRldi5jIHwgOCArKysrKy0tLQogMSBmaWxlIGNoYW5nZWQsIDUgaW5z
+ZXJ0aW9ucygrKSwgMyBkZWxldGlvbnMoLSkKCmRpZmYgLS1naXQgYS9zcmMvbmV0ZGV2LmMg
+Yi9zcmMvbmV0ZGV2LmMKaW5kZXggMDlmYWM5NTkuLjNiNmUyYzI2IDEwMDY0NAotLS0gYS9z
+cmMvbmV0ZGV2LmMKKysrIGIvc3JjL25ldGRldi5jCkBAIC0yOTE4LDYgKzI5MTgsMTEgQEAg
+c3RhdGljIHZvaWQgbmV0ZGV2X2F1dGhlbnRpY2F0ZV9ldmVudChzdHJ1Y3QgbF9nZW5sX21z
+ZyAqbXNnLAogCQlyZXR1cm47CiAJfQogCisJaWYgKCFuZXRkZXYtPnNtKSB7CisJCW5ldGRl
+di0+c20gPSBlYXBvbF9zbV9uZXcobmV0ZGV2LT5oYW5kc2hha2UpOworCQllYXBvbF9yZWdp
+c3RlcihuZXRkZXYtPnNtKTsKKwl9CisKIAkvKgogCSAqIER1cmluZyBGYXN0IFRyYW5zaXRp
+b24gd2UgdXNlIHRoZSBhdXRoZW50aWNhdGUgZXZlbnQgdG8gc3RhcnQgdGhlCiAJICogcmVh
+c3NvY2lhdGlvbiBzdGVwIGJlY2F1c2UgdGhlIEZURSBuZWNlc3NhcnkgYmVmb3JlIHdlIGNh
+biBidWlsZApAQCAtMzA5OSw5ICszMTA0LDYgQEAgc3RhdGljIHZvaWQgbmV0ZGV2X2Fzc29j
+aWF0ZV9ldmVudChzdHJ1Y3QgbF9nZW5sX21zZyAqbXNnLAogCQkJbmV0ZGV2LT5hcCA9IE5V
+TEw7CiAJCX0KIAotCQluZXRkZXYtPnNtID0gZWFwb2xfc21fbmV3KG5ldGRldi0+aGFuZHNo
+YWtlKTsKLQkJZWFwb2xfcmVnaXN0ZXIobmV0ZGV2LT5zbSk7Ci0KIAkJLyogSnVzdCBpbiBj
+YXNlIHRoaXMgd2FzIGEgcmV0cnkgKi8KIAkJbmV0ZGV2LT5pZ25vcmVfY29ubmVjdF9ldmVu
+dCA9IGZhbHNlOwogCi0tIAoyLjQ0LjAKCg==
+
+------=_=-_OpenGroupware_org_NGMime-2602023-1711387569.171470-2--------
+
