@@ -1,115 +1,146 @@
-Received: from wout1-smtp.messagingengine.com (wout1-smtp.messagingengine.com [64.147.123.24])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oo1-f53.google.com (mail-oo1-f53.google.com [209.85.161.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D54E314D280
-	for <iwd@lists.linux.dev>; Wed, 27 Mar 2024 19:21:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=64.147.123.24
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CB9C13E043
+	for <iwd@lists.linux.dev>; Wed, 27 Mar 2024 21:01:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711567299; cv=none; b=PDvru7x4BO8/FgtvbvdfZCjh08989Qoojp2oZCbqTunB335Svq4AR8rBF9SS++jqyFuY5RirxXS0gdjDr2njNJ9KCh2p5oCQXfbDtgFS2DWA7mFWZt+93ky5SFCBy37mvrKkQssB0ZWOrdcuU7ycQeEeQrLdYdz8D1hQfCGY0ks=
+	t=1711573301; cv=none; b=OT5mXSADXDe13ZNL+rcuOmhjdK4fv7ylUjNI/brxIkqXwr8/k/9uGMBmvOIDWJZ11q+2mkRtuZ3KtyTGKJzYsT5nEPKhHrk8fYbG6qVxFVIsUTjMA5dSz5A1dCh+3OdACX0jjs5vb7Hm7xPeUlZ7eMR8F1cVGv6QpvygzLKncmk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711567299; c=relaxed/simple;
-	bh=OXBfRgsMP0adkqh5IT77p658YAqxtZ7RyebPKmWwiKI=;
-	h=MIME-Version:Message-Id:In-Reply-To:References:Date:From:To:
-	 Subject:Content-Type; b=U77speaoxwHM2k0Hbyf9hkDiNvWBR60sR61PRkQ2yqMqV2VzQCgev0u+yE3iJymOT/FgY9WxrjX2ITVcGguG7yXjb/FMx8zRhsjmxyPb9mGhHEyym8Gls4FL6B+NFmqsWckt8zQrregzl2x1Lp8xMEraNHVhmdnr7Lb571YYfPQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=svenstaro.org; spf=pass smtp.mailfrom=svenstaro.org; dkim=pass (2048-bit key) header.d=svenstaro.org header.i=@svenstaro.org header.b=lD13ejFv; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=tkcM7Fo4; arc=none smtp.client-ip=64.147.123.24
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=svenstaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=svenstaro.org
+	s=arc-20240116; t=1711573301; c=relaxed/simple;
+	bh=NEN9/W9H96QkjvEMIvSZFIDGKMbThh957oLcl9D0opY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Bm9OQBjjPmlxdohkGicmY104l0rASIY2Fp0YXadzUGF18TagD1oDT97zSLRTWln9Kahx2rOFNUNgfbnggJKN5vXrx91oboihblKSpbGOmAk1nwqVsYaECwbAHtbnM/rTk7rjUPI1Wcv1zdwCRG9bpaHKiO+dUOqhnEBWknwCXKg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RtDeCr2d; arc=none smtp.client-ip=209.85.161.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=svenstaro.org header.i=@svenstaro.org header.b="lD13ejFv";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="tkcM7Fo4"
-Received: from compute6.internal (compute6.nyi.internal [10.202.2.47])
-	by mailout.west.internal (Postfix) with ESMTP id 00F443200A16;
-	Wed, 27 Mar 2024 15:21:35 -0400 (EDT)
-Received: from imap50 ([10.202.2.100])
-  by compute6.internal (MEProxy); Wed, 27 Mar 2024 15:21:36 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=svenstaro.org;
-	 h=cc:content-type:content-type:date:date:from:from:in-reply-to
-	:in-reply-to:message-id:mime-version:references:reply-to:subject
-	:subject:to:to; s=fm2; t=1711567295; x=1711653695; bh=9NRnfuXgI5
-	Nd60ekbndesIkjYMaKki9veDh4Vagwgys=; b=lD13ejFvGv5ipSA3CwtDZ8hKL7
-	ordqhqXy8w2EIecrEQQYj8f+T69peHMByZJRndH3FTg9R3y0myELc/mX1xj9GqJd
-	8fJMZA8qJmO4mKHxUS8TnM2z9/XnZNnLnR+gft4swCw5c3F7l+CT4UAsvUPiEaY1
-	rt2yxGuqkJjqgYaCAinaBmGNjj89qGsm9V7o1Q+9KrE6heOtFCn9o/cT3k+SBsGP
-	lAnh4tHmi56iE9zupGba/neD2GXDWgZ3KGzZHzalWb3gNWWmo6/gTsyIQhxxf3iz
-	PGX9M43ywsRGEsmT6y8fKOv2LIK6KpWsCp7HICms+mg4kdMIKuGGJXWRXxkg==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
-	fm2; t=1711567295; x=1711653695; bh=9NRnfuXgI5Nd60ekbndesIkjYMaK
-	ki9veDh4Vagwgys=; b=tkcM7Fo4T5cqaEwFgMCtW/fZpnpPLFkYWEL6JYYEnTKQ
-	tYgq4LTq+0xL+Y7qh/gWvQnD6GhUt2K0jQC7WA8eS0Vt9wFIFVwbivV0robd60Rk
-	m3l2ZFbVHtKpYgO/Khc5u4Nq8nahsTyLkv7wLDxoAkdlnIsj91C+fXasiyrlb1tO
-	/NPERup8dYAhXkZuNCXEe0nE9Cvfis1LfOHH51ih2glJiT4vyXy9iSELoU4OMcPw
-	Df+YNiXegGxIiOmrM4fSb7H2yR9etOEMuQB0SNkdFNh9pKzd3zJ81/UKwoUafjRA
-	By0h5fAAmYw/Cr63VuI+foGCr3nKDF2gDJWHiMZ03w==
-X-ME-Sender: <xms:v3EEZpLzYN8MYBftXmkfB2e6N1HEE782uCbBPKX1ewJX90AmRS6BXw>
-    <xme:v3EEZlL9qqVrRvbTKqO8vu71i4-SE9BfZnd4agLpWrY7IvSwzMbL-6kwQulWUQ8t7
-    z6XRDmRlkPOCGMbMrA>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvledrudduiedgleelucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
-    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
-    cujfgurhepofgfggfkjghffffhvffutgesthdtredtreertdenucfhrhhomhepfdfuvhgv
-    nhdqjfgvnhgurhhikhcujfgrrghsvgdfuceomhgrihhlihhnghhlihhsthhssehsvhgvnh
-    hsthgrrhhordhorhhgqeenucggtffrrghtthgvrhhnpeegfffhtedvtefhfefgteeitddt
-    lefghefggfeuudejheefkeegtdehhfejledtheenucevlhhushhtvghrufhiiigvpedtne
-    curfgrrhgrmhepmhgrihhlfhhrohhmpehmrghilhhinhhglhhishhtshesshhvvghnshht
-    rghrohdrohhrgh
-X-ME-Proxy: <xmx:v3EEZhvgXcTIDgFyDjsxCmjDssGJliEY7E1PFDbqdb9yQzqpb0WwAw>
-    <xmx:v3EEZqYZGDstdS2ZqG30xlu1_2XzkoJNY8FsR3dKYOVULRA3M1WyFg>
-    <xmx:v3EEZgbUmaUUDH-N_06-NPoElj9ET12govmV3Vbjvc2FPldm8Z5L4w>
-    <xmx:v3EEZuBGa-F38svI_4JxJsTDwqpTuj4fKgVLEWkPdWx0_5_WVQD7Sw>
-    <xmx:v3EEZpDFfu8kGNoBswdSwBIyfgdypB2YjKIVcLdkcizPZS2LKrdClA>
-Feedback-ID: i6bf14966:Fastmail
-Received: by mailuser.nyi.internal (Postfix, from userid 501)
-	id 08EB11700093; Wed, 27 Mar 2024 15:21:34 -0400 (EDT)
-X-Mailer: MessagingEngine.com Webmail Interface
-User-Agent: Cyrus-JMAP/3.11.0-alpha0-328-gc998c829b7-fm-20240325.002-gc998c829
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RtDeCr2d"
+Received: by mail-oo1-f53.google.com with SMTP id 006d021491bc7-5a550ce1a41so148724eaf.0
+        for <iwd@lists.linux.dev>; Wed, 27 Mar 2024 14:01:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1711573299; x=1712178099; darn=lists.linux.dev;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=976hSKmI6Z3JQaFjKARzLF3O5JJIHDsaOI22Ae6MFH4=;
+        b=RtDeCr2d52IUGr1fRdppUpM49O/B1PbD0CKhXNRA3ZhLMUFBesZhvaDm/JRRaXbYvn
+         LWaBRZoEHomV+89h8ikafecUbAOo8mMQo1Ox5RTZmzovxwj68GI3TMirblUJO9HO6OF1
+         XXFvI5yX4/P91B/ISC07TVae+J9OyqlH+WokiYEWlE2S5vwbfIw+y935CGxrlk3IgYZT
+         Yhy7+RiM0J2B7fshwPp8sxuG1mVVw3tcH1cvpPi1AjTXG3R4BeeONXlJaDu76NeS/OSV
+         WqFEfzviu8njJoeN2FwaoYZEOI0FFJBPsx7kgR1VxaqUfbFccBnifm1Q8uoE39JiGDlG
+         9oog==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1711573299; x=1712178099;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=976hSKmI6Z3JQaFjKARzLF3O5JJIHDsaOI22Ae6MFH4=;
+        b=tfRGHGD+9Q5Ay6HaoKfvUJY0jYDb1EI+gJxU4V+ji95unrnT00HDqR/sVrLsRzbvzZ
+         6F7ZZJmymxrRSv9rl/uzRcrVUmf4/ElpUGx5PeXmdIinK3atWPMH+I3Z9dE+JtSOIBm8
+         wSTHiVvkq/naV7CiJ2p0JVhTdhBMdH4Jt4/SLyogLdLV0ekM7UuoauGbAaJqZEEpmqzp
+         r2se2K4d1XDT1BNIy/I1EYiyz+lQ3b67GWKAMLQlDDPAdPr1GlSsfyDHpSyfiiZNxH9f
+         y1PNqN8nHWPvvQiheiRqQk4383rOIspYODQ+bBk4fVXjZVNUbH6Drzxvg4PDDIPZhoYU
+         xbUA==
+X-Forwarded-Encrypted: i=1; AJvYcCXY9ohcSRBaccJZNkuc8Zc4vILL6PzAxbKVn2P89vdArKNfK7usnK9pi4iB76xLj6iIw2TkgvegNer/gBF9mkz+PmsG
+X-Gm-Message-State: AOJu0YzBvfzdVXBcqmf1QPrWTXdRlf09SabSoPvJTe2ZwUT1kLo2QQbK
+	Mbr+SOljCGArSNAipPatpHeNMoo1pn4tJYYN5e3VCIdNf6VmRPsV
+X-Google-Smtp-Source: AGHT+IHM6IJ5Q10zjno03R01f0IpveZdic0d1jRGcWgDl02jh60sNuX9AsivQfWtdmxe38cOpuSEQA==
+X-Received: by 2002:a05:6820:2718:b0:5a5:21df:7eee with SMTP id db24-20020a056820271800b005a521df7eeemr1282350oob.1.1711573299072;
+        Wed, 27 Mar 2024 14:01:39 -0700 (PDT)
+Received: from [192.168.1.22] (070-114-247-242.res.spectrum.com. [70.114.247.242])
+        by smtp.googlemail.com with ESMTPSA id i10-20020a056820138a00b005a53ef7337csm158oow.31.2024.03.27.14.01.38
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 27 Mar 2024 14:01:38 -0700 (PDT)
+Message-ID: <fd511498-2a6c-4646-85b3-4f2f3f6f379b@gmail.com>
+Date: Wed, 27 Mar 2024 16:01:37 -0500
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Message-Id: <07f49420-74e8-4954-bd87-9ae3290e86d3@app.fastmail.com>
-In-Reply-To: <16f79ea4-32a2-47f5-b6a9-cfd911454a6a@gmail.com>
-References: <699c79ff-0082-4602-9bb8-475722563c46@app.fastmail.com>
- <16f79ea4-32a2-47f5-b6a9-cfd911454a6a@gmail.com>
-Date: Wed, 27 Mar 2024 20:21:14 +0100
-From: "Sven-Hendrik Haase" <mailinglists@svenstaro.org>
-To: "James Prestwood" <prestwoj@gmail.com>, iwd@lists.linux.dev
-Subject: Re: iwd picking worse network despite better one available
-Content-Type: text/plain
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] Register EAPOL frame listeners earlier
+Content-Language: en-US
+To: jeremy.whiting@collabora.com, iwd@lists.linux.dev
+Cc: ed.smith@collabora.com, alvaro.soliverez@collabora.com
+References: <20240327184927.677804-1-jeremy.whiting@collabora.com>
+From: Denis Kenzior <denkenz@gmail.com>
+In-Reply-To: <20240327184927.677804-1-jeremy.whiting@collabora.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Wed, Mar 27, 2024, at 19:54, James Prestwood wrote:
-> Hi,
+Hi Jeremy/Ed,
+
+On 3/27/24 13:49, jeremy.whiting@collabora.com wrote:
+> From: Ed Smith <ed.smith@collabora.com>
 > 
-> On 3/27/24 11:36 AM, Sven-Hendrik Haase wrote:
-> > Hello,
-> >
-> > I've spent a good chunk of my evening looking into why iwd doesn't select the network I want it to select. I have a network "Home" with two APs. iwd seems to strongly prefer the AP that is further away and that has worse strength as measured by iwd.
-> >
-> >  From some testing, I believe it has to do with the AP rather than the wifi adapter. I tested a wifi adapter using mt7921e and one using iwlwifi and the result is the same in both cases. The APs are both pretty modern: The one iwd doesn't like is a FRITZ!Box 7590 AX while the one it likes is a FRITZ!Repeater 6000. From the log it seems that iwd is unable to perform a proper data rate estimation and then falls back to some default. At any rate, the rank would indicate that the estimated data rate plays an important role. If I use the developer mode to force roaming to the AP I want (named "better" in the log) then I'm able to use it perfectly well with a good data rate.
-> >
-> > As such I think this is a bug _somewhere_ but I'm not exactly sure where. I searched the configuration options but it seems it's not possible to turn off the data rate estimations for the ranking. I'd be perfectly happy to just go by signal strength. However, I suppose it would be better to actually fix the core problem in iwd.
+> If we register the main EAPOL frame listener as late as the associate
+> event, it may not observe ptk_1_of_4. This defeats handling for early
+> messages in eapol_rx_packet, which only sees messages once it has been
+> registered.
 > 
-> IWD bases the ranking of BSS's heavily off the estimated data rate. If 
-> that fails then as you see the rank is very low as it defaults back to 
-> 802.11b rates. There are several IEs the AP sends which IWD parses, any 
-> one of them could be either not included at all, or not be formatted 
-> correctly, or an actual bug in the parsing code. Could you get an iwmon 
-> capture of IWD scanning your APs so I could take a look and see exactly 
-> why its failing? Then we can go from there.
-> 
-> Thanks,
-> 
-> James
+> If we move registration to the authenticate event, then the EAPOL
+> frame listeners should observe all messages, without any possible
+> races. Note that the messages are not actually processed until
+> eapol_start() is called, and we haven't moved that call site. All
+> that's changing here is how early EAPOL messages can be observed.
+> ---
+>   src/netdev.c | 17 +++++++++++++----
+>   1 file changed, 13 insertions(+), 4 deletions(-)
 > 
 
-Hi James,
+Can we please use patch versioning?  I can't keep track which version of this 
+patch I'm looking at now.
 
-You should have received a pcap file of an iwd restart in a separate email. I hope there's some usable data in there for you.
+> diff --git a/src/netdev.c b/src/netdev.c
+> index 09fac959..886a85f5 100644
+> --- a/src/netdev.c
+> +++ b/src/netdev.c
+> @@ -2896,6 +2896,14 @@ static bool kernel_will_retry_auth(uint16_t status_code,
+>   	return false;
+>   }
+>   
+> +static void netdev_ensure_registered(struct netdev *netdev)
 
-Cheers,
-Sven
+The naming could use some work.  What is being registered?
+
+> +{
+> +	if (!netdev->sm) {
+
+I would do:
+
+if (L_WARN_ON(netdev->sm))
+	return;
+
+....
+
+> +		netdev->sm = eapol_sm_new(netdev->handshake);
+> +		eapol_register(netdev->sm);
+> +	}
+> +}
+> +
+>   static void netdev_authenticate_event(struct l_genl_msg *msg,
+>   							struct netdev *netdev)
+>   {
+> @@ -2982,8 +2990,10 @@ static void netdev_authenticate_event(struct l_genl_msg *msg,
+>   						NULL, netdev->user_data);
+>   
+>   		/* We have sent another CMD_AUTHENTICATE / CMD_ASSOCIATE */
+> -		if (ret == 0 || ret == -EAGAIN)
+> +		if (ret == 0 || ret == -EAGAIN) {
+> +			netdev_ensure_registered(netdev);
+
+Nit: The whole point of EAGAIN is that we're not proceeding to the next stage. 
+See src/auth-proto.h.  You should only be trying to create eapol_sm when we do.
+
+>   			return;
+> +		}
+>   
+>   		retry = kernel_will_retry_auth(status_code,
+>   				L_CPU_TO_LE16(auth->algorithm),
+
+Regards,
+-Denis
+
