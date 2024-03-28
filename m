@@ -1,146 +1,98 @@
-Received: from mail-oo1-f53.google.com (mail-oo1-f53.google.com [209.85.161.53])
+Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CB9C13E043
-	for <iwd@lists.linux.dev>; Wed, 27 Mar 2024 21:01:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 607BD7E118
+	for <iwd@lists.linux.dev>; Thu, 28 Mar 2024 13:47:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711573301; cv=none; b=OT5mXSADXDe13ZNL+rcuOmhjdK4fv7ylUjNI/brxIkqXwr8/k/9uGMBmvOIDWJZ11q+2mkRtuZ3KtyTGKJzYsT5nEPKhHrk8fYbG6qVxFVIsUTjMA5dSz5A1dCh+3OdACX0jjs5vb7Hm7xPeUlZ7eMR8F1cVGv6QpvygzLKncmk=
+	t=1711633651; cv=none; b=hGOVIlv0ELrFaRts8LsvBfdhw3rcxwP8s4uaIQ/0CX7VlAPBBTi1cO1eIDwaxsDL5deuV5SQftVxdJTu+Z5SQrTM6FqrtqrLXC/wM9Us3nMKH/BZrm6bsBKGNaG5YhX631WK1xnSls+XfqHz+aoVAFV4nKlFdoeuNhmQE4rloQ8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711573301; c=relaxed/simple;
-	bh=NEN9/W9H96QkjvEMIvSZFIDGKMbThh957oLcl9D0opY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Bm9OQBjjPmlxdohkGicmY104l0rASIY2Fp0YXadzUGF18TagD1oDT97zSLRTWln9Kahx2rOFNUNgfbnggJKN5vXrx91oboihblKSpbGOmAk1nwqVsYaECwbAHtbnM/rTk7rjUPI1Wcv1zdwCRG9bpaHKiO+dUOqhnEBWknwCXKg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RtDeCr2d; arc=none smtp.client-ip=209.85.161.53
+	s=arc-20240116; t=1711633651; c=relaxed/simple;
+	bh=jgeUEzg2kaUgbJEfU4Qff6iM+sLQ4Ep0ug7ZdG2tQPQ=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=GEsr8j2Jp/OG+ETviq8+5ILSZE2DMovOChkW9D6ByDvfPEXAanmNR2BynkxWAqYbqaEBUdV5cLzeZgbe2yfKrZ/KfTJG2pFs19XP0NoGAzMAu5qcA5itIAGycgYoc/R9w7vIWaw/QVQ94dpQsvw/thDTW0M71dGwEQ5Kl5tBaeA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=S9wLGnXV; arc=none smtp.client-ip=209.85.214.170
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RtDeCr2d"
-Received: by mail-oo1-f53.google.com with SMTP id 006d021491bc7-5a550ce1a41so148724eaf.0
-        for <iwd@lists.linux.dev>; Wed, 27 Mar 2024 14:01:39 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="S9wLGnXV"
+Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-1def2a1aafaso7582925ad.3
+        for <iwd@lists.linux.dev>; Thu, 28 Mar 2024 06:47:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1711573299; x=1712178099; darn=lists.linux.dev;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=976hSKmI6Z3JQaFjKARzLF3O5JJIHDsaOI22Ae6MFH4=;
-        b=RtDeCr2d52IUGr1fRdppUpM49O/B1PbD0CKhXNRA3ZhLMUFBesZhvaDm/JRRaXbYvn
-         LWaBRZoEHomV+89h8ikafecUbAOo8mMQo1Ox5RTZmzovxwj68GI3TMirblUJO9HO6OF1
-         XXFvI5yX4/P91B/ISC07TVae+J9OyqlH+WokiYEWlE2S5vwbfIw+y935CGxrlk3IgYZT
-         Yhy7+RiM0J2B7fshwPp8sxuG1mVVw3tcH1cvpPi1AjTXG3R4BeeONXlJaDu76NeS/OSV
-         WqFEfzviu8njJoeN2FwaoYZEOI0FFJBPsx7kgR1VxaqUfbFccBnifm1Q8uoE39JiGDlG
-         9oog==
+        d=gmail.com; s=20230601; t=1711633649; x=1712238449; darn=lists.linux.dev;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=u6/LQEbj47XgO1NSTRnIcQMXt+T1PN8lsmLYGnxkXkg=;
+        b=S9wLGnXViS9HRBvIS37LyEHEXpLoljhBf+0K/enLv0iRwhwOpFb/BbmjMwRxPrM01V
+         4vjW/EG1geOJT4UN9EScadZxh82p3KkDBwKRdJ5NaLJv3Ov7JOMe8W79Bu+kXBuHNn+x
+         w34Jln5x1DI49deXvu/39VNdnI3flw+gAuBs6avZxNLa/vRPw2EZOKUbQxiqcboi6kLJ
+         PaKZ/OQa9azjH2Rd9Oz79890Kdoj8oq/CXU4VPSotvzGDawLesIzZVXIW6l5+rRI2tYC
+         KCnoRR6j+cOEGHlMabEo3PSE2CfSHNP1t40bLs4IyRDE7xjcRvkUAqTJvy3VAyIJ8R2c
+         Lnkg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711573299; x=1712178099;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=976hSKmI6Z3JQaFjKARzLF3O5JJIHDsaOI22Ae6MFH4=;
-        b=tfRGHGD+9Q5Ay6HaoKfvUJY0jYDb1EI+gJxU4V+ji95unrnT00HDqR/sVrLsRzbvzZ
-         6F7ZZJmymxrRSv9rl/uzRcrVUmf4/ElpUGx5PeXmdIinK3atWPMH+I3Z9dE+JtSOIBm8
-         wSTHiVvkq/naV7CiJ2p0JVhTdhBMdH4Jt4/SLyogLdLV0ekM7UuoauGbAaJqZEEpmqzp
-         r2se2K4d1XDT1BNIy/I1EYiyz+lQ3b67GWKAMLQlDDPAdPr1GlSsfyDHpSyfiiZNxH9f
-         y1PNqN8nHWPvvQiheiRqQk4383rOIspYODQ+bBk4fVXjZVNUbH6Drzxvg4PDDIPZhoYU
-         xbUA==
-X-Forwarded-Encrypted: i=1; AJvYcCXY9ohcSRBaccJZNkuc8Zc4vILL6PzAxbKVn2P89vdArKNfK7usnK9pi4iB76xLj6iIw2TkgvegNer/gBF9mkz+PmsG
-X-Gm-Message-State: AOJu0YzBvfzdVXBcqmf1QPrWTXdRlf09SabSoPvJTe2ZwUT1kLo2QQbK
-	Mbr+SOljCGArSNAipPatpHeNMoo1pn4tJYYN5e3VCIdNf6VmRPsV
-X-Google-Smtp-Source: AGHT+IHM6IJ5Q10zjno03R01f0IpveZdic0d1jRGcWgDl02jh60sNuX9AsivQfWtdmxe38cOpuSEQA==
-X-Received: by 2002:a05:6820:2718:b0:5a5:21df:7eee with SMTP id db24-20020a056820271800b005a521df7eeemr1282350oob.1.1711573299072;
-        Wed, 27 Mar 2024 14:01:39 -0700 (PDT)
-Received: from [192.168.1.22] (070-114-247-242.res.spectrum.com. [70.114.247.242])
-        by smtp.googlemail.com with ESMTPSA id i10-20020a056820138a00b005a53ef7337csm158oow.31.2024.03.27.14.01.38
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 27 Mar 2024 14:01:38 -0700 (PDT)
-Message-ID: <fd511498-2a6c-4646-85b3-4f2f3f6f379b@gmail.com>
-Date: Wed, 27 Mar 2024 16:01:37 -0500
+        d=1e100.net; s=20230601; t=1711633649; x=1712238449;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=u6/LQEbj47XgO1NSTRnIcQMXt+T1PN8lsmLYGnxkXkg=;
+        b=Um813cT/T1h9vAhY40+/Fw+TAX+7WgyezBfgR7xUv5tWsDw2Srsvmq68Exx3aYStL2
+         04EaDZSKtIrnXRHM+2F4Uj6+dC7gVrKVHdEtu11eFX6WaLk2ZYmIHNZufASiNa90xNBN
+         r6k+LUCW4WbNKitD2gCNVZlKe1XENixJUcWocmgCjaZzXrD/Ecos5BxL0w4qnRhf1RZE
+         mdCC0zhN4w3O0/3Nesy4Tmqbkb1cO9C32upm+96UOyUr6pLixWUVhOsh36wv3I9NDeyR
+         r04Rx5JJqCZGoO1/G4UP+1kASZoFLUac1/ouU4Ff/ZMs8Yqpn6D8pbgAeckSZ2Hw37Sm
+         c7KA==
+X-Gm-Message-State: AOJu0YyMdvmnC5gAI0S/yaxuFrZuv2yGzCcJ+AsFGWxBM55RGx1KieWl
+	HYvJq/bEL/p7Bblw6lo7OuEnpBHG+sT2I02Wq9+kHmPU3Z0H0IUEIrorl04X
+X-Google-Smtp-Source: AGHT+IEpY4JfmbNfWW7ZrKmF3RW89G1pUPwaKMz9GShMSh6EgGWM7FPq0wdhtLODkdxI8npTirj1hw==
+X-Received: by 2002:a17:902:6908:b0:1dd:6eba:c592 with SMTP id j8-20020a170902690800b001dd6ebac592mr2582676plk.56.1711633649245;
+        Thu, 28 Mar 2024 06:47:29 -0700 (PDT)
+Received: from LOCLAP699.. ([50.39.172.77])
+        by smtp.gmail.com with ESMTPSA id kx5-20020a170902f94500b001e10b6f45dasm1568838plb.295.2024.03.28.06.47.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 28 Mar 2024 06:47:28 -0700 (PDT)
+From: James Prestwood <prestwoj@gmail.com>
+To: iwd@lists.linux.dev
+Cc: James Prestwood <prestwoj@gmail.com>
+Subject: [PATCH 1/2] band: make HE/no-HT rate estimators return more descriptive
+Date: Thu, 28 Mar 2024 06:47:24 -0700
+Message-Id: <20240328134725.1484257-1-prestwoj@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] Register EAPOL frame listeners earlier
-Content-Language: en-US
-To: jeremy.whiting@collabora.com, iwd@lists.linux.dev
-Cc: ed.smith@collabora.com, alvaro.soliverez@collabora.com
-References: <20240327184927.677804-1-jeremy.whiting@collabora.com>
-From: Denis Kenzior <denkenz@gmail.com>
-In-Reply-To: <20240327184927.677804-1-jeremy.whiting@collabora.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-Hi Jeremy/Ed,
+If the IEs were not provided return -ENOTSUP rather than -EINVAL
+or -EBADMSG since this just means the AP doesn't support those
+capabilities.
+---
+ src/band.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-On 3/27/24 13:49, jeremy.whiting@collabora.com wrote:
-> From: Ed Smith <ed.smith@collabora.com>
-> 
-> If we register the main EAPOL frame listener as late as the associate
-> event, it may not observe ptk_1_of_4. This defeats handling for early
-> messages in eapol_rx_packet, which only sees messages once it has been
-> registered.
-> 
-> If we move registration to the authenticate event, then the EAPOL
-> frame listeners should observe all messages, without any possible
-> races. Note that the messages are not actually processed until
-> eapol_start() is called, and we haven't moved that call site. All
-> that's changing here is how early EAPOL messages can be observed.
-> ---
->   src/netdev.c | 17 +++++++++++++----
->   1 file changed, 13 insertions(+), 4 deletions(-)
-> 
-
-Can we please use patch versioning?  I can't keep track which version of this 
-patch I'm looking at now.
-
-> diff --git a/src/netdev.c b/src/netdev.c
-> index 09fac959..886a85f5 100644
-> --- a/src/netdev.c
-> +++ b/src/netdev.c
-> @@ -2896,6 +2896,14 @@ static bool kernel_will_retry_auth(uint16_t status_code,
->   	return false;
->   }
->   
-> +static void netdev_ensure_registered(struct netdev *netdev)
-
-The naming could use some work.  What is being registered?
-
-> +{
-> +	if (!netdev->sm) {
-
-I would do:
-
-if (L_WARN_ON(netdev->sm))
-	return;
-
-....
-
-> +		netdev->sm = eapol_sm_new(netdev->handshake);
-> +		eapol_register(netdev->sm);
-> +	}
-> +}
-> +
->   static void netdev_authenticate_event(struct l_genl_msg *msg,
->   							struct netdev *netdev)
->   {
-> @@ -2982,8 +2990,10 @@ static void netdev_authenticate_event(struct l_genl_msg *msg,
->   						NULL, netdev->user_data);
->   
->   		/* We have sent another CMD_AUTHENTICATE / CMD_ASSOCIATE */
-> -		if (ret == 0 || ret == -EAGAIN)
-> +		if (ret == 0 || ret == -EAGAIN) {
-> +			netdev_ensure_registered(netdev);
-
-Nit: The whole point of EAGAIN is that we're not proceeding to the next stage. 
-See src/auth-proto.h.  You should only be trying to create eapol_sm when we do.
-
->   			return;
-> +		}
->   
->   		retry = kernel_will_retry_auth(status_code,
->   				L_CPU_TO_LE16(auth->algorithm),
-
-Regards,
--Denis
+diff --git a/src/band.c b/src/band.c
+index bf40f789..11cd965e 100644
+--- a/src/band.c
++++ b/src/band.c
+@@ -90,7 +90,7 @@ int band_estimate_nonht_rate(const struct band *band,
+ 	int i;
+ 
+ 	if (!supported_rates && !ext_supported_rates)
+-		return -EINVAL;
++		return -ENOTSUP;
+ 
+ 	/*
+ 	 * Start at the back of the array.  Rates are generally given in
+@@ -607,7 +607,7 @@ int band_estimate_he_rx_rate(const struct band *band, const uint8_t *hec,
+ 	uint8_t width_set;
+ 
+ 	if (!hec || !band->he_capabilities)
+-		return -EBADMSG;
++		return -ENOTSUP;
+ 
+ 	for (entry = l_queue_get_entries(band->he_capabilities);
+ 						entry; entry = entry->next) {
+-- 
+2.34.1
 
