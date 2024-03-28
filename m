@@ -1,202 +1,89 @@
-Received: from mail-pf1-f181.google.com (mail-pf1-f181.google.com [209.85.210.181])
+Received: from mail-oo1-f54.google.com (mail-oo1-f54.google.com [209.85.161.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EF2683CB2
-	for <iwd@lists.linux.dev>; Thu, 28 Mar 2024 14:26:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B440F12F38D
+	for <iwd@lists.linux.dev>; Thu, 28 Mar 2024 15:21:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711635988; cv=none; b=TUXmR6WAJ09bK4h9Y2ETfxho1Y9qlhDdpZlHr8FPoRctGosvzEFjCFZPUCDRdLAegYZ7GuiI/JTDvTE0pIGsQ1HUkeYTgx0YO7MxISsEscuJKc76+04G5MHMOm/F1PCuZNM7srAGdf7TUI1ac1SAdGPEtLJp90GbEriNC6rZLv8=
+	t=1711639306; cv=none; b=uGA/cOT2hpTWmopHSArHhhPPn6temSclGBicjGM4XOVZZTSuoCdKxBlI99Eg3sEicULc+iy8052Mp9f07ooJy9f3AsFhFyQAULPVNbh93RLSq1L695cQPrRaYjy13M/Ln2F8a3XgOpD7+XbcFaoz8r6fj0Plb4pRwXx9BHWi0EU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711635988; c=relaxed/simple;
-	bh=/W+uRYz9Xe+SN7ZrUQmW/bCUsUWE6bkcvzn4B2Cq4kE=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=qM6L1JvcYDpAJWVlhtdJXTgU2qFQSB6WKau/t5eWC5BlO0WsDas66NeuzkGE1en3uH+2/FonVWa2ODaMmkVfSNIKDruIYlPJalDuXW4s2xcmAb1LCvafqMCuwvGRJzPbCbnKVwTEOw/+CBPUXkgF5oE88LQVlGf/bNVZM6ISRus=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=O7+1W57i; arc=none smtp.client-ip=209.85.210.181
+	s=arc-20240116; t=1711639306; c=relaxed/simple;
+	bh=Ebib5BvbkANW8wZpDdGV/A5qonaMYLj7VbMHvBaFiFE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=ihetA/YT81EZvSMNausZD90jCqXAak+jqwWEArYkZQOlBgNdbw7ehAzlJ6uHoTi+SxBolBw3wZF20vjirRWwW0H2sCSQGqwBx2ThqunmH6HEaphCB/yfWHZ99dcTCQjwSmmPE2KbvtS0lIp+7qj1AO514Sd5XlWdg+3VSEncWSM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UccxBNj2; arc=none smtp.client-ip=209.85.161.54
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="O7+1W57i"
-Received: by mail-pf1-f181.google.com with SMTP id d2e1a72fcca58-6ea9a605ca7so800926b3a.0
-        for <iwd@lists.linux.dev>; Thu, 28 Mar 2024 07:26:26 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UccxBNj2"
+Received: by mail-oo1-f54.google.com with SMTP id 006d021491bc7-5a467dae51dso367603eaf.1
+        for <iwd@lists.linux.dev>; Thu, 28 Mar 2024 08:21:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1711635986; x=1712240786; darn=lists.linux.dev;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=a6qFfDDaHQhcl+dfnHi39RAeEBabv5eZfQg3CHmZJL0=;
-        b=O7+1W57iI8bgdw3GrvHRA7SBTG8RnUPP9GZmvN9PzZWq7p+Inu0c1ImJeqPADryvEk
-         UBMqEmDJUQT/bFWIlkZ4q7mmp4m/MWv+rW6dj2ltF+HoavB+8Zv+2IvZei/5XlTSf7Pp
-         7FdBg7cygaca4qbF/LoPrbhrsdyzC5YOyI4gKnCImf8GD9TN8m0h6MsQA7O2X6ZDPgAJ
-         PPEaMLKhcHrMKwtDQ3/e3zDXFhl6Rnn5nhX6QRCsZMlDzSwSBuA4ksVs9oDm2/kSbYbS
-         DHfgk3bKHBj1TQAA3tO06Y/+qU9JVS9Ajtnh9JoeHfy91D/8GfnUWZ1UJpqibIfAGKgR
-         vkUA==
+        d=gmail.com; s=20230601; t=1711639304; x=1712244104; darn=lists.linux.dev;
+        h=content-transfer-encoding:in-reply-to:from:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=EZUNh9c1bR1+z3P3ZutceUXZxtiDVc1bqW5R4HTEpO4=;
+        b=UccxBNj296PdsKqxbx9wR9e37OM8Do/UGU4bvS9CBvAICAhk2bak+othPDxRiS/QIx
+         elEj3cNCmlP9ki05M62gPnsiBImiFX71LgeGc/4NAnHlQ9AGSu70uC2XDACC93vyCoh+
+         iA2Jtbjw9w/gb7UmMNfHRjU0sxrqPCIE31l9wSusAT3Bpum1EsbVRFcxi44aphJadgJ8
+         zxsl9kHJlF8rflZV294M1TJ6mjh9MqcPfLQaqBgcjl72XMUrbE+Vo+fLK+AH38rvHJ58
+         IBgUn2qJoA1zkHBgHdAlKE9+Z6smooev3TWMgdjP3s42wW6TXsVmwFcSUCoJ1dSYn7CQ
+         XOOA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711635986; x=1712240786;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=a6qFfDDaHQhcl+dfnHi39RAeEBabv5eZfQg3CHmZJL0=;
-        b=DJ7jSeJ9r1jXbRvquA9PJICLDb/4zNShSKr1zEhd9M9zbgl8DMEHMbaQ9+ZaxA90LW
-         dg7PIidHaCeHtJJY8ctMG67VvDDYuVCgTZzmlI83liicGYL0SRuZ44BxOW7BpoDOKx7x
-         FphxYDISCAF8dasZk5H8E1ytzW6scNl/JkPxtIDHboPnKD5DpttmiNwQOGw2uwYq0ZX3
-         /7/hhOG46TBHBVRH+zmI+iddi742ESruYAYW+UcENSaxvqR0TFizZCxA2sOdWC7WCgEl
-         tKNT+T5FF2N+SJtk0HdheDvi3WkFV+IaCXtpaApOuNa3SefJaKcZvll5+3fbkh0pRdN4
-         V9Mg==
-X-Gm-Message-State: AOJu0YxIwjYq2W2UTu5HltwxIHuEf4I9rzc+crgXC7PrSlmG1/XeYiJ4
-	Tx1NV9Pi/RnZvb+epOy5vI1bbFISWSYxQRQSyBVvkmiinWKyes/41oSu6eIr
-X-Google-Smtp-Source: AGHT+IEi6+AnfyD5/ZVv8cITcQZaW+wy2SzYVlIa200QaR8ZxRU7OzF1ern1dVzN9MJCOVmpOND0WA==
-X-Received: by 2002:a05:6a00:8cf:b0:6ea:df49:c8b1 with SMTP id s15-20020a056a0008cf00b006eadf49c8b1mr1514520pfu.13.1711635985638;
-        Thu, 28 Mar 2024 07:26:25 -0700 (PDT)
-Received: from LOCLAP699.. ([50.39.172.77])
-        by smtp.gmail.com with ESMTPSA id v15-20020aa799cf000000b006eac81dd456sm1412457pfi.36.2024.03.28.07.26.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 28 Mar 2024 07:26:25 -0700 (PDT)
-From: James Prestwood <prestwoj@gmail.com>
-To: iwd@lists.linux.dev
-Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH v2 2/2] wiphy: add better handling for rate estimation errors
-Date: Thu, 28 Mar 2024 07:26:22 -0700
-Message-Id: <20240328142622.1490115-2-prestwoj@gmail.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240328142622.1490115-1-prestwoj@gmail.com>
-References: <20240328142622.1490115-1-prestwoj@gmail.com>
+        d=1e100.net; s=20230601; t=1711639304; x=1712244104;
+        h=content-transfer-encoding:in-reply-to:from:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=EZUNh9c1bR1+z3P3ZutceUXZxtiDVc1bqW5R4HTEpO4=;
+        b=rL3sW8SNtGOskUCuvUO/fDQpwZ+yho/VT6T5j8TnhfvZzmqV6bO4gfJaRWzU/Qbuge
+         bdse/khP//wG/1+7eeggqH9hm/B1GFymPj4+Fn5NlTXhPAJMy+nOESd5X21rqyH0LaEI
+         ++cD8jZLN9IRxGhLfmWyycQrx6CJ+V8+L3BrobVLULsi8U4GdD3BN9Hx4tDN4PsMwWk0
+         QppVmV2Ux7UwvwtHAVOzJTiCj1ItqUKrG+Krq9GgboHu5jf3EWgSsayjnb5Bwsm1FrTM
+         D5xbhAVv4XTMof3ON10gJn06RrjnecTqC57uMPuleNqsneSt1FG5pdpm659Vm1Duz8zA
+         J4OA==
+X-Forwarded-Encrypted: i=1; AJvYcCXKSqUoThW4vKvd8tkWmJ34Nr3I9ouE6lZlFLITn6WpHLvy8tvOGTO7t/wQe/+gO9pjlXoDY5xl0gBV2Y1AIc4eXlCM
+X-Gm-Message-State: AOJu0Yzrae/zJ7gUXQpTt/1CsNBaYh/uuGhpSrzoVKuHY/g7kC3k1HNJ
+	NPBQq3fvKMD0a/L0aEtodC/zFPOF93VwSFeElZF9nikCql8aY2vd
+X-Google-Smtp-Source: AGHT+IGLPHijaSfv3zNlF/zELYrFagvqalK+inzWLjyEzDWFbbVOC88hORI2bhQjrUEqleZFxaqhOg==
+X-Received: by 2002:a4a:d24b:0:b0:5a5:2244:6b1c with SMTP id e11-20020a4ad24b000000b005a522446b1cmr2942910oos.9.1711639303930;
+        Thu, 28 Mar 2024 08:21:43 -0700 (PDT)
+Received: from [192.168.1.22] (070-114-247-242.res.spectrum.com. [70.114.247.242])
+        by smtp.googlemail.com with ESMTPSA id ee20-20020a0568202e9400b005a549dabb99sm325688oob.43.2024.03.28.08.21.43
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 28 Mar 2024 08:21:43 -0700 (PDT)
+Message-ID: <53aafc22-df24-49a0-9e27-7c614a9ef19c@gmail.com>
+Date: Thu, 28 Mar 2024 10:21:42 -0500
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 1/2] band: make HE/no-HT rate estimators return more
+ descriptive
+Content-Language: en-US
+To: James Prestwood <prestwoj@gmail.com>, iwd@lists.linux.dev
+References: <20240328142622.1490115-1-prestwoj@gmail.com>
+From: Denis Kenzior <denkenz@gmail.com>
+In-Reply-To: <20240328142622.1490115-1-prestwoj@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-In most cases any failure here is likely just due to the AP not
-supporting the feature, whether its HE/VHT/HE. This should result
-in the estimation returning -ENOTSUP in which case we move down
-the list. Any other non-zero return we will now warn to make it
-clear the IEs did exist, but were not properly formatted.
+Hi James,
 
-All length check failures were changed to continue instead of
-fail. This will now treat invalid lengths as if the IE did not
-exist.
+On 3/28/24 09:26, James Prestwood wrote:
+> If the IEs were not provided return -ENOTSUP rather than -EINVAL
+> or -EBADMSG since this just means the AP doesn't support those
+> capabilities.
+> ---
+>   src/band.c | 4 ++--
+>   1 file changed, 2 insertions(+), 2 deletions(-)
+> 
 
-In addition HE specifically has an extra validation function which,
-if failed, was bailing out of the estimation function entirely.
-Instead this is now treated as if there was no HE capabilities and
-the logic can move down to VHT, HT, or basic rates.
----
- src/wiphy.c | 44 ++++++++++++++++++++++++++++++--------------
- 1 file changed, 30 insertions(+), 14 deletions(-)
+Both applied, thanks.
 
-v2:
- - Make all length checks continue instead of return
-
-diff --git a/src/wiphy.c b/src/wiphy.c
-index 0d64b1b3..712d20cf 100644
---- a/src/wiphy.c
-+++ b/src/wiphy.c
-@@ -989,6 +989,7 @@ int wiphy_estimate_data_rate(struct wiphy *wiphy,
- 	const void *he_capabilities = NULL;
- 	const struct band *bandp;
- 	enum band_freq band;
-+	int ret;
- 
- 	if (band_freq_to_channel(bss->frequency, &band) == 0)
- 		return -ENOTSUP;
-@@ -1005,7 +1006,7 @@ int wiphy_estimate_data_rate(struct wiphy *wiphy,
- 		switch (tag) {
- 		case IE_TYPE_SUPPORTED_RATES:
- 			if (iter.len > 8)
--				return -EBADMSG;
-+				continue;
- 
- 			supported_rates = iter.data - 2;
- 			break;
-@@ -1014,31 +1015,33 @@ int wiphy_estimate_data_rate(struct wiphy *wiphy,
- 			break;
- 		case IE_TYPE_HT_CAPABILITIES:
- 			if (iter.len != 26)
--				return -EBADMSG;
-+				continue;
- 
- 			ht_capabilities = iter.data - 2;
- 			break;
- 		case IE_TYPE_HT_OPERATION:
- 			if (iter.len != 22)
--				return -EBADMSG;
-+				continue;
- 
- 			ht_operation = iter.data - 2;
- 			break;
- 		case IE_TYPE_VHT_CAPABILITIES:
- 			if (iter.len != 12)
--				return -EBADMSG;
-+				continue;
- 
- 			vht_capabilities = iter.data - 2;
- 			break;
- 		case IE_TYPE_VHT_OPERATION:
- 			if (iter.len != 5)
--				return -EBADMSG;
-+				continue;
- 
- 			vht_operation = iter.data - 2;
- 			break;
- 		case IE_TYPE_HE_CAPABILITIES:
--			if (!ie_validate_he_capabilities(iter.data, iter.len))
--				return -EBADMSG;
-+			if (!ie_validate_he_capabilities(iter.data, iter.len)) {
-+				l_warn("invalid HE capabilities");
-+				continue;
-+			}
- 
- 			he_capabilities = iter.data;
- 			break;
-@@ -1047,26 +1050,39 @@ int wiphy_estimate_data_rate(struct wiphy *wiphy,
- 		}
- 	}
- 
--	if (!band_estimate_he_rx_rate(bandp, he_capabilities,
-+	ret = band_estimate_he_rx_rate(bandp, he_capabilities,
- 					bss->signal_strength / 100,
--					out_data_rate))
-+					out_data_rate);
-+	if (!ret)
- 		return 0;
-+	else if (ret != -ENOTSUP)
-+		l_warn("error parsing HE capabilities");
- 
--	if (!band_estimate_vht_rx_rate(bandp, vht_capabilities, vht_operation,
-+	ret = band_estimate_vht_rx_rate(bandp, vht_capabilities, vht_operation,
- 					ht_capabilities, ht_operation,
- 					bss->signal_strength / 100,
--					out_data_rate))
-+					out_data_rate);
-+	if (!ret)
- 		return 0;
-+	else if (ret != -ENOTSUP)
-+		l_warn("error parsing VHT capabilities");
- 
--	if (!band_estimate_ht_rx_rate(bandp, ht_capabilities, ht_operation,
-+	ret = band_estimate_ht_rx_rate(bandp, ht_capabilities, ht_operation,
- 					bss->signal_strength / 100,
--					out_data_rate))
-+					out_data_rate);
-+	if (!ret)
- 		return 0;
-+	else if (ret != -ENOTSUP)
-+		l_warn("error parsing HT capabilities");
- 
--	return band_estimate_nonht_rate(bandp, supported_rates,
-+	ret = band_estimate_nonht_rate(bandp, supported_rates,
- 						ext_supported_rates,
- 						bss->signal_strength / 100,
- 						out_data_rate);
-+	if (ret != 0 && ret != -ENOTSUP)
-+		l_warn("error parsing non-HT rates");
-+
-+	return ret;
- }
- 
- bool wiphy_regdom_is_updating(struct wiphy *wiphy)
--- 
-2.34.1
+Regards,
+-Denis
 
