@@ -1,164 +1,124 @@
-Received: from mail-qv1-f52.google.com (mail-qv1-f52.google.com [209.85.219.52])
+Received: from mail-oo1-f43.google.com (mail-oo1-f43.google.com [209.85.161.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0810340C04
-	for <iwd@lists.linux.dev>; Thu, 28 Mar 2024 17:37:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBFCC1384B3
+	for <iwd@lists.linux.dev>; Thu, 28 Mar 2024 22:29:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711647475; cv=none; b=VrJYzraNqPlF0rHVD02JNwMi/62x0y+/+B5ZjlIRszh6zYGNnJENNQ/5A+OWryTdnNl/Y40kh7t5DDKOAtDduHcqBlCZx27Nr260s18EKITDaARLxNIEj+MjIC3YAPBZM59EWGVwWIW7dyBcq+JLutR4yvn/SbIoWM7xNyo75Bo=
+	t=1711664988; cv=none; b=kITELGIYF2KwQWExZOv8qv7fKRcSUWtmxSxGKCbPZX66MAmDopUe+MeT+zgQ0iN5ImOU8AyyVF4P0xU/fF/KU7MgH7zQuAfTq2RmZ/1EcNpdfQbBDrRwYg7prYIOVpheymjATRkK5lJwRAjETWcH02Y88h7JhOTDkDQ0tl95gSA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711647475; c=relaxed/simple;
-	bh=X99zTclj3L2Eh2YsA2eFNokkWt8kgKQ/i+cionD3b4w=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=O5m/ZepbzooVhmlA2W3XB0Ag10ZnRQAT8NxKyK0ghb/S2O9I+3L/eUr9iKnhZ6DJ5IJVaOx5viJz/qLEhg+TJhA43X3bmRK/GJwh7gvg3rhY0fiUCUJ+3e3CfvOkw32fx1F4dZGYU7pQPiVOcitFzTLG4Eb6FMAGAwY+i0Scgsk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=V7Nr0gtf; arc=none smtp.client-ip=209.85.219.52
+	s=arc-20240116; t=1711664988; c=relaxed/simple;
+	bh=Jq7ooCio/lqF6BJyoYlYmfMub+SsWFvakSG4bMRDMQY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=NnpLvnlSJVCzcoWEkojAUPb2nPibSuERD4xE9MJBylHLjuHtW7N8iRY/LCwCsJJaY0cqxH01WG+m0L4Ui0onOx6MEgd6alRTEHtrBqe4EJm/MYF6x04mDoVDlLX7LZjoXawg0k50vh3cTYgTwy2+wIUY4un6fol/WmnPzWqz9Mc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=S28Z939b; arc=none smtp.client-ip=209.85.161.43
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="V7Nr0gtf"
-Received: by mail-qv1-f52.google.com with SMTP id 6a1803df08f44-69107859bedso6428486d6.2
-        for <iwd@lists.linux.dev>; Thu, 28 Mar 2024 10:37:51 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="S28Z939b"
+Received: by mail-oo1-f43.google.com with SMTP id 006d021491bc7-5a56710cdccso607677eaf.3
+        for <iwd@lists.linux.dev>; Thu, 28 Mar 2024 15:29:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1711647470; x=1712252270; darn=lists.linux.dev;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=8Ou6IOtjjcGYZMKrK4cR1qGTIkU8uQc38glCA8iwLAw=;
-        b=V7Nr0gtfkyktvs5NvdBlb5iuUD1bDvnNMEn21znVPBXGokHjeHla/QVlG95TlCNRY3
-         PAWoiC7WWEZjQ37oNrqf+YzWnheOMiBM+p3RBLUl34cB2ikMhESKuWxSD+lTYbTtJ5TO
-         dw7dtCuOUE/MFqfbjXZrRyW2wmCcQIPf08FtNxqhm4EOVFnExn9s7jhJeYTe2AroAkcK
-         P3jgekW2jAPTG+dmgiiUEWUWCRJSaWrrMn38AvzCsNQj6G5hDaYyAaOwwhXfMCJdnMah
-         G8az2HECHg0dLbB6iQb3q6bF1tn+F5nMlKMppkuwgXxiFay9Q2P3TQJ1S5pfMBfKLrg+
-         Ngzg==
+        d=gmail.com; s=20230601; t=1711664986; x=1712269786; darn=lists.linux.dev;
+        h=content-transfer-encoding:in-reply-to:from:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=/DVDFiOnXA51QUjmuAkfrgeZPJoQNBS8cBL0C4O1y9A=;
+        b=S28Z939bnsxW57WYcZM9/dj9DqvAaVQucnVSafSYs1otrHhLbzrddCUZy5ipFVq0JP
+         vwr46kjSIdkpX6Ylk6o6iNCGa20NM+Hslo0I5CdE1ms2YGAKkdL2iVAJbyYKamOFxMID
+         jes1qmp0faU1sUM0cDEiovvCoGhrZb4CU+oVIxptl1Aalvo+QVOzL4V1c1xDVGsHzjOF
+         WL9LMdqqDPNVNwoXITesNCJa87/E60xQApe7/z/hEjkfVde5YSxz01wv2l7Spd2bEO1w
+         P1XlUzsHQfZyikKZ+qTq7FQ19umVwFUTQfOyC8rwAckGVuBelswMJRMZs7U8GhfG7/0N
+         DdkA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711647470; x=1712252270;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=8Ou6IOtjjcGYZMKrK4cR1qGTIkU8uQc38glCA8iwLAw=;
-        b=eDudpPj5VEOG8r59pOHz5sUHSbJlkZ8NC0pbzxjH3SKokXSQH1tLwWC3UpN4AMIhLd
-         C2mvvNcTinfBBAHzDrbaCTREPSwk+hiZpDZHHZaYSAK4JYqSgX37pAB8jUPwyLUQOXjT
-         cbTofq4nlpX0uWBI1tSd9v6OJh9y/bv1CYYmJIVIh2ZY6b/RXVJrl/OuWzSRowCg6eH1
-         zVT+9xV1e45+RR1LMk43/IszSNJru4YOjF2p9/yrnHeudw/oVm4o+0WQ+Ypj27sgcOvd
-         KZRfuNwfAf7Ei1hZP9yJ5gB4Or5bjr4sPIqBG9kDg7nicMk/fjSixnMCZdF9bkWsfu2E
-         02XA==
-X-Gm-Message-State: AOJu0YxUarFNe/TdmxCSrcUnauN9fGKXr1EjEBcna9xHDy8aAQEa99I8
-	5Oc2iDIZtTbqcsBK/Y90SBD+zZL1+iNNTGEzJRuqg64EgEHifxr9dh+59WV9
-X-Google-Smtp-Source: AGHT+IELKoMl1Mxbs+fibJkqNAk0yC/nc49R1qNZZbUzZb5OgxdiOuCYb/y+b4LpSP8OkRRIh52Sjg==
-X-Received: by 2002:a0c:f0d0:0:b0:696:8a6f:afde with SMTP id d16-20020a0cf0d0000000b006968a6fafdemr3569778qvl.24.1711647470551;
-        Thu, 28 Mar 2024 10:37:50 -0700 (PDT)
-Received: from LOCLAP699.rst-02.locus ([208.195.13.130])
-        by smtp.gmail.com with ESMTPSA id kk15-20020a056214508f00b00696a78b9cc6sm827751qvb.53.2024.03.28.10.37.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 28 Mar 2024 10:37:50 -0700 (PDT)
-From: James Prestwood <prestwoj@gmail.com>
-To: iwd@lists.linux.dev
-Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH] netdev: use CMD_DEAUTHENTICATE when needed on disconnect
-Date: Thu, 28 Mar 2024 10:37:45 -0700
-Message-Id: <20240328173745.1574384-1-prestwoj@gmail.com>
-X-Mailer: git-send-email 2.34.1
+        d=1e100.net; s=20230601; t=1711664986; x=1712269786;
+        h=content-transfer-encoding:in-reply-to:from:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=/DVDFiOnXA51QUjmuAkfrgeZPJoQNBS8cBL0C4O1y9A=;
+        b=E02t7ko3vNE4iG//5pFLnwDiJWMUZiZ+uQoQQruZxahsl0ir5mrbkuDJEAr0eJ1Uo3
+         T1PrLRAT7ueM6lltYEfCy6BaE0fYrP/a07fxMpg4oJXTk9Z7sVwKUsBBGd2Otnz8eDxY
+         6KqI2AJaS4hWIWdWd1wgFU0pAwSqUwXMEQdC9Ya0K/ln72pDkK2ORkK0FYQTzpReU5pU
+         BpIHm2O8GyppYuCtI0UAHwM40xnXF/eLuP1c0ALfFOp+TvFATLOebGaTtWZT9HADNJpd
+         /+LIovlM4ppsn32WQ9t/LeBOmD0baG7Az8Lh/FeZSxngpmp9SHHTDpo66edBKsS1P114
+         aVIA==
+X-Forwarded-Encrypted: i=1; AJvYcCXILuCZmTvcfQvYuVlIE47mxsAKW6nF8/mpzBbk+ehHQxKZ5nxeZP+M2Gr3YN0YjpRITDwUoXkmthNgyrf4vRPH7dMN
+X-Gm-Message-State: AOJu0YxWAeK/t2uCerJewyowwulDnXA5J/IWr6gTihgIbEQdosxEzwTQ
+	QGhzOJRWnQqTBy4w4O9QqdTuBHx77pNJykQb6OqZE89KuspPpE0q
+X-Google-Smtp-Source: AGHT+IFRPZDXm/+R9nt3Ifpv9NA03OxMvRU8RGKEg4a9u+sxSyZlZdoipLlHSJqh/3hKDZJn3F+Rpw==
+X-Received: by 2002:a05:6820:1e17:b0:5a5:1f92:ba2b with SMTP id dh23-20020a0568201e1700b005a51f92ba2bmr502864oob.2.1711664985966;
+        Thu, 28 Mar 2024 15:29:45 -0700 (PDT)
+Received: from [192.168.1.22] (070-114-247-242.res.spectrum.com. [70.114.247.242])
+        by smtp.googlemail.com with ESMTPSA id bi11-20020a05682008cb00b005a586b0906esm485473oob.26.2024.03.28.15.29.45
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 28 Mar 2024 15:29:45 -0700 (PDT)
+Message-ID: <330aae8b-d7db-4368-b4d7-f218b5074579@gmail.com>
+Date: Thu, 28 Mar 2024 17:29:44 -0500
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] netdev: use CMD_DEAUTHENTICATE when needed on disconnect
+Content-Language: en-US
+To: James Prestwood <prestwoj@gmail.com>, iwd@lists.linux.dev
+References: <20240328173745.1574384-1-prestwoj@gmail.com>
+From: Denis Kenzior <denkenz@gmail.com>
+In-Reply-To: <20240328173745.1574384-1-prestwoj@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-netdev_disconnect() was unconditionally sending CMD_DISCONNECT which
-is not the right behavior when IWD has not associated. This means
-that if a connection was started then immediately canceled with
-the Disconnect() method the kernel would continue to authenticate.
+Hi James,
 
-Instead if IWD has not yet associated it should send a deauth
-command which causes the kernel to correctly cleanup its state and
-stop trying to authenticate.
+On 3/28/24 12:37, James Prestwood wrote:
+> netdev_disconnect() was unconditionally sending CMD_DISCONNECT which
+> is not the right behavior when IWD has not associated. This means
+> that if a connection was started then immediately canceled with
+> the Disconnect() method the kernel would continue to authenticate.
+> 
+> Instead if IWD has not yet associated it should send a deauth
+> command which causes the kernel to correctly cleanup its state and
+> stop trying to authenticate.
+> 
+> Below are logs showing the behavior. Autoconnect is started followed
+> immediately by a DBus Disconnect call, yet the kernel continues
+> sending authenticate events.
+> 
+> event: state, old: autoconnect_quick, new: connecting (auto)
+> src/scan.c:scan_cancel() Trying to cancel scan id 1 for wdev 7d
+> src/wiphy.c:wiphy_radio_work_done() Work item 1 done
+> src/wiphy.c:wiphy_radio_work_next() Starting work item 2
+> src/netdev.c:netdev_mlme_notify() MLME notification New Station(19)
+> src/station.c:station_dbus_disconnect()
+> src/station.c:station_reset_connection_state() 85
+> src/station.c:station_roam_state_clear() 85
+> event: state, old: connecting (auto), new: disconnecting
+> src/wiphy.c:wiphy_radio_work_done() Work item 2 done
+> src/station.c:station_connect_cb() 85, result: 5
+> src/station.c:station_disconnect_cb() 85, success: 1
+> event: state, old: disconnecting, new: disconnected
+> src/netdev.c:netdev_mlme_notify() MLME notification Authenticate(37)
+> src/netdev.c:netdev_authenticate_event()
+> Unexpected connection related event -- is another supplicant running?
+> src/netdev.c:netdev_mlme_notify() MLME notification Authenticate(37)
+> src/netdev.c:netdev_authenticate_event()
+> Unexpected connection related event -- is another supplicant running?
+> src/netdev.c:netdev_mlme_notify() MLME notification Authenticate(37)
+> src/netdev.c:netdev_authenticate_event()
+> Unexpected connection related event -- is another supplicant running?
+> src/netdev.c:netdev_mlme_notify() MLME notification Del Station(20)
+> src/netdev.c:netdev_mlme_notify() MLME notification Authenticate(37)
+> src/netdev.c:netdev_authenticate_event()
+> Unexpected connection related event -- is another supplicant running?
+> ---
+>   src/netdev.c | 19 ++++++++++++++++---
+>   1 file changed, 16 insertions(+), 3 deletions(-)
+> 
 
-Below are logs showing the behavior. Autoconnect is started followed
-immediately by a DBus Disconnect call, yet the kernel continues
-sending authenticate events.
+Applied, thanks.
 
-event: state, old: autoconnect_quick, new: connecting (auto)
-src/scan.c:scan_cancel() Trying to cancel scan id 1 for wdev 7d
-src/wiphy.c:wiphy_radio_work_done() Work item 1 done
-src/wiphy.c:wiphy_radio_work_next() Starting work item 2
-src/netdev.c:netdev_mlme_notify() MLME notification New Station(19)
-src/station.c:station_dbus_disconnect()
-src/station.c:station_reset_connection_state() 85
-src/station.c:station_roam_state_clear() 85
-event: state, old: connecting (auto), new: disconnecting
-src/wiphy.c:wiphy_radio_work_done() Work item 2 done
-src/station.c:station_connect_cb() 85, result: 5
-src/station.c:station_disconnect_cb() 85, success: 1
-event: state, old: disconnecting, new: disconnected
-src/netdev.c:netdev_mlme_notify() MLME notification Authenticate(37)
-src/netdev.c:netdev_authenticate_event()
-Unexpected connection related event -- is another supplicant running?
-src/netdev.c:netdev_mlme_notify() MLME notification Authenticate(37)
-src/netdev.c:netdev_authenticate_event()
-Unexpected connection related event -- is another supplicant running?
-src/netdev.c:netdev_mlme_notify() MLME notification Authenticate(37)
-src/netdev.c:netdev_authenticate_event()
-Unexpected connection related event -- is another supplicant running?
-src/netdev.c:netdev_mlme_notify() MLME notification Del Station(20)
-src/netdev.c:netdev_mlme_notify() MLME notification Authenticate(37)
-src/netdev.c:netdev_authenticate_event()
-Unexpected connection related event -- is another supplicant running?
----
- src/netdev.c | 19 ++++++++++++++++---
- 1 file changed, 16 insertions(+), 3 deletions(-)
-
-diff --git a/src/netdev.c b/src/netdev.c
-index 09fac959..26e36081 100644
---- a/src/netdev.c
-+++ b/src/netdev.c
-@@ -3935,6 +3935,8 @@ int netdev_disconnect(struct netdev *netdev,
- {
- 	struct l_genl_msg *disconnect;
- 	bool send_disconnect = true;
-+	bool deauth = false;
-+	uint8_t aa[6];
- 
- 	if (!(netdev->ifi_flags & IFF_UP))
- 		return -ENETDOWN;
-@@ -3953,8 +3955,8 @@ int netdev_disconnect(struct netdev *netdev,
- 		 * 1. We do not actually have a connect in progress (work.id
- 		 *    is zero), then we can bail out early with an error.
- 		 * 2. We have sent CMD_CONNECT but not fully connected. The
--		 *    CMD_CONNECT needs to be canceled and a disconnect should
--		 *    be sent.
-+		 *    CMD_CONNECT needs to be canceled and a disconnect or
-+		 *    deauth should be sent.
- 		 * 3. Queued up the connect work, but haven't sent CMD_CONNECT
- 		 *    to the kernel. This case we do not need to send a
- 		 *    disconnect.
-@@ -3969,6 +3971,11 @@ int netdev_disconnect(struct netdev *netdev,
- 							netdev->work.id))
- 			send_disconnect = false;
- 
-+		if (netdev->handshake && !netdev->associated) {
-+			memcpy(aa, netdev->handshake->aa, 6);
-+			deauth = true;
-+		}
-+
- 		netdev_connect_failed(netdev, NETDEV_RESULT_ABORTED,
- 					MMPDU_REASON_CODE_UNSPECIFIED);
- 	} else {
-@@ -3976,8 +3983,14 @@ int netdev_disconnect(struct netdev *netdev,
- 	}
- 
- 	if (send_disconnect) {
--		disconnect = nl80211_build_disconnect(netdev->index,
-+		if (deauth)
-+			disconnect = nl80211_build_deauthenticate(
-+					netdev->index, aa,
- 					MMPDU_REASON_CODE_DEAUTH_LEAVING);
-+		else
-+			disconnect = nl80211_build_disconnect(netdev->index,
-+					MMPDU_REASON_CODE_DEAUTH_LEAVING);
-+
- 		netdev->disconnect_cmd_id = l_genl_family_send(nl80211,
- 					disconnect, netdev_cmd_disconnect_cb,
- 					netdev, NULL);
--- 
-2.34.1
+Regards,
+-Denis
 
