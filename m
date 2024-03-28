@@ -1,124 +1,122 @@
-Received: from mail-oo1-f43.google.com (mail-oo1-f43.google.com [209.85.161.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from madrid.collaboradmins.com (madrid.collaboradmins.com [46.235.227.194])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBFCC1384B3
-	for <iwd@lists.linux.dev>; Thu, 28 Mar 2024 22:29:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE3A93FB8D
+	for <iwd@lists.linux.dev>; Thu, 28 Mar 2024 22:39:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.235.227.194
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711664988; cv=none; b=kITELGIYF2KwQWExZOv8qv7fKRcSUWtmxSxGKCbPZX66MAmDopUe+MeT+zgQ0iN5ImOU8AyyVF4P0xU/fF/KU7MgH7zQuAfTq2RmZ/1EcNpdfQbBDrRwYg7prYIOVpheymjATRkK5lJwRAjETWcH02Y88h7JhOTDkDQ0tl95gSA=
+	t=1711665589; cv=none; b=SSr7ga2rt1cF1ue9aomZuEcO/WknsWWFqLfhsb+CK+qVPJABf7yqf7hcPJfY5kYGZmkG9wkYGu8MJlwP0okVVlo2q106XHYmD9WKFRdbfirkTBj3pI5zFIuUyIz4186EnWxUN4WTFJHtB5HzsggZHB+q5NToSb7r0OqC7Tq+kFo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711664988; c=relaxed/simple;
-	bh=Jq7ooCio/lqF6BJyoYlYmfMub+SsWFvakSG4bMRDMQY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=NnpLvnlSJVCzcoWEkojAUPb2nPibSuERD4xE9MJBylHLjuHtW7N8iRY/LCwCsJJaY0cqxH01WG+m0L4Ui0onOx6MEgd6alRTEHtrBqe4EJm/MYF6x04mDoVDlLX7LZjoXawg0k50vh3cTYgTwy2+wIUY4un6fol/WmnPzWqz9Mc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=S28Z939b; arc=none smtp.client-ip=209.85.161.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1711665589; c=relaxed/simple;
+	bh=fXMIX0dnv+w56jqOJXCAAU209h6yN4DGabMDgIqRi6I=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=A/fYP54rX0O8Zw5kJUfiosvKmINZCGP/ZuQjk0or0ZrL8De8/tuvOMMmofgBtZcb8xApjlTv6/O6ct+WkUh5lZcfDBTEcqSHQnJJ7zxEO9Mj5+vy6WPC/9UtkVqrRGU0/IlwaH3XhiZmLpYa6FkZtjc8gG0ykNZaJB7ZMCSnnzI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=QpKonrrl; arc=none smtp.client-ip=46.235.227.194
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=collabora.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="S28Z939b"
-Received: by mail-oo1-f43.google.com with SMTP id 006d021491bc7-5a56710cdccso607677eaf.3
-        for <iwd@lists.linux.dev>; Thu, 28 Mar 2024 15:29:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1711664986; x=1712269786; darn=lists.linux.dev;
-        h=content-transfer-encoding:in-reply-to:from:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=/DVDFiOnXA51QUjmuAkfrgeZPJoQNBS8cBL0C4O1y9A=;
-        b=S28Z939bnsxW57WYcZM9/dj9DqvAaVQucnVSafSYs1otrHhLbzrddCUZy5ipFVq0JP
-         vwr46kjSIdkpX6Ylk6o6iNCGa20NM+Hslo0I5CdE1ms2YGAKkdL2iVAJbyYKamOFxMID
-         jes1qmp0faU1sUM0cDEiovvCoGhrZb4CU+oVIxptl1Aalvo+QVOzL4V1c1xDVGsHzjOF
-         WL9LMdqqDPNVNwoXITesNCJa87/E60xQApe7/z/hEjkfVde5YSxz01wv2l7Spd2bEO1w
-         P1XlUzsHQfZyikKZ+qTq7FQ19umVwFUTQfOyC8rwAckGVuBelswMJRMZs7U8GhfG7/0N
-         DdkA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711664986; x=1712269786;
-        h=content-transfer-encoding:in-reply-to:from:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=/DVDFiOnXA51QUjmuAkfrgeZPJoQNBS8cBL0C4O1y9A=;
-        b=E02t7ko3vNE4iG//5pFLnwDiJWMUZiZ+uQoQQruZxahsl0ir5mrbkuDJEAr0eJ1Uo3
-         T1PrLRAT7ueM6lltYEfCy6BaE0fYrP/a07fxMpg4oJXTk9Z7sVwKUsBBGd2Otnz8eDxY
-         6KqI2AJaS4hWIWdWd1wgFU0pAwSqUwXMEQdC9Ya0K/ln72pDkK2ORkK0FYQTzpReU5pU
-         BpIHm2O8GyppYuCtI0UAHwM40xnXF/eLuP1c0ALfFOp+TvFATLOebGaTtWZT9HADNJpd
-         /+LIovlM4ppsn32WQ9t/LeBOmD0baG7Az8Lh/FeZSxngpmp9SHHTDpo66edBKsS1P114
-         aVIA==
-X-Forwarded-Encrypted: i=1; AJvYcCXILuCZmTvcfQvYuVlIE47mxsAKW6nF8/mpzBbk+ehHQxKZ5nxeZP+M2Gr3YN0YjpRITDwUoXkmthNgyrf4vRPH7dMN
-X-Gm-Message-State: AOJu0YxWAeK/t2uCerJewyowwulDnXA5J/IWr6gTihgIbEQdosxEzwTQ
-	QGhzOJRWnQqTBy4w4O9QqdTuBHx77pNJykQb6OqZE89KuspPpE0q
-X-Google-Smtp-Source: AGHT+IFRPZDXm/+R9nt3Ifpv9NA03OxMvRU8RGKEg4a9u+sxSyZlZdoipLlHSJqh/3hKDZJn3F+Rpw==
-X-Received: by 2002:a05:6820:1e17:b0:5a5:1f92:ba2b with SMTP id dh23-20020a0568201e1700b005a51f92ba2bmr502864oob.2.1711664985966;
-        Thu, 28 Mar 2024 15:29:45 -0700 (PDT)
-Received: from [192.168.1.22] (070-114-247-242.res.spectrum.com. [70.114.247.242])
-        by smtp.googlemail.com with ESMTPSA id bi11-20020a05682008cb00b005a586b0906esm485473oob.26.2024.03.28.15.29.45
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 28 Mar 2024 15:29:45 -0700 (PDT)
-Message-ID: <330aae8b-d7db-4368-b4d7-f218b5074579@gmail.com>
-Date: Thu, 28 Mar 2024 17:29:44 -0500
+	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="QpKonrrl"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
+	s=mail; t=1711665580;
+	bh=fXMIX0dnv+w56jqOJXCAAU209h6yN4DGabMDgIqRi6I=;
+	h=From:To:Cc:Subject:Date:From;
+	b=QpKonrrlD4DZLVnKLg103wLDzeHeBbFUQ90n4BbKhIzF0yA8bKLQVavqihPmLE/ll
+	 xG3SchMxhcRCHNajZUCN51hGyYq9P3/qYsUNdKMPASxTtUH6I2uVnAm+EIYgWr0V7V
+	 9oQS47HGt4bZ++7ZTpxT5Cy+anrbpMqeC4jgBfhUqYtF+NKhiRI+jiXpguMLZv4ONZ
+	 2TGcLKii2Mqb3T0na8HuCt++5NxtaBQ2Mnpfyx9oWY1q5EcPMXlzsVCihNyQ6FQlpR
+	 kHCU5DRrSGV2Pn8/QLpZtgBZh7NUlD8/Wbfbxt9EgTed/RvffJcvMsaEu2zhXDvu9v
+	 1dag/yJNYPF9w==
+Received: from kirby.atomupd.steamos.gitlab.com (ec2-34-240-57-77.eu-west-1.compute.amazonaws.com [34.240.57.77])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: jwhiting)
+	by madrid.collaboradmins.com (Postfix) with ESMTPSA id BB8FA378209C;
+	Thu, 28 Mar 2024 22:39:39 +0000 (UTC)
+From: jeremy.whiting@collabora.com
+To: iwd@lists.linux.dev
+Cc: ed.smith@collabora.com,
+	alvaro.soliverez@collabora.com
+Subject: [PATCH v4] Register EAPOL frame listeners earlier
+Date: Thu, 28 Mar 2024 16:39:31 -0600
+Message-ID: <20240328223931.814213-1-jeremy.whiting@collabora.com>
+X-Mailer: git-send-email 2.44.0
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] netdev: use CMD_DEAUTHENTICATE when needed on disconnect
-Content-Language: en-US
-To: James Prestwood <prestwoj@gmail.com>, iwd@lists.linux.dev
-References: <20240328173745.1574384-1-prestwoj@gmail.com>
-From: Denis Kenzior <denkenz@gmail.com>
-In-Reply-To: <20240328173745.1574384-1-prestwoj@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-Hi James,
+From: Ed Smith <ed.smith@collabora.com>
 
-On 3/28/24 12:37, James Prestwood wrote:
-> netdev_disconnect() was unconditionally sending CMD_DISCONNECT which
-> is not the right behavior when IWD has not associated. This means
-> that if a connection was started then immediately canceled with
-> the Disconnect() method the kernel would continue to authenticate.
-> 
-> Instead if IWD has not yet associated it should send a deauth
-> command which causes the kernel to correctly cleanup its state and
-> stop trying to authenticate.
-> 
-> Below are logs showing the behavior. Autoconnect is started followed
-> immediately by a DBus Disconnect call, yet the kernel continues
-> sending authenticate events.
-> 
-> event: state, old: autoconnect_quick, new: connecting (auto)
-> src/scan.c:scan_cancel() Trying to cancel scan id 1 for wdev 7d
-> src/wiphy.c:wiphy_radio_work_done() Work item 1 done
-> src/wiphy.c:wiphy_radio_work_next() Starting work item 2
-> src/netdev.c:netdev_mlme_notify() MLME notification New Station(19)
-> src/station.c:station_dbus_disconnect()
-> src/station.c:station_reset_connection_state() 85
-> src/station.c:station_roam_state_clear() 85
-> event: state, old: connecting (auto), new: disconnecting
-> src/wiphy.c:wiphy_radio_work_done() Work item 2 done
-> src/station.c:station_connect_cb() 85, result: 5
-> src/station.c:station_disconnect_cb() 85, success: 1
-> event: state, old: disconnecting, new: disconnected
-> src/netdev.c:netdev_mlme_notify() MLME notification Authenticate(37)
-> src/netdev.c:netdev_authenticate_event()
-> Unexpected connection related event -- is another supplicant running?
-> src/netdev.c:netdev_mlme_notify() MLME notification Authenticate(37)
-> src/netdev.c:netdev_authenticate_event()
-> Unexpected connection related event -- is another supplicant running?
-> src/netdev.c:netdev_mlme_notify() MLME notification Authenticate(37)
-> src/netdev.c:netdev_authenticate_event()
-> Unexpected connection related event -- is another supplicant running?
-> src/netdev.c:netdev_mlme_notify() MLME notification Del Station(20)
-> src/netdev.c:netdev_mlme_notify() MLME notification Authenticate(37)
-> src/netdev.c:netdev_authenticate_event()
-> Unexpected connection related event -- is another supplicant running?
-> ---
->   src/netdev.c | 19 ++++++++++++++++---
->   1 file changed, 16 insertions(+), 3 deletions(-)
-> 
+If we register the main EAPOL frame listener as late as the associate
+event, it may not observe ptk_1_of_4. This defeats handling for early
+messages in eapol_rx_packet, which only sees messages once it has been
+registered.
 
-Applied, thanks.
+If we move registration to the authenticate event, then the EAPOL
+frame listeners should observe all messages, without any possible
+races. Note that the messages are not actually processed until
+eapol_start() is called, and we haven't moved that call site. All
+that's changing here is how early EAPOL messages can be observed.
+---
+ src/netdev.c | 21 +++++++++++++++++----
+ 1 file changed, 17 insertions(+), 4 deletions(-)
 
-Regards,
--Denis
+diff --git a/src/netdev.c b/src/netdev.c
+index 09fac959..f146d906 100644
+--- a/src/netdev.c
++++ b/src/netdev.c
+@@ -2896,6 +2896,15 @@ static bool kernel_will_retry_auth(uint16_t status_code,
+ 	return false;
+ }
+ 
++static void netdev_ensure_eapol_registered(struct netdev *netdev)
++{
++	if (L_WARN_ON(netdev->sm))
++		return;
++
++	netdev->sm = eapol_sm_new(netdev->handshake);
++	eapol_register(netdev->sm);
++}
++
+ static void netdev_authenticate_event(struct l_genl_msg *msg,
+ 							struct netdev *netdev)
+ {
+@@ -2982,7 +2991,12 @@ static void netdev_authenticate_event(struct l_genl_msg *msg,
+ 						NULL, netdev->user_data);
+ 
+ 		/* We have sent another CMD_AUTHENTICATE / CMD_ASSOCIATE */
+-		if (ret == 0 || ret == -EAGAIN)
++		if (ret == 0) {
++			netdev_ensure_eapol_registered(netdev);
++			return;
++		}
++
++		if (ret == -EAGAIN)
+ 			return;
+ 
+ 		retry = kernel_will_retry_auth(status_code,
+@@ -3099,9 +3113,6 @@ static void netdev_associate_event(struct l_genl_msg *msg,
+ 			netdev->ap = NULL;
+ 		}
+ 
+-		netdev->sm = eapol_sm_new(netdev->handshake);
+-		eapol_register(netdev->sm);
+-
+ 		/* Just in case this was a retry */
+ 		netdev->ignore_connect_event = false;
+ 
+@@ -4279,6 +4290,8 @@ int netdev_ft_reassociate(struct netdev *netdev,
+ 	if (netdev->sm) {
+ 		eapol_sm_free(netdev->sm);
+ 		netdev->sm = NULL;
++
++		netdev_ensure_eapol_registered(netdev);
+ 	}
+ 
+ 	msg = netdev_build_cmd_associate_common(netdev);
+-- 
+2.44.0
 
