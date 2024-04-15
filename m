@@ -1,62 +1,62 @@
-Received: from mail-qk1-f179.google.com (mail-qk1-f179.google.com [209.85.222.179])
+Received: from mail-qk1-f174.google.com (mail-qk1-f174.google.com [209.85.222.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37A25155A27
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 301C0B656
 	for <iwd@lists.linux.dev>; Mon, 15 Apr 2024 19:29:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.179
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713209395; cv=none; b=K3vBIhputTJhx7yY7XLcWU8VFdQYbH04hH7FZGxhRNY81ybyOozGgN74nnqJj0bGIy4pRF2oG5NWj2TFMHzSuNjqPrb/e4JzVMeJDFh4TkGKMJkMp4pJ6DipvTRdHZzLG2Vrhg5uLMAtw+o0PIDJSkUYYdaKgMsm9wdTIqsdaFk=
+	t=1713209396; cv=none; b=lm+P0jePuh5eL7OcqKMeZTb36Irt+JL124ceLkQAsFVESqs79JdaRNKAAuZdKoPACYqlFqonx9NdBEewiyJE2+gRQUYmdbpRwK2FOCVLcGjMH+EXzKhxX4Vgn/oVA1pEowjzFfSHAe+XDL8r0gGSmO053Xsa35AJPeC7vYRl+mA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713209395; c=relaxed/simple;
-	bh=JYUd1YnwzQR5fAxaQrB+vFPKMGMlev6sSku8tQpQPmw=;
+	s=arc-20240116; t=1713209396; c=relaxed/simple;
+	bh=9e8fXaxoiyGcuJnIKd+Ot45gqR/t7USfEcfrn9EWXl4=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=dZjow1NYcq6DioiTmvLwPUzOxeyNk7kUHRlZIr4D3SMh8CMNIUk5Qo3G+VcU+hk4PbaKcq2MYjdQol6cuZlLijhAOXed8iVE7xT/1VvZjsLoV3cusaj8y2YDbHQDZtdG0mklTd4ajWqwK+OZrERXJNmV2y0Cw30W+wVhcx40a8w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Gs5Be+In; arc=none smtp.client-ip=209.85.222.179
+	 MIME-Version; b=GarutCmkOq+S56+Sl+Gq3Q/xXs+b1JRJBsv4GgkSLpNhy3KVcIrHD/frakZmMqhWlxfG5ukb8dM54PxFfc99E3FfbkuTERlqd3I38bNsyuQwNfz//T9HYaWtoGdO5WmXCzP+hZiGxG12KW9qYEXffTRuJF3T4z9W2951HZEcasw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Bi1ufK4D; arc=none smtp.client-ip=209.85.222.174
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Gs5Be+In"
-Received: by mail-qk1-f179.google.com with SMTP id af79cd13be357-78d54a3e462so262837885a.0
-        for <iwd@lists.linux.dev>; Mon, 15 Apr 2024 12:29:53 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Bi1ufK4D"
+Received: by mail-qk1-f174.google.com with SMTP id af79cd13be357-789f00aba19so204782685a.0
+        for <iwd@lists.linux.dev>; Mon, 15 Apr 2024 12:29:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1713209393; x=1713814193; darn=lists.linux.dev;
+        d=gmail.com; s=20230601; t=1713209394; x=1713814194; darn=lists.linux.dev;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=AE/16RdkwukYb4JDJ7+P5wfWqu1kgtUy20qtG5TQS/4=;
-        b=Gs5Be+In7surjZAsmVE1O4S9+M9hfa16rKYzauhiUu5uU91ea9TopJfk8xlGIMGRv0
-         YdVH2KzIHXK8MhJWUj2LyOE08vHWlrUsGqUt8stdXMv+ToqgT282+jsUp1kXIHtGKW+J
-         X1NmesFCMCBHh1q4r+bnFbH/RNY5tr85SGLUh45eL+d4gft01u+mnqQ+JxkSoI7i4Z7f
-         96S2bEd+TYe+53lU6wbGhL0JSasbc0U7znW6NH1Emx9u3xttEkmSK9716EzaLGuIIXj3
-         tgR2WU9q1PJwnxb1CaXUMFGKQnaR/OoglabzgqNCcf7t10Qpqh38TcEfgeGli6zPxZ3m
-         nkIQ==
+        bh=vxKwqw3e+B3TZiTyFUBpnnUNUraD1JDLJeaUr1aESjU=;
+        b=Bi1ufK4DDlZriwR9LS3+9Sh79GugEBK57YByKVCZmmV28zv3dkxbe7CgJK7+9Xmvcx
+         zVa2EjFqJqxOR5KaPGECj9T71VErURJkRZLrDQPVmaVwBg9Ka2X9sa2XJA5AKiTQZEFO
+         Wv1oLmlkmOvitjOv+rd2tsOiLH/NeNFqcj2nEerjnnImOVG9P0MPOU71quHzD098rPQm
+         Xl/h/9cbabVZTpvTih7pBOtt3mCywt+a0RpStfYeJSYT7IgobMdZ2GxDoFzI9HROCIKp
+         ++4YqxMH2EKEAu2je7hVpVgJxjs2lhYTgTXEb/FoBkEFp1jj5TA9l1CahZlEu0gVpDkQ
+         Q1yg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713209393; x=1713814193;
+        d=1e100.net; s=20230601; t=1713209394; x=1713814194;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=AE/16RdkwukYb4JDJ7+P5wfWqu1kgtUy20qtG5TQS/4=;
-        b=e8EQYmtj3nX9iaU84peNZ+xRr1uUmRdN+5N/TQw1vBrJSxQ3pXRMQ5h5SvyDZT6Svp
-         glqq322UD92wcWufy9VHQIJ611DJW6KHKMVaKxfNqDaAjr3V3e+C9H85GO3HlLFc5bCb
-         nRtjNCjUvQvlgTz6HFoavI3c1ZifoqjqqR2PtV3DYNTDCCzm6jyFQZ/LSuoaZKhAtn0B
-         bI02gAudAT0aX47pfMHeFf0M18+EUv8HQrSiM0TBFgFKXmw4HifWpXPcCI3H/pElsO5n
-         81JsiQ05j4HyZLuwfWgLDK/nzkiUVQsTEpDke1qdLuu+K5bVAHiJoOzXZvt8r0glHE7A
-         FGtQ==
-X-Gm-Message-State: AOJu0YzIDXGW8vojuqiDJ6subJEsyqjTybmeefL4YZsjeyfBAJtuLGNR
-	FUFpKaTys4IqJUeUSqRCDh2JFnzKNhJ4CFagCOosB+RDOjYOuRDIZ52Uxw==
-X-Google-Smtp-Source: AGHT+IEryFjzgf+3xao6oLWel26TVacBaZHOjgntI6rvNTOc1HHDt29zWrd6DpI5Y9i2be4mFtZaNQ==
-X-Received: by 2002:a05:620a:3d1:b0:78d:69d6:43ca with SMTP id r17-20020a05620a03d100b0078d69d643camr11889447qkm.25.1713209392845;
-        Mon, 15 Apr 2024 12:29:52 -0700 (PDT)
+        bh=vxKwqw3e+B3TZiTyFUBpnnUNUraD1JDLJeaUr1aESjU=;
+        b=SJMP8jCqABTQbHK7ovWJFMOZd+NpVBbC/Bxo/Z2eNP8NSDhrbCSYaZJ4fub2bxNBfl
+         DbCwaVDGsut6DsumnhNP7Zs0tHQCD491IvCcjcyM3PXk/TxU4P3OqJY/m3+db0/Lesxm
+         qbpLmu5/iYPK6LDexNolQIDIUogjAtl7iLmSj3QC4ZIuQMk6auzPCZZVmrQMawhtp+LK
+         AAes4J99GGge8MFnZP6ho/vWV7PiqE1BcnoZuf/i7bdkPV4M+goIudibZTAnUsN3Uv9Y
+         Z7ImLZuUasZRiW3EkA5GOYgVU9F+mLhdt+ekbN/5UiPwrUWXNS70IctFDD2gcoSgm+ha
+         iKZg==
+X-Gm-Message-State: AOJu0Yyhk+VDcTXlC96Z1KJOP+pLl4JQoNqY6sql4fELst5koqI6Ta7y
+	T6GbaDhtH6l4iqT1Hi/QE0jxEFe8O//QfComDSBT61tskiQKCa2iJKCRMA==
+X-Google-Smtp-Source: AGHT+IF40Xp6M8IyKlwMyb0hufBHC3lAMbPPruviS9y6pHXqKS7pPgA59vjg2L49axAe0jm+LIIYvQ==
+X-Received: by 2002:a05:620a:110c:b0:78a:5bfa:3619 with SMTP id o12-20020a05620a110c00b0078a5bfa3619mr11036376qkk.17.1713209393884;
+        Mon, 15 Apr 2024 12:29:53 -0700 (PDT)
 Received: from LOCLAP699.rst-02.locus ([208.195.13.130])
-        by smtp.gmail.com with ESMTPSA id wx8-20020a05620a5a4800b0078ecd71114dsm5003499qkn.69.2024.04.15.12.29.51
+        by smtp.gmail.com with ESMTPSA id wx8-20020a05620a5a4800b0078ecd71114dsm5003499qkn.69.2024.04.15.12.29.53
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 15 Apr 2024 12:29:52 -0700 (PDT)
+        Mon, 15 Apr 2024 12:29:53 -0700 (PDT)
 From: James Prestwood <prestwoj@gmail.com>
 To: iwd@lists.linux.dev
 Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH v2 2/4] wiphy: handle -ENETUNREACH for rate estimation
-Date: Mon, 15 Apr 2024 12:29:46 -0700
-Message-Id: <20240415192948.65857-2-prestwoj@gmail.com>
+Subject: [PATCH v2 3/4] band: return -ENETUNREACH for HE rate estimation
+Date: Mon, 15 Apr 2024 12:29:47 -0700
+Message-Id: <20240415192948.65857-3-prestwoj@gmail.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240415192948.65857-1-prestwoj@gmail.com>
 References: <20240415192948.65857-1-prestwoj@gmail.com>
@@ -68,56 +68,32 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-If the RSSI is too low or the local capabilities were not
-compatible to estimate the rate don't warn but instead treat
-this the same as -ENOTSUP and drop down to the next capability
-set.
+This was overlooked in a prior patch and causes warnings to be
+printed when the RSSI is too low to estimate an HE data rate or
+due to incompatible local capabilities (e.g. MCS support).
+
+Similar to the other estimations, return -ENETUNREACH if the IE
+was valid but incompatible.
 ---
- src/wiphy.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ src/band.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 v2:
- * Check for -ENETUNREACH
+ * Remove the -ENOTSUP return and keep -ENETUNREACH
 
-diff --git a/src/wiphy.c b/src/wiphy.c
-index 8f5e46bf..fb36ebb2 100644
---- a/src/wiphy.c
-+++ b/src/wiphy.c
-@@ -1056,7 +1056,7 @@ int wiphy_estimate_data_rate(struct wiphy *wiphy,
- 					out_data_rate);
- 	if (!ret)
- 		return 0;
--	else if (ret != -ENOTSUP)
-+	else if (ret != -ENOTSUP && ret != -ENETUNREACH)
- 		l_warn("error parsing HE capabilities");
+diff --git a/src/band.c b/src/band.c
+index 11cd965e..906d6197 100644
+--- a/src/band.c
++++ b/src/band.c
+@@ -678,7 +678,7 @@ int band_estimate_he_rx_rate(const struct band *band, const uint8_t *hec,
+ 	}
  
- 	ret = band_estimate_vht_rx_rate(bandp, vht_capabilities, vht_operation,
-@@ -1065,7 +1065,7 @@ int wiphy_estimate_data_rate(struct wiphy *wiphy,
- 					out_data_rate);
- 	if (!ret)
- 		return 0;
--	else if (ret != -ENOTSUP)
-+	else if (ret != -ENOTSUP && ret != -ENETUNREACH)
- 		l_warn("error parsing VHT capabilities");
+ 	if (!rate)
+-		return -EBADMSG;
++		return -ENETUNREACH;
  
- 	ret = band_estimate_ht_rx_rate(bandp, ht_capabilities, ht_operation,
-@@ -1073,14 +1073,14 @@ int wiphy_estimate_data_rate(struct wiphy *wiphy,
- 					out_data_rate);
- 	if (!ret)
- 		return 0;
--	else if (ret != -ENOTSUP)
-+	else if (ret != -ENOTSUP && ret != -ENETUNREACH)
- 		l_warn("error parsing HT capabilities");
+ 	*out_data_rate = rate;
  
- 	ret = band_estimate_nonht_rate(bandp, supported_rates,
- 						ext_supported_rates,
- 						bss->signal_strength / 100,
- 						out_data_rate);
--	if (ret != 0 && ret != -ENOTSUP)
-+	if (ret != 0 && ret != -ENOTSUP && ret != -ENETUNREACH)
- 		l_warn("error parsing non-HT rates");
- 
- 	return ret;
 -- 
 2.34.1
 
