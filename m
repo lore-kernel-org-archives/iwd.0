@@ -1,59 +1,59 @@
-Received: from mail-qk1-f182.google.com (mail-qk1-f182.google.com [209.85.222.182])
+Received: from mail-oa1-f49.google.com (mail-oa1-f49.google.com [209.85.160.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A3B17602B
-	for <iwd@lists.linux.dev>; Mon, 15 Apr 2024 15:15:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F1C61553A7
+	for <iwd@lists.linux.dev>; Mon, 15 Apr 2024 18:47:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713194110; cv=none; b=kCljUWnJw53DbRmhIgKsFVi4pQJioz9eGQcLWVZL2zg2FM2WTKam3DQIrVhta7rs6aPSed4KJgpYF3uhTAwo/tBt7bUiQDsnAMtNdDGgP7bu6Wv/XLYLl1k+y5Cy/R+c9kPYPMtOxT7yZ06ubjowdpTZ2SsXA3xeuB4rA02oVOU=
+	t=1713206867; cv=none; b=Pl5SkAAjA7lgLcnFNk2RQ2HAws8pivAaSSXQAtfVsyacsONlvuHwy2KDF/XnHuMkcW3WFJbBN7rIByglmUlJ4JXqVNeTNViqifXj85sfvZMGPN7IRbVKrgO3hBKpd/GXeoJM7vk1uZHY8EKp+Ln6/cCPK15puSXzmVAy3dL9w1U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713194110; c=relaxed/simple;
-	bh=iXqBpgfp02HohyXqrvmIgzaQSJWxDXDzTOZeZ5/Z5Xs=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:References:
-	 In-Reply-To:Content-Type; b=VWi3I/XpyCKl05onTCvDSMwYPu6e0Y8nIKUfTx8otG3/4aT1XlQi0Dxpzf7xQs8c2aO0j+zb//qZvGBW2CbjMOYrJf8GmA57q1PApUBRKwlhHJnQJdPScD7I+2twfKTuH4qxpai4dB40Sz1Sxory2zt8OZtynIU1Ea/1VBjzFyc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kf3zsURV; arc=none smtp.client-ip=209.85.222.182
+	s=arc-20240116; t=1713206867; c=relaxed/simple;
+	bh=0dkcoKq/sUWgjLXwOx81OSMISfzBZeW0cjuJ9eEfz7I=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=gOppP5JmhnCpHn8Xt3XypPkmkBSYPl1Fe5jzSX6gCXO9B/AYxrJKkf9xkGFnI6g3IY5AUKmHZmGFKdt0wFuAvQ3KvGB4mSN/t3MNzYDb9qEkEe9Jr7A6sZ3i4DH74yuEOBCSLbzsvoCG2R5piDKgUp6a9aswV9BBE0thbHdByLU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=h+17WyMv; arc=none smtp.client-ip=209.85.160.49
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kf3zsURV"
-Received: by mail-qk1-f182.google.com with SMTP id af79cd13be357-78d723c0dc5so310881685a.2
-        for <iwd@lists.linux.dev>; Mon, 15 Apr 2024 08:15:08 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="h+17WyMv"
+Received: by mail-oa1-f49.google.com with SMTP id 586e51a60fabf-22f01274622so2442224fac.1
+        for <iwd@lists.linux.dev>; Mon, 15 Apr 2024 11:47:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1713194108; x=1713798908; darn=lists.linux.dev;
-        h=content-transfer-encoding:in-reply-to:references:to:from
+        d=gmail.com; s=20230601; t=1713206863; x=1713811663; darn=lists.linux.dev;
+        h=content-transfer-encoding:in-reply-to:from:references:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=6K96iEZ1BuOWju8tqn4ED9Xpvmx4N9YtMuYsZUsJB2g=;
-        b=kf3zsURVC1cj7rWyu9wTXyUfK+E8GafhImGSR6CWqzSAedubEbNNCXG+fc3a9hd4zE
-         Pg1/PouEQK6z8FLd0HhtVzCmzFdnaMGiGATtTp1ZoXKyG+Af5497H6vIK6BlyXzxprYs
-         CnR2GQ9fjJmxKzXi5D5TpXkUbnhnM34jM47QYxKe6jkXpaD204KtCkc8N8Y35vJtGqS2
-         L/tNX2bjXrDF4W+PeKpitYdnaenymMuc9Lr2nYp47wfqQdJiDp66uCoxosn8Frvr6xd3
-         DJBS/CMxLfBkwcLjckrOrgij5Ucw9A+LAWtgYaJf8P4Ozn1gMnlwWD2GaJN/MPcCyhFh
-         UUag==
+        bh=lVRUHoUAFrLIjTU9ydJTkkcUdR/FZQZhBUgz4FfaQM0=;
+        b=h+17WyMv+mbNtrDKkEG8OOeBUulIByQMdVY2Axf3wAUngXf7DR+i2fXhENUjMjdRPC
+         XWcFCX2/IIU8hhaAghT+5YMO5KrUAbSX5WSsY2Q8NYUKibN10M9gCjgCKG+JIQLZV3L7
+         fmNah2KJpRbUnpfTjF2WMn4D2Dl82IPiO4HMxEkp+d8uihf9yBcf+puKVrwNMWbq/c6+
+         bCvZngECL0Gm9IA6ZNn+j88mQ4SH5Luu4iGtUqzNGe9yfbZTRk4tGY1xOQTjwkO8hPqH
+         dzuaVxzPAquYFUuKAZwtsnENfu0n0wYFRpIm2fgNAgbDrEsUK+ajik2zLeOLqf6DaOCN
+         uT6w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713194108; x=1713798908;
-        h=content-transfer-encoding:in-reply-to:references:to:from
+        d=1e100.net; s=20230601; t=1713206863; x=1713811663;
+        h=content-transfer-encoding:in-reply-to:from:references:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=6K96iEZ1BuOWju8tqn4ED9Xpvmx4N9YtMuYsZUsJB2g=;
-        b=qPheGzvk+slyR3SkXOhISewAW0F2mduZIF845pvqLqYBuGZQGtTO17e/0YelN+OI69
-         VKo6WKmgPdKCwONWoT/IXLpCR5/ZruMd4pvgCEFKQGYMrEo1fTXNpzGfUHJ1JDbg3Oq/
-         +ym8sBP9iC8LMhKULcYvZNS7955HB7JM5KUQivi4M83uprn6L92fBsgQA/BE6SJKJgHB
-         tZu7ILCUJdMGR8+trpA/GACeKDIaaX4k9KgN8n1e4naSptOTMoLAsiR1tHlVh6M7Lsqz
-         Bt4ocIzIUY00qXH8ftyeKa6PDgzTxT5Bo7XJrEQeMTCdz1rRZOSf/otMBH/e7zB7tTIf
-         oLVg==
-X-Forwarded-Encrypted: i=1; AJvYcCWmvof2NSsS6zv8lPB7HOscr/nroLz1ClBgS8e0U0YGYKJZV/DTJViGCvKEZX5APSLTvomePmUF+FCVskf64nGdY1Xk
-X-Gm-Message-State: AOJu0Yy4X7cC4QdF1RJgzRiSZGsQJ+nDyjsUHuUD6YG+lMUD8qxLp/lZ
-	VpwsIGQV9gSEjaviqigV7fYuyjYyn6ANLCB+F992yJc33scp824E
-X-Google-Smtp-Source: AGHT+IHc/C8SJ8CBGSswruqOqJCBzjjhEgtlq5GzBmnuqVxLaPUXEyoFoJNRKV7Q4If12wPrMPiGkA==
-X-Received: by 2002:a05:620a:c90:b0:78d:39ef:c1e4 with SMTP id q16-20020a05620a0c9000b0078d39efc1e4mr10715955qki.24.1713194108093;
-        Mon, 15 Apr 2024 08:15:08 -0700 (PDT)
-Received: from [10.102.4.159] ([208.195.13.130])
-        by smtp.gmail.com with ESMTPSA id bi36-20020a05620a31a400b0078d677e72f3sm6441980qkb.118.2024.04.15.08.15.07
+        bh=lVRUHoUAFrLIjTU9ydJTkkcUdR/FZQZhBUgz4FfaQM0=;
+        b=L81LOnXdm3UcWU/Ppa1SngFG+VkhfSSm5J/eC5l7ryQiGknAmaIiOL6RsYTCS5sCDd
+         EbjwFhGoFUw120PNwbwyelyUYQnYIDpmOxrSi1sN0iXkPxom6hHqIL7oEWX7RZuq0nr7
+         vmyC9C2HJwJeT2QFVw+wYE0/vEGAc+9Xy3dzC1D4ukABNYZyBQo1hOlNI7VR6rTthueh
+         NoX+VIemiRugzBtlwH7oHgBedDn8o0te1jdVD3HiYIkIHs0Wd2IkT8hK/1ROsokubQZN
+         NXkkvsqOHPMiiJSNAFK3wqC+3UE4HumQlRQ4fYXukuWuj9+WiDW5zZn574J4gGvhZr5l
+         AFfQ==
+X-Forwarded-Encrypted: i=1; AJvYcCV4Dyr/FJoR6MZspUW5y6/zNTTK5fkO0c2bCDFT/X8atK/znuIV4QZjzV+uKqi6FDQg0l9gmwZUur5/RvSOBZq/Vyfz
+X-Gm-Message-State: AOJu0YxsaEBl1CMxI1cgucf8rq27Kr+6XV2yoZLUTRA9qDeiOuGlAviK
+	tU6WvAodw3aE0VKOqnuzjwWJdQuDpDF/5zwa81tTZBHolUau4QXt
+X-Google-Smtp-Source: AGHT+IHuAZ9YYrvohhzN61NkyjFJ9MugRcVgyN668xYVRbQ3yBzpt7PmqQwaqnY01xAZRgoEXa6IMg==
+X-Received: by 2002:a05:6871:553:b0:22e:a970:a2ba with SMTP id t19-20020a056871055300b0022ea970a2bamr12375397oal.8.1713206863507;
+        Mon, 15 Apr 2024 11:47:43 -0700 (PDT)
+Received: from [192.168.1.22] ([70.114.247.242])
+        by smtp.googlemail.com with ESMTPSA id vp8-20020a056871a00800b0022ea967bb9dsm2395573oab.50.2024.04.15.11.47.42
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 15 Apr 2024 08:15:07 -0700 (PDT)
-Message-ID: <8c99082f-fa0d-4c9f-87ab-e49dc9e0f497@gmail.com>
-Date: Mon, 15 Apr 2024 08:15:05 -0700
+        Mon, 15 Apr 2024 11:47:43 -0700 (PDT)
+Message-ID: <873738bd-0761-4b0a-bbcb-cf76ea8f66e9@gmail.com>
+Date: Mon, 15 Apr 2024 13:47:41 -0500
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
@@ -61,45 +61,41 @@ List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: NT/VHT errors filling log
+Subject: Re: [PATCH 1/3] band: return -ENOTSUP when RSSI is too low for rate
+ estimation
 Content-Language: en-US
-From: James Prestwood <prestwoj@gmail.com>
-To: KeithG <ys3al35l@gmail.com>, iwd@lists.linux.dev
-References: <CAG17S_OZt84p8HQ4E189+VTMssSrDBDXNzeMUT_hZb=jbuKE6Q@mail.gmail.com>
- <7978cd1a-8122-4b6b-9e38-b7d65a9c393e@gmail.com>
-In-Reply-To: <7978cd1a-8122-4b6b-9e38-b7d65a9c393e@gmail.com>
+To: James Prestwood <prestwoj@gmail.com>, iwd@lists.linux.dev
+References: <20240415151130.40389-1-prestwoj@gmail.com>
+From: Denis Kenzior <denkenz@gmail.com>
+In-Reply-To: <20240415151130.40389-1-prestwoj@gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-Hi Keith,
+Hi James,
 
-On 4/15/24 4:24 AM, James Prestwood wrote:
-> Hi Keith,
->
-> On 4/12/24 10:41 AM, KeithG wrote:
->> Group,
->>
->> This is on a Pi5. this is with the 'current from git' build of iwd.
->> iwd-git/now 2.17.r0.g468cecdb-1
->> These are new errors which are showing up in the log and recur a lot:
->> Apr 12 12:14:17 pi5 iwd[1537]: error parsing HT capabilities
->> Apr 12 12:14:17 pi5 iwd[1537]: error parsing non-HT rates
->> Apr 12 12:14:17 pi5 iwd[1537]: error parsing VHT capabilities
->> Apr 12 12:14:17 pi5 iwd[1537]: error parsing HT capabilities
->> Apr 12 12:14:17 pi5 iwd[1537]: error parsing non-HT rates
->
-> I added these recently as well as a small modification to improve 
-> fallback behavior for calculating the data rate. This isn't coming 
-> from the driver, but the scan results. Apparently APs sending invalid 
-> IEs is more widespread than I thought. I'll need to change this to 
-> instead maybe a single warning, or maybe hidden behind an env var.
+On 4/15/24 10:11, James Prestwood wrote:
+> This was overlooked in a prior patch and causes the rate estimation
+> to return -ENETUNREACH if the RSSI is too low to support the
+> various capabilities. This return was unhandled and was treated as
+> if the IE was invalid which then printed a warning.
+> 
+> The low RSSI case should just be ignored, similar to if the IE was
+> not provided at all. In this case return -ENOTSUP so the caller
+> moves on to the next capability set.
 
-I sent some patches to the list which should help. You may still get a 
-warning for HE capabilities though, if APs are advertising the malformed IE.
+Err, why?  Just handle the error code.
 
-> Thanks,
->
-> James
->
->> Keith
->>
+> 
+> Note: this does result in most of the estimation functions only
+>        returning 0 or -ENOTSUP as they do little to no validation
+>        on the frame, but rather just test bits. Additional
+>        validation could be added in the future which would be
+>        handled by this patch.
+> ---
+>   src/band.c | 8 ++++----
+>   1 file changed, 4 insertions(+), 4 deletions(-)
+
+Hmm, this set is failing CI for some reason?
+
+Regards,
+-Denis
