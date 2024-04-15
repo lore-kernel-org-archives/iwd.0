@@ -1,59 +1,59 @@
-Received: from mail-qk1-f174.google.com (mail-qk1-f174.google.com [209.85.222.174])
+Received: from mail-oi1-f179.google.com (mail-oi1-f179.google.com [209.85.167.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 842B7155A32
-	for <iwd@lists.linux.dev>; Mon, 15 Apr 2024 19:01:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D112384D24
+	for <iwd@lists.linux.dev>; Mon, 15 Apr 2024 19:07:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713207703; cv=none; b=tzUJCk9tn1/MIYBLAqQB894L4H+2yJ9U1jiw8jH08+fzMpKBSTE7QGsyLOG+yly9lPMM1ylVz5CAa+80iQtMcTdQAk4+v1zGDZtrEjGcPOKRKpuJCC5A73i5Ep0sscqS75iJTGrZbU9lC2tRi1LtE326nV1K/1oXyuBx9qLGFZY=
+	t=1713208044; cv=none; b=cda711rCmSu+989IFnpZogwhMJyCcpwtRl/C3R30XoL+lVF7RuHSVlSZfgqrjbAwMzLdpfgZSfXn2bIzhSane+emj4QDSMxoiPthyL5JzU8sIepMZfTUESDq7LL9sYk4KXuXCbONOmTn/BmIE6ZA064bqHZ8ZEoIEI1ILUCh0bg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713207703; c=relaxed/simple;
-	bh=YnKmowB5LAmCBkB1qtoVtkQ6mLteiLW/cXYlubf+OlQ=;
+	s=arc-20240116; t=1713208044; c=relaxed/simple;
+	bh=1sdnLNnp6W2FG1NOJhsJJjhfIyfnMnWRhOHDdw9Xb64=;
 	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=l+p/2ria0yX8xa7F13kG1KV5GHvzZe4ITXOhqf97aVU4wNy0hkO9LKVW9KpePLblzh2W8FIDLbQ3REdvEoUKl6ORtJj0/RQ+sZBRl3iBkSVBkILDMIY5IBeoshrsgt07AumHTOJjJ1xcUL5AL4KogSRw9AqWUpg/c58uCYwW4I0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VoGgSljv; arc=none smtp.client-ip=209.85.222.174
+	 In-Reply-To:Content-Type; b=T0WRIk6J9MXVKvSKun6nsBq52hBbqgBdZDlCvm0shZ1doYzF5umunjwPMzJK6KNVTOeXr08H0GuntFSnsNA5rlClYcRJCMSKExhCQzyED8ocYPjuRFUTpCPrPmwJVbk9TOkSzTQIPj2kI0L8Tom//yrkypkw8C06xjwNRUbaWrU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TzdHxPOB; arc=none smtp.client-ip=209.85.167.179
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VoGgSljv"
-Received: by mail-qk1-f174.google.com with SMTP id af79cd13be357-78d620408f8so293586085a.3
-        for <iwd@lists.linux.dev>; Mon, 15 Apr 2024 12:01:42 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TzdHxPOB"
+Received: by mail-oi1-f179.google.com with SMTP id 5614622812f47-3c397193878so2179508b6e.3
+        for <iwd@lists.linux.dev>; Mon, 15 Apr 2024 12:07:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1713207701; x=1713812501; darn=lists.linux.dev;
+        d=gmail.com; s=20230601; t=1713208042; x=1713812842; darn=lists.linux.dev;
         h=content-transfer-encoding:in-reply-to:from:references:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=6qKV7aqaz6EQ/1wZRNZGCqYIRXstgMAbQHSxlQ/GICI=;
-        b=VoGgSljvQWpudEv6yrZ4bxy2B5mqqgfPRtNy6ZBJg14mSTSTGOqXWVFkXEPm5mMiH2
-         QvOlNwmN/bG7QFzMhsSMl0Nhhk7Ibd6YGKzh5B0mYDpaSt2WTwWqq7e7BbLTff6qy6vw
-         r/WLz9B3r52T4HMyAtsx5Fo02nXX2XDggS6PghYNN0DXgIHfGGGoppMoKFbuscvTw6/L
-         lHX/8SAuDiYWFqE5tkfv2ykSCUbLQvJUurWAodX8uxWcmnQAWcoEGu0wk51W5VrxPHSJ
-         IDnLCDkZSxU2OG6Ag3ZG552uW7PjwlGprNVN9nRweTnNrWRLP8jFmz2Hpee1fxkL0Om2
-         gBzw==
+        bh=9mT4Os0u8UbdcrQFmc6iaZlnGc/tMwAYNe3El3dVP+4=;
+        b=TzdHxPOBIYmtOIEaVNk4hVyCVx1PqsSEMq+Z0s0iFMrNSSMOQRQdQjj8DT9ZAxTVTZ
+         ERy3dDMQvkcfQBxqDH7TbYaGr59IAXfcjH93c9X1yumFZzxdPMW3FfX+LW7SgkPk5aM8
+         n5sqnhS8L2bHj/XSheI0G1cA1Mp+Q8gxss/lusPI+VVcchQ9lAqMfVN0r2kEw8wqlsSx
+         cuVROmhCIrjpNZBYVORi1hsLxQgXfQV4rLcdHIV5dQ+fh9G30MW+px1qH/GlSJSANeGy
+         D6djdaEYgRgKtJUEZkJYH1RWRb0GMPNw/1WkH0n312bz+ysnTdvavh0e3C3vdV1Qgd31
+         MfKA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713207701; x=1713812501;
+        d=1e100.net; s=20230601; t=1713208042; x=1713812842;
         h=content-transfer-encoding:in-reply-to:from:references:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=6qKV7aqaz6EQ/1wZRNZGCqYIRXstgMAbQHSxlQ/GICI=;
-        b=q8+f4VnknOYrcUpQ2wcdC81UoBPRe7XN0IFWiaCvlJjt+p5+cXKe/wl2Lge2g2GN3u
-         gMzUjPAJ+Z9WiDJNXyGDVftO2Cauf1pNHK3oeaU81WFZFJRnRfFvVY3u6Y7CdbdbIIJh
-         ysIcy7UTzT9tlc9/i4O8Nw0utcRpMReHjJ0FOUk4NYIhf27X52oIWAECZeTdCfytgqeJ
-         7lX8vV70XS6KwNFslacpydvgo8X6D5WaPYkyf4LoEmC3sQhi6CcF8hpw1DPhrZFqT6jp
-         ktn2ZhkeYe303CDKv1l1diKr7VdceylnkEBhs9m8Ux23NRbzvHLbW1j6ax9d2Vbxd7on
-         dIEQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXXjcSC6ivefDKaeMrIfSs2nJBUwJa7rbSgvLJ95+ZHDPS3pJTPAOMSCqgwD3tbGYEcply6VnErRB0+7F6KUKSVMQU4
-X-Gm-Message-State: AOJu0YwNIKBo0m/565J2u4fjf65tKmm45ZNfhHnkpyIcNw8s4tJBqR9b
-	hfDhpfBULLUGorxW+Yo9CV5Ppoba/KCLfDixik9zVVsQBJiZ4r3n
-X-Google-Smtp-Source: AGHT+IHNBP6UuBwahlG9W9/ZIofhGOfe/PMRnAv538SDCsxn60f6sBpSoDsVims7WuZpQzgpy4pZDQ==
-X-Received: by 2002:a05:620a:3bcd:b0:78e:ccd6:be8a with SMTP id yf13-20020a05620a3bcd00b0078eccd6be8amr10481376qkn.57.1713207701465;
-        Mon, 15 Apr 2024 12:01:41 -0700 (PDT)
-Received: from [10.102.4.159] ([208.195.13.130])
-        by smtp.gmail.com with ESMTPSA id u13-20020a05620a084d00b0078a04882ac2sm6624179qku.53.2024.04.15.12.01.40
+        bh=9mT4Os0u8UbdcrQFmc6iaZlnGc/tMwAYNe3El3dVP+4=;
+        b=eA4NSnlNYP1X+WZcIdXaAH9qMh9M5CaKt8X9AFh4/qe+iiCRt/Gm4VuHC02NNpXSsR
+         5Ubc2OpbVNGtH9vVxOASWSR4WJEDowB1L2n8I4nHTG3nI0TVvFF0y71nK95foi0ehYyq
+         HQVvT9MYY2nMwkcCuAJZgHPmRBDnqqr4phD/FIu1dQjDMQczlciJ3Ffyo3HfGlaXOgb8
+         GAtNWOCkTiBK2TcyHq2oLuTilfKOHVnZh/hsEwEBLY9Lzx1rZS+sRAyONTSO4YCey8Hl
+         Ewg52b951mHYtJyg2UCKEEtcfzkiP1mcBZGHWEsjx5WmbNi/A/kaDWfE45NhagrqKUGB
+         b4sw==
+X-Forwarded-Encrypted: i=1; AJvYcCWLwpWhbXITvC5kQ6xxqdjWyrnNi8SnlePdWXKi3aaw9iYO7w8wxSuh8CfieLYQG3pn/hPVvhAcbc/P4IaIH8V9a1f3
+X-Gm-Message-State: AOJu0Yxx3gYy8Bj+GpWWldqkIIz3pdU3Mys1KxC4yn3by6NMoPO6ITJm
+	2qtFLsBqmaxPtQWJnxQL0Nkd7H6R2HDkJK0MVFVRMGhPSyGkJNB4
+X-Google-Smtp-Source: AGHT+IF8Bo2DcK0m0spgFpIAGUNr9iaWVhvI4AZipQX2JiBVFs0x1CjGsvQGDqsocqWIHz5Iq0B58Q==
+X-Received: by 2002:a05:6808:2803:b0:3c5:f302:e7d8 with SMTP id et3-20020a056808280300b003c5f302e7d8mr11315291oib.48.1713208041993;
+        Mon, 15 Apr 2024 12:07:21 -0700 (PDT)
+Received: from [192.168.1.22] ([70.114.247.242])
+        by smtp.googlemail.com with ESMTPSA id 22-20020aca1016000000b003c5f3c1895esm1703863oiq.49.2024.04.15.12.07.21
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 15 Apr 2024 12:01:40 -0700 (PDT)
-Message-ID: <8e9b5eaf-6ac2-433d-9c49-5f1fc3912924@gmail.com>
-Date: Mon, 15 Apr 2024 12:01:39 -0700
+        Mon, 15 Apr 2024 12:07:21 -0700 (PDT)
+Message-ID: <819893af-b563-44c5-b542-b16a287e520b@gmail.com>
+Date: Mon, 15 Apr 2024 14:07:20 -0500
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
@@ -64,54 +64,37 @@ User-Agent: Mozilla Thunderbird
 Subject: Re: [PATCH 1/3] band: return -ENOTSUP when RSSI is too low for rate
  estimation
 Content-Language: en-US
-To: Denis Kenzior <denkenz@gmail.com>, iwd@lists.linux.dev
+To: James Prestwood <prestwoj@gmail.com>, iwd@lists.linux.dev
 References: <20240415151130.40389-1-prestwoj@gmail.com>
  <873738bd-0761-4b0a-bbcb-cf76ea8f66e9@gmail.com>
-From: James Prestwood <prestwoj@gmail.com>
-In-Reply-To: <873738bd-0761-4b0a-bbcb-cf76ea8f66e9@gmail.com>
+ <8e9b5eaf-6ac2-433d-9c49-5f1fc3912924@gmail.com>
+From: Denis Kenzior <denkenz@gmail.com>
+In-Reply-To: <8e9b5eaf-6ac2-433d-9c49-5f1fc3912924@gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 
-Hi Denis,
+Hi James,
 
-On 4/15/24 11:47 AM, Denis Kenzior wrote:
-> Hi James,
->
-> On 4/15/24 10:11, James Prestwood wrote:
->> This was overlooked in a prior patch and causes the rate estimation
->> to return -ENETUNREACH if the RSSI is too low to support the
->> various capabilities. This return was unhandled and was treated as
->> if the IE was invalid which then printed a warning.
->>
->> The low RSSI case should just be ignored, similar to if the IE was
->> not provided at all. In this case return -ENOTSUP so the caller
->> moves on to the next capability set.
->
-> Err, why?  Just handle the error code.
+> 
+> Seemed better to do this than checking for 2 return codes. And IMO "Not 
+> Supported" actually describes the situation better than "Network is unreachable".
 
-Seemed better to do this than checking for 2 return codes. And IMO "Not 
-Supported" actually describes the situation better than "Network is 
-unreachable".
+Well, it is supported, just not reachable ;)
 
-But I don't have a strong preference either way, if you prefer checking 
-both we can do that too.
+> 
+> But I don't have a strong preference either way, if you prefer checking both we 
+> can do that too.
 
->
->>
->> Note: this does result in most of the estimation functions only
->>        returning 0 or -ENOTSUP as they do little to no validation
->>        on the frame, but rather just test bits. Additional
->>        validation could be added in the future which would be
->>        handled by this patch.
->> ---
->>   src/band.c | 8 ++++----
->>   1 file changed, 4 insertions(+), 4 deletions(-)
->
-> Hmm, this set is failing CI for some reason?
-Ah, good catch CI :) its because test-band was expecting -EBADMSG when 
-all MCS' were unsupported. Really this is a valid IE so we shouldn't 
-expect -EBADMSG there but we do. I'll have to change this, or check for 
--ENETUNREACH if we go back to that.
->
-> Regards,
-> -Denis
+I rather we check both, since unit tests in particular would probably use the 
+extra information.
+
+>> Hmm, this set is failing CI for some reason?
+> Ah, good catch CI :) its because test-band was expecting -EBADMSG when all MCS' 
+> were unsupported. Really this is a valid IE so we shouldn't expect -EBADMSG 
+> there but we do. I'll have to change this, or check for -ENETUNREACH if we go 
+> back to that.
+
+Heh :)
+
+Regards,
+-Denis
