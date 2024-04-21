@@ -1,62 +1,62 @@
-Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
+Received: from mail-oa1-f44.google.com (mail-oa1-f44.google.com [209.85.160.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93E4F134BD
-	for <iwd@lists.linux.dev>; Sun, 21 Apr 2024 12:53:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DB8B13FFC
+	for <iwd@lists.linux.dev>; Sun, 21 Apr 2024 12:53:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713704033; cv=none; b=iqODEcohaRgMRxtcsYhG1ehFX6mTPfonVizhIPIighc7/so7ytcZnfaTKdoG5E9RPE2G3PXbZinhN2Wfh8+f623bI3A6U7Iw2fea858N7IpKC0UY/4qioMtP5RA+QP5NKAMX5pAfcgZoao9ylLmyH5LDDiyew/wbydVHNE9vQ4U=
+	t=1713704039; cv=none; b=GUVNRORUpbXIqZ0No/ctOCGg9p+mqMMjD4Mum6J5N1UA17FDtzdpyASrKfvls9lZZ8OvPxgaVPZwAj11ufCsfYvWitLYXNcmbK/XX9S4/qnq2ZXkN6eXcErbzFfAdwIaEfeAhMgnYoCNdYP63BKZJr6SHswA8vPWJSsHZC2WnYY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713704033; c=relaxed/simple;
-	bh=KSqVNXJAzwRZNdXuYPVxpWhELcovp1U195/KHof8DKc=;
+	s=arc-20240116; t=1713704039; c=relaxed/simple;
+	bh=yCmx85wBVN/7EiI+ez6K2mx5NWXkfMYkMnIgjaEM2sw=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ju3PqBGeODWengkNgUARsqT/947fH0ZECz/44HRzrMrK6i586So3t9pSeQK/bL4uKmI1LtbSwfLZTKiqs6OfuJzyrKb5mdM95gTOSAERBTibI+HHzgDG3/xWBmnXi5rdbKJBYZ1fw92ZaYZmfz/v5mr7CgBtQO4YzZUkUpAxNLQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HGCWPTyg; arc=none smtp.client-ip=209.85.214.174
+	 MIME-Version; b=uemI7bv4ONVFpZMKYXrZ/RH5FmP48uPA0tF8rLp2Pu2P3vNgxfLEOfBwJx3t0DkvB+nPws+CAuIZ4kiPR3dAuJfaVC0S+mqSYuiqsTFMyYJanTCS9tYIQmcnSOHnnC/QNQ1NZ3d+ouTAYe3hoS4wA+L+wG7qi9FlNpmiPoWUU2g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fEHKPzhF; arc=none smtp.client-ip=209.85.160.44
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HGCWPTyg"
-Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-1e3ca546d40so28486325ad.3
-        for <iwd@lists.linux.dev>; Sun, 21 Apr 2024 05:53:52 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fEHKPzhF"
+Received: by mail-oa1-f44.google.com with SMTP id 586e51a60fabf-222a9eae9a7so1884765fac.3
+        for <iwd@lists.linux.dev>; Sun, 21 Apr 2024 05:53:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1713704031; x=1714308831; darn=lists.linux.dev;
+        d=gmail.com; s=20230601; t=1713704037; x=1714308837; darn=lists.linux.dev;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=sc7Bi3BtpcquWPNmKpc6bVHtZ49jfz+XY+SvcGcoCR8=;
-        b=HGCWPTygEuuEY0tTY1LtNNJ7A4rEQpkDNKQbFALeEgMRn9jxlBrkIYBQ7/IYCyJN/u
-         FN0NEaZ0y8p4Mz+OREwq0j8ujzrYnWZQuiB8dZH/bPMuspgttp9kCfwjl2RXL7bCfDui
-         xsDW2HlmTNVCLO9m4qEGSii1JAcwYPyAhkj5fnmX3SXS2ot9maQmwfz8vRcw2IoQmYlr
-         pRmO3lxIRLBRLVICeCsoDd3L4nJyvg7CngosVfIObvKIDODSfOO+VsNDpNJks6NTLeZ0
-         SRqz02aTkCn2ZSgYyKKmZxkPvix+a5sM9l3fGmuvhf9waNUOEeZ8yeZQP2QFY9CKPzXA
-         0BEA==
+        bh=ndBxbfX4iSMh44sy1SZlErIMMSFuRVM7SNywOFhVQv4=;
+        b=fEHKPzhFAoq1mzIfJEjGAISinS1Ir3MOl63+nfkQ7NYSCva31sU2D+m8vEQnttD+iV
+         rw+UABJ1/vN6CQlscvaalX7CBkCxiBsfuxLhxJ9E4JNjegtEjBaNlanl80VsLYy+A1xw
+         9Ks5iKoAOklly8IMpgZTv2+1kj1b7/sTNh/JYdrzdnAv6qOgwgTrdUO/Tc6DLTipXRen
+         xejBhXe4mXai9E/xrgoGihmPunUIUSeoYSJpWWocZWbi66AVHoN5+LKxlF/m/19wt621
+         ofTOEA1Lrg0sAhAkJ43xugrgLiDmt3Fn877p7KaxirYyzJcbKPq3htyDH1oNz8ccvvkq
+         xZXQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713704031; x=1714308831;
+        d=1e100.net; s=20230601; t=1713704037; x=1714308837;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=sc7Bi3BtpcquWPNmKpc6bVHtZ49jfz+XY+SvcGcoCR8=;
-        b=L6kW+ZfebyssKkVjryP+/OHBYXTE3cue7LEXJCLCbhJQEMk8khvgA4QNEr/ztg2nDg
-         UehwCZo7eOFl8YPjAtZ19Zbvf4jRk9PxSbGwZJanbSmGM99eO74ZP7Flbfz9oJ2UJbs6
-         dbhc+X4r34DEf6aPdrXWp2iT7hqFb9RrerEIhIK5P1m+zHPQ4oT1jE2Ia0oTm8mFOOI5
-         jfvxhortC15/ToEVCviFCEoxzEYeFHZnIC9sjze/T26dJli9VsHadP4bonj7sRL5/H9S
-         iW3fseK5R3GeEVxC+62B/Ygxds/ccOKmlrmEIuICEC6/6f4OBetJ+kFF6Pc7One26zHH
-         AVhw==
-X-Gm-Message-State: AOJu0YxNqPR0QZyNa73LkMHv/4IyOR6ipqakJpUHThmyXtRZ+mu1txs3
-	zIzSulU5iffybNp+vtcRVvvk/CbhrReBUqkyRoplMgcMTmkYEdXt8csKoN/D6Ig=
-X-Google-Smtp-Source: AGHT+IG0/D5+JedD95KCmpaw28VfbQmzZenhjnY70qfXnugWHLdtYtkmS/acUt+8W8pZVcFlwfCSNg==
-X-Received: by 2002:a17:903:943:b0:1e4:3c7f:c060 with SMTP id ma3-20020a170903094300b001e43c7fc060mr9715528plb.66.1713704031485;
-        Sun, 21 Apr 2024 05:53:51 -0700 (PDT)
+        bh=ndBxbfX4iSMh44sy1SZlErIMMSFuRVM7SNywOFhVQv4=;
+        b=fgFtnzBiIKLnLUxBWxWD0jbJ30xTA4vm/mLxIRbI3c6wd7di3/TXxfGEFFJtqC99Qy
+         2RX1el3ditju2ESxmhCYxyOBZOwTBYY9dRmK2ELe0ll7YXVS2sugsSQR+qWKcjOtBQIt
+         rRaDUk5McMW+2xVhHGkKzkafeeM3G2VEzGc2LvOQIVEh+N/LEr9Ixict5vr5+OppdgxQ
+         00RMNNNXkzzfQQuIlT7UhEoCybfC8munniB3e75BZGbBc/0b9E3+tuMd76POz9RfC3q+
+         pRhK05mhg2tX1OTM7M4g7iNsascvX4AmWu5MYBjt+ZUZ+DoBHTdZT1xeAgJIHCxf83vd
+         RMDA==
+X-Gm-Message-State: AOJu0YzYhUE4qsHhBgqXU+TJrinS8YRZtbG3+7A1w4uNp4xkOUnriPrm
+	nIE9s0KSTtQu7wc8GMElbJ/0hHmy5TKGeDmqACaOPiMvh53rmiwsmRxO/NNr9fk=
+X-Google-Smtp-Source: AGHT+IH0Fh/7ZKKOgDIt5mNir9tQSwbzR4uFX5s5YZQPZx6vwzu9LFRjFHwkPTiFYNTV0auDcJu9jw==
+X-Received: by 2002:a05:6870:2252:b0:229:a47f:72cc with SMTP id j18-20020a056870225200b00229a47f72ccmr9559953oaf.38.1713704037380;
+        Sun, 21 Apr 2024 05:53:57 -0700 (PDT)
 Received: from localhost ([185.169.0.163])
-        by smtp.gmail.com with ESMTPSA id e11-20020a170902784b00b001e0bae4490fsm6398646pln.154.2024.04.21.05.53.50
+        by smtp.gmail.com with ESMTPSA id d16-20020a056a0010d000b006ed36f2c0dcsm6312549pfu.90.2024.04.21.05.53.56
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 21 Apr 2024 05:53:51 -0700 (PDT)
+        Sun, 21 Apr 2024 05:53:57 -0700 (PDT)
 From: John Brandt <brandtwjohn@gmail.com>
 To: iwd@lists.linux.dev
 Cc: John Brandt <brandtwjohn@gmail.com>
-Subject: [PATCH 07/11] sae: support reception of Confirm frame by AP
-Date: Sun, 21 Apr 2024 05:50:37 -0700
-Message-ID: <20240421125050.6649-8-brandtwjohn@gmail.com>
+Subject: [PATCH 08/11] ap: add support to handle SAE authentication
+Date: Sun, 21 Apr 2024 05:50:38 -0700
+Message-ID: <20240421125050.6649-9-brandtwjohn@gmail.com>
 X-Mailer: git-send-email 2.44.0
 In-Reply-To: <20240421125050.6649-1-brandtwjohn@gmail.com>
 References: <20240421125050.6649-1-brandtwjohn@gmail.com>
@@ -68,73 +68,121 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Experimental AP-mode support for receiving a Confirm frame when in the
-COMMITTED state. The AP will reply with a Confirm frame.
-
-Note that when acting as an AP, on reception of a Commit frame, the AP
-only replies with a Commit frame. The protocols allows to also already
-send the Confirm frame, but older clients may not support simultaneously
-receiving a Commit and Confirm frame.
+When the client requests SAE authentication, and it is enabled, allocate
+an auth_proto instance to handle SAE authentication. This also adds a
+new function to send SAE frames in AP mode that can be used by the
+auth_proto instance.
 ---
- src/sae.c | 38 +++++++++++++++++++++++++-------------
- 1 file changed, 25 insertions(+), 13 deletions(-)
+ src/ap.c | 64 ++++++++++++++++++++++++++++++++++++++++++++++++--------
+ 1 file changed, 55 insertions(+), 9 deletions(-)
 
-diff --git a/src/sae.c b/src/sae.c
-index 8a1e311a..da55c764 100644
---- a/src/sae.c
-+++ b/src/sae.c
-@@ -906,9 +906,13 @@ static int sae_process_confirm(struct sae_sm *sm, const uint8_t *from,
+diff --git a/src/ap.c b/src/ap.c
+index 14268551..ab0cbdcd 100644
+--- a/src/ap.c
++++ b/src/ap.c
+@@ -59,6 +59,8 @@
+ #include "src/diagnostic.h"
+ #include "src/band.h"
+ #include "src/common.h"
++#include "src/sae.h"
++#include "src/auth-proto.h"
  
- 	sm->state = SAE_STATE_ACCEPTED;
+ struct ap_state {
+ 	struct netdev *netdev;
+@@ -132,6 +134,7 @@ struct sta_state {
+ 	uint8_t *assoc_ies;
+ 	size_t assoc_ies_len;
+ 	uint8_t *assoc_rsne;
++	struct auth_proto *auth_proto;
+ 	enum ie_rsn_akm_suite akm_suite;
+ 	struct eapol_sm *sm;
+ 	struct handshake_state *hs;
+@@ -2595,6 +2598,35 @@ static void ap_auth_reply(struct ap_state *ap, const uint8_t *dest,
+ 				ap_auth_reply_cb, NULL);
+ }
  
--	sae_debug("Sending Associate to "MAC, MAC_STR(sm->handshake->aa));
--
--	sm->tx_assoc(sm->user_data);
-+	if (!sm->handshake->authenticator) {
-+		sae_debug("Sending Associate to "MAC, MAC_STR(sm->handshake->aa));
-+		sm->tx_assoc(sm->user_data);
-+	} else {
-+		if (!sae_send_confirm(sm))
-+			return -EPROTO;
++static void sae_auth_reply(const uint8_t *data, size_t len, void *user_data)
++{
++	struct sta_state *sta = (struct sta_state *)user_data;
++	struct ap_state *ap = (struct ap_state *)sta->ap;
++	const uint8_t *addr = netdev_get_address(ap->netdev);
++	uint8_t sae_buf[2048];
++	struct mmpdu_header *mpdu = (struct mmpdu_header *) sae_buf;
++	struct mmpdu_authentication *auth;
++
++	memset(mpdu, 0, sizeof(*mpdu));
++
++	/* Header */
++	mpdu->fc.protocol_version = 0;
++	mpdu->fc.type = MPDU_TYPE_MANAGEMENT;
++	mpdu->fc.subtype = MPDU_MANAGEMENT_SUBTYPE_AUTHENTICATION;
++	memcpy(mpdu->address_1, sta->addr, 6);	/* DA */
++	memcpy(mpdu->address_2, addr, 6);	/* SA */
++	memcpy(mpdu->address_3, addr, 6);	/* BSSID */
++
++	/* Authentication body */
++	auth = (void *) mmpdu_body(mpdu);
++	auth->algorithm = L_CPU_TO_LE16(MMPDU_AUTH_ALGO_SAE);
++
++	/* SAE elements */
++	memcpy(sae_buf + 26, data, len);
++	ap_send_mgmt_frame(ap, mpdu, 26 + len,
++				ap_auth_reply_cb, NULL);
++}
++
+ /*
+  * 802.11-2016 9.3.3.12 (frame format), 802.11-2016 11.3.4.3 and
+  * 802.11-2016 12.3.3.2 (MLME/SME)
+@@ -2664,7 +2696,7 @@ static void ap_auth_cb(const struct mmpdu_header *hdr, const void *body,
+ 	 * than State 1."
+ 	 */
+ 	if (sta)
+-		goto done;
++		goto have_sta;
+ 
+ 	/*
+ 	 * Per 12.3.3.2.3 with Open System the state change is immediate,
+@@ -2679,18 +2711,32 @@ static void ap_auth_cb(const struct mmpdu_header *hdr, const void *body,
+ 		ap->sta_states = l_queue_new();
+ 
+ 	sta->akm_suite = akm_suite;
++	if (sta->akm_suite == IE_RSN_AKM_SUITE_SAE_SHA256) {
++		sta->hs = netdev_handshake_state_new(sta->ap->netdev);
++		handshake_state_set_authenticator(sta->hs, true);
++		handshake_state_set_passphrase(sta->hs, ap->passphrase);
++		handshake_state_set_supplicant_address(sta->hs, sta->addr);
++		handshake_state_set_authenticator_address(sta->hs, bssid);
++
++		sta->auth_proto = sae_sm_new(sta->hs, sae_auth_reply, NULL, sta);
 +	}
  
- 	return 0;
- }
-@@ -1059,16 +1063,24 @@ static int sae_verify_committed(struct sae_sm *sm, uint16_t transaction,
- 	unsigned int skip;
- 	struct ie_tlv_iter iter;
+ 	l_queue_push_tail(ap->sta_states, sta);
  
 -	/*
--	 * Upon receipt of a Con event...
--	 * Then the protocol instance checks the value of Sync. If it
--	 * is greater than dot11RSNASAESync, the protocol instance shall send a
--	 * Del event to the parent process and transition back to Nothing state.
--	 * If Sync is not greater than dot11RSNASAESync, the protocol instance
--	 * shall increment Sync, transmit the last SAE Commit message sent to
--	 * the peer...
+-	 * Nothing to do here netlink-wise as we can't receive any data
+-	 * frames until after association anyway.  We do need to add a
+-	 * timeout for the authentication and possibly the kernel could
+-	 * handle that if we registered the STA with NEW_STATION now (TODO)
 -	 */
--	if (transaction == SAE_STATE_CONFIRMED) {
-+	if (sm->handshake->authenticator && transaction == SAE_STATE_CONFIRMED) {
-+		/*
-+		 * TODO: Sanity-check received Confirm frame from the client. For now
-+		 * AP-mode SAE support is experimental and we simply accept the frame.
-+		 * Note that the cryptographic confirm field value will still be checked
-+		 * before replying with a Confirm frame.
-+		 */
-+		return 0;
-+	} else if (transaction == SAE_STATE_CONFIRMED) {
-+		/*
-+		 * Upon receipt of a Con event...
-+		 * Then the protocol instance checks the value of Sync. If it
-+		 * is greater than dot11RSNASAESync, the protocol instance shall send a
-+		 * Del event to the parent process and transition back to Nothing state.
-+		 * If Sync is not greater than dot11RSNASAESync, the protocol instance
-+		 * shall increment Sync, transmit the last SAE Commit message sent to
-+		 * the peer...
-+		 */
- 		if (sm->sync > SAE_SYNC_MAX)
- 			return -ETIMEDOUT;
  
+-done:
+-	ap_auth_reply(ap, from, 0);
++have_sta:
++	if (sta->akm_suite == IE_RSN_AKM_SUITE_SAE_SHA256) {
++		auth_proto_rx_authenticate(sta->auth_proto, (const uint8_t *)hdr,
++					   body + body_len - (void *) hdr);
++	} else {
++		/*
++		 * Nothing to do here netlink-wise as we can't receive any data
++		 * frames until after association anyway.  We do need to add a
++		 * timeout for the authentication and possibly the kernel could
++		 * handle that if we registered the STA with NEW_STATION now (TODO)
++		 */
++		ap_auth_reply(ap, from, 0);
++	}
+ }
+ 
+ /* 802.11-2016 9.3.3.13 (frame format), 802.11-2016 11.3.4.5 (MLME/SME) */
 -- 
 2.44.0
 
