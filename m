@@ -1,62 +1,62 @@
-Received: from mail-pf1-f181.google.com (mail-pf1-f181.google.com [209.85.210.181])
+Received: from mail-pf1-f179.google.com (mail-pf1-f179.google.com [209.85.210.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5EB0C8DE
-	for <iwd@lists.linux.dev>; Sun, 21 Apr 2024 12:52:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40942C8DE
+	for <iwd@lists.linux.dev>; Sun, 21 Apr 2024 12:52:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713703947; cv=none; b=izAFIXkL5OdLFFtSbZQ9AY+BpRLi/IGYNlQDgAFzsfD3EV3z1F3D0bgpY2+TPTHmQ5JpgWNEZ6iuai9aMuDQQPoasF4A4em0FhwuK0RkJsLuRa1kbx07cBGwAxE1v9f8fPHwHFGTbE7V+ddl8meCyZfrjZEfzYNUFBLCAhOyG1U=
+	t=1713703953; cv=none; b=l+ErKnn7S0zwZghDm65eEaJF3bvrUHfBqW/lEsIr4+B2JmTAFg1gMfvQ0ffBifsZkvBz+adyxdb4v2x+BSPnK1SrOazvg+s5rK/pgKD4dfvAZtNKbO8B1bQHXmdWsmuoXLv3h8I/znccJgcslcqvsRyybuNFP1+zr/+Rqfcsj7U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713703947; c=relaxed/simple;
-	bh=w3TKeFM1KimJ4aJWJglCBsRkmLbYuLakaPCjm8K13+I=;
+	s=arc-20240116; t=1713703953; c=relaxed/simple;
+	bh=ZH5x9ATGv2Xx/ubGDt4J9KfabwYuBMBME0PJ2i2205o=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Zw9+x02WkaMJTuFqX1IYoBL1lI61JsyN3SOLTUPVwxjGeBqzGpWc8pvKVPvi2Fn2ciIO/uPQ0VJ7igL6IGbBO2cKU7a8XnreQMzMweGjeaGGxRMWjrW0WnH/0FcaLPp4regFdPcL8jS1NZ6NzqGSij1keIM7r2fDJKMxOg0K/vo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FdbsUIoe; arc=none smtp.client-ip=209.85.210.181
+	 MIME-Version; b=tD641x2ayJ9w2D3NBHFXo+4vvFoT+oAPa+SwkNDJBkF09nc9+zWLlMPzLQVduk/nz1heEf9IaoqhbyKbGDGO0jOpNc3iQzUYH38o/RhVQVfeM1gH5eXjfa0T9woPjxTgbb/9+nkQBK7uGl3olL8UpG2J1vsFlBLXpNzDAkenz3k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PcPyMEcz; arc=none smtp.client-ip=209.85.210.179
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FdbsUIoe"
-Received: by mail-pf1-f181.google.com with SMTP id d2e1a72fcca58-6f0aeee172dso1674899b3a.1
-        for <iwd@lists.linux.dev>; Sun, 21 Apr 2024 05:52:26 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PcPyMEcz"
+Received: by mail-pf1-f179.google.com with SMTP id d2e1a72fcca58-6f28bb6d747so342376b3a.3
+        for <iwd@lists.linux.dev>; Sun, 21 Apr 2024 05:52:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1713703946; x=1714308746; darn=lists.linux.dev;
+        d=gmail.com; s=20230601; t=1713703951; x=1714308751; darn=lists.linux.dev;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=T0w0cZSMYhki2e5Ps51YDWTfICjiJNw9DXP+Y8XATlU=;
-        b=FdbsUIoe5S3DIjM36gCk11nlwRoroSuHOI6L7OUuMtOOvoZJpBEKbVvd8cTFUEjs76
-         tFAbirnBloq2Y6xwAmoSJtWsnhZM4gxog8O3c9Q95dg7En5DuYb4sBLx8TEQvXFbL2BF
-         ILM2lZTTtY47uvN4y7u0pUYqxsbU5gNI0IY1M6VAmUZnyZQdUohIvoFAjibsqdeT/iex
-         8hxNtSo8L+NsZkdT4Wv4DfS49DbUHnXeao7elLNcroNq7Anw4epsvnFQOJmD1183YKcZ
-         taTdjCjN3Bif/Kwm7cG/0O+bOpmCwQOzkv/GeQYP+OGgzSW+bHy6HHx1jSgQ+RorICx0
-         HEbg==
+        bh=+lB//zIMayDnKBIFfFR1upol5JgGtsL17HmLjVPPniA=;
+        b=PcPyMEczJpwissdb/5DQawRnY3HC0T2CBnu4Mce8N9SX2wFjJu6uey4yneXWflMgUi
+         Dm+/IQOnJ8KjI1jdni1Iwhut3nIjY/ncFYKbD62a6LXVFa0qZItM2jBhaouuQhIw0s+i
+         RL6Awz7gVg3iF4yCwUgLdaRhnC6CQ1uz+XS8b1qMXzTzHDR4PgJYOBADKGuCT8tkiSmC
+         cBm3g2GJOSPorsYpAiTiu+TGwG/skuFEvx1OG4jfzg2bNAeMA0uqE5agyC08CdlWc/5F
+         RLuyyXEqWtO5Iz3pyc0WPDq/LqX7IOVa855U2zjF+Bzsq7tYRwHdJ+fKPOD44na6F4ds
+         0hzQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713703946; x=1714308746;
+        d=1e100.net; s=20230601; t=1713703951; x=1714308751;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=T0w0cZSMYhki2e5Ps51YDWTfICjiJNw9DXP+Y8XATlU=;
-        b=wCVOiEbrenPprYv4S/bYJLRfPbpJpTziJlaUJTxVHbRais3QwQxXcJlkAs/cxrbdF9
-         2abqBzA4UbA1xGd4rLWj1EGWbbXfEuDdiiWTRmINZ9ybRu7IA0sAvy+OGa/5FOdLMUde
-         C20hV7/NHsSoXQ7d68Uy36i+d1nb4pnIWHUVcZN0W/iFabCOoyksL2FxLYy32XE6IwXx
-         v9mqpOC7UrIY/yUKiRIzkRbKl/PmqifGC1PS5Ab68B6242DXHxoWvhXILerRTacFC/YJ
-         Dm/mScBi5HLDmU7OdKGJInKehHFobB6sc/10iLbh0zCzeuY7mKZSgqHuDbZTllO8Lmrq
-         jfaQ==
-X-Gm-Message-State: AOJu0YzAzNzLIAJpAgoXJ9fRrdKQCiKWCVYNKiIDG0Hld7Hr2kbnbFc4
-	VQEvHCW3r82FCVLnzP9Cv3n7MsImAo3lKFKc7iLPryxXcQIlUNUaTD+pWHvWsSo=
-X-Google-Smtp-Source: AGHT+IEFUs6mlsuA/naGlylsBRThPGL6ssZA2VDLpGKNmtgSIIOvs4zBpojm4wZDpKxGXWTU7EJyyQ==
-X-Received: by 2002:a05:6a00:189b:b0:6ea:f05c:5c16 with SMTP id x27-20020a056a00189b00b006eaf05c5c16mr11076255pfh.5.1713703945742;
-        Sun, 21 Apr 2024 05:52:25 -0700 (PDT)
+        bh=+lB//zIMayDnKBIFfFR1upol5JgGtsL17HmLjVPPniA=;
+        b=U901kor23l/EDh9dLAo4II/VjAaG6PdKVVhT5OyfVnCaBn9OAbXGwS/6Aj6D4KYAGc
+         0sqvQIFgLKEV4R+I1AGPwAGnnmZAz0Sb1S4yiGE1VCT+UufOA+l4wYvLIrC/FCX6GDBA
+         3g8J4eoS/sP9EerlBtafLWvacOXjP8dIwziYKLvHfVtowD4suCv0C+BbujTk7IkOnMLa
+         GELBqEwnOeuNZP8aWZXim3NP69GhABxN0e2dUpDCH6t4n/yopIA3V5LDaXPq62Nh70ls
+         U7nI8Qe4KRfJqxCKxbCn1cYc7fquVX6hk6BuCPbGMGUHlqtCqT/z9/5VML+CwRW+sJeD
+         9iRg==
+X-Gm-Message-State: AOJu0YzAaK3qeHiEwThDbY5l87YfMQWBlHWLgC7qK9jiwjdYNfVVIGTr
+	7MgvHWP5rKjbVcldw8+nl6BOTwH/QxJxkXwF2+vTqaUW8/aaE67ORvoHyzglynk=
+X-Google-Smtp-Source: AGHT+IFNjmPv30b0UOzFHuXSnqbzteGyS0BCTtuhgsWKMRfT/6HlJ0v8Urnw+wXqJj/sI1ESxyCZWg==
+X-Received: by 2002:a05:6a21:8015:b0:1a9:8152:511c with SMTP id ou21-20020a056a21801500b001a98152511cmr5888735pzb.62.1713703951392;
+        Sun, 21 Apr 2024 05:52:31 -0700 (PDT)
 Received: from localhost ([185.169.0.163])
-        by smtp.gmail.com with ESMTPSA id fh9-20020a056a00390900b006ecf1922df7sm6102706pfb.36.2024.04.21.05.52.24
+        by smtp.gmail.com with ESMTPSA id e7-20020a17090a77c700b002a55d8a99d5sm7538838pjs.22.2024.04.21.05.52.30
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 21 Apr 2024 05:52:25 -0700 (PDT)
+        Sun, 21 Apr 2024 05:52:31 -0700 (PDT)
 From: John Brandt <brandtwjohn@gmail.com>
 To: iwd@lists.linux.dev
 Cc: John Brandt <brandtwjohn@gmail.com>
-Subject: [PATCH 01/11] ap: ability to advertise PSK and SAE
-Date: Sun, 21 Apr 2024 05:50:31 -0700
-Message-ID: <20240421125050.6649-2-brandtwjohn@gmail.com>
+Subject: [PATCH 02/11] ap: accept PSK/SAE in auth depending on config
+Date: Sun, 21 Apr 2024 05:50:32 -0700
+Message-ID: <20240421125050.6649-3-brandtwjohn@gmail.com>
 X-Mailer: git-send-email 2.44.0
 In-Reply-To: <20240421125050.6649-1-brandtwjohn@gmail.com>
 References: <20240421125050.6649-1-brandtwjohn@gmail.com>
@@ -68,71 +68,76 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add the configuration option AKMSuites under Security so it becomes
-possible to support both PSK and SAE. This influences the advertised
-AKMs in the beacon.
+On reception of an authentication frame, accept both PSK and SAE as AKM
+depending on the config. Save the client's AKM for later use.
 ---
- src/ap.c | 26 +++++++++++++++++++++++++-
- 1 file changed, 25 insertions(+), 1 deletion(-)
+ src/ap.c | 28 +++++++++++++++++++++-------
+ 1 file changed, 21 insertions(+), 7 deletions(-)
 
 diff --git a/src/ap.c b/src/ap.c
-index b4e7593e..d50f9e4f 100644
+index d50f9e4f..14268551 100644
 --- a/src/ap.c
 +++ b/src/ap.c
-@@ -80,6 +80,7 @@ struct ap_state {
+@@ -132,6 +132,7 @@ struct sta_state {
+ 	uint8_t *assoc_ies;
+ 	size_t assoc_ies_len;
+ 	uint8_t *assoc_rsne;
++	enum ie_rsn_akm_suite akm_suite;
+ 	struct eapol_sm *sm;
+ 	struct handshake_state *hs;
+ 	uint32_t gtk_query_cmd_id;
+@@ -2606,6 +2607,7 @@ static void ap_auth_cb(const struct mmpdu_header *hdr, const void *body,
+ 	const uint8_t *from = hdr->address_2;
+ 	const uint8_t *bssid = netdev_get_address(ap->netdev);
+ 	struct sta_state *sta;
++	enum ie_rsn_akm_suite akm_suite;
  
- 	unsigned int ciphers;
- 	enum ie_rsn_cipher_suite group_cipher;
-+	unsigned int akm_suites;
- 	uint32_t beacon_interval;
- 	struct l_uintset *rates;
- 	uint32_t start_stop_cmd_id;
-@@ -631,7 +632,7 @@ static void ap_drop_rsna(struct sta_state *sta)
- static void ap_set_rsn_info(struct ap_state *ap, struct ie_rsn_info *rsn)
- {
- 	memset(rsn, 0, sizeof(*rsn));
--	rsn->akm_suites = IE_RSN_AKM_SUITE_PSK;
-+	rsn->akm_suites = ap->akm_suites;
- 	rsn->pairwise_ciphers = ap->ciphers;
- 	rsn->group_cipher = ap->group_cipher;
- }
-@@ -3620,6 +3621,7 @@ static int ap_load_config(struct ap_state *ap, const struct l_settings *config,
- 	size_t len;
- 	L_AUTO_FREE_VAR(char *, strval) = NULL;
- 	_auto_(l_strv_free) char **ciphers_str = NULL;
-+	_auto_(l_strv_free) char **akms_str = NULL;
- 	uint16_t cipher_mask;
- 	int err;
- 	int i;
-@@ -3838,6 +3840,28 @@ static int ap_load_config(struct ap_state *ap, const struct l_settings *config,
- 		ap->ciphers |= cipher;
+ 	l_info("AP Authentication from %s", util_address_to_string(from));
+ 
+@@ -2627,17 +2629,27 @@ static void ap_auth_cb(const struct mmpdu_header *hdr, const void *body,
+ 		}
  	}
  
-+	akms_str = l_settings_get_string_list(config, "Security",
-+						"AKMSuites", ',');
-+	for (i = 0; akms_str && akms_str[i]; i++) {
-+		if (!strcmp(akms_str[i], "PSK"))
-+			ap->akm_suites |= IE_RSN_AKM_SUITE_PSK;
-+		else if (!strcmp(akms_str[i], "SAE"))
-+			ap->akm_suites |= IE_RSN_AKM_SUITE_SAE_SHA256;
-+		else {
-+			l_warn("Unsupported or unknown AKM suite %s",
-+					akms_str[i]);
-+			return -ENOTSUP;
+-	/* Only Open System authentication implemented here */
+-	if (L_LE16_TO_CPU(auth->algorithm) !=
+-			MMPDU_AUTH_ALGO_OPEN_SYSTEM) {
++	if ((ap->akm_suites & IE_RSN_AKM_SUITE_SAE_SHA256) &&
++	    (L_LE16_TO_CPU(auth->algorithm) == MMPDU_AUTH_ALGO_SAE) ) {
++		/* When using SAE it must be COMMIT or CONFIRM frame */
++		if (L_LE16_TO_CPU(auth->transaction_sequence) > 2) {
++			ap_auth_reply(ap, from, MMPDU_REASON_CODE_UNSPECIFIED);
++			return;
 +		}
-+	}
++		akm_suite = IE_RSN_AKM_SUITE_SAE_SHA256;
++	} else if ((ap->akm_suites & IE_RSN_AKM_SUITE_PSK) &&
++		   (L_LE16_TO_CPU(auth->algorithm) == MMPDU_AUTH_ALGO_OPEN_SYSTEM) ) {
++		/* When using PSK it must be Open System authentication */
++		if (L_LE16_TO_CPU(auth->transaction_sequence) != 1) {
++			ap_auth_reply(ap, from, MMPDU_REASON_CODE_UNSPECIFIED);
++			return;
++		}
++		akm_suite = IE_RSN_AKM_SUITE_PSK;
++	} else {
+ 		ap_auth_reply(ap, from, MMPDU_REASON_CODE_UNSPECIFIED);
+ 		return;
+ 	}
+ 
+-	if (L_LE16_TO_CPU(auth->transaction_sequence) != 1) {
+-		ap_auth_reply(ap, from, MMPDU_REASON_CODE_UNSPECIFIED);
+-		return;
+-	}
+ 
+ 	sta = l_queue_find(ap->sta_states, ap_sta_match_addr, from);
+ 
+@@ -2666,6 +2678,8 @@ static void ap_auth_cb(const struct mmpdu_header *hdr, const void *body,
+ 	if (!ap->sta_states)
+ 		ap->sta_states = l_queue_new();
+ 
++	sta->akm_suite = akm_suite;
 +
-+	if (ap->akm_suites == 0) {
-+		/*
-+		 * Default behavior if no AKMs are specified but a passphrase
-+		 * is to only enable PSK == WPA2.
-+		 */
-+		 ap->akm_suites |= IE_RSN_AKM_SUITE_PSK;
-+	}
-+
- 	if (!ap->ciphers) {
- 		/*
- 		 * Default behavior if no ciphers are specified, disable TKIP
+ 	l_queue_push_tail(ap->sta_states, sta);
+ 
+ 	/*
 -- 
 2.44.0
 
