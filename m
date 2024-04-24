@@ -1,59 +1,59 @@
-Received: from mail-qk1-f170.google.com (mail-qk1-f170.google.com [209.85.222.170])
+Received: from mail-qv1-f46.google.com (mail-qv1-f46.google.com [209.85.219.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00B2515A4B0
-	for <iwd@lists.linux.dev>; Wed, 24 Apr 2024 12:06:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F6CC54F8D
+	for <iwd@lists.linux.dev>; Wed, 24 Apr 2024 12:07:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713960373; cv=none; b=IMMSpVGf9y01YRE5SVehpRSBQrMQ2aswtPTYXlJB+HvR3r+cp/k8cYaZHn43jdBVfgqu+mStd09/63jNlcirnWjav3fTqSndIkcLZPyDoEDYDnIGi23rkg6gMAUUAXr1iodyJsNthkkJP2a6/PgqVIhjVKo9lHC++EKzEoyiVr0=
+	t=1713960453; cv=none; b=eZeO4y4LMkbB+fjbnKscGHTWHUhvEhPQXsGjO3YH1r4q+1EXiJpwEjBpDONake7YHv18MC8Q7ntXJHKmcLOandO7i7UarRJCqMTc8JjbT1eIeomC+5GVY7frEtLwpwM9xx07LUK5T+joPjbeIYgdY+64HXgypgAkrRLy67WvwJk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713960373; c=relaxed/simple;
-	bh=pDY5LSXKwpL8zlRghVe9CY3w4MVkd6nn9WbbI13c55E=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=WCTPQSeF/TorFxNTixz6+8G2+6eGSqGpdFjvK0TBKFHGrqZqAZeDtclBSV+VBQJxPE2X8tFBVzC/dgHSdz+AZ73jq9utzGUEbJGsXArmJMLPrY7ZeqMw0OVMRVfodpuja+PiAEDjeqL7W3FWyO5G9WfEj/H1zuznz1RrkfXqw7Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kq6xkCqE; arc=none smtp.client-ip=209.85.222.170
+	s=arc-20240116; t=1713960453; c=relaxed/simple;
+	bh=so5T988OKZKGyWb3VKqwPz/VKJjPjGPzB2aO14zaWNU=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:References:
+	 In-Reply-To:Content-Type; b=r3G1K3jpE90SpezCZd5rKI0jCATj0zTWVvX+boZ/T5U3ob5dQjxcpP+nUjRBUMXp5PJWEGEBN/EQSitfNvuFYAe8f0iN1+qTpcDbzB9YOEWe2dBIXH3rUgZgIRxa+easAw4cLRJAkTlaKBf9/ncmQjNEL416UpDbWLErIpg+tmM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TCnMoly4; arc=none smtp.client-ip=209.85.219.46
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kq6xkCqE"
-Received: by mail-qk1-f170.google.com with SMTP id af79cd13be357-78f03917484so462748585a.3
-        for <iwd@lists.linux.dev>; Wed, 24 Apr 2024 05:06:11 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TCnMoly4"
+Received: by mail-qv1-f46.google.com with SMTP id 6a1803df08f44-69b4043b7b3so39933296d6.1
+        for <iwd@lists.linux.dev>; Wed, 24 Apr 2024 05:07:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1713960371; x=1714565171; darn=lists.linux.dev;
-        h=content-transfer-encoding:in-reply-to:from:references:to
+        d=gmail.com; s=20230601; t=1713960451; x=1714565251; darn=lists.linux.dev;
+        h=content-transfer-encoding:in-reply-to:references:to:from
          :content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=CxfxxxAOF0yzFbMvUoe4cwxC7xXVXSEB9S+dmknPLNY=;
-        b=kq6xkCqEoF9a7NAirMW3Q6LM30UNednWIMRaf70SWdBXU201b5X0vmXGac5UnpxYDP
-         JI/aHgSFXaIyDjeEvRpRc6HpmRsVmx/OBxnvtgnvLTNTWZbwS8zRgRI4x8H+UzwAGZs4
-         AttRsJNpqodO/xYcLLCwarfohdOrC/TwLnwQaytEjPnmeI2JvOEKB/wxZyhP0yw5d/K5
-         rBDXkf23PgcRTexL1SmMqhNjD7nn8Z4CziNSLZzVeG/TS9H+xQwheBFd63jMnZSADDVb
-         wGzjka6kVPjFKktet7T+ztDTfepHx4c6OgFhNjZLdjeWUwxJJRHQ6oVT3zmvhDD/aJlu
-         DIwA==
+        bh=omfwagIFnxrV7t9WtpMNZXzOK3vT6DmdNPHMjSYAHQE=;
+        b=TCnMoly4XLo/7NbfRV8TnWxDA+/VFMs3y4r/VR4n1Oe0r58BoNaACONBQT1BinLbBa
+         VJsNEov5Z8YDTJ1NiZCX+mrBLoEjK8QL9+9WUx25dZ5mZUD5/vsxxdhq5BWXKFlsakey
+         T2bHIIpJLwAO1rKcyJMtWqzsENOLJzFeRl7WBDW17VXKFxZqtx84Dt6wNYGJv9kwvFP6
+         Zvoa0S17WqXBNhLkSi9vbTb2NwhmQywCI1ffy5XUvGr/xM+udwXwfG8CGSKNMXJeiNSP
+         n0mj+aUfz1zWVZvBuMaH+Pm2OLjCnkXkJKUbTsk8t0KAYSb9bp4fbL+ix9PArCNMaSg0
+         0AdQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713960371; x=1714565171;
-        h=content-transfer-encoding:in-reply-to:from:references:to
+        d=1e100.net; s=20230601; t=1713960451; x=1714565251;
+        h=content-transfer-encoding:in-reply-to:references:to:from
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=CxfxxxAOF0yzFbMvUoe4cwxC7xXVXSEB9S+dmknPLNY=;
-        b=iucFB3fgVaRD11DsU166hpaDiC1dcAyMGzgywAdaE1qFUZndUtie+8MSGVE65VzLu6
-         eLenaJBu4jb+g6aFDwu/4OezlQtM6Er2IWvvnDsSY15cNjRsTG5wLQYRe3BlVJnV03bH
-         xOGUQNVfNp1X9gQlKcZfYgFU98e/VIMvuEYZNWaoUqcnkuwTaqSqMkqkoeoYaq0Z0Xv5
-         VKq6IvMpj4MoqWLZB80+ylr37sUui3bCVY632npGZ7VIAgL2baUlMqPSrpsSN3Q0R8Yu
-         NjYPeeed0ECWsboDtskvbgQDbR6Z7t2RZvluLfMw7ydBVNVGWUqVBXT6b0PSSnXoQCS6
-         Cmng==
-X-Forwarded-Encrypted: i=1; AJvYcCWowBfVbBVGckQZK6t3x3B7i55ItFHvX7zJCKJicUedmTiX8u4sNlwgaE076U9g2RmoUcbUr1HD+4iDq4QJO0Pl933N
-X-Gm-Message-State: AOJu0YwJgdr/kxXO5I65NJDWVQQ2c5B6SC0gwhgJEjTYSMiOzNIA0FHA
-	BBP4m4VCO+2qigco+v1B7z3FACqBiC3rnxT3Kqu/xgx+x3a4CXuwbSy//Q==
-X-Google-Smtp-Source: AGHT+IHYHmrIODXXjwzY+1dLFEk94M76Gcp6/n3DkBsQ7m7QAdmMo1z9Tajw24TOBqgom2DxBWP8rw==
-X-Received: by 2002:a0c:c212:0:b0:6a0:49c5:c2b5 with SMTP id l18-20020a0cc212000000b006a049c5c2b5mr2429576qvh.28.1713960370860;
-        Wed, 24 Apr 2024 05:06:10 -0700 (PDT)
+        bh=omfwagIFnxrV7t9WtpMNZXzOK3vT6DmdNPHMjSYAHQE=;
+        b=ieFBZX1CwdJhHWmwLXs68AEMhhO2shpnRzy/7XBsvm6w1BAnUmngk2pnuPS2LaLUnK
+         6CfdQeyOS+PjG/sria49fclvWqRdlxioQK7JC9h69SnOQk9a8d8xZL629sJ3GnPeCgLX
+         whYQsCNbRiZgQQlyJ4zamLIIMDN+QDpIgMwAmwbC3JRTwWxQK41rfdv+GgE7/E+kl8VJ
+         Z2mW/qMH67i7GwRezOyDoFhTvhvSviEUNxlpr9IQz41qdtnqfzUcy/h7z7Ozp556bNrR
+         rxh5SQ7HeraVrm7ij1mAXqCYKtmrYKsKy5XKq79RNFo5jZJspSHk8Yff4Q2exjaQ088M
+         WKeA==
+X-Forwarded-Encrypted: i=1; AJvYcCVATfc6OuLrLUYGNYzTBZygCl5CvqtApPxGccFOPGFe4jvZUgjTotA8L63J6NkRY3mCNccJo/U+65icOsbfyEQ7Xl/J
+X-Gm-Message-State: AOJu0YxXwXzoSKsij4dqeuN1AjfwB7YjVJHSVi5renneEDMkUcV6NIgH
+	Yb/KyUaCn3u0Ako8VXeCOP+xmq0blz6YsFqXSbl1W2c30QPxvmsG
+X-Google-Smtp-Source: AGHT+IFklXaB5QEebWqaTdJ0y8OfjQxqL63TZyyAnZ2WeZgE8DgX3n8TMfM1FN65NHwpPugItHTTig==
+X-Received: by 2002:a0c:f609:0:b0:6a0:946f:7e18 with SMTP id r9-20020a0cf609000000b006a0946f7e18mr1648981qvm.12.1713960451202;
+        Wed, 24 Apr 2024 05:07:31 -0700 (PDT)
 Received: from [10.102.4.159] ([208.195.13.130])
-        by smtp.gmail.com with ESMTPSA id r15-20020a0c8d0f000000b006a045780b77sm3393748qvb.51.2024.04.24.05.06.10
+        by smtp.gmail.com with ESMTPSA id r15-20020a0c8d0f000000b006a045780b77sm3393748qvb.51.2024.04.24.05.07.30
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 24 Apr 2024 05:06:10 -0700 (PDT)
-Message-ID: <5476c11a-764e-43fa-9ac3-52adb811138b@gmail.com>
-Date: Wed, 24 Apr 2024 05:06:10 -0700
+        Wed, 24 Apr 2024 05:07:30 -0700 (PDT)
+Message-ID: <fd8371c5-38a4-4302-ba1b-fa4577c5492e@gmail.com>
+Date: Wed, 24 Apr 2024 05:07:30 -0700
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
@@ -61,140 +61,75 @@ List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 08/11] ap: add support to handle SAE authentication
+Subject: Re: [PATCH 00/11] Basic SAE support for AP mode
 Content-Language: en-US
+From: James Prestwood <prestwoj@gmail.com>
 To: John Brandt <brandtwjohn@gmail.com>, iwd@lists.linux.dev
 References: <20240421125050.6649-1-brandtwjohn@gmail.com>
- <20240421125050.6649-9-brandtwjohn@gmail.com>
-From: James Prestwood <prestwoj@gmail.com>
-In-Reply-To: <20240421125050.6649-9-brandtwjohn@gmail.com>
+ <13851d8a-e91d-47e8-b9c1-0b1e7369edba@gmail.com>
+In-Reply-To: <13851d8a-e91d-47e8-b9c1-0b1e7369edba@gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-Hi John,
 
-On 4/21/24 5:50 AM, John Brandt wrote:
-> When the client requests SAE authentication, and it is enabled, allocate
-> an auth_proto instance to handle SAE authentication. This also adds a
-> new function to send SAE frames in AP mode that can be used by the
-> auth_proto instance.
-> ---
->   src/ap.c | 64 ++++++++++++++++++++++++++++++++++++++++++++++++--------
->   1 file changed, 55 insertions(+), 9 deletions(-)
+On 4/22/24 6:52 AM, James Prestwood wrote:
+> Hi John,
 >
-> diff --git a/src/ap.c b/src/ap.c
-> index 14268551..ab0cbdcd 100644
-> --- a/src/ap.c
-> +++ b/src/ap.c
-> @@ -59,6 +59,8 @@
->   #include "src/diagnostic.h"
->   #include "src/band.h"
->   #include "src/common.h"
-> +#include "src/sae.h"
-> +#include "src/auth-proto.h"
->   
->   struct ap_state {
->   	struct netdev *netdev;
-> @@ -132,6 +134,7 @@ struct sta_state {
->   	uint8_t *assoc_ies;
->   	size_t assoc_ies_len;
->   	uint8_t *assoc_rsne;
-> +	struct auth_proto *auth_proto;
->   	enum ie_rsn_akm_suite akm_suite;
->   	struct eapol_sm *sm;
->   	struct handshake_state *hs;
-> @@ -2595,6 +2598,35 @@ static void ap_auth_reply(struct ap_state *ap, const uint8_t *dest,
->   				ap_auth_reply_cb, NULL);
->   }
->   
-> +static void sae_auth_reply(const uint8_t *data, size_t len, void *user_data)
-> +{
-> +	struct sta_state *sta = (struct sta_state *)user_data;
-> +	struct ap_state *ap = (struct ap_state *)sta->ap;
-> +	const uint8_t *addr = netdev_get_address(ap->netdev);
-> +	uint8_t sae_buf[2048];
+> On 4/21/24 5:50 AM, John Brandt wrote:
+>> This set of patches adds basic SAE support for IWD in AP mode. It has
+>> been tested by connecting to IWD AP using wpa_supplicant. Note that this
+>> does not yet correspond to WPA3, since WPA3 would also require the
+>> support of Management Frame Protection.
+>>
+>> Normal client functionality has also been confirmed to still work. After
+>> applying these patches it remains possible for IWD client to connect to
+>> WPA3/SAE network.
+>>
+>> Remaining TODOs are to include better sanity-checking of received
+>> frames.
+>
+> I took a quick pass and I'm impressed you took the initiative to 
+> implement this. I do need to take a closer look from the spec side of 
+> things but overall it looks good.
+>
+> Assuming we are compliant with the spec my only concern merging this 
+> would be the TODOs. You do mention this is experimental and certain 
+> checks are not done, but you'd be surprised at the number of people 
+> using IWD in AP mode. The minute we merge this we're going to have 
+> people using it, which in its current form would be insecure. I think 
+> we first need to get the frame verification implemented as well as 
+> MFP. But anyways, this is a good start and I'll give it a full review 
+> when I have some time, hopefully this week.
+>
+> Thanks,
+>
+> James
 
-Could probably pare this down a bit. I don't mind if we leave a little 
-room but 2048 seems a bit much. In a commit we've got the header + 48 + 
-96 bytes for the scalar/element + 32 bytes of a token + some other bytes 
-here and there. You could probably at least half this and to be safe you 
-could:
+Reviewed. I also forgot to mention the CI we have showed test-sae failed 
+after your patches, so that will need to be addressed as well. I keep 
+getting reminded I need to also email the patch submitter.
 
-if (L_WARN_ON(len > sizeof(sae_buf))
-     return;
-> +	struct mmpdu_header *mpdu = (struct mmpdu_header *) sae_buf;
-> +	struct mmpdu_authentication *auth;
-> +
-> +	memset(mpdu, 0, sizeof(*mpdu));
-> +
-> +	/* Header */
-> +	mpdu->fc.protocol_version = 0;
-> +	mpdu->fc.type = MPDU_TYPE_MANAGEMENT;
-> +	mpdu->fc.subtype = MPDU_MANAGEMENT_SUBTYPE_AUTHENTICATION;
-> +	memcpy(mpdu->address_1, sta->addr, 6);	/* DA */
-> +	memcpy(mpdu->address_2, addr, 6);	/* SA */
-> +	memcpy(mpdu->address_3, addr, 6);	/* BSSID */
-> +
-> +	/* Authentication body */
-> +	auth = (void *) mmpdu_body(mpdu);
-> +	auth->algorithm = L_CPU_TO_LE16(MMPDU_AUTH_ALGO_SAE);
-> +
-> +	/* SAE elements */
-> +	memcpy(sae_buf + 26, data, len);
-> +	ap_send_mgmt_frame(ap, mpdu, 26 + len,
-> +				ap_auth_reply_cb, NULL);
-> +}
-> +
->   /*
->    * 802.11-2016 9.3.3.12 (frame format), 802.11-2016 11.3.4.3 and
->    * 802.11-2016 12.3.3.2 (MLME/SME)
-> @@ -2664,7 +2696,7 @@ static void ap_auth_cb(const struct mmpdu_header *hdr, const void *body,
->   	 * than State 1."
->   	 */
->   	if (sta)
-> -		goto done;
-> +		goto have_sta;
->   
->   	/*
->   	 * Per 12.3.3.2.3 with Open System the state change is immediate,
-> @@ -2679,18 +2711,32 @@ static void ap_auth_cb(const struct mmpdu_header *hdr, const void *body,
->   		ap->sta_states = l_queue_new();
->   
->   	sta->akm_suite = akm_suite;
-> +	if (sta->akm_suite == IE_RSN_AKM_SUITE_SAE_SHA256) {
-> +		sta->hs = netdev_handshake_state_new(sta->ap->netdev);
-> +		handshake_state_set_authenticator(sta->hs, true);
-> +		handshake_state_set_passphrase(sta->hs, ap->passphrase);
-> +		handshake_state_set_supplicant_address(sta->hs, sta->addr);
-> +		handshake_state_set_authenticator_address(sta->hs, bssid);
-> +
-> +		sta->auth_proto = sae_sm_new(sta->hs, sae_auth_reply, NULL, sta);
-> +	}
->   
->   	l_queue_push_tail(ap->sta_states, sta);
->   
-> -	/*
-> -	 * Nothing to do here netlink-wise as we can't receive any data
-> -	 * frames until after association anyway.  We do need to add a
-> -	 * timeout for the authentication and possibly the kernel could
-> -	 * handle that if we registered the STA with NEW_STATION now (TODO)
-> -	 */
->   
-> -done:
-> -	ap_auth_reply(ap, from, 0);
-> +have_sta:
-> +	if (sta->akm_suite == IE_RSN_AKM_SUITE_SAE_SHA256) {
-> +		auth_proto_rx_authenticate(sta->auth_proto, (const uint8_t *)hdr,
-> +					   body + body_len - (void *) hdr);
-> +	} else {
-> +		/*
-> +		 * Nothing to do here netlink-wise as we can't receive any data
-> +		 * frames until after association anyway.  We do need to add a
-> +		 * timeout for the authentication and possibly the kernel could
-> +		 * handle that if we registered the STA with NEW_STATION now (TODO)
-> +		 */
-> +		ap_auth_reply(ap, from, 0);
-> +	}
->   }
->   
->   /* 802.11-2016 9.3.3.13 (frame format), 802.11-2016 11.3.4.5 (MLME/SME) */
+Thanks,
+
+James
+
+>
+>>
+>> John Brandt (11):
+>>    ap: ability to advertise PSK and SAE
+>>    ap: accept PSK/SAE in auth depending on config
+>>    sae: add function sae_set_group
+>>    sae: refactor and add function sae_calculate_keys
+>>    sae: make sae_process_commit callable in AP mode
+>>    sae: verify offered group in AP mode
+>>    sae: support reception of Confirm frame by AP
+>>    ap: add support to handle SAE authentication
+>>    ap: enable start of 4-way HS after SAE
+>>    eapol: support PTK derivation with SHA256
+>>    eapol: encrypt key data for AKM-defined ciphers
+>>
+>>   src/ap.c    | 135 +++++++++++++++++++++++++++++++++-------
+>>   src/eapol.c |  58 ++++++++++++-----
+>>   src/sae.c   | 175 +++++++++++++++++++++++++++++++++-------------------
+>>   3 files changed, 265 insertions(+), 103 deletions(-)
+>>
