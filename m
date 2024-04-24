@@ -1,59 +1,59 @@
-Received: from mail-qv1-f52.google.com (mail-qv1-f52.google.com [209.85.219.52])
+Received: from mail-qv1-f53.google.com (mail-qv1-f53.google.com [209.85.219.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D79F815AAC6
-	for <iwd@lists.linux.dev>; Wed, 24 Apr 2024 12:08:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 555F015AD9A
+	for <iwd@lists.linux.dev>; Wed, 24 Apr 2024 12:08:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713960525; cv=none; b=jAVhxcdTrqOXJGaPxsN6FC6kBIMlclnuitGEq5zvKqjK7ncD+1WVB29X9LmLj+CtcDwwkQpaH0JNGmfinz8Kd4CWgtV8mIQjyMgEcujz/G4JDF4zm5pnpbTQkxXfQ2cBt0NyDru4XOXaI7hQRI/qX1QS0nDUR+g7Mijdi2nPCgM=
+	t=1713960530; cv=none; b=RuDpTTM4pDC3ybHGGt5Y5viHxMTuR33sMOBDzyb4mWC/TUij/vPPMDNtMCB4q2EzUJTgSTNpwnBq8LNpKUWeRbDyeJNzKaqbmKGLuVOacg5zNPHPmbO+0p9fKW+GQ0rMZhB9AH089lurcdYLpLtYdd65XfbHO6QL75iHjF+6lyo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713960525; c=relaxed/simple;
-	bh=q/xSWf5W7Z/dK6C7dEA3TQSgHOsue3iMkqbYwlyfq0c=;
+	s=arc-20240116; t=1713960530; c=relaxed/simple;
+	bh=KiOdXEvzJhIkOooxJp+5+rtYPdnG6yO3vDCR1eVgt5Y=;
 	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=FBmP4elWqdjk4fNlVHtibusl1EszIVaqZ1ZHYyIAWAJS/EKRtSujfCBIjWFI0nw4bA2iNC5ZVuJD7nFZmM5+ylClwkbNCyZRmfv6vHA7cvbzG9hmdU7FBprY5vTb02CbY0hs3jdzGQ12yLfesquSSUyuw3y3iIvqZSgUgx4hUF8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SJQLAmMD; arc=none smtp.client-ip=209.85.219.52
+	 In-Reply-To:Content-Type; b=j58sH20d+oo2oO22Edq0y9ak1uOAq+Hzs2/IylaLJK7xYD2mHZmJ74gR4X+KJB7AosIRHoRgR1l2/Bpz7d2Z7uDzUfZzOYt4JLouWiDuzaZR6NJrF5IQ57IUJUbOB1ZmCjwiSNNhRN+4e25HOW8UaFdM3J8fbTpwNn9QoBFH7cs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bV6D9v+W; arc=none smtp.client-ip=209.85.219.53
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SJQLAmMD"
-Received: by mail-qv1-f52.google.com with SMTP id 6a1803df08f44-699320fcbc1so39656766d6.3
-        for <iwd@lists.linux.dev>; Wed, 24 Apr 2024 05:08:43 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bV6D9v+W"
+Received: by mail-qv1-f53.google.com with SMTP id 6a1803df08f44-6a06b12027cso7373616d6.0
+        for <iwd@lists.linux.dev>; Wed, 24 Apr 2024 05:08:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1713960523; x=1714565323; darn=lists.linux.dev;
+        d=gmail.com; s=20230601; t=1713960528; x=1714565328; darn=lists.linux.dev;
         h=content-transfer-encoding:in-reply-to:from:references:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=M0aP+gPH6cs9AJ+njPaazHOYyA+ti5esWeL+quSkL4s=;
-        b=SJQLAmMDqG7s7j1ja2XWmSKFXpEWmh1TlEheCDUUNCCzGQmvNyAycJvFYAUC6KvoTM
-         6gIygjEaLQnYl4SWQcm8texGMMHpxfalDBKT5yJLD61Cavt6b3XUC9ZeGSjunqeRWrhn
-         gqbDIzrvYuMpC7PYHNHvew+oyyu/HlR7kBCGK1enEV2bsjtP8UUoZXP+xtxD+TTW6qd7
-         Uq5210lNRpWLf2o+feqq7wTLD0/zyoO0zTzxmttukJk9Ywt11O1GlvJ2BXH+QcAyAUyQ
-         gFaWQdMzC7ZavAovfvSA4zmUmju9lvuvoYg1OHR4byj1LnmiAliPawiEF0Xd5Ig64StU
-         6kZg==
+        bh=AGhUsa+vksEzPGECeWuYKwk6kLL2R9F6JqQRLvHtx6k=;
+        b=bV6D9v+WkHPQUTyowutHLAFg0CVvzAZuv7A7KvU7QMbc+Lk9T3xeqwFtYiJr4P11wQ
+         AeOERcdfwHatmrcnjgnqJw9jkT5EcRfeXLZrOHTaKAsgCVymdNjRodypr7AX9flj3wRo
+         kvVWqfXKl8HZl51s5OW9npZQL6m75aftfY5koql2ItpJQmb7v8GJ4D+0TxShH7FTrpP6
+         o9c8ZvPFpkT5B7QO12duRV+43SFmz2Iphae6kV6TyP/xXKUoDN3rbJAUbUfYzFPRf3qV
+         mIoiePPc/So13Ncz44vHgqhnxVhQmmrGNg8hvKW43ojkTv3G9aW9yYiOE5LMSZ2/bU2t
+         v8Cg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713960523; x=1714565323;
+        d=1e100.net; s=20230601; t=1713960528; x=1714565328;
         h=content-transfer-encoding:in-reply-to:from:references:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=M0aP+gPH6cs9AJ+njPaazHOYyA+ti5esWeL+quSkL4s=;
-        b=FTKwXa0qfTXsVwaRK8P4RiGBx9a8pZLKx5WfvBpaGeaWWbdhzZ6g/8nwzfytYiGhtL
-         q4bVDsnbeSzNs30QnSbJ8ny5ioembJytl+bYjn/8Z+17g/6FwIIbsKcbK53R3M+3Wcwx
-         Hl9Vd5F/GStbnI9suKJHt0XB41E8phkjO5Yll0TvvTBQTRXtXYC2NHPtvot9IxHHRmO3
-         hQKzk4FNCd/hrBgkUR1suhHhRp0ByXhxiwlVhCAK2wmuQBjZE0bRpt5bcxNS5GzTGIm4
-         rdbPH7bcY9tvSNdtje8NQakAPpUGZxPBRw+d8WGOJk3Po/LbpBPPtM6AIRfhf3RfRQ3s
-         pBNg==
-X-Forwarded-Encrypted: i=1; AJvYcCX52LZVxCgyEIdQNfvhvnC1Rv6V4hnMeFJhPoLQGHjfhDQRkGBXYuZER6OCxZf4O0+u36oDGGG/LAnbVy3SySERkdYb
-X-Gm-Message-State: AOJu0YyuulsYfaqLTr4gvWbMsgAp4gHARWiSn+84i2VUh1UqzzPVM+St
-	HMMk/kNclmEYljkg93NIyBYJ/tpklt8YmYpuFegr2hmUVsgXtq8Z
-X-Google-Smtp-Source: AGHT+IGm4IotmymYrf2RSA/jiwkS8HbbxBd6UuUsVjEzNMxFiNyW+Ffzv2dYExi8RyfSkZcnwLFYlg==
-X-Received: by 2002:a05:6214:a68:b0:69b:fb9:9a75 with SMTP id ef8-20020a0562140a6800b0069b0fb99a75mr2121587qvb.49.1713960522717;
-        Wed, 24 Apr 2024 05:08:42 -0700 (PDT)
+        bh=AGhUsa+vksEzPGECeWuYKwk6kLL2R9F6JqQRLvHtx6k=;
+        b=q7BVZSh1i9aCcaDTbzZh0vPMkX8RNol3MOp6XEVvcqrjt28iDzy3qZvO7aC8tiWX3h
+         k4PLF6JDjOr7vXkh9CtX5N3/OcTljJEZRjwGF4P2i77B50FY6I6kJ3KGXT2jVvM6lBEZ
+         /eHsCpq7nwC5rB+AQMtCmUFEoWQ7IGrbFMI8cOev1Uvfu+1/YSlSNmwmlvjujLbF5bpr
+         8pF297OmcrfxgK+1Je2HIrn3SYGN76RoVlQICXuO7Am7fMP4hTgTusoXeLQ2P3l/+wPP
+         zC0HskRc56u0O5x1sOJ4p0FdEYwD8ImUEaZjtBFAy+fkg6n2nBdeQbkN4PvwJnufm0ij
+         E9Eg==
+X-Forwarded-Encrypted: i=1; AJvYcCX0/57ELr5S0WzIQF5Wg3MFE6q3kyXSAHI5K8SGQxcisEUZyFzZVopXqVW85WPD5Iei6WsWTP+aXfqpkCJTsWWWo4/v
+X-Gm-Message-State: AOJu0YwXXVlOFbp96I4e3I8EO1qjGaWN2xMYAYewnlCntBOAX6KR9lWK
+	2c95aZ18TqMLAMD/4MPUAsfeznVxog1Xu/Ulli91m02G6o0HcXJUulnBAQ==
+X-Google-Smtp-Source: AGHT+IFoHVJwFhyoNq+tNazxIYjaGpa2aysImohkJP8gYzhxP0yEt0oZDhcc4dcw+tnZESeMeyf+9Q==
+X-Received: by 2002:a05:6214:841:b0:69f:74f7:a96a with SMTP id dg1-20020a056214084100b0069f74f7a96amr3548853qvb.11.1713960528127;
+        Wed, 24 Apr 2024 05:08:48 -0700 (PDT)
 Received: from [10.102.4.159] ([208.195.13.130])
-        by smtp.gmail.com with ESMTPSA id r15-20020a0c8d0f000000b006a045780b77sm3393748qvb.51.2024.04.24.05.08.41
+        by smtp.gmail.com with ESMTPSA id r15-20020a0c8d0f000000b006a045780b77sm3393748qvb.51.2024.04.24.05.08.47
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 24 Apr 2024 05:08:42 -0700 (PDT)
-Message-ID: <34794f6d-211b-4f91-91f7-4de8ab063841@gmail.com>
-Date: Wed, 24 Apr 2024 05:08:41 -0700
+        Wed, 24 Apr 2024 05:08:47 -0700 (PDT)
+Message-ID: <e049836d-04cf-47db-82ea-a19997af8c46@gmail.com>
+Date: Wed, 24 Apr 2024 05:08:47 -0700
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
@@ -61,95 +61,85 @@ List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 05/11] sae: make sae_process_commit callable in AP mode
+Subject: Re: [PATCH 07/11] sae: support reception of Confirm frame by AP
 Content-Language: en-US
 To: John Brandt <brandtwjohn@gmail.com>, iwd@lists.linux.dev
 References: <20240421125050.6649-1-brandtwjohn@gmail.com>
- <20240421125050.6649-6-brandtwjohn@gmail.com>
+ <20240421125050.6649-8-brandtwjohn@gmail.com>
 From: James Prestwood <prestwoj@gmail.com>
-In-Reply-To: <20240421125050.6649-6-brandtwjohn@gmail.com>
+In-Reply-To: <20240421125050.6649-8-brandtwjohn@gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-Hi John
+Hi John,
 
 On 4/21/24 5:50 AM, John Brandt wrote:
-> As an AP, the function sae_process_commit will pick the group offered by
-> the client. In a subsuquent commit the offered group will first be
-> verified before calling sae_process_commit. The AP will reply with a
-> Commit frame, calculate current keys, and move to the COMMITTED state.
+> Experimental AP-mode support for receiving a Confirm frame when in the
+> COMMITTED state. The AP will reply with a Confirm frame.
+>
+> Note that when acting as an AP, on reception of a Commit frame, the AP
+> only replies with a Commit frame. The protocols allows to also already
+> send the Confirm frame, but older clients may not support simultaneously
+> receiving a Commit and Confirm frame.
+Could we add some basic unit tests. Mainly just sanity checks that the 
+message flow works as expected with handshake->authenticator set.
 > ---
->   src/sae.c | 32 ++++++++++++++++++++------------
->   1 file changed, 20 insertions(+), 12 deletions(-)
+>   src/sae.c | 38 +++++++++++++++++++++++++-------------
+>   1 file changed, 25 insertions(+), 13 deletions(-)
 >
 > diff --git a/src/sae.c b/src/sae.c
-> index 314fc28f..2c97d94c 100644
+> index 8a1e311a..da55c764 100644
 > --- a/src/sae.c
 > +++ b/src/sae.c
-> @@ -48,6 +48,8 @@ static bool debug;
->   #define SAE_SYNC_MAX		3
->   #define SAE_MAX_ASSOC_RETRY	3
+> @@ -906,9 +906,13 @@ static int sae_process_confirm(struct sae_sm *sm, const uint8_t *from,
 >   
-> +static bool sae_send_commit(struct sae_sm *sm, bool retry);
-> +
->   #define sae_debug(fmat, ...) \
->   ({	\
->   	if (debug) \
-> @@ -797,8 +799,12 @@ static int sae_process_commit(struct sae_sm *sm, const uint8_t *from,
->   					const uint8_t *frame, size_t len)
->   {
->   	uint8_t *ptr = (uint8_t *) frame;
-> -	unsigned int nbytes = l_ecc_curve_get_scalar_bytes(sm->curve);
-> +	unsigned int nbytes;
-> +
-> +	if (sm->handshake->authenticator && sae_set_group(sm, l_get_le16(frame)) < 0)
-> +		return -1;
+>   	sm->state = SAE_STATE_ACCEPTED;
 >   
-> +	nbytes = l_ecc_curve_get_scalar_bytes(sm->curve);
->   	ptr += 2;
->   
->   	sm->p_scalar = l_ecc_scalar_new(sm->curve, ptr, nbytes);
-> @@ -824,20 +830,22 @@ static int sae_process_commit(struct sae_sm *sm, const uint8_t *from,
->   	 * it is evidence of a reflection attack) and the t0 (retransmission)
->   	 * timer shall be set.
->   	 */
-> -	if (l_ecc_scalars_are_equal(sm->p_scalar, sm->scalar) ||
-> -			l_ecc_points_are_equal(sm->p_element, sm->element)) {
-> -		l_warn("peer scalar or element matched own, discarding frame");
-> +	if ((sm->scalar && l_ecc_scalars_are_equal(sm->p_scalar, sm->scalar)) ||
-> +			(sm->element && l_ecc_points_are_equal(sm->p_element, sm->element)))
-So we isolated this check to only the supplicant side now, but do we 
-also need to do the same check after the keys are calculated for AP mode?
->   		return -ENOMSG;
-> -	}
->   
->   	sm->sc++;
->   
-> -	sae_calculate_keys(sm);
+> -	sae_debug("Sending Associate to "MAC, MAC_STR(sm->handshake->aa));
 > -
-> -	if (!sae_send_confirm(sm))
-> -		return -EPROTO;
-> -
-> -	sm->state = SAE_STATE_CONFIRMED;
-> +	if (sm->handshake->authenticator) {
-> +		sae_send_commit(sm, false);
-> +		sae_calculate_keys(sm);
-> +		sm->state = SAE_STATE_COMMITTED;
+> -	sm->tx_assoc(sm->user_data);
+> +	if (!sm->handshake->authenticator) {
+> +		sae_debug("Sending Associate to "MAC, MAC_STR(sm->handshake->aa));
+> +		sm->tx_assoc(sm->user_data);
 > +	} else {
-> +		sae_calculate_keys(sm);
 > +		if (!sae_send_confirm(sm))
 > +			return -EPROTO;
-> +		sm->state = SAE_STATE_CONFIRMED;
 > +	}
 >   
 >   	return 0;
 >   }
-> @@ -1008,7 +1016,7 @@ static int sae_verify_nothing(struct sae_sm *sm, uint16_t transaction,
->   	/*
->   	 * TODO: This does not handle the transition from NOTHING -> CONFIRMED
->   	 * as this is only relevant to the AP or in Mesh mode which is not
-> -	 * yet supported.
-> +	 * yet fully supported.
->   	 */
->   	if (transaction != SAE_STATE_COMMITTED)
->   		return -EBADMSG;
+> @@ -1059,16 +1063,24 @@ static int sae_verify_committed(struct sae_sm *sm, uint16_t transaction,
+>   	unsigned int skip;
+>   	struct ie_tlv_iter iter;
+>   
+> -	/*
+> -	 * Upon receipt of a Con event...
+> -	 * Then the protocol instance checks the value of Sync. If it
+> -	 * is greater than dot11RSNASAESync, the protocol instance shall send a
+> -	 * Del event to the parent process and transition back to Nothing state.
+> -	 * If Sync is not greater than dot11RSNASAESync, the protocol instance
+> -	 * shall increment Sync, transmit the last SAE Commit message sent to
+> -	 * the peer...
+> -	 */
+> -	if (transaction == SAE_STATE_CONFIRMED) {
+> +	if (sm->handshake->authenticator && transaction == SAE_STATE_CONFIRMED) {
+> +		/*
+> +		 * TODO: Sanity-check received Confirm frame from the client. For now
+> +		 * AP-mode SAE support is experimental and we simply accept the frame.
+> +		 * Note that the cryptographic confirm field value will still be checked
+> +		 * before replying with a Confirm frame.
+> +		 */
+> +		return 0;
+> +	} else if (transaction == SAE_STATE_CONFIRMED) {
+> +		/*
+> +		 * Upon receipt of a Con event...
+> +		 * Then the protocol instance checks the value of Sync. If it
+> +		 * is greater than dot11RSNASAESync, the protocol instance shall send a
+> +		 * Del event to the parent process and transition back to Nothing state.
+> +		 * If Sync is not greater than dot11RSNASAESync, the protocol instance
+> +		 * shall increment Sync, transmit the last SAE Commit message sent to
+> +		 * the peer...
+> +		 */
+>   		if (sm->sync > SAE_SYNC_MAX)
+>   			return -ETIMEDOUT;
+>   
