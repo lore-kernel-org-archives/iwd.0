@@ -1,59 +1,59 @@
-Received: from mail-ot1-f48.google.com (mail-ot1-f48.google.com [209.85.210.48])
+Received: from mail-qk1-f176.google.com (mail-qk1-f176.google.com [209.85.222.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E34C6159919
-	for <iwd@lists.linux.dev>; Wed, 24 Apr 2024 12:05:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF5C815AAB3
+	for <iwd@lists.linux.dev>; Wed, 24 Apr 2024 12:06:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713960356; cv=none; b=BlIqbgDfXR9un3+2zHjt07js+w+rBKvxKBs6PvNPvfJTb9Jc/LpdOKAqy618ixZJDBaw55vxZsrcfs+KaI9i4uf3sk8OwkjjhQ9UwdWds0LkQC5rQkCZqFJZFrQctvRu9q4m6skLo7qHhze5jLTLuQncJIaSQyHHSA5tGc8eMhU=
+	t=1713960363; cv=none; b=qKXd5oNqa3I6QgSymq3WYBA50XIOVl/MnBwl9uLlzdS7eT/oWPwEG6+L0BtyCkiBjz6haLZcokknxar3A6omJE1Fei+k2sm9De0PqTMSrZ8yzvkjuBhtZ82mDeNNFSEqHMHNHb8ABMltuwkhVs1VkyFZEkLDip1llHRDKs2qkt8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713960356; c=relaxed/simple;
-	bh=Xs1O5F9HglwBYGxbnzco1XAw3lw90pQGTZGr8a8T7xk=;
+	s=arc-20240116; t=1713960363; c=relaxed/simple;
+	bh=yBAiTw21g+F7pENNxahuz4wfRmxtvTKPS7a5LXQ+Aik=;
 	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=ey/1dpkm2eZP9gsXmpp5p17JtgUF8OYiZYr6gQ1MeEx0KXPk24JeI32oYAWYEfYKE3+zfy4Fnh08adanz6/noyjCejSsgm9bzoDFIM/spQKNUmnGkRlKxp3GMWsiB2TSZ7vyMYapzVNxyInpJUSsioOKyg4l5WwX4wbIrkrMz9Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TnbPTUFG; arc=none smtp.client-ip=209.85.210.48
+	 In-Reply-To:Content-Type; b=Ex2GWbqaaOIv8KqSxbymHqKnjdBosJ/ymvUxCUE94HoOlIW7FBTqukRsYDgvXaWD8pUb2zHRFW4D/+kBE0VXW3sKQv98Gc/xMIeGGSLdpyEcPwRt4KQIZN3VEXk1J5gi3vm6Eh96WmoLLFdmL0sTND1KgiJmVfcAc6+ggrnkdT4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cWlcJiiu; arc=none smtp.client-ip=209.85.222.176
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TnbPTUFG"
-Received: by mail-ot1-f48.google.com with SMTP id 46e09a7af769-6eb7ee5a776so4063671a34.3
-        for <iwd@lists.linux.dev>; Wed, 24 Apr 2024 05:05:54 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cWlcJiiu"
+Received: by mail-qk1-f176.google.com with SMTP id af79cd13be357-78ef59a369bso478562285a.2
+        for <iwd@lists.linux.dev>; Wed, 24 Apr 2024 05:06:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1713960354; x=1714565154; darn=lists.linux.dev;
+        d=gmail.com; s=20230601; t=1713960361; x=1714565161; darn=lists.linux.dev;
         h=content-transfer-encoding:in-reply-to:from:references:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=Znqdr+BxPPs6cNLUAxAKSYlLZuWN0ROIuR+E6TMB2AM=;
-        b=TnbPTUFGStRqKkQ6nqCI//DqQ34N65btRO2Ghznwi/iQ8uwzQzMCresXVLsGgcZYlS
-         /VUmnd+mq8u6lLmTjjP44LB8OfswRZhI2iHjdzG6onuJfGWgOmf7l5OLHa+ZFuQ5dpwV
-         5pnMkD9sf8/ZAUfNn/6+rqh3A8DS26XLju8/Bbc8qptSleXaZQ9aPGWdRx7mlUqnzHIp
-         OnoBxcjEfarg359c+6vhC6KptSidUPI1UU4iKK/b/V01zQKmDFbOCVId6JSB7175nEhg
-         DhI7JL+nof6JEyXSdiUjCIRRLctb09D7fFpSCEiM9eO9FRJrsGOJPJHY2gViefmQlxWb
-         EZKw==
+        bh=6W1p5069DQxfRMJnazxDe8KW1SHIiK/hJO2/WdUI00E=;
+        b=cWlcJiiusvlIHBXF0e/iZX0cCYLQfl60lVcpXftoZjkJy+yowIZTIGo2H6b1EA7eSR
+         8mg2leJ+4G6BFeXvYDMv5amLd6oecuiAZtWPfPIZWGKjFwzjmzQDU7e6kdsGTJnCz5N4
+         wpEn2dRnjD82ibQYPCxTo6Tv6pP8MncI9OinnkTOalv7RMax8dDCYy+jspQTpv1+tHjf
+         KZEU6u0+5E0ZuLRLTv3M91o0gRh6rQpDBkGJndbyK6wdjk4LT2EgTjYfCLZ7aIUoPzxK
+         Blj4ms+QkoRDufOdwRYh8DeZKNQuewNOrgGc3gQ0y/UlYvg8bm4e+n+5nJ/Lsdag/aHe
+         dG9g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713960354; x=1714565154;
+        d=1e100.net; s=20230601; t=1713960361; x=1714565161;
         h=content-transfer-encoding:in-reply-to:from:references:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Znqdr+BxPPs6cNLUAxAKSYlLZuWN0ROIuR+E6TMB2AM=;
-        b=CUegqpsiJOG5a45eoYGRP7hxkbHtkEku2MJVfiPL0GsAr8bTp8MpZ3pTSHSrjVUHU9
-         4W1n6OpEyxD7J7s6+yh9h5p1qST7DWy7xmJmfuaAvkKAb0tRyYvfg92KsW4kiEEFuzHN
-         AiC5Kbh+uMrm4hjc8W8ybXeUMQ/RK9h4Ar8xlQzBRG13z5rFLQLkfnEvwU/a+nT0fxNw
-         HnxsNwLLhSXwBuZeYDuNZRvA0esavb3wfp1HBQW6/VScRIG/yhHPtk8hK5LkwPuiVWGg
-         0+cCYhkCUJWpkEP0k27Axv4vHXHZp28dxLD3dV3YFfC75OoWozWD4quCTolU7SLdFkZM
-         421A==
-X-Forwarded-Encrypted: i=1; AJvYcCW3tluAeUvbzVe34VS7VLSftgjE6+ysPQYoxxst2O9bey/bllaqecjnlCZ6VhYYbIc8+77FXUUG9gBnLU60wAYZvcGM
-X-Gm-Message-State: AOJu0YxtKbKIIYwYxQ+sctPABAmd4jXuCOGtxVI1Eg039/5nSzP3t41B
-	xX5gdYopwG7sU57OYkbxEBmZchiKW5Br6+AMgmR6/t3XG+CjQ6Uq
-X-Google-Smtp-Source: AGHT+IEHgGUlFex7ZZkiEBm8yS5M3hvB9VckU6lqxs0TbbjIka2YuMQcph3j3WvuoOgqlrAxN4p1Rw==
-X-Received: by 2002:a05:6808:68b:b0:3c7:4c0e:5389 with SMTP id k11-20020a056808068b00b003c74c0e5389mr2006742oig.14.1713960353861;
-        Wed, 24 Apr 2024 05:05:53 -0700 (PDT)
+        bh=6W1p5069DQxfRMJnazxDe8KW1SHIiK/hJO2/WdUI00E=;
+        b=R7u9r+WoU+9J6QwW1dBb4DvxMJNmVbyPlpSQ/NULjkT2JVh/1BWCDs07pAcHHdQ2yv
+         RH+Yv2/6d89IL4OIdkNYeMH9mCN4DOhETGbfzQG3xmh99xWb3NOCMq9iEvZ+ehCLYJvA
+         SS4e30DSRLczGQpGBVffsI3zS0WQjg2HdiGxeER14QxYk22XMF3gJeCTzqTil+PWzPDD
+         6C25OIMwiCHFaQL70ynHAKU3RAyF8dZ5sLlQXuSdG9NGZ2czyzNx1sNGUoDrMeKbtrql
+         KEaVf27hKdqHj9Bv41PK/1ZnF/4SLCaNGh62IbyZphOyAqAPRH98HdGQCtNHFyypjpXR
+         erlA==
+X-Forwarded-Encrypted: i=1; AJvYcCV1zUv7LbGcnXK6eaw2PMo82Hm1H5d0UzFwI/WxUC/jCTlEz3RhomAKNpDd8lub7vIBKSNtsD8soAqIV0S3DJiyoL/t
+X-Gm-Message-State: AOJu0Yxmge6M4Rdn39edc+aM2yqXCmfR7LmYdfPW0981YwfEDh+g9eMR
+	jWskRMuATVpTFTpZq36kXN3WtnollpOm21ae8q5Qa1QxOSGvRt1+
+X-Google-Smtp-Source: AGHT+IE7KzJScPyvvY7+sKbPEoY4TJh8OW3pf/5M4YBC+jczbkunvYd0VNuBHRIm3bFsPI3Cb07BHQ==
+X-Received: by 2002:a0c:e6e8:0:b0:6a0:6bf1:446f with SMTP id m8-20020a0ce6e8000000b006a06bf1446fmr2612886qvn.48.1713960360701;
+        Wed, 24 Apr 2024 05:06:00 -0700 (PDT)
 Received: from [10.102.4.159] ([208.195.13.130])
-        by smtp.gmail.com with ESMTPSA id r15-20020a0c8d0f000000b006a045780b77sm3393748qvb.51.2024.04.24.05.05.53
+        by smtp.gmail.com with ESMTPSA id r15-20020a0c8d0f000000b006a045780b77sm3393748qvb.51.2024.04.24.05.05.59
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 24 Apr 2024 05:05:53 -0700 (PDT)
-Message-ID: <1e152991-95dc-4348-9723-ff5de9fcf9c4@gmail.com>
-Date: Wed, 24 Apr 2024 05:05:52 -0700
+        Wed, 24 Apr 2024 05:06:00 -0700 (PDT)
+Message-ID: <b6a5cd74-57a4-4d45-908a-ed7894ce950a@gmail.com>
+Date: Wed, 24 Apr 2024 05:05:59 -0700
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
@@ -61,88 +61,73 @@ List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 02/11] ap: accept PSK/SAE in auth depending on config
+Subject: Re: [PATCH 03/11] sae: add function sae_set_group
 Content-Language: en-US
 To: John Brandt <brandtwjohn@gmail.com>, iwd@lists.linux.dev
 References: <20240421125050.6649-1-brandtwjohn@gmail.com>
- <20240421125050.6649-3-brandtwjohn@gmail.com>
+ <20240421125050.6649-4-brandtwjohn@gmail.com>
 From: James Prestwood <prestwoj@gmail.com>
-In-Reply-To: <20240421125050.6649-3-brandtwjohn@gmail.com>
+In-Reply-To: <20240421125050.6649-4-brandtwjohn@gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 Hi John,
 
 On 4/21/24 5:50 AM, John Brandt wrote:
-> On reception of an authentication frame, accept both PSK and SAE as AKM
-> depending on the config. Save the client's AKM for later use.
+> Refactor code by adding function sae_set_group. This will make the next
+> commits easier where basic SAE support for APs is added.
 > ---
->   src/ap.c | 28 +++++++++++++++++++++-------
->   1 file changed, 21 insertions(+), 7 deletions(-)
+>   src/sae.c | 23 ++++++++++++-----------
+>   1 file changed, 12 insertions(+), 11 deletions(-)
 >
-> diff --git a/src/ap.c b/src/ap.c
-> index d50f9e4f..14268551 100644
-> --- a/src/ap.c
-> +++ b/src/ap.c
-> @@ -132,6 +132,7 @@ struct sta_state {
->   	uint8_t *assoc_ies;
->   	size_t assoc_ies_len;
->   	uint8_t *assoc_rsne;
-> +	enum ie_rsn_akm_suite akm_suite;
->   	struct eapol_sm *sm;
->   	struct handshake_state *hs;
->   	uint32_t gtk_query_cmd_id;
-> @@ -2606,6 +2607,7 @@ static void ap_auth_cb(const struct mmpdu_header *hdr, const void *body,
->   	const uint8_t *from = hdr->address_2;
->   	const uint8_t *bssid = netdev_get_address(ap->netdev);
->   	struct sta_state *sta;
-> +	enum ie_rsn_akm_suite akm_suite;
+> diff --git a/src/sae.c b/src/sae.c
+> index bf9fb0ff..c133386f 100644
+> --- a/src/sae.c
+> +++ b/src/sae.c
+> @@ -148,6 +148,16 @@ static void sae_reset_state(struct sae_sm *sm)
+>   	sm->pwe = NULL;
+>   }
 >   
->   	l_info("AP Authentication from %s", util_address_to_string(from));
->   
-> @@ -2627,17 +2629,27 @@ static void ap_auth_cb(const struct mmpdu_header *hdr, const void *body,
->   		}
->   	}
->   
-> -	/* Only Open System authentication implemented here */
-> -	if (L_LE16_TO_CPU(auth->algorithm) !=
-> -			MMPDU_AUTH_ALGO_OPEN_SYSTEM) {
-> +	if ((ap->akm_suites & IE_RSN_AKM_SUITE_SAE_SHA256) &&
-> +	    (L_LE16_TO_CPU(auth->algorithm) == MMPDU_AUTH_ALGO_SAE) ) {
-> +		/* When using SAE it must be COMMIT or CONFIRM frame */
-> +		if (L_LE16_TO_CPU(auth->transaction_sequence) > 2) {
-Probably want to explicitly check for a transaction of 1 or 2. This 
-allows zero.
-> +			ap_auth_reply(ap, from, MMPDU_REASON_CODE_UNSPECIFIED);
-> +			return;
-> +		}
-> +		akm_suite = IE_RSN_AKM_SUITE_SAE_SHA256;
-> +	} else if ((ap->akm_suites & IE_RSN_AKM_SUITE_PSK) &&
-> +		   (L_LE16_TO_CPU(auth->algorithm) == MMPDU_AUTH_ALGO_OPEN_SYSTEM) ) {
-> +		/* When using PSK it must be Open System authentication */
-> +		if (L_LE16_TO_CPU(auth->transaction_sequence) != 1) {
-> +			ap_auth_reply(ap, from, MMPDU_REASON_CODE_UNSPECIFIED);
-> +			return;
-> +		}
-> +		akm_suite = IE_RSN_AKM_SUITE_PSK;
-> +	} else {
->   		ap_auth_reply(ap, from, MMPDU_REASON_CODE_UNSPECIFIED);
->   		return;
->   	}
->   
-> -	if (L_LE16_TO_CPU(auth->transaction_sequence) != 1) {
-> -		ap_auth_reply(ap, from, MMPDU_REASON_CODE_UNSPECIFIED);
-> -		return;
-> -	}
->   
->   	sta = l_queue_find(ap->sta_states, ap_sta_match_addr, from);
->   
-> @@ -2666,6 +2678,8 @@ static void ap_auth_cb(const struct mmpdu_header *hdr, const void *body,
->   	if (!ap->sta_states)
->   		ap->sta_states = l_queue_new();
->   
-> +	sta->akm_suite = akm_suite;
+> +static int sae_set_group(struct sae_sm *sm, int group)
+> +{
+> +	sae_debug("Using group %u", group);
 > +
->   	l_queue_push_tail(ap->sta_states, sta);
+> +	sm->group = group;
+> +	sm->curve = l_ecc_curve_from_ike_group(group);
+We need to check if the group was supported. For this set it doesn't 
+matter since your only using the static set of groups, but patch 5 uses 
+the raw frame which may be a bogus/unsupported group number.
+> +
+> +	return 0;
+> +}
+> +
+>   static int sae_choose_next_group(struct sae_sm *sm)
+>   {
+>   	const unsigned int *ecc_groups = l_ecc_supported_ike_groups();
+> @@ -166,9 +176,7 @@ static int sae_choose_next_group(struct sae_sm *sm)
+>   		sae_debug("Forcing default SAE group 19");
 >   
->   	/*
+>   		sm->group_retry++;
+> -		sm->group = 19;
+> -
+> -		goto get_curve;
+> +		return sae_set_group(sm, 19);
+>   	}
+>   
+>   	do {
+> @@ -182,14 +190,7 @@ static int sae_choose_next_group(struct sae_sm *sm)
+>   	if (reset)
+>   		sae_reset_state(sm);
+>   
+> -	sm->group = ecc_groups[sm->group_retry];
+> -
+> -get_curve:
+> -	sae_debug("Using group %u", sm->group);
+> -
+> -	sm->curve = l_ecc_curve_from_ike_group(sm->group);
+> -
+> -	return 0;
+> +	return sae_set_group(sm, ecc_groups[sm->group_retry]);
+>   }
+>   
+>   static int sae_valid_group(struct sae_sm *sm, unsigned int group)
