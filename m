@@ -1,224 +1,173 @@
-Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com [209.85.210.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-008cba01.pphosted.com (mx0a-008cba01.pphosted.com [148.163.135.235])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACABB5CB0
-	for <iwd@lists.linux.dev>; Mon,  6 May 2024 00:51:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.170
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714956676; cv=none; b=S1+/s20mD/hieaUkHoRZmw8LB3YgHM+MZth0jJ8EwR39wZAbLyjyHVAAnvd0rhwBts6pII8c/HekdgHYZ+P0k9wNbGojK/NMpkJ/90b84jcM929DmpcFwe0vmoamjuo4wZJnEms6vnUl6x0EvDQHrJ+BTELnrXsQtoz4uQGTmxg=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714956676; c=relaxed/simple;
-	bh=g13A95xIBuvnuaDLoK6acafqHx9DsXHsiO9kPwfiOmQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=C2Hl+16x20WCJIv8M4hJHv12jkEjPwY/4NmBDewS39QFEO5BFuFB7+qqAPFGHBuytUS/Ae8uvwCeNZnDRCPbMCALJgCVBYS/diOxTPuY5sgVvILEaOGUFspoqAw2mVP0EK0Xhbh5f+A8gNhnq4/aJKL2UtrOWKEugEz10f+Njs0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZFRZlf4z; arc=none smtp.client-ip=209.85.210.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A87804642B
+	for <iwd@lists.linux.dev>; Mon,  6 May 2024 13:44:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=148.163.135.235
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1715003084; cv=fail; b=SClL0ecFt0J0iPzlEl5KlhLSF+Z0n85Ww4enybM8qXYsJxsldzyWJ2d/RZ1WbZjI3wQPWDQG73rjwMqUVxIE4OoGskYAbDRQLug2Nh9tHP64HLgs+v8cPRiqwG4bmcFGK5itssjaVrsdO1GCGtccGz97Np69UYBpJo3i3iYA9yw=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1715003084; c=relaxed/simple;
+	bh=J/1fEjFqBVpjk7vxlyHFYVhbMh52hgzsMSVQQszfj6A=;
+	h=From:To:Subject:Date:Message-ID:Content-Type:MIME-Version; b=WJMBHak/WPJWkzNJugZOus2dY7R/D8wIssiICZcW55MHBBHXXlzLurdDr3NTlF+K8OoLvSxUHaHKjU5jnB1U2nH1PDgLCKwRMf9Zv2sg5LbB1mGipHcR98hOpPxu0x3wVlbv7c7fFz3OUbWusONHiTMjgFDg/xtZhChJM08iQBQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=midmark.com; spf=pass smtp.mailfrom=midmark.com; dkim=pass (2048-bit key) header.d=midmark.com header.i=@midmark.com header.b=blkQopeK; arc=fail smtp.client-ip=148.163.135.235
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=midmark.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=midmark.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZFRZlf4z"
-Received: by mail-pf1-f170.google.com with SMTP id d2e1a72fcca58-6f30f69a958so805759b3a.1
-        for <iwd@lists.linux.dev>; Sun, 05 May 2024 17:51:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1714956674; x=1715561474; darn=lists.linux.dev;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=8p6aGW2BhpL/FR3VvsYOv36Uqn0LWX592NCfsKCEaCo=;
-        b=ZFRZlf4zfzW7Kh2GUBBtm9u8E7dTkvABdGM7f53WbX+NeeHACZu3xVk+TVdrIKHdZk
-         pBsCkQygt3lDtC1MZF6qZbA6rN1hQucsO4mS/236s3c/e4OAzvWU5RX2IaQUI6qSTxXp
-         JxIelQomjhYSB2fyAiXuRiL9AcDrcPjOuEDZ03KziN/y7FI5L4p5xQKOyfJlQBBq2cUo
-         Gis2wV/PDXIMW5Xalz1XQRP62asJlirGwSUsx0gU1Q324C4ugazxrCxUxG8+v6NTt8z9
-         ETuOwh7f4iP6PXv8RqYTCyosOo3bWSizU6LKiL8iObA7YYgYKSib3BEkARpH/ZUXgZch
-         4bJg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714956674; x=1715561474;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=8p6aGW2BhpL/FR3VvsYOv36Uqn0LWX592NCfsKCEaCo=;
-        b=E0fCx+ZLXt21EGckvnVM7bH4GA9DS3xOnUxl2oF40YrmcDoL0UtFqjS9MJBtXPc+9V
-         kLhXApSxjzfqPny4pTTf1F9+3Lzr8aG2xi8r5lmfqzx15Za9U74PC+SSLTJaAYrlgJ14
-         gDrDhLT818yCYpXkhDyxZD43phFYL7TL+xLOMqmR2Wf3RHgimI2880Z8RvJDbXS3lLSL
-         Y2NEer70150VVKUOwFCYgYQbRA6lJclAxf1HJezfvje2AqLjF+PB2mvWwCoRu9vT7iaY
-         ZGUJE+/XZ1LNCOJjgxwiYhSg+gr21bK7oA6+k4+3/7+73HVwcHaxHiDWrULrngs13Ass
-         naEA==
-X-Gm-Message-State: AOJu0YxrRD1bP23hGcjh0zpRlPGa/A30q89Pk/dcFaZQyCOastR1NBrh
-	9UDzGYpF1Fu9DkfTWKmz/xPxRHMq/Q+nfhS2MkImEhxaomsevIjHYGT9yw==
-X-Google-Smtp-Source: AGHT+IHshjHc9BqrdZtgCCyZiDCmncs62X86iidhuCdPMfuJPuPUWiqueYAgnyuhfYicL7EmSxvOkw==
-X-Received: by 2002:a05:6a21:6d99:b0:1a7:a72c:6f4 with SMTP id wl25-20020a056a216d9900b001a7a72c06f4mr9685679pzb.41.1714956673706;
-        Sun, 05 May 2024 17:51:13 -0700 (PDT)
-Received: from localhost ([192.145.118.41])
-        by smtp.gmail.com with ESMTPSA id u15-20020a170902e5cf00b001e223b9eb25sm7024531plf.153.2024.05.05.17.51.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 05 May 2024 17:51:13 -0700 (PDT)
-From: John Brandt <brandtwjohn@gmail.com>
-To: iwd@lists.linux.dev
-Cc: John Brandt <brandtwjohn@gmail.com>
-Subject: [PATCH v2 18/18] ap: propogate IGTK and RSC to handshake
-Date: Sun,  5 May 2024 17:30:41 -0700
-Message-ID: <20240506003518.320176-19-brandtwjohn@gmail.com>
-X-Mailer: git-send-email 2.45.0
-In-Reply-To: <20240506003518.320176-1-brandtwjohn@gmail.com>
-References: <20240506003518.320176-1-brandtwjohn@gmail.com>
+	dkim=pass (2048-bit key) header.d=midmark.com header.i=@midmark.com header.b="blkQopeK"
+Received: from pps.filterd (m0372074.ppops.net [127.0.0.1])
+	by mx0a-008cba01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 446AtJFO017776
+	for <iwd@lists.linux.dev>; Mon, 6 May 2024 09:16:25 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=midmark.com; h=
+	from:to:subject:date:message-id:content-type
+	:content-transfer-encoding:mime-version; s=pps1; bh=3/OMoiXQ8QWU
+	7Rsoh+eplI6yDsGB2wjGfBEDvIl7he4=; b=blkQopeKxpkN05wud8Q7H/9TE+ZG
+	OxOD/71CZSfSG2WdSTu+X70Q9/Zh5gROgn7Ztv7QSMYwZe3Xe/D/yLfAXb8lYVbh
+	LkIyTv/FmkE2dWquSOjTEgt+G7tmOhhaBvdtoWS2Y2ujBGBjL28bvMEsQvWTJwA9
+	2kwtvexHPhPZXPvylj9gP//USR8UnfCZNnQdNcAcC465iTaGEZ/OuY+ijwSOmcEu
+	6nDEbaFfC+nHVa4bsoTugb93bw3MxbbYQIfKbapssXOlD6U9j5e5AfdNpi+2iFZb
+	Hj1uLHNwKXCHMtZoiyOqOXoZ2T5umcMAN4Gy7Qlt8Q81j37Xw4ORfMy1JA==
+Received: from nam12-bn8-obe.outbound.protection.outlook.com (mail-bn8nam12lp2169.outbound.protection.outlook.com [104.47.55.169])
+	by mx0a-008cba01.pphosted.com (PPS) with ESMTPS id 3xx65trn2x-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <iwd@lists.linux.dev>; Mon, 06 May 2024 09:16:25 -0400 (EDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=f0RQIBa9NmXYxPnH+BWIPgym3+L6e8/DdznUu0ytIpttngEv1nuTXxckEccca9rRv7eNAtjhlrM1gVm6vVf1xBy0P/S2LblxSaNpvIIie0xkiZtN5rbAQI2Ija0FTp8uExGZeRAuNQTZrczWQ9rz61IHIJ8LiIuCcuxuidKb7adaOfB0MkoTlcuzlIaGa6hitflat3cwe1bv+oNCUimgzmiujvYOmEktl8UMgHIRVvC7un5EhZgvp3vOOI5rzaRsWS06gwHcvnlcCTMxtIlvR7+B3pODr0MZrJ64Ky2dFzdD5KgMbIAYf426wvFE8vAstSiRH7ZiDAEvNDOk06CweQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=3/OMoiXQ8QWU7Rsoh+eplI6yDsGB2wjGfBEDvIl7he4=;
+ b=UtwwES0vuhyZY3Q0agyLw5XZfCqtN/B4QxII89ZCxfzCnJkt3E9Zpa2027Pm+WsM2rWkyUsC4EU3uUARUWmI4wAFr4tmcKOIly2zXrAbnYljsuGttbyKNBGrKjfgoQA5wzPAnsnX6USIU3DXZTBksuUcwZNju2qTV/6nSOWwFcWQpuCkui5m4zGskcaVbZMBMMHl+1gcFRzEymVSzrLlGp0kFNTXwvu2GiDnuzqQmzONqXU/Pf1MNjGvF+SgPL2ddW6ysiWfbEk29+4h5rh1ThhdutMageP9b6/AigMvCqWa47x1gwSv1K3mbC/WcZgJrG25hgJzyHv7+ZMzYwlcFQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=midmark.com; dmarc=pass action=none header.from=midmark.com;
+ dkim=pass header.d=midmark.com; arc=none
+Received: from LV8PR08MB9350.namprd08.prod.outlook.com (2603:10b6:408:1f9::14)
+ by DM3PR08MB9013.namprd08.prod.outlook.com (2603:10b6:0:49::20) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7544.41; Mon, 6 May
+ 2024 13:16:20 +0000
+Received: from LV8PR08MB9350.namprd08.prod.outlook.com
+ ([fe80::7973:5566:a047:872b]) by LV8PR08MB9350.namprd08.prod.outlook.com
+ ([fe80::7973:5566:a047:872b%5]) with mapi id 15.20.7544.041; Mon, 6 May 2024
+ 13:16:20 +0000
+From: Michael John <MJohn@midmark.com>
+To: "iwd@lists.linux.dev" <iwd@lists.linux.dev>
+Subject: Getting list of found networks
+Thread-Topic: Getting list of found networks
+Thread-Index: AQHan7ePre4eCmlnGkWJ2z4c7hs7Hw==
+Date: Mon, 6 May 2024 13:16:20 +0000
+Message-ID: 
+ <LV8PR08MB9350F79243154C9930EFC4BEAE1C2@LV8PR08MB9350.namprd08.prod.outlook.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+msip_labels: 
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: LV8PR08MB9350:EE_|DM3PR08MB9013:EE_
+x-ms-office365-filtering-correlation-id: 909b3276-110d-428b-3dba-08dc6dceb896
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230031|366007|376005|1800799015|38070700009;
+x-microsoft-antispam-message-info: 
+ =?iso-8859-1?Q?bt94Do8J/WjMBzgSfjafB4aYqI6GSMb+FbQBssDaAtnO4P3IDC7fYhY75/?=
+ =?iso-8859-1?Q?kjs6gNNLyxjllMULSP2xeQ3PWTpOCVSKzBxUdTtyVOABI4Ph4DcJgC1Meg?=
+ =?iso-8859-1?Q?8jkX4Rfgz8YkjrKfJyboqzdlLpOMt0XGj3oK90o08zxV0IX97wtuwETvGg?=
+ =?iso-8859-1?Q?QpS7tltv1Sk/03IFr9hh0tzjpQcHvmVL4a4+JERjT822x1t36gRBcaDdqo?=
+ =?iso-8859-1?Q?hQxZx6hReq87qSXIBTzjaUUTBcb3WnPYVvyusfKyhTLguXXS0VkCEQJC7y?=
+ =?iso-8859-1?Q?uKpPVs2GsJl63Hm/9hKJ3ru0LmDLDZrr10KkJSXa6DK/uQ0vCSWWhJD+2A?=
+ =?iso-8859-1?Q?LzlqgZHp1Ow9Pa2XsOwSLBTPndfvvdF2UZf/PxRGKH6LsNPk7xZp+yfcRM?=
+ =?iso-8859-1?Q?NXzoMa+HFQHJmiHJGtSbHSK8I+0AlII0FW6Gl8gld6RF3urSZHpqbqdqsI?=
+ =?iso-8859-1?Q?4uuOZMMrseiX2i0TtGqhSur4DAvpwcvsu/rtqOk1l/EaSlHEs6G+fU9MVm?=
+ =?iso-8859-1?Q?wzeemR2+FveWqjDTu4vG2PoaVwXL5pt2JEmgmrPkFbSsz2Y688KkROzDMR?=
+ =?iso-8859-1?Q?ZFZQ9YNjPScdwey9KN2KaezUT2D662el2RRc23g6T1eUmrDrqepA+P93qU?=
+ =?iso-8859-1?Q?e/IJItHsu+skV74fihe9Ole988JOSM98wHqA0a8S1D0gLffodnNRn8cANi?=
+ =?iso-8859-1?Q?AyaWGtpeKCR+t32ESal/cvD0Xu95LLj8cGA4z6cUxLCAyuRf5Hqy5NFMN9?=
+ =?iso-8859-1?Q?+EfVMWwPKT7BkkqKm9XYCHREmsKbV9164rabw70OG1fqIftJBa+OZIpkEa?=
+ =?iso-8859-1?Q?LB5X9s03tE4Pi+2x5XQYDOT/vb6rbF8voApi6vMuIdb2mTjDCJgjvCANQg?=
+ =?iso-8859-1?Q?dptcnjn1OvywzeNwn9tUIqbz1uysrEvITEytZbvYK3Jr4m+n3It5ZciLS3?=
+ =?iso-8859-1?Q?VRrhkJL3NgcIgVjrUcWc5CJeOEVB/FMbty9BEQIo9gN3GKbn20y+WMquiI?=
+ =?iso-8859-1?Q?9DC8II2ywv8PJeo0m0MHL4Rg16V/AMyZMDlOn0H+YIBxt7FYiVRmHKPZSq?=
+ =?iso-8859-1?Q?Autegce4JJc3OUyV67O3vD62e1KyhcBH6lN6+/ok71+OcpdGmd6sp4RcCo?=
+ =?iso-8859-1?Q?BGLxGL/T+hJjTn5LXU0WFngHsEpwP8uKQy9XEEgk6PERr0qRw1ZYsSq5hG?=
+ =?iso-8859-1?Q?McEP/C8/ylvI/dXl00V126c5E4Z0L6a3JfpEVXl2ekgeuRbGK4gvdTJZNY?=
+ =?iso-8859-1?Q?XBs73v9Po43LFo5g6sqfsheqlI0WXJY15Aes663lhT5hBtPav9XOIVjrwW?=
+ =?iso-8859-1?Q?YG8FxiYsAXigr55iLZdUgm1Aw+Z1hNsRO4PySzxU4gsb45V+X8C/7+fQB3?=
+ =?iso-8859-1?Q?dZl9W01akeyEn9xGy3mGCOhfUzJ4StWA=3D=3D?=
+x-forefront-antispam-report: 
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV8PR08MB9350.namprd08.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366007)(376005)(1800799015)(38070700009);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: 
+ =?iso-8859-1?Q?mrvrgfognVlvQCjcOig6XIK+A9kPmWcjTrFp7VdycKgYD05oCnToT7OxdC?=
+ =?iso-8859-1?Q?XDXeUSHrHmgCLVDglCsdQ86MRTI+zL84mh70JhxpsxhIcuxbKkTxNofwrr?=
+ =?iso-8859-1?Q?wQT/uLAZ+c59JHdCTkLIkzNGfsleKzOMf0nfI4DHjWWQR8LrDlSJCI5QFi?=
+ =?iso-8859-1?Q?e8wRWHxA+KXFy51ntBcMg+X3YX7A63E2VgmP5nm6BqsdtPHOho7OFh2nf3?=
+ =?iso-8859-1?Q?fZ3hf2DYKCMf5eXjHJ4rSd1Ay+l7TRaGcPToBIITvG52E+rTFUWU4Pnpce?=
+ =?iso-8859-1?Q?cOPbEhcJzdLyN76m6MlROMQgskPKxmkR4QoYb1NkP811MI35ha745YbxJG?=
+ =?iso-8859-1?Q?UoA2dGVcCC47RyC0TCsbMpkclon732CWhndlpHB44QAeoVGt8sjP+KODdE?=
+ =?iso-8859-1?Q?MSH5bEtQziNp+WZfjwqyaKkisGkJLMDS57RqBwoklMPQ4V9KHyohttp+s9?=
+ =?iso-8859-1?Q?btuEJaqQCEJHRE+vN1uzdPidHVYtnbWUwDsBAIwcOiXlBCLIL9SSc//Y/v?=
+ =?iso-8859-1?Q?exsvPm4nw3BLUePtsXizWfAXWyf73oLjIcs8SSd7TpzFj8Hcq9OFHpGdjo?=
+ =?iso-8859-1?Q?YmN7acTz7a4zTxtFdzCOFv4A0sUn/GZNyuFzY8XQk7qv0TXs0qLipJv7Pq?=
+ =?iso-8859-1?Q?lv0OpieS8F9CON07VwsXdLck7k12Lq1Xu+jH+7/WVd+x18Qlq+YT4iorpX?=
+ =?iso-8859-1?Q?RTC+NLWTu52wY1IiXqD5ic06lQGkv3na4OMI5VWbAhE+FQTUG+MEs63NOi?=
+ =?iso-8859-1?Q?K4J/bhBQrOSSW8vniJcdCTf+9hSu0VIYGcbL171wNE1k9HNgF1ZWGX0OG5?=
+ =?iso-8859-1?Q?VY4ScaLeFKElOaknSclAxCMVhQCBjGmnANsdWi5xHPC4Bh+Z+ZX8ThTqYV?=
+ =?iso-8859-1?Q?6Vzxfxn6M/83EMqliiffnOwET3pD6aqhXvo3fAFVmanmsVP6/uWduHxiDc?=
+ =?iso-8859-1?Q?tVGCTH7SXO5C6o3Ajm7T/M8GesQlwuYp7zKokatnN09U5s7cDYV4oHZ7Wh?=
+ =?iso-8859-1?Q?3cky5R9lLD3lSilUsrfHVisABVvAOmOf1tJlkcVBy9lW1ZqoYTI7BtXDXA?=
+ =?iso-8859-1?Q?/qkG/UORtBCzRbFaNovoGZiNLaOLWJEegl2hza4dJeLYL35EOAzeJFOaza?=
+ =?iso-8859-1?Q?kHAKKzhHZeLLpl+FlEO5z93RWnhurf2rew28sHhdc90ErJFagkxJi9F2qq?=
+ =?iso-8859-1?Q?qpivO7ElTU+wpSXGfDhwTJKhqzUXIfeK+zWCkjaH0GCZzcWD3Lk9feldOv?=
+ =?iso-8859-1?Q?ieK8OBHsjZToKo0Z/3bRI3Xg0vAFsJxsC1mRbu0AVoERMNS3VaSKVIQFI3?=
+ =?iso-8859-1?Q?myZYlaH84lIbBtdzOaZlpMDOtuD5jnQMnu4F/xbZRpTNmCByUim1/YB+pv?=
+ =?iso-8859-1?Q?90dHqFM0pLMv58rA8u4Sp9rTbTvyUcbjCiiwGZMCX0gDayVbSU7GsxCbWy?=
+ =?iso-8859-1?Q?xLyEnop8bjcpS6NYfp9Qntj2UOXMbEsx9ioySnWGUkgg2/STrsDC+PSGmr?=
+ =?iso-8859-1?Q?mvqCcUH4j735WQUYeP6qZY9GOqOWyhPMn4Jotlpjorzgm47cwUplpGa8/m?=
+ =?iso-8859-1?Q?hsAp13wi0hbE8gZdBqg+SFuLq/rxdS7M58+S41zv19az7scIk4KRsO+YNG?=
+ =?iso-8859-1?Q?Nw64TPNR+ZNNA=3D?=
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-OriginatorOrg: midmark.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: LV8PR08MB9350.namprd08.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 909b3276-110d-428b-3dba-08dc6dceb896
+X-MS-Exchange-CrossTenant-originalarrivaltime: 06 May 2024 13:16:20.7221
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 3c2a020d-f343-4ca1-b6ef-91768380352f
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 1j0K2Z3wN1GP+lJmWtCiMO93HXf2QWBG+9caiJpFATkh7jiGrW40HPYh7iO/Le231t9qrHyOYdLbczRPsn8AkA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM3PR08MB9013
+X-Proofpoint-GUID: D-PSwg-bVeGuBKuWX6UQXQFM2NSimXn5
+X-Proofpoint-ORIG-GUID: D-PSwg-bVeGuBKuWX6UQXQFM2NSimXn5
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1011,Hydra:6.0.650,FMLib:17.11.176.26
+ definitions=2024-05-06_08,2024-05-06_01,2023-05-22_02
 
-When a client is connecting, remember whether it supports MFP, and if
-so, propogate the IGTK to the handshake. Also get the current Receive
-Sequence Counter (RSC) of the IGTK and propogate it to the handshake.
----
- src/ap.c | 61 +++++++++++++++++++++++++++++++++++++++++++++++---------
- 1 file changed, 52 insertions(+), 9 deletions(-)
+Hi,
 
-diff --git a/src/ap.c b/src/ap.c
-index f598c173..c7ca49e8 100644
---- a/src/ap.c
-+++ b/src/ap.c
-@@ -144,6 +144,7 @@ struct sta_state {
- 	struct eapol_sm *sm;
- 	struct handshake_state *hs;
- 	uint32_t gtk_query_cmd_id;
-+	uint8_t prev_igtk_rsc[6];
- 	struct l_idle *stop_handshake_work;
- 	struct l_settings *wsc_settings;
- 	uint8_t wsc_uuid_e[16];
-@@ -154,6 +155,7 @@ struct sta_state {
- 
- 	bool ht_support : 1;
- 	bool ht_greenfield : 1;
-+	bool mfp : 1;
- };
- 
- struct ap_wsc_pbc_probe_record {
-@@ -1379,7 +1381,7 @@ static uint32_t ap_send_mgmt_frame(struct ap_state *ap,
- 	}))
- 
- static void ap_start_handshake(struct sta_state *sta, bool use_eapol_start,
--				const uint8_t *gtk_rsc)
-+				const uint8_t *gtk_rsc, const uint8_t *igtk_rsc)
- {
- 	struct ap_state *ap = sta->ap;
- 	const uint8_t *own_addr = netdev_get_address(ap->netdev);
-@@ -1401,6 +1403,9 @@ static void ap_start_handshake(struct sta_state *sta, bool use_eapol_start,
- 	if (gtk_rsc)
- 		handshake_state_set_gtk(sta->hs, sta->ap->gtk,
- 					sta->ap->gtk_index, gtk_rsc);
-+	if (sta->mfp && igtk_rsc)
-+		handshake_state_set_igtk(sta->hs, sta->ap->igtk,
-+					 sta->ap->igtk_index, igtk_rsc);
- 
- 	if (ap->netconfig_dhcp)
- 		sta->hs->support_ip_allocation = true;
-@@ -1506,7 +1511,8 @@ static void ap_handshake_event(struct handshake_state *hs,
- 	va_end(args);
- }
- 
--static void ap_start_rsna(struct sta_state *sta, const uint8_t *gtk_rsc)
-+static void ap_start_rsna(struct sta_state *sta, const uint8_t *gtk_rsc,
-+			  const uint8_t *igtk_rsc)
- {
- 	/* this handshake setup assumes SAE or PSK network */
- 	if (sta->hs && sta->akm_suite == IE_RSN_AKM_SUITE_SAE_SHA256) {
-@@ -1521,7 +1527,7 @@ static void ap_start_rsna(struct sta_state *sta, const uint8_t *gtk_rsc)
- 	handshake_state_set_event_func(sta->hs, ap_handshake_event, sta);
- 	handshake_state_set_supplicant_ie(sta->hs, sta->assoc_rsne);
- 
--	ap_start_handshake(sta, false, gtk_rsc);
-+	ap_start_handshake(sta, false, gtk_rsc, igtk_rsc);
- }
- 
- static void ap_gtk_query_cb(struct l_genl_msg *msg, void *user_data)
-@@ -1546,13 +1552,48 @@ zero_rsc:
- 		gtk_rsc = zero_gtk_rsc;
- 	}
- 
--	ap_start_rsna(sta, gtk_rsc);
-+	ap_start_rsna(sta, gtk_rsc, sta->prev_igtk_rsc);
- 	return;
- 
- error:
- 	ap_del_station(sta, MMPDU_REASON_CODE_UNSPECIFIED, true);
- }
- 
-+static void ap_igtk_query_cb(struct l_genl_msg *msg, void *user_data)
-+{
-+	struct sta_state *sta = user_data;
-+	struct ap_state *ap = sta->ap;
-+
-+	const void *igtk_rsc;
-+	uint8_t zero_igtk_rsc[6];
-+	int err;
-+
-+	sta->gtk_query_cmd_id = 0;
-+
-+	err = l_genl_msg_get_error(msg);
-+	if (err == -ENOTSUP)
-+		goto zero_rsc;
-+	else if (err < 0)
-+		return;
-+
-+	igtk_rsc = nl80211_parse_get_key_seq(msg);
-+	if (!igtk_rsc) {
-+zero_rsc:
-+		memset(zero_igtk_rsc, 0, 6);
-+		igtk_rsc = zero_igtk_rsc;
-+	}
-+
-+	memcpy(sta->prev_igtk_rsc, igtk_rsc, 6);
-+
-+	msg = nl80211_build_get_key(netdev_get_ifindex(ap->netdev),
-+				    ap->gtk_index);
-+	sta->gtk_query_cmd_id = l_genl_family_send(ap->nl80211, msg, ap_gtk_query_cb, sta, NULL);
-+	if (!sta->gtk_query_cmd_id) {
-+		l_genl_msg_unref(msg);
-+		l_error("Issuing GET_KEY failed");
-+	}
-+}
-+
- static void ap_stop_handshake_schedule(struct sta_state *sta)
- {
- 	if (sta->stop_handshake_work)
-@@ -1656,7 +1697,7 @@ static void ap_start_eap_wsc(struct sta_state *sta)
- 	handshake_state_set_event_func(sta->hs, ap_wsc_handshake_event, sta);
- 	handshake_state_set_8021x_config(sta->hs, sta->wsc_settings);
- 
--	ap_start_handshake(sta, wait_for_eapol_start, NULL);
-+	ap_start_handshake(sta, wait_for_eapol_start, NULL, NULL);
- }
- 
- static struct l_genl_msg *ap_build_cmd_del_key(struct ap_state *ap, uint8_t index)
-@@ -1834,13 +1875,13 @@ static void ap_associate_sta_cb(struct l_genl_msg *msg, void *user_data)
- 	}
- 
- 	if (ap->group_cipher == IE_RSN_CIPHER_SUITE_NO_GROUP_TRAFFIC)
--		ap_start_rsna(sta, NULL);
-+		ap_start_rsna(sta, NULL, NULL);
- 	else {
- 		msg = nl80211_build_get_key(netdev_get_ifindex(ap->netdev),
--					ap->gtk_index);
-+					    sta->mfp ? ap->igtk_index : ap->gtk_index);
- 		sta->gtk_query_cmd_id = l_genl_family_send(ap->nl80211, msg,
--								ap_gtk_query_cb,
--								sta, NULL);
-+							   sta->mfp ? ap_igtk_query_cb : ap_gtk_query_cb,
-+							   sta, NULL);
- 		if (!sta->gtk_query_cmd_id) {
- 			l_genl_msg_unref(msg);
- 			l_error("Issuing GET_KEY failed");
-@@ -2315,6 +2356,8 @@ static void ap_assoc_reassoc(struct sta_state *sta, bool reassoc,
- 			err = MMPDU_REASON_CODE_INVALID_GROUP_CIPHER;
- 			goto unsupported;
- 		}
-+
-+		sta->mfp = rsn_info.mfpc && ap->mfpc;
- 	}
- 
- 	/* 802.11-2016 11.3.5.3 j) */
--- 
-2.45.0
+I'm looking to better understand how the list of networks are collected  af=
+ter a scan is done and get-networks is called.
+How long does a scan run for? I am assuming the scan causes the radio to go=
+ through each channel and listen for broadcast beacons to find available AP=
+s. I have noticed when calling scan and then get-networks I can get a diffe=
+rent amount of found APs, like either I am not waiting long enough for a sc=
+an to complete or there is some other logic that dictates adding a network =
+to the list (too low of an RSSI?). I'm also wondering how much of this is r=
+eally controlled by IWD verses the radio firmware and are these simply requ=
+est sent via nl80211?
 
+Thanks
+Michael John
+CONFIDENTIALITY NOTICE: This message, including any attachments, contains c=
+onfidential information intended for a specific individual and purpose. If =
+you are not the intended recipient, you should delete this message and any =
+disclosure, copying, or distribution of this message, or the taking of any =
+action based on it, by you is strictly prohibited.
