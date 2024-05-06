@@ -1,62 +1,62 @@
-Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
+Received: from mail-pf1-f178.google.com (mail-pf1-f178.google.com [209.85.210.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D714EA934
-	for <iwd@lists.linux.dev>; Mon,  6 May 2024 00:50:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F846182DA
+	for <iwd@lists.linux.dev>; Mon,  6 May 2024 00:50:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714956603; cv=none; b=f3nfLLIBFbZD6zazO5nOVfYlCskSx509qlpL0VRv+UDbdBoUlFAH1CgTCU39fWpbPGejA1NPtglMjsUMy4jekfqebjp2sH6s8Rz5EEFJ5nw5wucZqzjgribQuztZdrvh7BIvngg6UmV2wJrWBFj1n0Ajsd6Q4o5w9bJe1DXJNh8=
+	t=1714956612; cv=none; b=UbSx78bNIRMhkzuC5zVK6Nt6rxXmhoxChVIxjhf6IbSPFU+MhT7gyNazEpLAizfiDU+v+syzLhOZNh6V1fTRlqyrf27+tFxuJ69xmwa7ezfEnyNealEduE2F/A1sXO8HVQT+AwQtGvQkfYeMhi2LqthdvOwIqeD1bFKugVt6P8A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714956603; c=relaxed/simple;
-	bh=eEq9Td+YFyMLbQxlT4nLIpPILrfWB3pFM6RwDSO05p4=;
+	s=arc-20240116; t=1714956612; c=relaxed/simple;
+	bh=wLZ20aAvwxqooNqKINzsGpjS+1yMxQi6jW3Bx/oZZL4=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=KO00IMdVVUuDuHTrDlVcwW+exFkOvnjrSmsiugf+u2k6qmm0x2nS69u+6Gj7b4MgTVAEsMzlgxTQ/e/mZWitjK+IowguS10RGOIUaXdVLYPv85xCS+SfljranN5Mhug1CfbBVLoDkYOypjy9eRov6YOt3JPU1INm0akX969JYTk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YCkGPumH; arc=none smtp.client-ip=209.85.214.176
+	 MIME-Version; b=m+QuoI3IdOkVhexKMA/6goWKs5aS00t4W1J/J/cKgxztfO3H+Gysdz9oRpvDNIbClW+RaBB2gArA7JMRpnSw1nJhprUQ6U1zHObXvf9o/j86KhoW/OSnuxmlZJIa1IbbR1Es7JU4ElCavLG5s9TtQNiQhL5scE+amz4D8/Ss/9M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lQsSJCIV; arc=none smtp.client-ip=209.85.210.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YCkGPumH"
-Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-1e3ca546d40so8969515ad.3
-        for <iwd@lists.linux.dev>; Sun, 05 May 2024 17:50:01 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lQsSJCIV"
+Received: by mail-pf1-f178.google.com with SMTP id d2e1a72fcca58-6f30f69a958so805273b3a.1
+        for <iwd@lists.linux.dev>; Sun, 05 May 2024 17:50:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1714956601; x=1715561401; darn=lists.linux.dev;
+        d=gmail.com; s=20230601; t=1714956610; x=1715561410; darn=lists.linux.dev;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=m4WaFKoi3gYbHn3QYKFOplN1UMqY7nh1w7n7PFZNIWs=;
-        b=YCkGPumHFlCjiPO/31QZhdnOfPrx89oMDq2HjMR5b019wWP499bjEeSHOJ3ckPW8yB
-         eaoIiziCeX1h8BNXpCYMrHvZu7rv3tvXp8NLe+dGsiCjQQrEhQmic83mbmamMg0NPtQh
-         P1JRdmzhV8pEphY98J3OX2hSwBhqNyc1WaU9vDC8Pm1daoIpURq5VhqARWNV5pjzn6Qg
-         HTPdaPWTgTqQkHYADAGEAkzln1ChfOTxl/2+m/7gBSvRwwXihehdWRnEF+dC0OwSlkeb
-         +urPeXn3UzyE2J0lEErIrFQaOfPL0YwxrpucSXgEkojT0IR40yQ+EKcMe125oiM98A3W
-         dZCg==
+        bh=6nNm6WDmFWUrK7tEKHQFGw9/TWYHnwuyyFKXj5Lrdkg=;
+        b=lQsSJCIVzKDvp/D8u+r6tEual1NRnx/v820bg1eSEamqiLwn100/+Y8msGU021kvz4
+         /lXGZ8OKXZBKu9y9y5n5IoP6BHXDIShqwTpdzM75MVBUhijBeWpaOWTFADREIp7pMkpE
+         nVClle5qY39WYeyokx0Ficr+11OR9hjV6QEQRO3Hm83owS7niOLtGUJYMfCRvv5eZrUU
+         r42SDZ8Z86lN2uW7o/sPbEqM+v+gYKc5lE5horW1f+N2kduLynveCFh+X5kguSX1rgLC
+         054AzTDgfx5s0HkePMmQlHK7ntekUZyhbjap6oYUW+gGCpCGvM9QKMNGFKE/8gFnrZi1
+         uRIA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714956601; x=1715561401;
+        d=1e100.net; s=20230601; t=1714956610; x=1715561410;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=m4WaFKoi3gYbHn3QYKFOplN1UMqY7nh1w7n7PFZNIWs=;
-        b=RbbcHfMTJDrpwVvYvYzr9aCdpe+W5kYso4Ykg00+N8oH1VsPz3Mf+LGu7EWTqHp36w
-         HGCc6IX+F9xBhUpCaG0gpQDo8OIb6iG4kmbQgi3nlvq1mmcd5uCNLTbFtnGRUXVhqUDy
-         tT99OGVY4Lfx4lv43zRoGpZ5SuK5+3ZYfNEc3yrEuza5T4HZzA8FevDwSKvW15ICqzRH
-         Ouh6KO8NOfOz1n0J+sAHOOAoqamljv7dh4BxjlipX21G6lxDiU0XObGGg7bCe2h/Wlid
-         ednS4K4ZUPSeVqch0JyDvbCUQNDIEGrxKg0z3mic4kNPHZ09thVQlfIC0PlH3DWgilGL
-         s96Q==
-X-Gm-Message-State: AOJu0YwXktxoOZFI63KhsNX6tNu3Y0oGAaJ9s7R0VChVBPHaRxPgVMoJ
-	6MzPhIzdTkq8nkwELx8nHBPs7ii+WgU4ctp8zk+v9vEhQ+ipNEfBriOQKA==
-X-Google-Smtp-Source: AGHT+IE16+xhwZKMSYRlNAaQ/PZ9Nyrscu4RyFkD2ihSto1kO22XwGjoY1q7NfB138mTwxsyEZdQeA==
-X-Received: by 2002:a17:902:a513:b0:1ec:8d50:8dec with SMTP id s19-20020a170902a51300b001ec8d508decmr7678440plq.39.1714956600971;
-        Sun, 05 May 2024 17:50:00 -0700 (PDT)
+        bh=6nNm6WDmFWUrK7tEKHQFGw9/TWYHnwuyyFKXj5Lrdkg=;
+        b=hmUMGmnzBEmYo3PWli70gmN4qTvDDJhOxLeZFB0y/j/LcEfLWy8O9msj4yf8ZlOtJT
+         9BoDTSdnXRn0mIFs33qnZwvmL7nLFcnf8UUvkg8saRr4gWcO/WHbjToUQqVAf0vS9e7W
+         7DweRn92Y4l/ZEgNiZQ0tJ8I7NheM0EJqYZdCp3u5kW/hOgbD9Z/wL150n22BYRyl8oe
+         FL9SNv/jxemAHwq0gce6pHyktU/VHS3uiu+EqypsZiOxtS+wLHHgvcbfk+99UUy6yl6X
+         im2upN2fObiWaAr4vFmQbIawwaisVWZ+Xm80WM6emShNe7tkK4viNLpdVLsZxj0znAiS
+         MA4A==
+X-Gm-Message-State: AOJu0YxqeAUQ6jlTE28OFjNfWGUiGf0JqwEWQIH/tc+4a0gCJWQno58U
+	VZnkXj8rLPm2CuXCIY2EDWp/VrrwDwrAMgbHLzQAdY+BCC9AqUd23+r8ow==
+X-Google-Smtp-Source: AGHT+IHXiGymzWPLdPahFpAncra7OxwKeL4nCLcw+5Yzjr9C4ACztG4VQey0cPEY0+01cAqM2PcOEA==
+X-Received: by 2002:a05:6a00:2185:b0:6ed:4f2e:ef22 with SMTP id h5-20020a056a00218500b006ed4f2eef22mr9868759pfi.31.1714956610498;
+        Sun, 05 May 2024 17:50:10 -0700 (PDT)
 Received: from localhost ([192.145.118.41])
-        by smtp.gmail.com with ESMTPSA id d10-20020a170902654a00b001e435350a7bsm3247619pln.259.2024.05.05.17.49.59
+        by smtp.gmail.com with ESMTPSA id w11-20020aa7858b000000b006efd89cea71sm6586879pfn.84.2024.05.05.17.50.09
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 05 May 2024 17:50:00 -0700 (PDT)
+        Sun, 05 May 2024 17:50:10 -0700 (PDT)
 From: John Brandt <brandtwjohn@gmail.com>
 To: iwd@lists.linux.dev
 Cc: John Brandt <brandtwjohn@gmail.com>
-Subject: [PATCH v2 12/18] eapol: encrypt key data for AKM-defined ciphers
-Date: Sun,  5 May 2024 17:30:35 -0700
-Message-ID: <20240506003518.320176-13-brandtwjohn@gmail.com>
+Subject: [PATCH v2 13/18] unit: add unit test for SAE AP mode
+Date: Sun,  5 May 2024 17:30:36 -0700
+Message-ID: <20240506003518.320176-14-brandtwjohn@gmail.com>
 X-Mailer: git-send-email 2.45.0
 In-Reply-To: <20240506003518.320176-1-brandtwjohn@gmail.com>
 References: <20240506003518.320176-1-brandtwjohn@gmail.com>
@@ -68,100 +68,141 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Support encrypting key data when the cipher is AKM-defined. This is
-needed to support SAE in AP mode.
+Add unit test that simulates client and AP in SAE handshake. Test that
+both the client and AP complete the SAE handshake.
 ---
- src/eapol.c | 51 ++++++++++++++++++++++++++++++++++++---------------
- 1 file changed, 36 insertions(+), 15 deletions(-)
+ unit/test-sae.c | 111 ++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 111 insertions(+)
 
-diff --git a/src/eapol.c b/src/eapol.c
-index a9b4f3ba..524a26c9 100644
---- a/src/eapol.c
-+++ b/src/eapol.c
-@@ -387,6 +387,23 @@ error:
- 	return NULL;
+diff --git a/unit/test-sae.c b/unit/test-sae.c
+index 04783d18..87e3554d 100644
+--- a/unit/test-sae.c
++++ b/unit/test-sae.c
+@@ -631,6 +631,116 @@ static void test_end_to_end(const void *arg)
+ 	l_free(td2);
  }
  
-+static int padded_aes_wrap(const uint8_t *kek, uint8_t *key_data,
-+				size_t *key_data_len,
-+				struct eapol_key *out_frame, size_t mic_len)
++static void ap_to_client_tx_func(const uint8_t *frame, size_t len, void *user_data)
 +{
-+	if (*key_data_len < 16 || *key_data_len % 8)
-+		key_data[(*key_data_len)++] = 0xdd;
-+	while (*key_data_len < 16 || *key_data_len % 8)
-+		key_data[(*key_data_len)++] = 0x00;
++	struct test_data *td = user_data;
++	uint16_t trans;
 +
-+	if (!aes_wrap(kek, key_data, *key_data_len,
-+				EAPOL_KEY_DATA(out_frame, mic_len)))
-+		return -ENOPROTOOPT;
++	memcpy(td->tx_packet, frame, len);
++	td->tx_packet_len = len;
 +
-+	*key_data_len += 8;
-+	return 0;
++	if (len <= 6 && l_get_le16(frame + 2) != 0) {
++		td->tx_reject_occurred = true;
++		return;
++	}
++
++	trans = l_get_le16(frame);	/* transaction */
++
++	switch (trans) {
++	case 1:
++		assert(l_get_le16(frame + 2) == 0);	/* status */
++		assert(l_get_le16(frame + 4) == 19);	/* group */
++
++		td->commit_success = true;
++
++		return;
++	case 2:
++		assert(l_get_le16(frame + 2) == 0);
++		assert(len == 38);
++
++		td->confirm_success = true;
++
++		return;
++	}
++
++	assert(false);
 +}
 +
- /*
-  * Pad and encrypt the plaintext Key Data contents in @key_data using
-  * the encryption scheme required by @out_frame->key_descriptor_version,
-@@ -395,12 +412,12 @@ error:
-  * Note that for efficiency @key_data is being modified, including in
-  * case of failure, so it must be sufficiently larger than @key_data_len.
-  */
--static int eapol_encrypt_key_data(const uint8_t *kek, uint8_t *key_data,
--				size_t key_data_len,
-+static int eapol_encrypt_key_data(enum ie_rsn_akm_suite akm, const uint8_t *kek,
-+				uint8_t *key_data, size_t key_data_len,
- 				struct eapol_key *out_frame, size_t mic_len)
++static void test_client_to_ap(const void *arg)
++{
++	struct auth_proto *ap_sta;
++	struct auth_proto *ap_ap;
++	struct test_data *td_sta = l_new(struct test_data, 1);
++	struct test_data *td_ap = l_new(struct test_data, 1);
++	struct handshake_state *hs_sta = test_handshake_state_new(1);
++	struct handshake_state *hs_ap = test_handshake_state_new(2);
++	struct authenticate_frame *frame = alloca(
++				sizeof(struct authenticate_frame) + 512);
++	struct associate_frame *assoc = alloca(sizeof(struct associate_frame));
++	size_t frame_len;
++
++	td_sta->status = 0xffff;
++	td_ap->status = 0xffff;
++
++	handshake_state_set_supplicant_address(hs_sta, spa);
++	handshake_state_set_authenticator_address(hs_sta, aa);
++	handshake_state_set_passphrase(hs_sta, passphrase);
++
++	handshake_state_set_supplicant_address(hs_ap, aa);
++	handshake_state_set_authenticator_address(hs_ap, spa);
++	handshake_state_set_passphrase(hs_ap, passphrase);
++	handshake_state_set_authenticator(hs_ap, true);
++
++	ap_sta = sae_sm_new(hs_sta, end_to_end_tx_func, test_tx_assoc_func, td_sta);
++	ap_ap = sae_sm_new(hs_ap, ap_to_client_tx_func, test_tx_assoc_func, td_ap);
++
++	/* let client send a commit */
++	auth_proto_start(ap_sta);
++
++	/* forward commit from client to the AP */
++	frame_len = setup_auth_frame(frame, aa, 1, 0, td_sta->tx_packet + 4,
++					td_sta->tx_packet_len - 4);
++	assert(auth_proto_rx_authenticate(ap_ap, (uint8_t *)frame,
++						frame_len) == 0);
++
++	/* forward commit from AP to the client */
++	frame_len = setup_auth_frame(frame, spa, 1, 0, td_ap->tx_packet + 4,
++					td_ap->tx_packet_len - 4);
++	assert(auth_proto_rx_authenticate(ap_sta, (uint8_t *)frame,
++						frame_len) == 0);
++
++	/* forward confirm from client to the AP */
++	frame_len = setup_auth_frame(frame, aa, 2, 0, td_sta->tx_packet + 4,
++					td_sta->tx_packet_len - 4);
++	assert(auth_proto_rx_authenticate(ap_ap, (uint8_t *)frame,
++						frame_len) == 0);
++
++	/* forward confirm from AP to the client */
++	frame_len = setup_auth_frame(frame, spa, 2, 0, td_ap->tx_packet + 4,
++					td_ap->tx_packet_len - 4);
++	assert(auth_proto_rx_authenticate(ap_sta, (uint8_t *)frame,
++						frame_len) == 0);
++
++	/* client should by now have sent association request to AP */
++	assert(td_sta->tx_assoc_called);
++	/* AP should have sent a confirm frame to complete handshake */
++	assert(td_ap->confirm_success);
++
++	/* confirm association frame doesn't return an error */
++	frame_len = setup_assoc_frame(assoc, 0);
++	assert(auth_proto_rx_associate(ap_sta, (uint8_t *)assoc, frame_len) == 0);
++	assert(auth_proto_rx_associate(ap_ap, (uint8_t *)assoc, frame_len) == 0);
++
++	handshake_state_free(hs_sta);
++	handshake_state_free(hs_ap);
++
++	auth_proto_free(ap_sta);
++	auth_proto_free(ap_ap);
++
++	l_free(td_sta);
++	l_free(td_ap);
++}
++
+ static void test_pt_pwe(const void *data)
  {
- 	uint8_t key[32];
--	bool ret;
-+	int ret;
+ 	static const char *ssid = "byteme";
+@@ -893,6 +1003,7 @@ int main(int argc, char *argv[])
+ 	l_test_add("SAE bad confirm", test_bad_confirm, NULL);
+ 	l_test_add("SAE confirm after accept", test_confirm_after_accept, NULL);
+ 	l_test_add("SAE end-to-end", test_end_to_end, NULL);
++	l_test_add("SAE client-to-ap", test_client_to_ap, NULL);
  
- 	switch (out_frame->key_descriptor_version) {
- 	case EAPOL_KEY_DESCRIPTOR_VERSION_HMAC_MD5_ARC4:
-@@ -426,18 +443,21 @@ static int eapol_encrypt_key_data(const uint8_t *kek, uint8_t *key_data,
- 		break;
- 	case EAPOL_KEY_DESCRIPTOR_VERSION_HMAC_SHA1_AES:
- 	case EAPOL_KEY_DESCRIPTOR_VERSION_AES_128_CMAC_AES:
--		if (key_data_len < 16 || key_data_len % 8)
--			key_data[key_data_len++] = 0xdd;
--		while (key_data_len < 16 || key_data_len % 8)
--			key_data[key_data_len++] = 0x00;
--
--		if (!aes_wrap(kek, key_data, key_data_len,
--					EAPOL_KEY_DATA(out_frame, mic_len)))
--			return -ENOPROTOOPT;
--
--		key_data_len += 8;
-+		ret = padded_aes_wrap(kek, key_data, &key_data_len, out_frame, mic_len);
-+		if (ret < 0)
-+			return ret;
+ 	l_test_add("SAE pt-pwe", test_pt_pwe, NULL);
  
- 		break;
-+	case EAPOL_KEY_DESCRIPTOR_VERSION_AKM_DEFINED:
-+		switch (akm) {
-+		case IE_RSN_AKM_SUITE_SAE_SHA256:
-+			ret = padded_aes_wrap(kek, key_data, &key_data_len, out_frame, mic_len);
-+			if (ret < 0)
-+				return ret;
-+			break;
-+		default:
-+			return -ENOTSUP;
-+		}
- 	}
- 
- 	l_put_be16(key_data_len, EAPOL_KEY_DATA(out_frame, mic_len) - 2);
-@@ -1467,8 +1487,9 @@ static void eapol_send_ptk_3_of_4(struct eapol_sm *sm)
- 	}
- 
- 	kek = handshake_state_get_kek(sm->handshake);
--	key_data_len = eapol_encrypt_key_data(kek, key_data_buf,
--						key_data_len, ek, sm->mic_len);
-+	key_data_len = eapol_encrypt_key_data(sm->handshake->akm_suite, kek,
-+						key_data_buf, key_data_len, ek,
-+						sm->mic_len);
- 	explicit_bzero(key_data_buf, sizeof(key_data_buf));
- 
- 	if (key_data_len < 0)
 -- 
 2.45.0
 
