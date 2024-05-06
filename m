@@ -1,62 +1,62 @@
-Received: from mail-pf1-f178.google.com (mail-pf1-f178.google.com [209.85.210.178])
+Received: from mail-oi1-f172.google.com (mail-oi1-f172.google.com [209.85.167.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F846182DA
-	for <iwd@lists.linux.dev>; Mon,  6 May 2024 00:50:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA364B673
+	for <iwd@lists.linux.dev>; Mon,  6 May 2024 00:50:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714956612; cv=none; b=UbSx78bNIRMhkzuC5zVK6Nt6rxXmhoxChVIxjhf6IbSPFU+MhT7gyNazEpLAizfiDU+v+syzLhOZNh6V1fTRlqyrf27+tFxuJ69xmwa7ezfEnyNealEduE2F/A1sXO8HVQT+AwQtGvQkfYeMhi2LqthdvOwIqeD1bFKugVt6P8A=
+	t=1714956626; cv=none; b=NL/yIjoUv+S6DCpnYXd8t/SWri/vYqyBScehUIcwS/g6swJBBlrbx/vBwveqSF3tfh7LSyHmdDWDECWiNxspJmZEJg6dHMYOltbPTtgcxWsC5FIjGO1bbkEdL6/yp6ACgIzDwIwNKuwPIXuPCRsbP2F76eXu9tpslHksRptsEa4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714956612; c=relaxed/simple;
-	bh=wLZ20aAvwxqooNqKINzsGpjS+1yMxQi6jW3Bx/oZZL4=;
+	s=arc-20240116; t=1714956626; c=relaxed/simple;
+	bh=kbyJhhrxU4mE6ZZc0Mx9u/14LBLLLW915QVOrVc3t5c=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=m+QuoI3IdOkVhexKMA/6goWKs5aS00t4W1J/J/cKgxztfO3H+Gysdz9oRpvDNIbClW+RaBB2gArA7JMRpnSw1nJhprUQ6U1zHObXvf9o/j86KhoW/OSnuxmlZJIa1IbbR1Es7JU4ElCavLG5s9TtQNiQhL5scE+amz4D8/Ss/9M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lQsSJCIV; arc=none smtp.client-ip=209.85.210.178
+	 MIME-Version; b=oRjmkhiduGpIgPe8PXErI+29PmxAHDq8Mb4oXvHbVD9tsV3e3CXvV1z4poOVqb4S537p45YtbDUDuI0yV1Q9b/svPVg8Hx0H2tqD7Z9+NI2FTO+eJmvI37GhJYoBXt7jYqjuqur3G8TebmweOL4JzExERxO2wGbVc9BDxCV9rWM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Zd3jLt6b; arc=none smtp.client-ip=209.85.167.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lQsSJCIV"
-Received: by mail-pf1-f178.google.com with SMTP id d2e1a72fcca58-6f30f69a958so805273b3a.1
-        for <iwd@lists.linux.dev>; Sun, 05 May 2024 17:50:11 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Zd3jLt6b"
+Received: by mail-oi1-f172.google.com with SMTP id 5614622812f47-3c96c1e27a3so294362b6e.2
+        for <iwd@lists.linux.dev>; Sun, 05 May 2024 17:50:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1714956610; x=1715561410; darn=lists.linux.dev;
+        d=gmail.com; s=20230601; t=1714956624; x=1715561424; darn=lists.linux.dev;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=6nNm6WDmFWUrK7tEKHQFGw9/TWYHnwuyyFKXj5Lrdkg=;
-        b=lQsSJCIVzKDvp/D8u+r6tEual1NRnx/v820bg1eSEamqiLwn100/+Y8msGU021kvz4
-         /lXGZ8OKXZBKu9y9y5n5IoP6BHXDIShqwTpdzM75MVBUhijBeWpaOWTFADREIp7pMkpE
-         nVClle5qY39WYeyokx0Ficr+11OR9hjV6QEQRO3Hm83owS7niOLtGUJYMfCRvv5eZrUU
-         r42SDZ8Z86lN2uW7o/sPbEqM+v+gYKc5lE5horW1f+N2kduLynveCFh+X5kguSX1rgLC
-         054AzTDgfx5s0HkePMmQlHK7ntekUZyhbjap6oYUW+gGCpCGvM9QKMNGFKE/8gFnrZi1
-         uRIA==
+        bh=aTXjM9WUFKL8XGPzF+cuiI2OWaB05tCHhnayPlf4miY=;
+        b=Zd3jLt6bOnZ2T6BeGqGVq5g/mlV+9oInwl8ibTAi/Rn5P5u4ZQI8ezq7umwtlxUvRE
+         l+aqOMV+dwLFn64MqkfOxTkdcB1uf4jzhe6mkdYSSfHgD1DFPob18nerlL1b1e0QrnI8
+         5K49H2Ugt2REOV2YIWfcFp+rlsz42QDCkcXOt+lhTjH4T7YH7C8ywNoASmkrEGKxMw3X
+         Xd76dFAiYrqiBzHZziqHoG10l2eB34waEgCO53aq/D+1DlEl9PLoB9Upa5A7ojO0n3a1
+         XV8SOOU/37utXg0/8wysjGvWKHF18+OK13Tbzsea0iHo34LBJS140e73xAbuhiy30gfe
+         lzgw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714956610; x=1715561410;
+        d=1e100.net; s=20230601; t=1714956624; x=1715561424;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=6nNm6WDmFWUrK7tEKHQFGw9/TWYHnwuyyFKXj5Lrdkg=;
-        b=hmUMGmnzBEmYo3PWli70gmN4qTvDDJhOxLeZFB0y/j/LcEfLWy8O9msj4yf8ZlOtJT
-         9BoDTSdnXRn0mIFs33qnZwvmL7nLFcnf8UUvkg8saRr4gWcO/WHbjToUQqVAf0vS9e7W
-         7DweRn92Y4l/ZEgNiZQ0tJ8I7NheM0EJqYZdCp3u5kW/hOgbD9Z/wL150n22BYRyl8oe
-         FL9SNv/jxemAHwq0gce6pHyktU/VHS3uiu+EqypsZiOxtS+wLHHgvcbfk+99UUy6yl6X
-         im2upN2fObiWaAr4vFmQbIawwaisVWZ+Xm80WM6emShNe7tkK4viNLpdVLsZxj0znAiS
-         MA4A==
-X-Gm-Message-State: AOJu0YxqeAUQ6jlTE28OFjNfWGUiGf0JqwEWQIH/tc+4a0gCJWQno58U
-	VZnkXj8rLPm2CuXCIY2EDWp/VrrwDwrAMgbHLzQAdY+BCC9AqUd23+r8ow==
-X-Google-Smtp-Source: AGHT+IHXiGymzWPLdPahFpAncra7OxwKeL4nCLcw+5Yzjr9C4ACztG4VQey0cPEY0+01cAqM2PcOEA==
-X-Received: by 2002:a05:6a00:2185:b0:6ed:4f2e:ef22 with SMTP id h5-20020a056a00218500b006ed4f2eef22mr9868759pfi.31.1714956610498;
-        Sun, 05 May 2024 17:50:10 -0700 (PDT)
+        bh=aTXjM9WUFKL8XGPzF+cuiI2OWaB05tCHhnayPlf4miY=;
+        b=DBY5lz8So4xNWwT8vuAySXGZ2AVJhpqpQYDe5zs0QYedKJx8nhy+0j8zog0aUCwUkO
+         ypzDAbM6F/q6Kq6QevVBwTM7sOQ125/qT/hoTlFfelXBzlUfcQuPt63cVZKVXh3Lq01S
+         qLYmnUhxkQp06Jkhx2Sfu4hDWU9j2wwdToMqMDNjcsck3qmUKw7zUJltnI5O+naVwjmz
+         xuI3Kbooy1gn5oT18Cr3g4XHumMCTaTJTpyfJVqQmUhEQlLR2R46kt3q5DE5tHc6HNlF
+         cBnKQVd4GOneA5Pto+qGoEMSAF3HxAAXiGzQmvKtQCPRVD5RSg3hAwwUf1+DxwRduU3V
+         seIw==
+X-Gm-Message-State: AOJu0Yw0aHlW5TMk18afiU4z7Z7k32LbBETN+9dxbBZjGeDPLGGyAuhK
+	zkvPVbH1vAl5nBsHaOOf9ROcYMGKlMe/xsVbKYyJJNb3nHSqqIBLIAsG4Q==
+X-Google-Smtp-Source: AGHT+IGUwihI8HdaHutT8LexIfVN0NzBv/NrfWiUJu2Ha6bQ6e89qt81djlCl9gPkB15zcr7/9l7nw==
+X-Received: by 2002:a05:6808:300e:b0:3c7:513b:4298 with SMTP id ay14-20020a056808300e00b003c7513b4298mr12693957oib.54.1714956623754;
+        Sun, 05 May 2024 17:50:23 -0700 (PDT)
 Received: from localhost ([192.145.118.41])
-        by smtp.gmail.com with ESMTPSA id w11-20020aa7858b000000b006efd89cea71sm6586879pfn.84.2024.05.05.17.50.09
+        by smtp.gmail.com with ESMTPSA id u9-20020a056a00098900b006f3ef4e7551sm2516945pfg.217.2024.05.05.17.50.22
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 05 May 2024 17:50:10 -0700 (PDT)
+        Sun, 05 May 2024 17:50:23 -0700 (PDT)
 From: John Brandt <brandtwjohn@gmail.com>
 To: iwd@lists.linux.dev
 Cc: John Brandt <brandtwjohn@gmail.com>
-Subject: [PATCH v2 13/18] unit: add unit test for SAE AP mode
-Date: Sun,  5 May 2024 17:30:36 -0700
-Message-ID: <20240506003518.320176-14-brandtwjohn@gmail.com>
+Subject: [PATCH v2 14/18] ap: move toward requiring MFP when using SAE
+Date: Sun,  5 May 2024 17:30:37 -0700
+Message-ID: <20240506003518.320176-15-brandtwjohn@gmail.com>
 X-Mailer: git-send-email 2.45.0
 In-Reply-To: <20240506003518.320176-1-brandtwjohn@gmail.com>
 References: <20240506003518.320176-1-brandtwjohn@gmail.com>
@@ -68,141 +68,86 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add unit test that simulates client and AP in SAE handshake. Test that
-both the client and AP complete the SAE handshake.
+When wanting to use SAE, confirm that MFP is also supported, and
+automatically enable MFP. Advertise as MFP capable in the beacon.
 ---
- unit/test-sae.c | 111 ++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 111 insertions(+)
+ src/ap.c    | 13 +++++++++++--
+ src/wiphy.c |  2 +-
+ src/wiphy.h |  2 ++
+ 3 files changed, 14 insertions(+), 3 deletions(-)
 
-diff --git a/unit/test-sae.c b/unit/test-sae.c
-index 04783d18..87e3554d 100644
---- a/unit/test-sae.c
-+++ b/unit/test-sae.c
-@@ -631,6 +631,116 @@ static void test_end_to_end(const void *arg)
- 	l_free(td2);
+diff --git a/src/ap.c b/src/ap.c
+index ae406e16..8cebef42 100644
+--- a/src/ap.c
++++ b/src/ap.c
+@@ -82,6 +82,7 @@ struct ap_state {
+ 
+ 	unsigned int ciphers;
+ 	enum ie_rsn_cipher_suite group_cipher;
++	enum ie_rsn_cipher_suite group_management_cipher;
+ 	unsigned int akm_suites;
+ 	uint32_t beacon_interval;
+ 	struct l_uintset *rates;
+@@ -93,6 +94,7 @@ struct ap_state {
+ 	struct l_timeout *wsc_pbc_timeout;
+ 	uint16_t wsc_dpid;
+ 	uint8_t wsc_uuid_r[16];
++	bool mfpc;
+ 
+ 	uint16_t last_aid;
+ 	struct l_queue *sta_states;
+@@ -639,6 +641,9 @@ static void ap_set_rsn_info(struct ap_state *ap, struct ie_rsn_info *rsn)
+ 	rsn->akm_suites = ap->akm_suites;
+ 	rsn->pairwise_ciphers = ap->ciphers;
+ 	rsn->group_cipher = ap->group_cipher;
++
++	rsn->group_management_cipher = ap->group_management_cipher;
++	rsn->mfpc = ap->mfpc;
  }
  
-+static void ap_to_client_tx_func(const uint8_t *frame, size_t len, void *user_data)
-+{
-+	struct test_data *td = user_data;
-+	uint16_t trans;
-+
-+	memcpy(td->tx_packet, frame, len);
-+	td->tx_packet_len = len;
-+
-+	if (len <= 6 && l_get_le16(frame + 2) != 0) {
-+		td->tx_reject_occurred = true;
-+		return;
-+	}
-+
-+	trans = l_get_le16(frame);	/* transaction */
-+
-+	switch (trans) {
-+	case 1:
-+		assert(l_get_le16(frame + 2) == 0);	/* status */
-+		assert(l_get_le16(frame + 4) == 19);	/* group */
-+
-+		td->commit_success = true;
-+
-+		return;
-+	case 2:
-+		assert(l_get_le16(frame + 2) == 0);
-+		assert(len == 38);
-+
-+		td->confirm_success = true;
-+
-+		return;
-+	}
-+
-+	assert(false);
-+}
-+
-+static void test_client_to_ap(const void *arg)
-+{
-+	struct auth_proto *ap_sta;
-+	struct auth_proto *ap_ap;
-+	struct test_data *td_sta = l_new(struct test_data, 1);
-+	struct test_data *td_ap = l_new(struct test_data, 1);
-+	struct handshake_state *hs_sta = test_handshake_state_new(1);
-+	struct handshake_state *hs_ap = test_handshake_state_new(2);
-+	struct authenticate_frame *frame = alloca(
-+				sizeof(struct authenticate_frame) + 512);
-+	struct associate_frame *assoc = alloca(sizeof(struct associate_frame));
-+	size_t frame_len;
-+
-+	td_sta->status = 0xffff;
-+	td_ap->status = 0xffff;
-+
-+	handshake_state_set_supplicant_address(hs_sta, spa);
-+	handshake_state_set_authenticator_address(hs_sta, aa);
-+	handshake_state_set_passphrase(hs_sta, passphrase);
-+
-+	handshake_state_set_supplicant_address(hs_ap, aa);
-+	handshake_state_set_authenticator_address(hs_ap, spa);
-+	handshake_state_set_passphrase(hs_ap, passphrase);
-+	handshake_state_set_authenticator(hs_ap, true);
-+
-+	ap_sta = sae_sm_new(hs_sta, end_to_end_tx_func, test_tx_assoc_func, td_sta);
-+	ap_ap = sae_sm_new(hs_ap, ap_to_client_tx_func, test_tx_assoc_func, td_ap);
-+
-+	/* let client send a commit */
-+	auth_proto_start(ap_sta);
-+
-+	/* forward commit from client to the AP */
-+	frame_len = setup_auth_frame(frame, aa, 1, 0, td_sta->tx_packet + 4,
-+					td_sta->tx_packet_len - 4);
-+	assert(auth_proto_rx_authenticate(ap_ap, (uint8_t *)frame,
-+						frame_len) == 0);
-+
-+	/* forward commit from AP to the client */
-+	frame_len = setup_auth_frame(frame, spa, 1, 0, td_ap->tx_packet + 4,
-+					td_ap->tx_packet_len - 4);
-+	assert(auth_proto_rx_authenticate(ap_sta, (uint8_t *)frame,
-+						frame_len) == 0);
-+
-+	/* forward confirm from client to the AP */
-+	frame_len = setup_auth_frame(frame, aa, 2, 0, td_sta->tx_packet + 4,
-+					td_sta->tx_packet_len - 4);
-+	assert(auth_proto_rx_authenticate(ap_ap, (uint8_t *)frame,
-+						frame_len) == 0);
-+
-+	/* forward confirm from AP to the client */
-+	frame_len = setup_auth_frame(frame, spa, 2, 0, td_ap->tx_packet + 4,
-+					td_ap->tx_packet_len - 4);
-+	assert(auth_proto_rx_authenticate(ap_sta, (uint8_t *)frame,
-+						frame_len) == 0);
-+
-+	/* client should by now have sent association request to AP */
-+	assert(td_sta->tx_assoc_called);
-+	/* AP should have sent a confirm frame to complete handshake */
-+	assert(td_ap->confirm_success);
-+
-+	/* confirm association frame doesn't return an error */
-+	frame_len = setup_assoc_frame(assoc, 0);
-+	assert(auth_proto_rx_associate(ap_sta, (uint8_t *)assoc, frame_len) == 0);
-+	assert(auth_proto_rx_associate(ap_ap, (uint8_t *)assoc, frame_len) == 0);
-+
-+	handshake_state_free(hs_sta);
-+	handshake_state_free(hs_ap);
-+
-+	auth_proto_free(ap_sta);
-+	auth_proto_free(ap_ap);
-+
-+	l_free(td_sta);
-+	l_free(td_ap);
-+}
-+
- static void test_pt_pwe(const void *data)
+ static void ap_wsc_exit_pbc(struct ap_state *ap)
+@@ -3916,9 +3921,13 @@ static int ap_load_config(struct ap_state *ap, const struct l_settings *config,
+ 	for (i = 0; akms_str && akms_str[i]; i++) {
+ 		if (!strcmp(akms_str[i], "PSK"))
+ 			ap->akm_suites |= IE_RSN_AKM_SUITE_PSK;
+-		else if (!strcmp(akms_str[i], "SAE"))
++		else if (!strcmp(akms_str[i], "SAE")) {
++			if (!wiphy_can_connect_sae(wiphy))
++				return -ENOTSUP;
+ 			ap->akm_suites |= IE_RSN_AKM_SUITE_SAE_SHA256;
+-		else {
++			ap->group_management_cipher = IE_RSN_CIPHER_SUITE_BIP_CMAC;
++			ap->mfpc = true;
++		} else {
+ 			l_warn("Unsupported or unknown AKM suite %s",
+ 					akms_str[i]);
+ 			return -ENOTSUP;
+diff --git a/src/wiphy.c b/src/wiphy.c
+index fb36ebb2..fb30e7a6 100644
+--- a/src/wiphy.c
++++ b/src/wiphy.c
+@@ -195,7 +195,7 @@ uint16_t wiphy_get_supported_ciphers(struct wiphy *wiphy, uint16_t mask)
+ 	return wiphy->supported_ciphers & mask;
+ }
+ 
+-static bool wiphy_can_connect_sae(struct wiphy *wiphy)
++bool wiphy_can_connect_sae(struct wiphy *wiphy)
  {
- 	static const char *ssid = "byteme";
-@@ -893,6 +1003,7 @@ int main(int argc, char *argv[])
- 	l_test_add("SAE bad confirm", test_bad_confirm, NULL);
- 	l_test_add("SAE confirm after accept", test_confirm_after_accept, NULL);
- 	l_test_add("SAE end-to-end", test_end_to_end, NULL);
-+	l_test_add("SAE client-to-ap", test_client_to_ap, NULL);
+ 	/*
+ 	 * WPA3 Specification version 3, Section 2.2:
+diff --git a/src/wiphy.h b/src/wiphy.h
+index bc82a007..9472b253 100644
+--- a/src/wiphy.h
++++ b/src/wiphy.h
+@@ -72,6 +72,8 @@ enum ie_rsn_cipher_suite wiphy_select_cipher(struct wiphy *wiphy,
+ 							uint16_t mask);
+ uint16_t wiphy_get_supported_ciphers(struct wiphy *wiphy, uint16_t mask);
  
- 	l_test_add("SAE pt-pwe", test_pt_pwe, NULL);
- 
++bool wiphy_can_connect_sae(struct wiphy *wiphy);
++
+ enum ie_rsn_akm_suite wiphy_select_akm(struct wiphy *wiphy,
+ 					const struct scan_bss *bss,
+ 					enum security security,
 -- 
 2.45.0
 
