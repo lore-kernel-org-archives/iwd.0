@@ -1,59 +1,59 @@
-Received: from mail-qk1-f181.google.com (mail-qk1-f181.google.com [209.85.222.181])
+Received: from mail-ot1-f43.google.com (mail-ot1-f43.google.com [209.85.210.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94F2E15B150
-	for <iwd@lists.linux.dev>; Tue,  7 May 2024 13:05:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A8C315F410
+	for <iwd@lists.linux.dev>; Tue,  7 May 2024 14:20:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715087116; cv=none; b=pqUjCJG+nFGglwmHNuB2rJhJ+8XDZS42aYftwaNy5VhMm30xGooVkhnahM2MX9DCTIpDfuWqPBMqAfjXCTET8uUImrWqCP3i+YuiMTLqE4odRjCuIl6291kNa0NhQzyNOWe6sxGg3SLAEhw4OwGkQUC9bC+punxZJlq5cK/c7xM=
+	t=1715091646; cv=none; b=WhD4TZj1HhgTErbIeDUx9DtdcOESmBTiqh0YmQEbsrvrSqXMTUMvhu9+9zZSYgachI8qH9QismdTOH65pUmsZOGOtY16q4fc+Hfw3DaOgtTadOO/3R7MUdl2J1DqDECeOedBK6mQ6lvyR8JpEN7t6XyqCY+aexbrCbQ2faBWaqs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715087116; c=relaxed/simple;
-	bh=bAbewbmkoJs8Zbf4ngLlz1O6CJT3kaBK4HMsmd+PpRs=;
+	s=arc-20240116; t=1715091646; c=relaxed/simple;
+	bh=zGbcGjtBUA41Den5SAqK1/SkbrLb+VKIwhLk/B3o/Xc=;
 	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=AKJg/UQ1xo+lY6thDAvTFmci7y9qY2/ENgSyy3YHPSJTFQWtshmiW1h2K/ZAijsHeAoq/FsYxmFbhF4M08EcoXznE/RyC5OjshUCNJIe3Digw7G4zXCgAaaKBfJlIsoETqhQk7eB8Psu54s9kQyB8eskpB6l7agIoZYamTmG2RU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kspnqYUk; arc=none smtp.client-ip=209.85.222.181
+	 In-Reply-To:Content-Type; b=sD8w6KD4SElorYXZ5zpab77LK+rdXf/qohi7BNVgULWcxZObuv4QSttyN1ZayE33aOIMYcoo4kZw4piRIBeAz52ERIOSpHkYKUGAlEzPLracRhkWmutswrICzZo/iywhJM5Hp4n5Aab0TnhgbOuT/I9IyBOiqLX+oE3xLo0Fplc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=b+qgkbnX; arc=none smtp.client-ip=209.85.210.43
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kspnqYUk"
-Received: by mail-qk1-f181.google.com with SMTP id af79cd13be357-7928c5be3deso249366985a.0
-        for <iwd@lists.linux.dev>; Tue, 07 May 2024 06:05:14 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="b+qgkbnX"
+Received: by mail-ot1-f43.google.com with SMTP id 46e09a7af769-6ee4162061fso1943838a34.1
+        for <iwd@lists.linux.dev>; Tue, 07 May 2024 07:20:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1715087113; x=1715691913; darn=lists.linux.dev;
-        h=content-transfer-encoding:in-reply-to:from:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=CEmeLU0OVtQpXezs8He8zRTp1+KLtRW8eXGJ7Hgm1ow=;
-        b=kspnqYUkzsIwgqWKuSW0bXvuGWEsDYVxGbtEzwgV4IOWP/PtZtiNrYEyoElXX/aQxE
-         mR00pAGt8kxMmHQs7s666B0zn0+ZKmF4mXc/DgWx5OPEX92syrVMj9UMtXiukYjO1QQb
-         PJ99yWkHsCKs61CGLONPvhhCjXdqzMt/SaRG2I4uHv1ZKiG+1mKBKnbpB0l3NzwQOcsh
-         /nhJ4YmcnJfa/Rkjcr6TzdUh0SnRiaTlrLObF2IlKuHTgNzTQQcMcO2mXXOEoQzUt2vy
-         3/agLmIr9qMj4A2QiVp1SgIQKYfTq6vZ55saXpi8zMNaaClY7HguK1YnGY3zizw5l5Sf
-         hkAg==
+        d=gmail.com; s=20230601; t=1715091644; x=1715696444; darn=lists.linux.dev;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:to:subject:user-agent:mime-version:date:message-id:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=MOgZVFbtFr5KasEV1bnnafDbJcAOOuNf4Ions7HaY4M=;
+        b=b+qgkbnX0Qoag49fF01FH0U+vhF4/Oj485y5wf49t4C/n2DncFCgXqUTVa6NTpxjbS
+         nyNRaA0Z+CbwgmhAyppflVJYoFqZ1fMKBD3/WQL8NpvuSEXpmLrUeqmhM6n7VqHgxhmL
+         QPbatsEqbdVR+omOVNECDYK2oPTTVxe93iTNYJgGbRO438hyeDjZZ8kVPqDpPf07eB+R
+         /ZP/1qaMsv1az1jgcjOWoOlHQ9lxBda7AxhsX4GCjeE5uQG4ZlE5F3pjJXtn8DumDwM0
+         iJDg9QA11D/8HqPAfQBg/ejul9iRU6uxi9qWLloeTMCMJIvM4R9fVSc1Dwq2g4HY1Uog
+         flSg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715087113; x=1715691913;
-        h=content-transfer-encoding:in-reply-to:from:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
+        d=1e100.net; s=20230601; t=1715091644; x=1715696444;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=CEmeLU0OVtQpXezs8He8zRTp1+KLtRW8eXGJ7Hgm1ow=;
-        b=Cvs8Yh/iaRZwUfEILlm1isHcqbv7gI7llpVdo2nP3zyOCbI2iM0sS1WfoiyPLBaoGa
-         VC41Qh9ilJESHU6+JBtty7XwBLmdWCUcq+UUGwpYERTRWgJitMxh5viD66/7dgI0QuAv
-         4Z8618awPpZgq082cYsun3KlB9jyBB5eC0I4k0rln4kUfe1nVn6FTZg2xqO012rG+eFV
-         RAyGKYY8ZTngENFOjDvrGg3BGHwbtfwFDNSgXRo7LtLyoJr/wMcOC/ARZlWOlp3iZh0g
-         NNXqgofgPmGw9o3KbhkdO30ceokC7XK34bz/U9fQEmNGJ4vqRo5fxjFmX2iZWzPaSp2o
-         l8wA==
-X-Forwarded-Encrypted: i=1; AJvYcCVT48LEhORsHuFBsclSNGLnGlTdUmkhKY26rAIqyC45Y+q70zE9yE3qE4gevqdGVC8tUFELrf0Py1riZVoxQD84j5or
-X-Gm-Message-State: AOJu0YxHWUIZX+G6xe0HM8OFVkB0UQyxh/yzrBu6Z+5ImcBqiExRpVmM
-	SlSGdJHref8sYeKHbYsQKW2+gGZAKRdHEu2K8ktw27WI3nhvcN11
-X-Google-Smtp-Source: AGHT+IHlgGAzDw6WGw3pHgoYdehfYQ+AM9wb1tk5+knXG2fyBdTGyoP2vYdKBCMvd7EKgh2zR/15Ow==
-X-Received: by 2002:ae9:f70c:0:b0:792:9f1a:869a with SMTP id s12-20020ae9f70c000000b007929f1a869amr4133131qkg.16.1715087113463;
-        Tue, 07 May 2024 06:05:13 -0700 (PDT)
-Received: from [10.102.4.159] ([208.195.13.130])
-        by smtp.gmail.com with ESMTPSA id f2-20020a05620a408200b0078ec0e6188asm4870975qko.89.2024.05.07.06.05.12
+        bh=MOgZVFbtFr5KasEV1bnnafDbJcAOOuNf4Ions7HaY4M=;
+        b=gUL0NZtKWHe97l5b5T7cWuFUXSTdC6Fuem7WS5JPdahpYE79olaXOTLSqU/42ZAPyz
+         rMIN+5hzYJx9ZeVTzkUVYJRbAaEl4YBb1fgdi4Tr+Uti4UnsCNfMH06LKkyGPbBrMNC6
+         2vby8jWgMsEJEbIypk0BwbIxgXAcH4e+bkKMl/2jOG+suWHztF/BtCJYbvXoH+qiI9My
+         UB5Yi1h7o/KGnrGsUnlFLuh09d2AjIgw98vMu+9SATbDrAH+7AnJs0BXI9gPO70gi152
+         9uLHN06s6Par7mWpi6iJr/vrn99wwgezSuNHVQL4G/I4y5wZBcU5MOlGM0I4SbrEU7cs
+         y8zg==
+X-Forwarded-Encrypted: i=1; AJvYcCVxGhG7HXeEQ29surP2yOHsm09Eog/Dy69KIxwT7IKTQ5zfjglnUXKqWeyUxYmxEJWjwi9b2RP2pgqz9OC1ydKZJvjj
+X-Gm-Message-State: AOJu0YwzmyxKe7SoIGJHOGKBgMxfukzi+xsSrhrBtFeBeNs7No1gUD/C
+	P3++XLqHQHrFwmP2jo+AZBdEItkzBhq+guPzOqF4ZoBQ5fI+sNqX
+X-Google-Smtp-Source: AGHT+IETPL8L4eKP8dPmF2a5EjHDrhkaIYF/kRgoEaBrsvEWqlqRGfj9GRlqK2hzN1loUH6DAo1epQ==
+X-Received: by 2002:a9d:6298:0:b0:6f0:4847:a984 with SMTP id x24-20020a9d6298000000b006f04847a984mr7521411otk.21.1715091644263;
+        Tue, 07 May 2024 07:20:44 -0700 (PDT)
+Received: from [192.168.1.20] (syn-070-114-247-242.res.spectrum.com. [70.114.247.242])
+        by smtp.googlemail.com with ESMTPSA id f11-20020a056830264b00b006ea19aa0e4fsm2485667otu.29.2024.05.07.07.20.43
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 07 May 2024 06:05:13 -0700 (PDT)
-Message-ID: <1c0e07d2-4090-48b2-8e21-48ebda227ef9@gmail.com>
-Date: Tue, 7 May 2024 06:05:11 -0700
+        Tue, 07 May 2024 07:20:43 -0700 (PDT)
+Message-ID: <fe0f8f88-edb4-409d-b72f-867c6f7603e3@gmail.com>
+Date: Tue, 7 May 2024 09:20:42 -0500
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
@@ -62,71 +62,49 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 Subject: Re: Getting list of found networks
-Content-Language: en-US
 To: Michael John <MJohn@midmark.com>,
  "iwd@lists.linux.dev" <iwd@lists.linux.dev>
 References: <LV8PR08MB9350F79243154C9930EFC4BEAE1C2@LV8PR08MB9350.namprd08.prod.outlook.com>
- <e49f9a7f-5d4c-453e-9dc8-1a7667383912@gmail.com>
- <LV8PR08MB9350989BEB22ACB3B9C67DF6AEE42@LV8PR08MB9350.namprd08.prod.outlook.com>
-From: James Prestwood <prestwoj@gmail.com>
-In-Reply-To: <LV8PR08MB9350989BEB22ACB3B9C67DF6AEE42@LV8PR08MB9350.namprd08.prod.outlook.com>
+Content-Language: en-US
+From: Denis Kenzior <denkenz@gmail.com>
+In-Reply-To: <LV8PR08MB9350F79243154C9930EFC4BEAE1C2@LV8PR08MB9350.namprd08.prod.outlook.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 Hi Michael,
 
-On 5/7/24 5:49 AM, Michael John wrote:
-> Hi James,
->
->
->> Hi Michael,
->>
->>> Hi,
->>>
->>> I'm looking to better understand how the list of networks are collected  after a scan is done and get-networks is called.
->>> How long does a scan run for? I am assuming the scan causes the radio to go through each channel and listen for broadcast beacons to find available APs. I have noticed when calling scan and then get-networks I can get a different amount of found APs, like either I am not waiting long enough for a scan to complete or there is some other logic that dictates adding a network to the list (too low of an RSSI?). I'm also wondering how much of this is really controlled by IWD verses the radio firmware and are these simply request sent via nl80211?
->> For a DBus initiated scan IWD is going to scan the entire spectrum,
->> 2.4GHz, 5GHz, and 6GHz (obviously depending on hardware support). The
->> scan runs for as long as it takes to scan these bands, and that is
->> hardware dependent but generally takes 100ms per channel/frequency. IWD
->> has some logic to update the networks it finds throughout the scan, so
->> if you call get-networks too soon you may not see ALL networks that the
->> scan finds by the end (there is a scanning property that gets set
->> true/false to know when the FULL scan is done). Its very normal to not
->> see the exact same scan results per scan. If some AP has a very low RSSI
->> it may or may not show up from scan to scan.
-> Can you help me understand why a scan may not lead to the same scan results per scan?
-The beacons need to travel through the air. With 
-distance/obstructions/interference this signal degrades. So an AP very 
-far away may show up sometimes (if the beacon reaches you) or may not. 
-Anything can degrade the signal, most of which is random and out of your 
-control. If your seeing an AP very close not showing up in scan results, 
-that seems like a different issue than signal degradation.
-> My understanding is an access point will send a broadcast beacon at a set interval and that
-> interval is usually configurable. I'm assuming sometime a broadcast beacon may not be seen
-> during that channel scan, hence causing the difference per scan. Are there other scenarios?
-> Does IWD cache seen networks, or is this list fully repopulated each scan?
+On 5/6/24 8:16 AM, Michael John wrote:
+> Hi,
+> 
+> I'm looking to better understand how the list of networks are collected  after a scan is done and get-networks is called.
 
-The beacon may not be seen but likely this isn't due to the beacon 
-interval. You _can_ configure the beacon interval but I'm not sure why 
-you'd want to for interoperability. Clients expect ~100ms beacon 
-intervals, so that's how long they wait on a channel. If you increased 
-this interval its more likely clients would miss the beacons.
+You can always look at src/station.c to gain full understanding.  In short, iwd 
+maintains a sorted list of networks that is updated by certain events.  For 
+example, new scan results being available, network connection / disconnection, 
+etc.  The 'Scanning' property is helpful to know when a scan is ongoing.  Once 
+Scanning changes from True -> False one can know that iwd is done scanning.
 
-IWD caches for short periods of time, but prior to each scan the cache 
-is flushed.
+> How long does a scan run for? I am assuming the scan causes the radio to go through each channel and listen for broadcast beacons to find available APs. I have noticed when calling scan and then get-networks I can get a different amount of found APs, like either I am not waiting long enough for a scan to complete or there is some other logic that dictates adding a network to the list (too low of an RSSI?). I'm also wondering how much of this is really controlled by IWD verses the radio firmware and are these simply request sent via nl80211?
 
->
-> Thanks!
-> Michael
->
->> And yes, all requests are sent via nl80211.
->>
->> Thanks,
->>
->> James
->>
->>
->>> Thanks
->>> Michael John
+Scanning strategy is entirely dependent on the driver / hardware implementation. 
+  iwd has rather limited ability to influence how the scan is performed.  Scan 
+results can and do vary depending on the distance from the AP.  You're welcome 
+to try this on your own by playing with 'iw' to trigger some scans.  You will 
+find that some APs will appear / disappear from the scan results, particularly 
+the ones further away or that have obstacles.  Make sure to flush the kernel 
+cache with every scan.  Something like:
+
+iw dev wlan0 scan trigger flush passive <- Passive scan
+iw dev wlan0 scan trigger flush <- Active scan
+
+> 
+> Thanks
+> Michael John
 > CONFIDENTIALITY NOTICE: This message, including any attachments, contains confidential information intended for a specific individual and purpose. If you are not the intended recipient, you should delete this message and any disclosure, copying, or distribution of this message, or the taking of any action based on it, by you is strictly prohibited.
+> 
+
+My company suffers from this as well, but please try to get rid of such notices 
+when corresponding on a public mailing list :)
+
+Regards,
+-Denis
