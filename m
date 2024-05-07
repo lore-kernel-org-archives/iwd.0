@@ -1,59 +1,59 @@
-Received: from mail-oo1-f47.google.com (mail-oo1-f47.google.com [209.85.161.47])
+Received: from mail-ot1-f42.google.com (mail-ot1-f42.google.com [209.85.210.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B922155A55
-	for <iwd@lists.linux.dev>; Tue,  7 May 2024 15:51:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02A5C15E1E2
+	for <iwd@lists.linux.dev>; Tue,  7 May 2024 15:52:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715097076; cv=none; b=U+J/nmF6Sn4n2Aq35uQgGI1shD72vqX9VB9e1f7nQ34sWFPS3h3O4sATR1VAHGdeySTIdDUgkRxXxLAhhSmLv9O5OUqbDuLt0BqWoz18xmBjVEbqXq2lyPLkm8GoVLi3RiK5CTC9T3rC918XeaWRZQc7wLGLK6Ium80bUNZueN0=
+	t=1715097122; cv=none; b=BoP6rE41Ub48eejiLH1ydNy+gRUC8h5UQ8gj1DhqJDioRqlR54pYoTCbDCtIGHqs4lwpSsxYuRrqITiv0qguxHA81cazctoJo5DKzAolce3iinFfp1n5JYcs1L78zRFb6HYIjN/wBtZ+Xp9OQgpC082NBEycMPYA0KadX+SVENg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715097076; c=relaxed/simple;
-	bh=Ii4R3yTBjDBT8BAus2ckU4RSpprMz6ix8194kSHv8pU=;
+	s=arc-20240116; t=1715097122; c=relaxed/simple;
+	bh=7O11iaLR2glLOIgbUfIB7zMufPl+C3lV6U+BVEQF2Ww=;
 	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=hxOssFQnVgRSlDMmFYLFnzara2L66upu6xv7/CDvkVDpxPklWU/H7YIXoh6vXaLN/0nxtuHr+MnIl9ziErxasy6Th/vrEpOaPGPEaYNciVdbgY2ToXn+I6rDJbERQtrQ/Ug0qOlMUBJxoFFUWw81W39lQJ6TXB2JzRS/Q2pZ90E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZGWBl6Bl; arc=none smtp.client-ip=209.85.161.47
+	 In-Reply-To:Content-Type; b=N0X2nWLKhpKgc+QqDI03famtXI+DVAXx0N8BFUhHTomr47IyYuEpJIQ6Ch3Qrs4MIzlmiMmLKL6tAmQJ0GU2S05KqfCsTSSA+Bu484LfhFix34BtN4XFQHvn4nParssG4JqNhky+NHD14cX7s9ri5vYR2Ark/QEvlNoBHCTeqTM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mVxMEpGc; arc=none smtp.client-ip=209.85.210.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZGWBl6Bl"
-Received: by mail-oo1-f47.google.com with SMTP id 006d021491bc7-5b1ff50e8d1so1813440eaf.0
-        for <iwd@lists.linux.dev>; Tue, 07 May 2024 08:51:15 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mVxMEpGc"
+Received: by mail-ot1-f42.google.com with SMTP id 46e09a7af769-6f0794fdb95so1165143a34.2
+        for <iwd@lists.linux.dev>; Tue, 07 May 2024 08:52:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1715097074; x=1715701874; darn=lists.linux.dev;
+        d=gmail.com; s=20230601; t=1715097120; x=1715701920; darn=lists.linux.dev;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:to:subject:user-agent:mime-version:date:message-id:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=RBYNUBWWlL+m2DomiGqgdZ8Vg6KcsC4w8JGS60aFPec=;
-        b=ZGWBl6BlZWj4Zsv3zis39Bm+GynyxrQb/g1BJef8fhZuSKQ2zf2BxyIsUda2eIaNN6
-         Oe2uU7wX6t35dTv79ivowMSZ3srPENN9F4dPH3tCbQ5kxed0I++eTCCscAiL7BXkbKHU
-         FZ6aoAC0pTCBr0E4oVCotJXMdabTyq/WTy1Km+OJzWqHQuHkk/+Totq4Od5Hmwt9EI9O
-         VlYxmVHKOf2w1QTB0jkgOCJxCXZQI0A6xqKZeM6NKnlrY+eYTLs67uDDNJliFOxgt9/q
-         tOw8EbsEPK+RQZXp2FoC2XSX73tePvAC/WWXNJPY3KN07nCeXaE/z68mi/a18LGiDX/T
-         n+JQ==
+        bh=B8a+YGSAndfcRZ3COkFWp4kWjvyzQ88J54DqUwRxCPc=;
+        b=mVxMEpGcVaKkpydal8+h1E3CRRfKZpQIxOyYUgzGCS9WTNmJE0xR9YFFe8OqY6F1wg
+         4gOHtSx61pLbwhKWhiMNuQ0M9/rFwSd1a9QYOmTXkCMpGSaHubIjpcQNHbjsOGQBQSXp
+         GhvR9jUP5SsqQ/+HMg4J3Vc+NKEkQUX/eTN/cKr5hFO35V7wUsRMuiQVAZ9WATdkxIgK
+         ct0pWuh1t00D84CcxD5I3SYPmBHLxiQXgda2BN9bS4UC/4HFZZSKsigdgLlRb/ZaqcE/
+         j5/lZ9cRzW/Wel9/Fv1802tKUwpgNtwFPHV5iW+Y1yGGho4qQjG0yGWLqShi3JG1JhOt
+         9yBA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715097074; x=1715701874;
+        d=1e100.net; s=20230601; t=1715097120; x=1715701920;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=RBYNUBWWlL+m2DomiGqgdZ8Vg6KcsC4w8JGS60aFPec=;
-        b=eZU2W5+CpSB1TCwauwcXhTzdIkYj/psXGqrQ5GUhJf0qL67QXomB+wipXAqo0fmxSE
-         EvjMxJtBLQ6JlbYa3AEQ27U7F9qDn4dfQnz025ff9u0F8dCvcytm+4qAHuLlGtwyu+T6
-         KbUoVNythqkJQ9UyKkfdnZQsTT5AfatUXkqMPPe3S9+pLL/FInc98dkiSstYR4bEyfne
-         fyGsbRfdk5P6ns4592n8fy4YndgW9ZuFRhOglfxRpojzB8phlbSIY0W1sYztGTwhMbSn
-         ibGmjngsCkvGyYYM/l4yJ8CIx58gdITm2jQF6sN2NWF3Xzy4ijxrSthXTZQ70gflWPGz
-         Q0fA==
-X-Forwarded-Encrypted: i=1; AJvYcCWwPCly/py+wovnaAA4m8b+pNpKo4HscKtH5T8C8RnF7DHJ02gIGTmGlBbB6ijmjOtINduQFhAN1+YqwZ49Gj+73uZa
-X-Gm-Message-State: AOJu0YzUzQNJRBlhzzFBode0pAyUWAT9xhluwVngKOfJtMlVPg5Ez7Sg
-	URSgB2lmvRLdg16MdS1aaSuR86BzFBhXR68+CqKlUOPvFnuB62p/O3WTWg==
-X-Google-Smtp-Source: AGHT+IEy55T8ivoLA8tpQk8rXpULP9f3V/vtP2i7bJzgg0MaVkbDPHXxhmG+dMD6RUBPa8tgxriVKg==
-X-Received: by 2002:a4a:44c1:0:b0:5b2:9d0:4d91 with SMTP id o184-20020a4a44c1000000b005b209d04d91mr7013179ooa.1.1715097074369;
-        Tue, 07 May 2024 08:51:14 -0700 (PDT)
+        bh=B8a+YGSAndfcRZ3COkFWp4kWjvyzQ88J54DqUwRxCPc=;
+        b=SYv5y/O/TzCXpoef072S0TbGVFClRJQRFS5XMI15M7fynSu1Wqdpi09rc+yWrzZUAz
+         ExpWzI7tflyKxaa+8Z8Zajmz+bpL42parrhqpX5G0SO6rKABxADrAD/S0pC/DZ3DmeKQ
+         9JY7s7lIe3Ynk/6+Zly0gVR7hlg2TvskiUtEC2iFF8Q/NKTsahFvqJNKRn1zOGpwuJm0
+         Ik2qWmMfxZTza+h+leTimHR3DgDk950tPpyrOp3sYNCweYKmg9yN8WPvmKdmW1fiDHWx
+         gEDS97k5IvSSt1PQKAKzNgwvjUljWmib9hdqyaK7Y3m6ryKWi1wOwlOgUk3pjeM9KpsN
+         /frg==
+X-Forwarded-Encrypted: i=1; AJvYcCXB58hAnxUSQI0JvqxisMYS6ogEO0Tb0ttnyRE0KGnIIXpM/AMZ+fjuRRcR9lhNPtJgcCbj11GYJ3Mvy5Bg/ns0tXcS
+X-Gm-Message-State: AOJu0Yy3+483AMpF3BZk6t1uWc6A5g4QfocZiMTXR7zKz+FDeEZKc2EY
+	8CM9N6+w3nVeWYuiaI0OCYwUV8CNcb0rMovXFPFHYXfpdSjberj3
+X-Google-Smtp-Source: AGHT+IGQfCU7YlVKMHDJ84mrUFa+59aSWL+d9v9F8TIXXu5Ep4UC1DcEiipLaiQq/r5tHZobmHjkkQ==
+X-Received: by 2002:a05:6830:1e4c:b0:6f0:478b:3e08 with SMTP id e12-20020a0568301e4c00b006f0478b3e08mr7234050otj.34.1715097120144;
+        Tue, 07 May 2024 08:52:00 -0700 (PDT)
 Received: from [192.168.1.20] (syn-070-114-247-242.res.spectrum.com. [70.114.247.242])
-        by smtp.googlemail.com with ESMTPSA id bh15-20020a056820088f00b005b1e10646a5sm2039929oob.39.2024.05.07.08.51.13
+        by smtp.googlemail.com with ESMTPSA id bl5-20020a056830370500b006ef9ac4599asm2568752otb.47.2024.05.07.08.51.59
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 07 May 2024 08:51:14 -0700 (PDT)
-Message-ID: <45018896-6df5-4646-9630-8a9765f37285@gmail.com>
-Date: Tue, 7 May 2024 10:51:12 -0500
+        Tue, 07 May 2024 08:51:59 -0700 (PDT)
+Message-ID: <d227d1ae-3fec-4261-a419-9e5ef0033462@gmail.com>
+Date: Tue, 7 May 2024 10:51:59 -0500
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
@@ -61,30 +61,33 @@ List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 03/18] unit: fix SAE unit tests
+Subject: Re: [PATCH v2 08/18] sae: support reception of Confirm frame by AP
 To: John Brandt <brandtwjohn@gmail.com>, iwd@lists.linux.dev
 References: <20240506003518.320176-1-brandtwjohn@gmail.com>
- <20240506003518.320176-4-brandtwjohn@gmail.com>
+ <20240506003518.320176-9-brandtwjohn@gmail.com>
 Content-Language: en-US
 From: Denis Kenzior <denkenz@gmail.com>
-In-Reply-To: <20240506003518.320176-4-brandtwjohn@gmail.com>
+In-Reply-To: <20240506003518.320176-9-brandtwjohn@gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 Hi John,
 
 On 5/5/24 7:30 PM, John Brandt wrote:
-> Don't mark either client as being the authenticator. In the current unit
-> tests, both instances act as clients to test functionality. This ensures
-> the unit does not show an error during the following commits where SAE
-> for AP mode is added.
+> Experimental AP-mode support for receiving a Confirm frame when in the
+> COMMITTED state. The AP will reply with a Confirm frame.
+> 
+> Note that when acting as an AP, on reception of a Commit frame, the AP
+> only replies with a Commit frame. The protocols allows to also already
+> send the Confirm frame, but older clients may not support simultaneously
+> receiving a Commit and Confirm frame.
 > ---
->   unit/test-sae.c | 3 ---
->   1 file changed, 3 deletions(-)
+>   src/sae.c | 48 +++++++++++++++++++++++++++++++++++-------------
+>   1 file changed, 35 insertions(+), 13 deletions(-)
 > 
 
-Applied, thanks.
+I went ahead and applied this patch as well after re-flowing some lines that 
+were > 80 characters.
 
 Regards,
 -Denis
-
