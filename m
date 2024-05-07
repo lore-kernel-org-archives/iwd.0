@@ -1,58 +1,59 @@
-Received: from mail-yb1-f177.google.com (mail-yb1-f177.google.com [209.85.219.177])
+Received: from mail-qk1-f181.google.com (mail-qk1-f181.google.com [209.85.222.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFA4D152534
-	for <iwd@lists.linux.dev>; Tue,  7 May 2024 11:41:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DDBC1509B0
+	for <iwd@lists.linux.dev>; Tue,  7 May 2024 11:55:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715082073; cv=none; b=iIXMZJcMxUwo+uix6DkvE3sRQj/64AHaZsIJXI7OougzCw10Lmlsh9PyGnVlA/xmGFXR9tYUgWna9lAZlu/oHXDDUFd/s+p7pSmRPaw28QrwowZ2nhkPIrGSTSQ9vB+nDq9mRseamVlqHWYhkwfgoYLmDzyRhbCSDo5T1udaEow=
+	t=1715082910; cv=none; b=bqNrzALxCxL1pQxPvueINeDfQ09w8jgUpwTXU/XgNcIPHqFngIRfkCu29RXJ9/IqqrvKQrz9jahaVgfIX4d+aBMCRAAr5a6sQ5QKXaLWzTWmYKzOtBsHv8O9nNtP3IPk5ZE4A+jW3Qe0ZHhtJuFvOLuhrOaNDvGkF6AjEbtUSpU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715082073; c=relaxed/simple;
-	bh=gRhgp21EZ1PoYgaGnzW32SKiNPEdxsKsaagdVAQAW7U=;
+	s=arc-20240116; t=1715082910; c=relaxed/simple;
+	bh=9uqj0jSiDbWe7334WtZXn2ZEPlJ/kA24WXapOgtmr7o=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=lyrAf/TSeuuUgdppq0Fxv/OmfVm/TjtaynfFn4y8YKAALmZ+Gq/J0KEK+Xq5aL2OvP23DAd7+s+aSdl/XCZFlSLeyfNn2G7dWUgV+RDfGh7zjMqwhKbgz8tPxuleHkS/V2HBeBjUWrHwtbKlVhJXRJVeSJGA3uimv3SO4gVOW7k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dvK5fIOt; arc=none smtp.client-ip=209.85.219.177
+	 In-Reply-To:Content-Type; b=XZ4eMDup7fW8zYKnaqZZc7c/CozV78w2hdqtLrGzaQp9SKZr/lUsxoHoA9+kaRTw26Rqu/tIYA19qj7TEcNbb8jTRt0qAzlhmbDB/Giarl6HvMj7lW30bpzwlXcm1v1j8VU5xCRIfu8M+eItCL9lDQcKTJZ3VNvYq1vkHMjBRrw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HEGA7Clb; arc=none smtp.client-ip=209.85.222.181
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dvK5fIOt"
-Received: by mail-yb1-f177.google.com with SMTP id 3f1490d57ef6-dc6dcd9124bso2721089276.1
-        for <iwd@lists.linux.dev>; Tue, 07 May 2024 04:41:11 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HEGA7Clb"
+Received: by mail-qk1-f181.google.com with SMTP id af79cd13be357-79291262dc2so295356085a.2
+        for <iwd@lists.linux.dev>; Tue, 07 May 2024 04:55:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1715082071; x=1715686871; darn=lists.linux.dev;
+        d=gmail.com; s=20230601; t=1715082908; x=1715687708; darn=lists.linux.dev;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=nmfh+Yuv5XzMZ/ZHUWUDxcxQ1EA3dgxtyZtPKR/OcYU=;
-        b=dvK5fIOtSlH+6QdJK43zJ4bg5XpUrJ/tiOYpA1vCLH5qrin3N3eRuPHMaZW152d3hc
-         eFpMZDjmD1wBo5oZ8heSQ2ys23MiDgZEqP2oMtaAiaYSFtkJB3PX/MPqspDNxg7kpaEp
-         UIhw/EuzGaXxXza89TtXzf6D8AVeu95eLBph9yv7qkhpcQ1zhEanOQ9iMDOTxB1ytmf5
-         6yd3QpzA72NEHRnJXzcT6AKyX4k/pLxYgZl4/fSQXnk5fpoYLCTNwOHcKxnbbX6SFUKf
-         tl6q35RB3UWHg/5/6BmicVQWPn+RfAe4oQYq3+njoPrZ46/WuQ0L5e46cCmfYWfkFjV/
-         FOww==
+        bh=Lutqo1zLDZi00gzOoguPAFYPdtveNfhJw/qEp3OcaHM=;
+        b=HEGA7Clb3Y1olgbZboqMKHmoiy1MjQV/F4uakVH026BMAcBReeKKWudBTBwJJzV07a
+         71oBukGO4RPacjcxbCUHl736cr+7TWjz0c4vPV8xNyCjyTdSeAsptK46E4I8ermwlIEC
+         BbOe9Y0Ad6Z4RIlFoZ/OuOiKxtPxSkiC8VnMiwkIJQ8XlSbHtcpeYy3wnjlo//QzaB4l
+         IRIJvW2r9xbeVGCcgb+39O1glQzApM/OZ1m4B0+05t2bN6uxQFs0CorSlluVgzMe1AqX
+         cgQAOxKqjBRTAhc6QK6s0zd8k9kR+AMDVCK9KIAkSDIUg/TxtWm+6rkYlFqyqPcSI3KV
+         eukg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715082071; x=1715686871;
+        d=1e100.net; s=20230601; t=1715082908; x=1715687708;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=nmfh+Yuv5XzMZ/ZHUWUDxcxQ1EA3dgxtyZtPKR/OcYU=;
-        b=pmFl9ykA7berOo+RGBh76ovMso/aimQFQYEJ7HdN2g2N2MDlDFnafGAS+35Lai/Th5
-         /fgj2pGdJo2hQwQ0GNwbCqjtRJX2/CQ50kYYRra2noHti4VoNRsXadjjjktd1dFVHcTU
-         FcABhdZGtKo2jLQb5L4ie1nVI2JDgS84UevrJgAu6Ru37T5bMEicNK6R2hG/BQ7GO21d
-         lt5+y8470V51XXoTNQNfGDyunsHsjPdrp+hFkzP/0epOzZdBEIKLsgLK5UtkOn1k49pD
-         Gw3OFfEh1qT37X53GnL/VJ61vGdhtPmxQrZka3Yo6E68dyXM9fL2YuAsQr4lXJmwp5vF
-         U8vQ==
-X-Gm-Message-State: AOJu0YzXPm7LohAgaRvDTh/iG7YriDlJPYiJgOskFVz7i0gXjh7ys/no
-	b9EOqMjEggN0VhZ6AilSRHs/NAukoK3Zfj2V5UBLfnDkjxjlO4l3+nkTnA==
-X-Google-Smtp-Source: AGHT+IE4OVzedR93QghiBHBID4PfHTGSp30lpFi+ytPXKjygIRtsFf4G2yZfFFFAlVUqTY6N+WXgyw==
-X-Received: by 2002:a5b:60e:0:b0:deb:3c92:9ae3 with SMTP id d14-20020a5b060e000000b00deb3c929ae3mr12414850ybq.44.1715082070731;
-        Tue, 07 May 2024 04:41:10 -0700 (PDT)
+        bh=Lutqo1zLDZi00gzOoguPAFYPdtveNfhJw/qEp3OcaHM=;
+        b=NLft42mwA9UeQIqQpaFcAFOfcV9OOl2oPXAXK1bAI/SD7F68riGDJW2c1HLjHDjVQT
+         YrJ1HeQCTOQUrKQEvR3FkApTAvn0vE9/iCaHVdsYiE+vLvXLc2xt14chKq58MnMegARa
+         cbf0Gyjt6C2KJBeaSaQmel31n41lbDuAk0Y7vfOnSmG5rjzrJTbR/uMAuCyYppKjnHSd
+         mDLeRFcG1inZiKgupvvVBQeDEphSJgyT7eap4NzRqAy1Mw6s4js4jsGxjtKCqP0cLshV
+         Vamf94A1Mi1UW9i3MWXBK5vNJWWptYbCaRMLmvOWfKNJVtSnpcNdA0Pc8SHvljLanNK4
+         kH8Q==
+X-Forwarded-Encrypted: i=1; AJvYcCVMm/Gnd8O+8rCq7HUSmfLFRVceVV4rQlskvvSvLbHe4bE1vwF9spuSN2pke3Hb2YbuCuiU8FsNd/aL7RZksj7BirrJ
+X-Gm-Message-State: AOJu0YwQ9PYoV91uWROOB3EOMHqTEk+HNh15fqlnt5+LtrpSbYIDMtnq
+	wUFktnxz3NIisijup5Ypwp82X2wYWZFA9m3B0uR5gakn+FuENcc0
+X-Google-Smtp-Source: AGHT+IGJSsBJpGK0wsgYdDeWypldCa5QPoyNJ7lX28D8r9tsjC4H5BR5qOIZnzguPZOx0XaeGv4u3A==
+X-Received: by 2002:ad4:5c4c:0:b0:6a0:d465:6088 with SMTP id a12-20020ad45c4c000000b006a0d4656088mr17312945qva.34.1715082907959;
+        Tue, 07 May 2024 04:55:07 -0700 (PDT)
 Received: from [10.102.4.159] ([208.195.13.130])
-        by smtp.gmail.com with ESMTPSA id m6-20020a05622a054600b00436434cc3e4sm1995279qtx.89.2024.05.07.04.41.09
+        by smtp.gmail.com with ESMTPSA id x12-20020a0ceb8c000000b006a0f012fab9sm4626983qvo.52.2024.05.07.04.55.06
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 07 May 2024 04:41:10 -0700 (PDT)
-Message-ID: <3e5c8d35-b08c-4906-ae06-7a5d511d518a@gmail.com>
-Date: Tue, 7 May 2024 04:41:08 -0700
+        Tue, 07 May 2024 04:55:07 -0700 (PDT)
+Message-ID: <083f4a69-a164-404b-b4fb-9ce024a38156@gmail.com>
+Date: Tue, 7 May 2024 04:55:05 -0700
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
@@ -60,165 +61,280 @@ List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: NetworkManager connection gets stuck in pending state when
- bringing up AP mode connection with IWD backend
+Subject: Re: Raspberry Pi 5 and WPA3
 Content-Language: en-US
-To: James Hilliard <james.hilliard1@gmail.com>
-Cc: iwd@lists.linux.dev
-References: <CADvTj4qmJm_Lyk5bR_WZE8TioVa5f0MHdtDghJdRX=9ZhivzjA@mail.gmail.com>
- <7fd93025-1bb2-46a9-aefc-3e74942164b9@gmail.com>
- <CADvTj4pHyYewHzSUF+546JPO6Y0Co+QfFcBbJEctNWQBNJmb=A@mail.gmail.com>
- <73d7295e-44e1-42ff-9d45-9effa65a0698@gmail.com>
- <CADvTj4oH4PjcD=0QXYT6BTEpQhtONr6QsT1mp+nmcG4Uc10c+g@mail.gmail.com>
+To: KeithG <ys3al35l@gmail.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+ Harry ten Berge <htenberge@gmail.com>, iwd@lists.linux.dev
+References: <CAN+yObo7O+c7x51maXYxUiSttAC6ZJkuNb9DJwjCuegbAgyLow@mail.gmail.com>
+ <91648487-9c59-40f9-996d-dfad1f1adcbb@gmail.com>
+ <38861D9C-F5F5-4149-99CD-0C59480986ED@holtmann.org>
+ <25618c14-df5a-4980-9e62-dd5c96084455@gmail.com>
+ <CAG17S_MTbFpQB-LDu6s87D1stbojwpto3y+V1X4kSPe3Gkixug@mail.gmail.com>
+ <CAG17S_PnK8PebjYZT5s0qyPMn7HhL=D+mC4VaG4i2ZAydeOjSA@mail.gmail.com>
+ <997f2369-3805-4141-ba39-72d5f6ac6931@gmail.com>
+ <CAG17S_MR1ZKkX7nUmb-0K0WAKDSpV8=xSR8ky-wD4uvmwiGiUw@mail.gmail.com>
+ <129db0c4-d402-480a-ba9a-d28ecbbdacfe@gmail.com>
+ <CAG17S_MfsMfPaxWa0C7g_O+anw6y1m+7hQTk_Y-RO_bTKHuowA@mail.gmail.com>
 From: James Prestwood <prestwoj@gmail.com>
-In-Reply-To: <CADvTj4oH4PjcD=0QXYT6BTEpQhtONr6QsT1mp+nmcG4Uc10c+g@mail.gmail.com>
+In-Reply-To: <CAG17S_MfsMfPaxWa0C7g_O+anw6y1m+7hQTk_Y-RO_bTKHuowA@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
 
-On 5/6/24 3:40 PM, James Hilliard wrote:
-> On Mon, May 6, 2024 at 2:49 PM James Prestwood <prestwoj@gmail.com> wrote:
->> Hi,
+On 5/6/24 7:33 PM, KeithG wrote:
+> On Thu, May 2, 2024 at 9:07 AM James Prestwood <prestwoj@gmail.com> wrote:
+>> Hi Keith,
 >>
->> On 5/6/24 1:34 PM, James Hilliard wrote:
->>> On Mon, May 6, 2024 at 2:15 PM James Prestwood <prestwoj@gmail.com> wrote:
->>>> Hi James,
->>>>
->>>> On 5/6/24 12:11 PM, James Hilliard wrote:
->>>>> It's a bit unclear if this is a NetworkManager bug or an IWD bug but
->>>>> I'm unable to successfully bring up AP mode connection in
->>>>> NetworkManager when using the IWD backend.
->>>>>
->>>>> It appears that NetworkManager fails to recognize that IWD has brought
->>>>> up the AP successfully for some reason even though the AP is
->>>>> active(i.e. devices can connect to the AP). This results in
->>>>> NetworkManager failing to appropriately configure the routes needed
->>>>> for the AP.
->>>>>
->>>>> Logs from NetworkManager:
->>>>> <debug> [1709938743.1640] device[e4bcd76bde98e8a1] (wlan0):
->>>>> Activation: (wifi) Called Start('APSSID').
->>>>> <debug> [1709938743.1641] device[e4bcd76bde98e8a1] (wlan0):
->>>>> Activation: (wifi) IWD Device.Mode set successfully
->>>>> <debug> [1709938743.1644] device[e4bcd76bde98e8a1] (wlan0):
->>>>> remove_pending_action (1): 'recheck-available'
->>>>> <trace> [1709938743.2594] platform: (wlan0) emit signal
->>>>> ip4-address-changed added: 192.168.45.129/28 brd 0.0.0.0 lft forever
->>>>> pref forever lifetime 1235-0[4294967295,4294967295] dev 5 flags
->>>>> permanent src kernel
->>>>> <debug> [1709938743.2595] platform: (wlan0) signal: address 4   added:
->>>>> 192.168.45.129/28 brd 0.0.0.0 lft forever pref forever lifetime
->>>>> 1235-0[4294967295,4294967295] dev 5 flags permanent src kernel
->>>>> <trace> [1709938743.2598] platform: (wlan0) emit signal
->>>>> ip4-route-changed added: type local table 255 192.168.45.129/32 dev 5
->>>>> metric 0 mss 0 rt-src rt-kernel scope host pref-src 192.168.45.129
->>>>> <debug> [1709938743.2599] platform: (wlan0) signal: route   4   added:
->>>>> type local table 255 192.168.45.129/32 dev 5 metric 0 mss 0 rt-src
->>>>> rt-kernel scope host pref-src 192.168.45.129
->>>>> <trace> [1709938743.2602] platform: (wlan0) emit signal
->>>>> ip4-route-changed added: type unicast 192.168.45.128/28 dev 5 metric 0
->>>>> mss 0 rt-src rt-kernel rtm_flags linkdown scope link pref-src
->>>>> 192.168.45.129
->>>>> <debug> [1709938743.2602] platform: (wlan0) signal: route   4   added:
->>>>> type unicast 192.168.45.128/28 dev 5 metric 0 mss 0 rt-src rt-kernel
->>>>> rtm_flags linkdown scope link pref-src 192.168.45.129
->>>>> <trace> [1709938743.2609] platform: (wlan0) emit signal link-changed
->>>>> changed: 5: wlan0 <UP,LOWER_UP;broadcast,multicast,up,running,lowerup>
->>>>> mtu 1500 arp 1 wifi? init addrgenmode none addr BC:25:F0:1D:6A:03
->>>>> permaddr BC:25:F0:1D:6A:03 brd FF:FF:FF:FF:FF:FF driver rtl8821ae
->>>>> tx-queue-len 1000 gso-max-size 65536 gso-max-segs 65535 gro-max-size
->>>>> 65536 rx:443,42144 tx:563,224232
->>>>> <debug> [1709938743.2610] platform: (wlan0) signal: link changed: 5:
->>>>> wlan0 <UP,LOWER_UP;broadcast,multicast,up,running,lowerup> mtu 1500
->>>>> arp 1 wifi? init addrgenmode none addr BC:25:F0:1D:6A:03 permaddr
->>>>> BC:25:F0:1D:6A:03 brd FF:FF:FF:FF:FF:FF driver rtl8821ae tx-queue-len
->>>>> 1000 gso-max-size 65536 gso-max-segs 65535 gro-max-size 65536
->>>>> rx:443,42144 tx:563,224232
->>>>> <debug> [1709938743.2611] device[e4bcd76bde98e8a1] (wlan0): queued
->>>>> link change for ifindex 5
->>>>> <info>  [1709938743.2657] device (wlan0): Activation: (wifi) Stage 2
->>>>> of 5 (Device Configure) successful.  Started 'APSSID'.
->>>>> <debug> [1709938743.2658] device[e4bcd76bde98e8a1] (wlan0):
->>>>> activation-stage: schedule activate_stage3_ip_config
->>>>> <debug> [1709938743.2659] device[e4bcd76bde98e8a1] (wlan0):
->>>>> activation-stage: invoke activate_stage3_ip_config
->>>>> <debug> [1709938743.2660] device[e4bcd76bde98e8a1] (wlan0):
->>>>> activation-stage: synchronously invoke activate_stage3_ip_config
->>>>> <debug> [1709938743.2661] device[e4bcd76bde98e8a1] (wlan0): ip4:
->>>>> required-timeout: disabled
->>>>> <debug> [1709938743.2661] device[e4bcd76bde98e8a1] (wlan0): ip6:
->>>>> required-timeout: disabled
->>>>> <debug> [1709938743.2662] active-connection[c8d123b3d4d3f96d]: set
->>>>> state-flags layer2-ready (was none)
->>>>> <info>  [1709938743.2664] device (wlan0): state change: config ->
->>>>> ip-config (reason 'none', sys-iface-state: 'managed')
->>>>> <debug> [1709938743.2699] device[e4bcd76bde98e8a1] (wlan0):
->>>>> add_pending_action (2): 'in-state-change'
->>>>> <debug> [1709938743.2704] device[e4bcd76bde98e8a1] (wlan0):
->>>>> remove_pending_action (1): 'in-state-change'
->>>>> <info>  [1709938743.2709] device (wlan0): IWD AP/AdHoc state is now Started
->>>>> <trace> [1709938743.2710] device[e4bcd76bde98e8a1] (wlan0): ip4:
->>>>> check-state: state pending => pending, is_failed=0, is_pending=0,
->>>>> is_started=0 temp_na=0, may-fail-4=1, may-fail-6=1;;;
->>>>> <trace> [1709938743.2710] device[e4bcd76bde98e8a1] (wlan0): ip:
->>>>> check-state: (combined) state pending => pending
->>>>> <trace> [1709938743.2711] device[e4bcd76bde98e8a1] (wlan0): ip6:
->>>>> check-state: state pending => pending, is_failed=0, is_pending=0,
->>>>> is_started=0 temp_na=0, may-fail-4=1, may-fail-6=1;;;
->>>>> <trace> [1709938743.2711] device[e4bcd76bde98e8a1] (wlan0): ip:
->>>>> check-state: (combined) state pending => pending
->>>>>
->>>>> NetworkManager bug report with some more details:
->>>>> https://gitlab.freedesktop.org/NetworkManager/NetworkManager/-/issues/1498
->>>> This does seem like an NM bug if your able to connect to the AP. That
->>>> means IWD is doing its part. Fwiw I just tried using NM 1.36.6 and IWD
->>>> 2.16 and was able to connect with my phone, saw it had an IP etc.
->>> Yeah, it does get an IP for me as well, but routes are not configured so
->>> no internet for the connecting device. What's unclear is how NM is supposed
->>> to detect this state change, does it do that over dbus or something?
+>> On 5/2/24 6:47 AM, KeithG wrote:
+>>> James,
 >>>
->>> Does NM also report a pending state for you?
->> I'm not very familiar with NM to be honest, but is this what your
->> looking for?
-> Can you see what the NM logs show when bringing up the connection?
->
-> I think you may need to enable trace logging like this or something:
-> nmcli general logging level TRACE domains ALL
->
->> jprestwood@LOCLAP699:~$ nmcli device show wlan0
->> GENERAL.DEVICE:                       wlan0
->> GENERAL.TYPE:                           wifi
->> GENERAL.HWADDR:                    <MAC>
->> GENERAL.MTU:                           1500
->> GENERAL.STATE:                         100 (connected)
->> GENERAL.CONNECTION:             Hotspot
->> GENERAL.CON-PATH: /org/freedesktop/NetworkManager/ActiveConnection/12
->> IP4.ADDRESS[1]:                        10.42.0.1/24
->> IP4.ADDRESS[2]:                        192.168.135.17/28
->> IP4.GATEWAY:                              --
->> IP4.ROUTE[1]:                            dst = 10.42.0.0/24, nh =
->> 0.0.0.0, mt = 600
->> IP4.ROUTE[2]:                            dst = 169.254.0.0/16, nh =
->> 0.0.0.0, mt = 1000
->> IP4.ROUTE[3]:                            dst = 192.168.135.16/28, nh =
->> 0.0.0.0, mt = 0
->> IP6.ADDRESS[1]: fe80::ae2e:3bf6:3828:d928/64
->> IP6.GATEWAY:                             --
->> IP6.ROUTE[1]:                            dst = fe80::/64, nh = ::, mt = 1024
+>>> I tried to connect via my Samsung S23 phone and my desktop with an
+>>> intel card. The desktop uses iwd 2.17 and when I tried to connect via
+>>> iwctl, it did the same thing as the RPi. I suspect my hostapd config,
+>>> but do not know. I can try collecting some logs next week on the
+>>> desktop and the Pi. Which log do you need? '-d something' or an iwmon
+>>> log?
+>> Yeah just a -d IWD log. If you want to capture with iwmon that
+>> definitely can't hurt. For reference, this is the config we use for one
+>> of our SAE autotests:
 >>
->> My phone has a 192. address so I assume ROUTE[3] is the right route?
-> Hmm, can it reach the internet or devices not on the 192 network?
-I wasn't able to test this yesterday, but with my laptop now on eth I 
-see the same behavior. I get not internet connection from the hotspot. 
-Still, this does seem like a NM bug because in this context IWD isn't 
-doing anything with IPs/routes. As far as wifi is concerned IWD is 
-operating correctly. Does this work with wpa_supplicant for you?
->
->> Thanks,
+>> https://git.kernel.org/pub/scm/network/wireless/iwd.git/tree/autotests/testSAE/ssidSAE.conf
 >>
->> James
->>
->>>> Thanks,
+>>> Keith
+>>>
+>>> On Thu, May 2, 2024 at 8:09 AM James Prestwood <prestwoj@gmail.com> wrote:
+>>>> Hi Keith,
 >>>>
->>>> James
+>>>> On 5/2/24 5:56 AM, KeithG wrote:
+>>>>> On Tue, Apr 30, 2024 at 7:19 AM KeithG <ys3al35l@gmail.com> wrote:
+>>>>>> On Tue, Apr 30, 2024 at 6:24 AM James Prestwood <prestwoj@gmail.com> wrote:
+>>>>>>> Hi Marcel,
+>>>>>>>
+>>>>>>> On 4/30/24 12:42 AM, Marcel Holtmann wrote:
+>>>>>>>> Hi James,
+>>>>>>>>
+>>>>>>>>>> I'm not sure this is the right place to ask for some assistance, but
+>>>>>>>>>> here we go...
+>>>>>>>>>>
+>>>>>>>>>> I'm the author for a small Raspberry Pi audio image that is
+>>>>>>>>>> specifically targeting Roon.
+>>>>>>>>>> If you're not familiair with Roon: it's an audio streaming platform
+>>>>>>>>>> targeting audiophiles ;-)
+>>>>>>>>>>
+>>>>>>>>>> Anyways, about a year ago I switched from wpa_supplicant to iwd, to
+>>>>>>>>>> full satisfaction.
+>>>>>>>>>> Better and easier integration, and overall a feel of me being in more control.
+>>>>>>>>>>
+>>>>>>>>>> Now, recently I'm having issues with WPA3 support. This is partly
+>>>>>>>>>> related to firmware (it's just so obfuscated how this all works with
+>>>>>>>>>> firmware from broadcom and firmware from cypress :-(
+>>>>>>>>>>
+>>>>>>>>>> And one of those things is that I can't get it to work on the new Pi
+>>>>>>>>>> 5. Specifically IWD reporting this:
+>>>>>>>>>>
+>>>>>>>>>> Apr 29 17:41:41 ropieee5 iwd[275]: src/wiphy.c:wiphy_select_akm()
+>>>>>>>>>> Network is WPA3-Personal...
+>>>>>>>>>> Apr 29 17:41:41 ropieee5 iwd[275]: SAE unsupported: brcmfmac needs
+>>>>>>>>>> CMD_EXTERNAL_AUTH for SAE
+>>>>>>>>>> Apr 29 17:41:41 ropieee5 iwd[275]: src/wiphy.c:wiphy_select_akm()
+>>>>>>>>>> Can't use SAE, trying WPA2
+>>>>>>>>>>
+>>>>>>>>>> Now, the Pi guys point me to the missing CMD_EXTERNAL_AUTH message and
+>>>>>>>>>> advise me to go back to wpa_supplicant. Which is not something I would
+>>>>>>>>>> like to do for various reasons...
+>>>>>>>>>>
+>>>>>>>>>> Do you have any advice for me on what I can do? is this
+>>>>>>>>>> CMD_EXTERNAL_AUTH really related to  this and are you planning on
+>>>>>>>>>> implementing this?
+>>>>>>>>> Unfortunately the external auth support is not yet implemented in IWD. The brcmfmac driver itself is rather unique being a fullmac driver. Depending on how you look at it, this on its own is "easier" to support. It handles connecting/roaming all on its own. But then, for some reason, someone didn't want to do SAE/WPA3 on the card itself so they came up with some one-off mechanism to offload that onto userspace. This is one of those things that got put upstream that is a pain for projects like IWD to support IMO. Its something we do need to support eventually, especially given the raspi 5 requires it.
+>>>>>>>> if the Broadcom firmware finally would be able to support external_auth,
+>>>>>>>> then it would be nice, but as seen on recent linux-wireless discussions,
+>>>>>>>> it is unclear who does what. Broadcom wanted to support external_auth,
+>>>>>>>> but then Infineon (the new owner) might be rather using SAE as part of
+>>>>>>>> the firmware. And actually the chip on the RPi5 marks itself as Cypress
+>>>>>>>> and so you it is an unclear story. I think that Raspberry Pi foundation
+>>>>>>>> should get their story straight. Until really recently they shipped a
+>>>>>>>> firmware that couldn’t do SAE and also their drivers couldn’t even do
+>>>>>>>> external_auth and you were stuck with WPA2 only.
+>>>>>>>>
+>>>>>>>> https://holtmann.dev/enabling-wpa3-on-raspberry-pi/
+>>>>>>> I was not aware that it didn't even support it correctly. I figured
+>>>>>>> broadcom was who added it in the first place.
+>>>>>>>> You can use an upstream firmware from linux-firmware and make the RPi5
+>>>>>>>> support WPA3. And as of a few weeks ago, even RPi5 latest Debian was
+>>>>>>>> switching to the upstream firmware.
+>>>>>>>>
+>>>>>>>> On side note, there exists no wpa_supplicant release that really supports
+>>>>>>>> SAE offload properly. You need to back port a lot of patches or hope
+>>>>>>>> that your distro back ported them for you.
+>>>>>>>>
+>>>>>>>> We should actually check if nl80211 tells us that external_auth is
+>>>>>>>> supported by the driver. And if not (which is the case for the Broadcom
+>>>>>>>> upstream driver) send a proper message to users and not lead them into
+>>>>>>>> a wild goose chase.
+>>>>>>>>
+>>>>>>>> Regards
+>>>>>>>>
+>>>>>>>> Marcel
+>>>>>>>>
+>>>>>> FWIW, the most recent update to the RPI Bookworm image has enabled
+>>>>>> this capability:
+>>>>>> # uname -a
+>>>>>> Linux pi5 6.6.28+rpt-rpi-2712 #1 SMP PREEMPT Debian 1:6.6.28-1+rpt1
+>>>>>> (2024-04-22) aarch64 GNU/Linux
+>>>>>>
+>>>>>> # dmesg | grep brcmfmac
+>>>>>> [    2.195263] brcmfmac: F1 signature read @0x18000000=0x15264345
+>>>>>> [    2.209946] brcmfmac: brcmf_fw_alloc_request: using
+>>>>>> brcm/brcmfmac43455-sdio for chip BCM4345/6
+>>>>>> [    2.216566] usbcore: registered new interface driver brcmfmac
+>>>>>> [    2.384898] brcmfmac: brcmf_c_process_txcap_blob: no txcap_blob
+>>>>>> available (err=-2)
+>>>>>> [    2.385212] brcmfmac: brcmf_c_preinit_dcmds: Firmware: BCM4345/6
+>>>>>> wl0: Apr 15 2021 03:03:20 version 7.45.234 (4ca95bb CY) FWID
+>>>>>> 01-996384e2
+>>>>>>
+>>>>>> # iw list
+>>>>>> Wiphy phy0
+>>>>>> ...
+>>>>>>        Supported extended features:
+>>>>>>            * [ CQM_RSSI_LIST ]: multiple CQM_RSSI_THOLD records
+>>>>>>            * [ 4WAY_HANDSHAKE_STA_PSK ]: 4-way handshake with PSK in station mode
+>>>>>>            * [ 4WAY_HANDSHAKE_STA_1X ]: 4-way handshake with 802.1X in station mode
+>>>>>>            * [ DFS_OFFLOAD ]: DFS offload
+>>>>>>            * [ SAE_OFFLOAD ]: SAE offload support
+>>>>>>            * [ 4WAY_HANDSHAKE_AP_PSK ]: AP mode PSK offload support
+>>>>>>            * [ SAE_OFFLOAD_AP ]: AP mode SAE authentication offload support
+>>>>>>
+>>>>>> This was achieved here with a normal 'apt update ; apt upgrade' routine.
+>>>>>>
+>>>>>> This appears to work for all Pis, now. Even a 32 bit image on a 3b+
+>>>>>> with similar hardware:
+>>>>>> # uname -a
+>>>>>> Linux rpi32 6.6.28+rpt-rpi-v7 #1 SMP Raspbian 1:6.6.28-1+rpt1
+>>>>>> (2024-04-22) armv7l GNU/Linux
+>>>>>> # iw list
+>>>>>> ...
+>>>>>>        Supported extended features:
+>>>>>>            * [ CQM_RSSI_LIST ]: multiple CQM_RSSI_THOLD records
+>>>>>>            * [ 4WAY_HANDSHAKE_STA_PSK ]: 4-way handshake with PSK in station mode
+>>>>>>            * [ 4WAY_HANDSHAKE_STA_1X ]: 4-way handshake with 802.1X in station mode
+>>>>>>            * [ DFS_OFFLOAD ]: DFS offload
+>>>>>>            * [ SAE_OFFLOAD ]: SAE offload support
+>>>>>>            * [ 4WAY_HANDSHAKE_AP_PSK ]: AP mode PSK offload support
+>>>>>>            * [ SAE_OFFLOAD_AP ]: AP mode SAE authentication offload support
+>>>>>>
+>>>>>> The PiZero2W does not show this capability with the same 64 bit image
+>>>>>> running as it has different hardware with different firmware:
+>>>>>> # dmesg | grep brcmfmac
+>>>>>> [    6.051393] brcmfmac: F1 signature read @0x18000000=0x1542a9a6
+>>>>>> [    6.077172] brcmfmac: brcmf_fw_alloc_request: using
+>>>>>> brcm/brcmfmac43430b0-sdio for chip BCM43430/2
+>>>>>> [    6.080782] usbcore: registered new interface driver brcmfmac
+>>>>>> [    6.476401] brcmfmac: brcmf_c_process_txcap_blob: no txcap_blob
+>>>>>> available (err=-2)
+>>>>>> [    6.481953] brcmfmac: brcmf_c_preinit_dcmds: Firmware: BCM43430/2
+>>>>>> wl0: Mar 31 2022 17:24:51 version 9.88.4.77 (g58bc5cc) FWID
+>>>>>> 01-3b307371
+>>>>>>
+>>>>>> Keith
+>>>>> I got around to testing this a bit tonight. I set up my Pi5 with
+>>>>> hostapd and used this /etc/hostapd/hostapd.conf
+>>>>>
+>>>>> # cat /etc/hostapd/hostapd.conf
+>>>>> # interface and driver
+>>>>> interface=ap0
+>>>>> driver=nl80211
+>>>>>
+>>>>> # WIFI-Config
+>>>>> ssid=SSIDWPA3
+>>>>> channel=7
+>>>>> hw_mode=g
+>>>>> ieee80211n=1
+>>>>> wmm_enabled=1
+>>>>> macaddr_acl=0
+>>>>> auth_algs=1
+>>>>> max_num_sta=10
+>>>>>
+>>>>> wpa=2
+>>>>> wpa_key_mgmt=SAE
+>>>>> rsn_pairwise=CCMP
+>>>>> ieee80211w=2
+>>>>> wpa_passphrase=password
+>>>>> sae_pwe=2
+>>>>>
+>>>>> Form the log, it looks like SAE is enabled and ruinning, but I do not
+>>>>> know what I am looking at.
+>>>>> Using interface ap0 with hwaddr d8:3a:dd:27:6f:a7 and ssid "SSIDWPA3"
+>>>>> ...
+>>>>> SAE: Derive PT - group 19
+>>>>> SAE: SSID - hexdump_ascii(len=8):
+>>>>>         53 53 49 44 57 50 41 33                           SSIDWPA3
+>>>>> SAE: password - hexdump_ascii(len=9): [REMOVED]
+>>>>> SAE: pwd-seed - hexdump(len=32): [REMOVED]
+>>>>> SAE: pwd-value (u1 P1) - hexdump(len=48): [REMOVED]
+>>>>> SAE: u1 - hexdump(len=32): [REMOVED]
+>>>>> ...
+>>>>>
+>>>>> I can 'see' it from my other pi running iwd and on my laptop, but I
+>>>>> cannot connect on either. I get nothing in the log. When I type in the
+>>>>> password, I get:
+>>>>>
+>>>>> [iwd]# station wlan0 connect SSIDWPA3
+>>>>> Type the network passphrase for SSIDWPA3 psk.
+>>>>> Passphrase: *********
+>>>>> Operation failed
+>>>> We'll need to see some IWD logs to see whats going on. Also, can you
+>>>> connect from your phone or some other device?
 >>>>
+>>>>> Both Pis show that they have what Marcel noted:
+>>>>>
+>>>>>        Supported extended features:
+>>>>>            * [ CQM_RSSI_LIST ]: multiple CQM_RSSI_THOLD records
+>>>>>            * [ 4WAY_HANDSHAKE_STA_PSK ]: 4-way handshake with PSK in station mode
+>>>>>            * [ 4WAY_HANDSHAKE_STA_1X ]: 4-way handshake with 802.1X in station mode
+>>>>>            * [ DFS_OFFLOAD ]: DFS offload
+>>>>>            * [ SAE_OFFLOAD ]: SAE offload support
+>>>>>            * [ 4WAY_HANDSHAKE_AP_PSK ]: AP mode PSK offload support
+>>>>>            * [ SAE_OFFLOAD_AP ]: AP mode SAE authentication offload support
+>>>>>
+>>>>> Is my config wrong?
+>>>>>
+>>>>> The version of iwd I am running is 2.17 built from git with the latest
+>>>>> commit as of e3f6a2c. The version if hostapd is:
+>>>>> # hostapd -v
+>>>>> hostapd v2.10
+>>>>> User space daemon for IEEE 802.11 AP management,
+>>>>> IEEE 802.1X/WPA/WPA2/EAP/RADIUS Authenticator
+> James,
+>
+> I tried this again. a Pi5 running your SAE hostapd.conf and a Pi3b+
+> running iwd -d. I get teh same thing on the cli when I try to connect
+> and put in the password: "Operation Failed'
+> The hostapd config on the Pi5 is:
+> # cat /etc/hostapd/hostapd.conf
+> # interface and driver
+> interface=ap0
+> driver=nl80211
+>
+> # WIFI-Config
+> ssid=ssidSAE
+> channel=1
+> hw_mode=g
+>
+> wpa=2
+> wpa_key_mgmt=SAE
+> wpa_pairwise=CCMP
+> sae_password=secret123
+> sae_groups=19
+> ieee80211w=2
+> sae_pwe=0
+>
+> The iwd log from the Pi3b+ is attached.
+Could you post the hostapd logs as well if you have them. I haven't 
+tried WPA3 on a pi3 in a while but I guess it might be time to give it 
+another round of testing. Could you also try connecting to the WPA3 AP 
+using a non-IWD device just for sanity?
+>
+> Keith
