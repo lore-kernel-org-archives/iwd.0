@@ -1,340 +1,221 @@
-Received: from mail-qk1-f181.google.com (mail-qk1-f181.google.com [209.85.222.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-008cba01.pphosted.com (mx0b-008cba01.pphosted.com [148.163.139.151])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DDBC1509B0
-	for <iwd@lists.linux.dev>; Tue,  7 May 2024 11:55:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.181
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715082910; cv=none; b=bqNrzALxCxL1pQxPvueINeDfQ09w8jgUpwTXU/XgNcIPHqFngIRfkCu29RXJ9/IqqrvKQrz9jahaVgfIX4d+aBMCRAAr5a6sQ5QKXaLWzTWmYKzOtBsHv8O9nNtP3IPk5ZE4A+jW3Qe0ZHhtJuFvOLuhrOaNDvGkF6AjEbtUSpU=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715082910; c=relaxed/simple;
-	bh=9uqj0jSiDbWe7334WtZXn2ZEPlJ/kA24WXapOgtmr7o=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=XZ4eMDup7fW8zYKnaqZZc7c/CozV78w2hdqtLrGzaQp9SKZr/lUsxoHoA9+kaRTw26Rqu/tIYA19qj7TEcNbb8jTRt0qAzlhmbDB/Giarl6HvMj7lW30bpzwlXcm1v1j8VU5xCRIfu8M+eItCL9lDQcKTJZ3VNvYq1vkHMjBRrw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HEGA7Clb; arc=none smtp.client-ip=209.85.222.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 014F715B137
+	for <iwd@lists.linux.dev>; Tue,  7 May 2024 12:49:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=148.163.139.151
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1715086195; cv=fail; b=kMJnKTiDuBgQPHZ4gyq/vMpKmlvf/L3cY5fHW4tdNhjj2tuvRLbQlMoU1sH/w3dg64lSbIoj/j37L6mq1pFIQjrmMzGbX97yEDj3438qRunFFjt4pj4pWZzVM86mnmrfwyDtQ9KopiLqLaXvMpMZOOHyGuJ9ukYYriNwHSRoxI8=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1715086195; c=relaxed/simple;
+	bh=GH0Os+JJ/SrDwCMI9dXVaN6eTU/93sgsBvFYJO6WT2A=;
+	h=From:To:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=sH2XbGt1GYojKroM9rW3HhKbPOdSV7GLZKYT484wuKu3GK92YAmaEbixzl69qEUf4Mhe/VTztNNS+5i+Ql51Q8GjwxWuFJXLSchgkPbZmYR49V1ddmbdtDvEP3/zN9fl87a4XCIY52439QYzIJWROL9VBjfV/09PqpPXuYo5Qpw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=midmark.com; spf=pass smtp.mailfrom=midmark.com; dkim=pass (2048-bit key) header.d=midmark.com header.i=@midmark.com header.b=W+Phgb1D; arc=fail smtp.client-ip=148.163.139.151
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=midmark.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=midmark.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HEGA7Clb"
-Received: by mail-qk1-f181.google.com with SMTP id af79cd13be357-79291262dc2so295356085a.2
-        for <iwd@lists.linux.dev>; Tue, 07 May 2024 04:55:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1715082908; x=1715687708; darn=lists.linux.dev;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Lutqo1zLDZi00gzOoguPAFYPdtveNfhJw/qEp3OcaHM=;
-        b=HEGA7Clb3Y1olgbZboqMKHmoiy1MjQV/F4uakVH026BMAcBReeKKWudBTBwJJzV07a
-         71oBukGO4RPacjcxbCUHl736cr+7TWjz0c4vPV8xNyCjyTdSeAsptK46E4I8ermwlIEC
-         BbOe9Y0Ad6Z4RIlFoZ/OuOiKxtPxSkiC8VnMiwkIJQ8XlSbHtcpeYy3wnjlo//QzaB4l
-         IRIJvW2r9xbeVGCcgb+39O1glQzApM/OZ1m4B0+05t2bN6uxQFs0CorSlluVgzMe1AqX
-         cgQAOxKqjBRTAhc6QK6s0zd8k9kR+AMDVCK9KIAkSDIUg/TxtWm+6rkYlFqyqPcSI3KV
-         eukg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715082908; x=1715687708;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Lutqo1zLDZi00gzOoguPAFYPdtveNfhJw/qEp3OcaHM=;
-        b=NLft42mwA9UeQIqQpaFcAFOfcV9OOl2oPXAXK1bAI/SD7F68riGDJW2c1HLjHDjVQT
-         YrJ1HeQCTOQUrKQEvR3FkApTAvn0vE9/iCaHVdsYiE+vLvXLc2xt14chKq58MnMegARa
-         cbf0Gyjt6C2KJBeaSaQmel31n41lbDuAk0Y7vfOnSmG5rjzrJTbR/uMAuCyYppKjnHSd
-         mDLeRFcG1inZiKgupvvVBQeDEphSJgyT7eap4NzRqAy1Mw6s4js4jsGxjtKCqP0cLshV
-         Vamf94A1Mi1UW9i3MWXBK5vNJWWptYbCaRMLmvOWfKNJVtSnpcNdA0Pc8SHvljLanNK4
-         kH8Q==
-X-Forwarded-Encrypted: i=1; AJvYcCVMm/Gnd8O+8rCq7HUSmfLFRVceVV4rQlskvvSvLbHe4bE1vwF9spuSN2pke3Hb2YbuCuiU8FsNd/aL7RZksj7BirrJ
-X-Gm-Message-State: AOJu0YwQ9PYoV91uWROOB3EOMHqTEk+HNh15fqlnt5+LtrpSbYIDMtnq
-	wUFktnxz3NIisijup5Ypwp82X2wYWZFA9m3B0uR5gakn+FuENcc0
-X-Google-Smtp-Source: AGHT+IGJSsBJpGK0wsgYdDeWypldCa5QPoyNJ7lX28D8r9tsjC4H5BR5qOIZnzguPZOx0XaeGv4u3A==
-X-Received: by 2002:ad4:5c4c:0:b0:6a0:d465:6088 with SMTP id a12-20020ad45c4c000000b006a0d4656088mr17312945qva.34.1715082907959;
-        Tue, 07 May 2024 04:55:07 -0700 (PDT)
-Received: from [10.102.4.159] ([208.195.13.130])
-        by smtp.gmail.com with ESMTPSA id x12-20020a0ceb8c000000b006a0f012fab9sm4626983qvo.52.2024.05.07.04.55.06
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 07 May 2024 04:55:07 -0700 (PDT)
-Message-ID: <083f4a69-a164-404b-b4fb-9ce024a38156@gmail.com>
-Date: Tue, 7 May 2024 04:55:05 -0700
+	dkim=pass (2048-bit key) header.d=midmark.com header.i=@midmark.com header.b="W+Phgb1D"
+Received: from pps.filterd (m0372076.ppops.net [127.0.0.1])
+	by mx0b-008cba01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 447AVAi6026423;
+	Tue, 7 May 2024 08:49:51 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=midmark.com; h=
+	from:to:subject:date:message-id:references:in-reply-to
+	:content-type:content-transfer-encoding:mime-version; s=pps1;
+	 bh=GH0Os+JJ/SrDwCMI9dXVaN6eTU/93sgsBvFYJO6WT2A=; b=W+Phgb1DI8YX
+	D1wMdSQ8mt/gr0oMTxJUhKI+MRkch3EqMrmL9JKhfh7/Vp43SwltqBpWGv6tSTt4
+	Gr4Niuwlnfhf1epa+m/4pl/4PoDmlUgkfTRENlyFm321Z1HGMhULzYYYQuE5v0NK
+	zlZ18ifX5pHqOChW2JA3KG4mUdlVl+9p+RQDMCwuCBGd0lfpkxuamMLxl+caNV3u
+	56mQ6z4HJwt/T1B7u4Z6dTsEwh6xBE0oGJhmMjRHDAZbGb9Em6d1KM3AJ3rZQWdi
+	mzg0rVez2Mxv293lKUWZVq1CuUM7YdENVzlnQ/XzX+UbHM2kJWMx1bYYM2SKz75/
+	osc8YqM4Jg==
+Received: from nam11-bn8-obe.outbound.protection.outlook.com (mail-bn8nam11lp2169.outbound.protection.outlook.com [104.47.58.169])
+	by mx0b-008cba01.pphosted.com (PPS) with ESMTPS id 3xx4as1hxc-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 07 May 2024 08:49:50 -0400 (EDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=aBZNuekajQVhcILMHxwypbHDHXkAR/e77AVosTvFhPWj2tTwGeU/9aMlIFGmuLEDpLEnu5IG9ANpAwfoF/kQ/2YQdccR2CR+BR8n2kc1ILJa3Wd7Aal2cANbjF0z+r1zmSKwf+4PfcAg2qx+wrFtnDmI6OQKIW6n2a+iH6HqRd1iEj1r0wSxbiK+f5gW2Z2C+GoQNOlISHOVVABSxFexl9LBfktkkQjr6jKrcEbp6uuU/j56UYnkPxmruiRLvpt2HXOB9JZk1Y/Lr4s+DtpBc4Hwq9qlSOMPVHXTNncVVNbmzXJOTfSfJpN7k2nD1qBWT5L3H8NBUNXLGonnzvuFXA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=GH0Os+JJ/SrDwCMI9dXVaN6eTU/93sgsBvFYJO6WT2A=;
+ b=F/xfXGagRQ2pSqsqaaADturC442XkdioMH1VQNj4AUZ6ZhQjl0ApDxCdJfFGOXJNyIwVvA9fIzm8wC7Fs3ukq//IbkL+xG7kFCqLznLSJBaVglpI33KU6QK49ZLFQCtmje4xFaAW40DxczG0711f+5PCPf7B+3jBbvMRGLcL6F4Hh8TplnWwzT7IvWxpVqFXVia+jOICQ+2ZeDIofSIX0sPyTFbqDhcPj5XC4cmdUDyWvexJfTcVC5natqxfFKOkAm1PYJIPo3ftKU0xn/nfjivHjKTBTMtBV9aVXLIjo4ivb0ha6rsg08MNIQjGK5vxgTA78Nx7eD/oUZszbS1u9g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=midmark.com; dmarc=pass action=none header.from=midmark.com;
+ dkim=pass header.d=midmark.com; arc=none
+Received: from LV8PR08MB9350.namprd08.prod.outlook.com (2603:10b6:408:1f9::14)
+ by SA1PR08MB7646.namprd08.prod.outlook.com (2603:10b6:806:1f5::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7544.28; Tue, 7 May
+ 2024 12:49:47 +0000
+Received: from LV8PR08MB9350.namprd08.prod.outlook.com
+ ([fe80::7973:5566:a047:872b]) by LV8PR08MB9350.namprd08.prod.outlook.com
+ ([fe80::7973:5566:a047:872b%5]) with mapi id 15.20.7544.041; Tue, 7 May 2024
+ 12:49:47 +0000
+From: Michael John <MJohn@midmark.com>
+To: James Prestwood <prestwoj@gmail.com>,
+        "iwd@lists.linux.dev"
+	<iwd@lists.linux.dev>
+Subject: Re: Getting list of found networks
+Thread-Topic: Getting list of found networks
+Thread-Index: AQHan7ePre4eCmlnGkWJ2z4c7hs7H7GKO2IAgAF8w5k=
+Date: Tue, 7 May 2024 12:49:47 +0000
+Message-ID: 
+ <LV8PR08MB9350989BEB22ACB3B9C67DF6AEE42@LV8PR08MB9350.namprd08.prod.outlook.com>
+References: 
+ <LV8PR08MB9350F79243154C9930EFC4BEAE1C2@LV8PR08MB9350.namprd08.prod.outlook.com>
+ <e49f9a7f-5d4c-453e-9dc8-1a7667383912@gmail.com>
+In-Reply-To: <e49f9a7f-5d4c-453e-9dc8-1a7667383912@gmail.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+msip_labels: 
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: LV8PR08MB9350:EE_|SA1PR08MB7646:EE_
+x-ms-office365-filtering-correlation-id: 0c8a6c45-3b65-4b9a-0f3a-08dc6e942d79
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230031|376005|1800799015|366007|38070700009;
+x-microsoft-antispam-message-info: 
+ =?iso-8859-1?Q?fStHFJaG5nBqLuQqu0/qVw/CIyaIYlITx8XwRqIeaz1lj1Gb/6m3I4nfcQ?=
+ =?iso-8859-1?Q?6GhgIAyQNyOpIa60BIsl464EgM508ygcEZ053tSmoH1DNegNxvQhiUE0Jw?=
+ =?iso-8859-1?Q?8XVlvC0GuLJcj+Fr/EG+X4R1shJx4glylJcyR3CsIKtuqJxophDsnlv+u0?=
+ =?iso-8859-1?Q?kPSLJMIzTzoa77Wkq4y88OVfR3nJtxD//0Dhmkld4JwNaTayO7vAneDyD7?=
+ =?iso-8859-1?Q?MsalAVpvmJIwXp5y34q30I72qN4TYrkJfQcFzxDZzg5hed3aL6ikXtoiYL?=
+ =?iso-8859-1?Q?cJMwRwS9AyQji+nroTms/t6gfnC7SUxybnkmqiyEYUuqXcw51jTdJK1zJp?=
+ =?iso-8859-1?Q?w0Cj8qoypl7Sbo0kJKNoc/Orsmhrw0pxMUmiNFp4iKVbufZHGwUFxITd2M?=
+ =?iso-8859-1?Q?gq69imZddqOUjOaDWLaIig/VZIEK/XtnuAU/YT9I6a6O1uMBKB02N34v8r?=
+ =?iso-8859-1?Q?RJTLcXzByCdArj6k+5InklMqlrOPu3traT59g8Jnn1LB4DUqetH2hPV53i?=
+ =?iso-8859-1?Q?lnQcd06yPNc7qyyYSXvPeoSdOm6fw4hF9nHtb4o0HAsk4j1zznDHoOv2Bh?=
+ =?iso-8859-1?Q?jpUVkiXb955Z26jwjn2n9cLvkCagm5jbr/zs59mBqkMxQAaGAuMlvqcMwI?=
+ =?iso-8859-1?Q?+35FrrKgKteAZNVoV6Lt9V8RhWWXLn3Ocu3lKHjGkwZWrcUWJGXeIDv0sp?=
+ =?iso-8859-1?Q?ak5Ry9UPaPdRbRF6dTNpbeWixa36HeAvSQmmnAuU0JCDyMSJxvp7QH7eNy?=
+ =?iso-8859-1?Q?Wra3UwA+tduQLw3CAr3QHo41MBTfvgokYf9s/aeKXfSD3b7iDEF1GKmWAA?=
+ =?iso-8859-1?Q?WwbKAF5lBmI37vho7exzOUb6mo5h3N+kVz1qLGequwYrmG9lgxEnEelbTw?=
+ =?iso-8859-1?Q?MmLoUdcDaw2yDewTJxqhIblF2JEBP+OivHhre7VncqGwAIR7qM/pbSRtHO?=
+ =?iso-8859-1?Q?zHbspVHlnIYyBgFK/vtSWVTVJMoOtgX1QstgJL/n/AL3BPpBf/MYVsNKFO?=
+ =?iso-8859-1?Q?VWMtxN2CQSn2BV7hpOr5mVCtMGPk+YgkmZnSOTqgred9c6OV9Ufa2wgkq7?=
+ =?iso-8859-1?Q?vcqaTlwKXUHuWChLKDSFSeUUjTgCqVmT2mYkDVahNd1OLNOtz9KJ9SPV6L?=
+ =?iso-8859-1?Q?nwLhlWuCUzFjsq31mJzNTQHnRallGE1D8vRghkfqLm5EVSJ52I7X3A1+CV?=
+ =?iso-8859-1?Q?bpmaczsu3J7vDvdg84u9oetDvmuj2sc0lSfq730MwOd7fz0TWcgEdSFRbn?=
+ =?iso-8859-1?Q?Sh6wLBHRuETO0VVp19TZPv9RxFDfuJeAGkJx1TjM1DHMVs0tvEE/0bJHPq?=
+ =?iso-8859-1?Q?qj7DZXmlsEqz/ESv3oK1aj9FeY7mAeHx+gTEXIaBDlgG/qXS2f7US/MeVb?=
+ =?iso-8859-1?Q?2nYV3+sKgrV9fOsSH2Kz8me/vhwHp1fw=3D=3D?=
+x-forefront-antispam-report: 
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV8PR08MB9350.namprd08.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376005)(1800799015)(366007)(38070700009);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: 
+ =?iso-8859-1?Q?YJP5l5bAYbDaJ9YV0RKuJOUoATkD53ohpUIjT522nq9edOa1uC/zzHpLjC?=
+ =?iso-8859-1?Q?so7cCQvJajEMwArx0yA0bzvmL2gujWrXfZ03wJeGg52H7LJDs8n3tUGFhR?=
+ =?iso-8859-1?Q?nB7I98u7c8EZ8q61movXs+z8rRJSYis0vjQGEmSR0Qh7CfqVDrUi2r82ix?=
+ =?iso-8859-1?Q?I4xftG4S8vJ88qtL0J23xPm52zpusOgHJENVxnsFueKTmsB3iLUFEjZq/g?=
+ =?iso-8859-1?Q?VxFVo1r0xSBwPOukqhU5oUw8PHPuUbqbEXXaV3YjIIoRflOmHwUvo6VaRb?=
+ =?iso-8859-1?Q?BiHmpELwS/m3gI9O2bKlo2FPZmsGekzD/U+yJOhtbr8WQI/kT8399CVe/i?=
+ =?iso-8859-1?Q?Y4BQ/X+LP4RqiXFUEgz+M1+3/YqgPL+dDY5N4ZItByOcoIyomFBjupTZ5O?=
+ =?iso-8859-1?Q?nIZk3OmR0LJ7o+5ar6serTIiYSM2My4ZKVYnVwVcwiLq5JK2OV5zTmunAJ?=
+ =?iso-8859-1?Q?tDIxH0gXYJ1pST7XhZuZR2u1XZPKggU0kyOKzs0SjiR7O2TOr1UR38OoUo?=
+ =?iso-8859-1?Q?QLMPAGPIj3058/0zOnymv5QcdbfV1RLbNud1WVQYUPMuko06RiAP+E/NYh?=
+ =?iso-8859-1?Q?DUKA9FzMgqnntEg9EhvhjbL9ykczP6M0pXYKwQa2AsaTX1tyjD00ppG3dG?=
+ =?iso-8859-1?Q?vaVQfnNVxMtiDffwtkGRDtiOUZR+jXtQ2x5FIqpAIQHuKKU925gqJkzgeQ?=
+ =?iso-8859-1?Q?jkdcFmVF7R9bQkmcxCSqZRFgBuX5xlTSR8micIcRZAKs6tWnMtp8zuscJ7?=
+ =?iso-8859-1?Q?NnWyYAPH+X28AevGUXOfL9d1DP43TBTi95VcJlwygqcXWNuOaZiYAfM6gP?=
+ =?iso-8859-1?Q?a8Wo/exr2AkEJhJA0F49JUkydYyQRj6ADsDVbWMeaZYMAm23bO/PggCH8p?=
+ =?iso-8859-1?Q?5KUL/+zXhizcwKxqFoM5GoeVlZuw5dXzba9kG3ImPFOl2rBa25G2wbxADJ?=
+ =?iso-8859-1?Q?AQsVgO1hfB3Mgvyc3YGbePbc69iFCY94pYKNR99urhlPOptGMsOzNcqIxN?=
+ =?iso-8859-1?Q?yewdV4hXjgdmuJMCNFw0NXh92/KXXQyMhckgqutPVU/A1SjO7hk6R41lGz?=
+ =?iso-8859-1?Q?oGpZo+O4QV+UG0zSkahS2WPbCxx++iFomGwwrt3ntDq+eKFq/vuHK4N1or?=
+ =?iso-8859-1?Q?yPqKMyBXu/J39CIJOFEfVo4PjdTABFq3t5cJZ0Dnl71jW05hL7D2y1P3dP?=
+ =?iso-8859-1?Q?dqOBoSqtoK73hgjPdKOQXCYz8uNvhDH6CSJ3e8x3o+OszBpGlaxWv9Maqt?=
+ =?iso-8859-1?Q?CgXIQd5X0ooZLgN+GjkTN7+DRvZNg012VlhX9uKxAJrQYB31LIAVgWrni2?=
+ =?iso-8859-1?Q?9XWZFEVxraPF0VLDHLK/HMpf8MOZ7KVqpSih7TbzyUYP6unO5Cs57hgR9+?=
+ =?iso-8859-1?Q?7rFBdahjP21C+oUZz7HIDbS+5s0V3TzuW5ZTJFYHUHokIgpgHt39W213aL?=
+ =?iso-8859-1?Q?LGQqoWgX4xvobZN5M+41bef51s6S2sYbVpuw9JGTYG9uwYu93z4GOyCTPs?=
+ =?iso-8859-1?Q?J1DSAp/g+xaVkQPX/AvO5iXh84U01yNzNhUWLHEVgJNkb6NfPyOHQ2Tgla?=
+ =?iso-8859-1?Q?GztVPEOyHU/+5iV8OPEc8v+t7C11UUFxYe6l5Yt1CAIVrA5iR6PwP1hfDr?=
+ =?iso-8859-1?Q?ll3iEt0B6B4lw=3D?=
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: Raspberry Pi 5 and WPA3
-Content-Language: en-US
-To: KeithG <ys3al35l@gmail.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>,
- Harry ten Berge <htenberge@gmail.com>, iwd@lists.linux.dev
-References: <CAN+yObo7O+c7x51maXYxUiSttAC6ZJkuNb9DJwjCuegbAgyLow@mail.gmail.com>
- <91648487-9c59-40f9-996d-dfad1f1adcbb@gmail.com>
- <38861D9C-F5F5-4149-99CD-0C59480986ED@holtmann.org>
- <25618c14-df5a-4980-9e62-dd5c96084455@gmail.com>
- <CAG17S_MTbFpQB-LDu6s87D1stbojwpto3y+V1X4kSPe3Gkixug@mail.gmail.com>
- <CAG17S_PnK8PebjYZT5s0qyPMn7HhL=D+mC4VaG4i2ZAydeOjSA@mail.gmail.com>
- <997f2369-3805-4141-ba39-72d5f6ac6931@gmail.com>
- <CAG17S_MR1ZKkX7nUmb-0K0WAKDSpV8=xSR8ky-wD4uvmwiGiUw@mail.gmail.com>
- <129db0c4-d402-480a-ba9a-d28ecbbdacfe@gmail.com>
- <CAG17S_MfsMfPaxWa0C7g_O+anw6y1m+7hQTk_Y-RO_bTKHuowA@mail.gmail.com>
-From: James Prestwood <prestwoj@gmail.com>
-In-Reply-To: <CAG17S_MfsMfPaxWa0C7g_O+anw6y1m+7hQTk_Y-RO_bTKHuowA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+X-OriginatorOrg: midmark.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: LV8PR08MB9350.namprd08.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 0c8a6c45-3b65-4b9a-0f3a-08dc6e942d79
+X-MS-Exchange-CrossTenant-originalarrivaltime: 07 May 2024 12:49:47.6473
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 3c2a020d-f343-4ca1-b6ef-91768380352f
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: thidbjdkBhzMVojyf78E6tHD3q16n1swQlZABOZS/1FpzxSapQtbb63QLrVtiXbj93j039IxbUK2vKiEQlzhRQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR08MB7646
+X-Proofpoint-ORIG-GUID: 3Q1hyBapb-uqLJKIYW2Dj8lg1J60of_Q
+X-Proofpoint-GUID: 3Q1hyBapb-uqLJKIYW2Dj8lg1J60of_Q
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.650,FMLib:17.11.176.26
+ definitions=2024-05-07_06,2024-05-06_02,2023-05-22_02
+
+Hi James,
 
 
-On 5/6/24 7:33 PM, KeithG wrote:
-> On Thu, May 2, 2024 at 9:07 AM James Prestwood <prestwoj@gmail.com> wrote:
->> Hi Keith,
+>
+>Hi Michael,
+>
+>> Hi,
 >>
->> On 5/2/24 6:47 AM, KeithG wrote:
->>> James,
->>>
->>> I tried to connect via my Samsung S23 phone and my desktop with an
->>> intel card. The desktop uses iwd 2.17 and when I tried to connect via
->>> iwctl, it did the same thing as the RPi. I suspect my hostapd config,
->>> but do not know. I can try collecting some logs next week on the
->>> desktop and the Pi. Which log do you need? '-d something' or an iwmon
->>> log?
->> Yeah just a -d IWD log. If you want to capture with iwmon that
->> definitely can't hurt. For reference, this is the config we use for one
->> of our SAE autotests:
+>> I'm looking to better understand how the list of networks are collected =
+ after a scan is done and get-networks is called.
+>> How long does a scan run for? I am assuming the scan causes the radio to=
+ go through each channel and listen for broadcast beacons to find available=
+ APs. I have noticed when calling scan and then get-networks I can get a di=
+fferent amount of found APs, like either I am not waiting long enough for a=
+ scan to complete or there is some other logic that dictates adding a netwo=
+rk to the list (too low of an RSSI?). I'm also wondering how much of this i=
+s really controlled by IWD verses the radio firmware and are these simply r=
+equest sent via nl80211?
+>
+> For a DBus initiated scan IWD is going to scan the entire spectrum,
+> 2.4GHz, 5GHz, and 6GHz (obviously depending on hardware support). The
+> scan runs for as long as it takes to scan these bands, and that is
+> hardware dependent but generally takes 100ms per channel/frequency. IWD
+> has some logic to update the networks it finds throughout the scan, so
+> if you call get-networks too soon you may not see ALL networks that the
+> scan finds by the end (there is a scanning property that gets set
+> true/false to know when the FULL scan is done). Its very normal to not
+> see the exact same scan results per scan. If some AP has a very low RSSI
+> it may or may not show up from scan to scan.
+
+Can you help me understand why a scan may not lead to the same scan results=
+ per scan?
+My understanding is an access point will send a broadcast beacon at a set i=
+nterval and that
+interval is usually configurable. I'm assuming sometime a broadcast beacon =
+may not be seen
+during that channel scan, hence causing the difference per scan. Are there =
+other scenarios?
+Does IWD cache seen networks, or is this list fully repopulated each scan?
+
+Thanks!
+Michael
+
+>
+> And yes, all requests are sent via nl80211.
+>
+> Thanks,
+>
+> James
+>
+>
 >>
->> https://git.kernel.org/pub/scm/network/wireless/iwd.git/tree/autotests/testSAE/ssidSAE.conf
->>
->>> Keith
->>>
->>> On Thu, May 2, 2024 at 8:09 AM James Prestwood <prestwoj@gmail.com> wrote:
->>>> Hi Keith,
->>>>
->>>> On 5/2/24 5:56 AM, KeithG wrote:
->>>>> On Tue, Apr 30, 2024 at 7:19 AM KeithG <ys3al35l@gmail.com> wrote:
->>>>>> On Tue, Apr 30, 2024 at 6:24 AM James Prestwood <prestwoj@gmail.com> wrote:
->>>>>>> Hi Marcel,
->>>>>>>
->>>>>>> On 4/30/24 12:42 AM, Marcel Holtmann wrote:
->>>>>>>> Hi James,
->>>>>>>>
->>>>>>>>>> I'm not sure this is the right place to ask for some assistance, but
->>>>>>>>>> here we go...
->>>>>>>>>>
->>>>>>>>>> I'm the author for a small Raspberry Pi audio image that is
->>>>>>>>>> specifically targeting Roon.
->>>>>>>>>> If you're not familiair with Roon: it's an audio streaming platform
->>>>>>>>>> targeting audiophiles ;-)
->>>>>>>>>>
->>>>>>>>>> Anyways, about a year ago I switched from wpa_supplicant to iwd, to
->>>>>>>>>> full satisfaction.
->>>>>>>>>> Better and easier integration, and overall a feel of me being in more control.
->>>>>>>>>>
->>>>>>>>>> Now, recently I'm having issues with WPA3 support. This is partly
->>>>>>>>>> related to firmware (it's just so obfuscated how this all works with
->>>>>>>>>> firmware from broadcom and firmware from cypress :-(
->>>>>>>>>>
->>>>>>>>>> And one of those things is that I can't get it to work on the new Pi
->>>>>>>>>> 5. Specifically IWD reporting this:
->>>>>>>>>>
->>>>>>>>>> Apr 29 17:41:41 ropieee5 iwd[275]: src/wiphy.c:wiphy_select_akm()
->>>>>>>>>> Network is WPA3-Personal...
->>>>>>>>>> Apr 29 17:41:41 ropieee5 iwd[275]: SAE unsupported: brcmfmac needs
->>>>>>>>>> CMD_EXTERNAL_AUTH for SAE
->>>>>>>>>> Apr 29 17:41:41 ropieee5 iwd[275]: src/wiphy.c:wiphy_select_akm()
->>>>>>>>>> Can't use SAE, trying WPA2
->>>>>>>>>>
->>>>>>>>>> Now, the Pi guys point me to the missing CMD_EXTERNAL_AUTH message and
->>>>>>>>>> advise me to go back to wpa_supplicant. Which is not something I would
->>>>>>>>>> like to do for various reasons...
->>>>>>>>>>
->>>>>>>>>> Do you have any advice for me on what I can do? is this
->>>>>>>>>> CMD_EXTERNAL_AUTH really related to  this and are you planning on
->>>>>>>>>> implementing this?
->>>>>>>>> Unfortunately the external auth support is not yet implemented in IWD. The brcmfmac driver itself is rather unique being a fullmac driver. Depending on how you look at it, this on its own is "easier" to support. It handles connecting/roaming all on its own. But then, for some reason, someone didn't want to do SAE/WPA3 on the card itself so they came up with some one-off mechanism to offload that onto userspace. This is one of those things that got put upstream that is a pain for projects like IWD to support IMO. Its something we do need to support eventually, especially given the raspi 5 requires it.
->>>>>>>> if the Broadcom firmware finally would be able to support external_auth,
->>>>>>>> then it would be nice, but as seen on recent linux-wireless discussions,
->>>>>>>> it is unclear who does what. Broadcom wanted to support external_auth,
->>>>>>>> but then Infineon (the new owner) might be rather using SAE as part of
->>>>>>>> the firmware. And actually the chip on the RPi5 marks itself as Cypress
->>>>>>>> and so you it is an unclear story. I think that Raspberry Pi foundation
->>>>>>>> should get their story straight. Until really recently they shipped a
->>>>>>>> firmware that couldn’t do SAE and also their drivers couldn’t even do
->>>>>>>> external_auth and you were stuck with WPA2 only.
->>>>>>>>
->>>>>>>> https://holtmann.dev/enabling-wpa3-on-raspberry-pi/
->>>>>>> I was not aware that it didn't even support it correctly. I figured
->>>>>>> broadcom was who added it in the first place.
->>>>>>>> You can use an upstream firmware from linux-firmware and make the RPi5
->>>>>>>> support WPA3. And as of a few weeks ago, even RPi5 latest Debian was
->>>>>>>> switching to the upstream firmware.
->>>>>>>>
->>>>>>>> On side note, there exists no wpa_supplicant release that really supports
->>>>>>>> SAE offload properly. You need to back port a lot of patches or hope
->>>>>>>> that your distro back ported them for you.
->>>>>>>>
->>>>>>>> We should actually check if nl80211 tells us that external_auth is
->>>>>>>> supported by the driver. And if not (which is the case for the Broadcom
->>>>>>>> upstream driver) send a proper message to users and not lead them into
->>>>>>>> a wild goose chase.
->>>>>>>>
->>>>>>>> Regards
->>>>>>>>
->>>>>>>> Marcel
->>>>>>>>
->>>>>> FWIW, the most recent update to the RPI Bookworm image has enabled
->>>>>> this capability:
->>>>>> # uname -a
->>>>>> Linux pi5 6.6.28+rpt-rpi-2712 #1 SMP PREEMPT Debian 1:6.6.28-1+rpt1
->>>>>> (2024-04-22) aarch64 GNU/Linux
->>>>>>
->>>>>> # dmesg | grep brcmfmac
->>>>>> [    2.195263] brcmfmac: F1 signature read @0x18000000=0x15264345
->>>>>> [    2.209946] brcmfmac: brcmf_fw_alloc_request: using
->>>>>> brcm/brcmfmac43455-sdio for chip BCM4345/6
->>>>>> [    2.216566] usbcore: registered new interface driver brcmfmac
->>>>>> [    2.384898] brcmfmac: brcmf_c_process_txcap_blob: no txcap_blob
->>>>>> available (err=-2)
->>>>>> [    2.385212] brcmfmac: brcmf_c_preinit_dcmds: Firmware: BCM4345/6
->>>>>> wl0: Apr 15 2021 03:03:20 version 7.45.234 (4ca95bb CY) FWID
->>>>>> 01-996384e2
->>>>>>
->>>>>> # iw list
->>>>>> Wiphy phy0
->>>>>> ...
->>>>>>        Supported extended features:
->>>>>>            * [ CQM_RSSI_LIST ]: multiple CQM_RSSI_THOLD records
->>>>>>            * [ 4WAY_HANDSHAKE_STA_PSK ]: 4-way handshake with PSK in station mode
->>>>>>            * [ 4WAY_HANDSHAKE_STA_1X ]: 4-way handshake with 802.1X in station mode
->>>>>>            * [ DFS_OFFLOAD ]: DFS offload
->>>>>>            * [ SAE_OFFLOAD ]: SAE offload support
->>>>>>            * [ 4WAY_HANDSHAKE_AP_PSK ]: AP mode PSK offload support
->>>>>>            * [ SAE_OFFLOAD_AP ]: AP mode SAE authentication offload support
->>>>>>
->>>>>> This was achieved here with a normal 'apt update ; apt upgrade' routine.
->>>>>>
->>>>>> This appears to work for all Pis, now. Even a 32 bit image on a 3b+
->>>>>> with similar hardware:
->>>>>> # uname -a
->>>>>> Linux rpi32 6.6.28+rpt-rpi-v7 #1 SMP Raspbian 1:6.6.28-1+rpt1
->>>>>> (2024-04-22) armv7l GNU/Linux
->>>>>> # iw list
->>>>>> ...
->>>>>>        Supported extended features:
->>>>>>            * [ CQM_RSSI_LIST ]: multiple CQM_RSSI_THOLD records
->>>>>>            * [ 4WAY_HANDSHAKE_STA_PSK ]: 4-way handshake with PSK in station mode
->>>>>>            * [ 4WAY_HANDSHAKE_STA_1X ]: 4-way handshake with 802.1X in station mode
->>>>>>            * [ DFS_OFFLOAD ]: DFS offload
->>>>>>            * [ SAE_OFFLOAD ]: SAE offload support
->>>>>>            * [ 4WAY_HANDSHAKE_AP_PSK ]: AP mode PSK offload support
->>>>>>            * [ SAE_OFFLOAD_AP ]: AP mode SAE authentication offload support
->>>>>>
->>>>>> The PiZero2W does not show this capability with the same 64 bit image
->>>>>> running as it has different hardware with different firmware:
->>>>>> # dmesg | grep brcmfmac
->>>>>> [    6.051393] brcmfmac: F1 signature read @0x18000000=0x1542a9a6
->>>>>> [    6.077172] brcmfmac: brcmf_fw_alloc_request: using
->>>>>> brcm/brcmfmac43430b0-sdio for chip BCM43430/2
->>>>>> [    6.080782] usbcore: registered new interface driver brcmfmac
->>>>>> [    6.476401] brcmfmac: brcmf_c_process_txcap_blob: no txcap_blob
->>>>>> available (err=-2)
->>>>>> [    6.481953] brcmfmac: brcmf_c_preinit_dcmds: Firmware: BCM43430/2
->>>>>> wl0: Mar 31 2022 17:24:51 version 9.88.4.77 (g58bc5cc) FWID
->>>>>> 01-3b307371
->>>>>>
->>>>>> Keith
->>>>> I got around to testing this a bit tonight. I set up my Pi5 with
->>>>> hostapd and used this /etc/hostapd/hostapd.conf
->>>>>
->>>>> # cat /etc/hostapd/hostapd.conf
->>>>> # interface and driver
->>>>> interface=ap0
->>>>> driver=nl80211
->>>>>
->>>>> # WIFI-Config
->>>>> ssid=SSIDWPA3
->>>>> channel=7
->>>>> hw_mode=g
->>>>> ieee80211n=1
->>>>> wmm_enabled=1
->>>>> macaddr_acl=0
->>>>> auth_algs=1
->>>>> max_num_sta=10
->>>>>
->>>>> wpa=2
->>>>> wpa_key_mgmt=SAE
->>>>> rsn_pairwise=CCMP
->>>>> ieee80211w=2
->>>>> wpa_passphrase=password
->>>>> sae_pwe=2
->>>>>
->>>>> Form the log, it looks like SAE is enabled and ruinning, but I do not
->>>>> know what I am looking at.
->>>>> Using interface ap0 with hwaddr d8:3a:dd:27:6f:a7 and ssid "SSIDWPA3"
->>>>> ...
->>>>> SAE: Derive PT - group 19
->>>>> SAE: SSID - hexdump_ascii(len=8):
->>>>>         53 53 49 44 57 50 41 33                           SSIDWPA3
->>>>> SAE: password - hexdump_ascii(len=9): [REMOVED]
->>>>> SAE: pwd-seed - hexdump(len=32): [REMOVED]
->>>>> SAE: pwd-value (u1 P1) - hexdump(len=48): [REMOVED]
->>>>> SAE: u1 - hexdump(len=32): [REMOVED]
->>>>> ...
->>>>>
->>>>> I can 'see' it from my other pi running iwd and on my laptop, but I
->>>>> cannot connect on either. I get nothing in the log. When I type in the
->>>>> password, I get:
->>>>>
->>>>> [iwd]# station wlan0 connect SSIDWPA3
->>>>> Type the network passphrase for SSIDWPA3 psk.
->>>>> Passphrase: *********
->>>>> Operation failed
->>>> We'll need to see some IWD logs to see whats going on. Also, can you
->>>> connect from your phone or some other device?
->>>>
->>>>> Both Pis show that they have what Marcel noted:
->>>>>
->>>>>        Supported extended features:
->>>>>            * [ CQM_RSSI_LIST ]: multiple CQM_RSSI_THOLD records
->>>>>            * [ 4WAY_HANDSHAKE_STA_PSK ]: 4-way handshake with PSK in station mode
->>>>>            * [ 4WAY_HANDSHAKE_STA_1X ]: 4-way handshake with 802.1X in station mode
->>>>>            * [ DFS_OFFLOAD ]: DFS offload
->>>>>            * [ SAE_OFFLOAD ]: SAE offload support
->>>>>            * [ 4WAY_HANDSHAKE_AP_PSK ]: AP mode PSK offload support
->>>>>            * [ SAE_OFFLOAD_AP ]: AP mode SAE authentication offload support
->>>>>
->>>>> Is my config wrong?
->>>>>
->>>>> The version of iwd I am running is 2.17 built from git with the latest
->>>>> commit as of e3f6a2c. The version if hostapd is:
->>>>> # hostapd -v
->>>>> hostapd v2.10
->>>>> User space daemon for IEEE 802.11 AP management,
->>>>> IEEE 802.1X/WPA/WPA2/EAP/RADIUS Authenticator
-> James,
->
-> I tried this again. a Pi5 running your SAE hostapd.conf and a Pi3b+
-> running iwd -d. I get teh same thing on the cli when I try to connect
-> and put in the password: "Operation Failed'
-> The hostapd config on the Pi5 is:
-> # cat /etc/hostapd/hostapd.conf
-> # interface and driver
-> interface=ap0
-> driver=nl80211
->
-> # WIFI-Config
-> ssid=ssidSAE
-> channel=1
-> hw_mode=g
->
-> wpa=2
-> wpa_key_mgmt=SAE
-> wpa_pairwise=CCMP
-> sae_password=secret123
-> sae_groups=19
-> ieee80211w=2
-> sae_pwe=0
->
-> The iwd log from the Pi3b+ is attached.
-Could you post the hostapd logs as well if you have them. I haven't 
-tried WPA3 on a pi3 in a while but I guess it might be time to give it 
-another round of testing. Could you also try connecting to the WPA3 AP 
-using a non-IWD device just for sanity?
->
-> Keith
+>> Thanks
+>> Michael John
+
+CONFIDENTIALITY NOTICE: This message, including any attachments, contains c=
+onfidential information intended for a specific individual and purpose. If =
+you are not the intended recipient, you should delete this message and any =
+disclosure, copying, or distribution of this message, or the taking of any =
+action based on it, by you is strictly prohibited.
