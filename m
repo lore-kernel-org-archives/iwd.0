@@ -1,59 +1,59 @@
-Received: from mail-oi1-f174.google.com (mail-oi1-f174.google.com [209.85.167.174])
+Received: from mail-oi1-f173.google.com (mail-oi1-f173.google.com [209.85.167.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 502F316078B
-	for <iwd@lists.linux.dev>; Tue,  7 May 2024 15:07:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CAC815F414
+	for <iwd@lists.linux.dev>; Tue,  7 May 2024 15:12:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715094446; cv=none; b=jgqOpfmRCer77/q5Hbddxl1ixHpCbzjsuvBwSF2iJ0/woNLlJnV9PYiQJyZlzI52xxvAn6MUkhowJruCQWe14z3ktxNh0UYzQOoNa9Ov3mVA4sXgjsjUBD15hzFsitERK7OhSJ77TwCtHknUTaAZwhCFp6QOpvjMBmmsoQe3l0c=
+	t=1715094722; cv=none; b=MbF6z5rhg+r11xSBpIrdP8BuD9pHMBYcuGZw+l3MuCadiUfb8gxA9WCdk9ZM8wg7hxJCv+sHozJEKyYZ4OHyT6/SOfOyk+YpN74/gSpqWWvqVtJo1X6QvJjPFUiQhvju114ENEf3ZbC+bTfmsqO1Z+pWdxPOH8pFaLFOGl2jErM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715094446; c=relaxed/simple;
-	bh=JosTvr1kjVGe7gZpmiKVolRR/avYZHSG3lclk9W0QE0=;
+	s=arc-20240116; t=1715094722; c=relaxed/simple;
+	bh=7+L9Lv82Mty3NETGPTOMveDYqBrbbW4g1I+S7gWuBhE=;
 	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=kaNw6BfxxpRDjagkNNQWczhku/SL3nzQFXgUcwam8r3Bt+7toq4/K/CVY656Av3TUihkY+qr++6El5XsoppGcc0k1I1QnofKSHhafXUcakT8TPzk6syliJeM7kms8YUtmXhMwYG10KW0oDvmD1d74bwdnT//tgLKY8DcUsPYMYM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eWNJD4QB; arc=none smtp.client-ip=209.85.167.174
+	 In-Reply-To:Content-Type; b=clDRFUAH+okwb3EhA6ddE1e2Mkxy1amIhES9OjpTIb+WJ2BpOpE2clCXLd75vkjJRjEq/4XeUvS8T5GJgmw9ZMpBIK8mkcyWp5uIHbN5EX27rs6oRimr9FWZSX9do2HEs2QtdSEyE9Tdb1uRsFNfZFagvvtR4LcEM22ZER3ohI8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=g8p5vmHr; arc=none smtp.client-ip=209.85.167.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eWNJD4QB"
-Received: by mail-oi1-f174.google.com with SMTP id 5614622812f47-3c9539d1bbcso2609123b6e.1
-        for <iwd@lists.linux.dev>; Tue, 07 May 2024 08:07:15 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="g8p5vmHr"
+Received: by mail-oi1-f173.google.com with SMTP id 5614622812f47-3c974a0647bso1005348b6e.2
+        for <iwd@lists.linux.dev>; Tue, 07 May 2024 08:12:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1715094434; x=1715699234; darn=lists.linux.dev;
+        d=gmail.com; s=20230601; t=1715094720; x=1715699520; darn=lists.linux.dev;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:to:subject:user-agent:mime-version:date:message-id:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=hh2yhrG4Ll82ibdR2c28INCin1mNMP32LexBhj6JwFI=;
-        b=eWNJD4QB5ZOY1HB+go1lVeLaaNrA242nH1Yu66FazV0Kp7DAzmdlTteX1B27RvWF1i
-         XpzGpXsJAJz7jyPJaP9mA10NuuKDTJ7Tvo7rI/h28wgHAzZn+qsx+2EaezBPwNx4kzQ0
-         578YZU+giZJwAgpEF1sYW3PpdSMOlr9PfJuasvcu6XLA8IQsilGa0swjePt5/hdG5SjI
-         OC9KQS8KdFNhiYM2eYtKlFry//daGY/aifBisZQtHzdv9ie/lCiTJYIor+dmOLTxTkpg
-         S3vuUPqrEftxxZwSee/1FGP0kQi/4AlyqMzdUZU5v5XZYBcDWsvpcDYachmHF04Z1ZKB
-         GJSQ==
+        bh=bfmS4GYwMDoZxTm5Xm/9YNc2xG7Kb4bHfxBOrnhxVkc=;
+        b=g8p5vmHrkH6cMSF7ba3NjUQBmRJiinA5Dg7jAa7m5NP1EdIKzJn88CRiyE5tyA8GcQ
+         C+2slH7zgI6SlRFbMrhV69v3/hXC8nB7jNBXy5iUKACXRhj4CY6kWYNQWvT2vIxYBLuP
+         L+4Wyh+Rr540tHi7yEd1yAgTrkIZPS0xMmzNCStHTbTXQWZQmHlFkoHAxmhhMY8DtN8T
+         LktnbZFXTc+kCZZRQnmexbSBvRY0G+cUlApSAmWx1jr90jfcNsDKuEGLCMoM+ByvkHZu
+         HZWbLeAh2gztJwlMbQ++jY+SbDyGIQdIY5zM/SigwuGgPa/ca0B/dW0QklZciPOedlWd
+         6b6Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715094434; x=1715699234;
+        d=1e100.net; s=20230601; t=1715094720; x=1715699520;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=hh2yhrG4Ll82ibdR2c28INCin1mNMP32LexBhj6JwFI=;
-        b=OczyIITay7f9rSNyYURl/IIWBf+uhA3ip42wDqMxMIucDBhv3qqB+n64/oyjgt328I
-         oqhZZcGojvJ0sIij5bgNAN4cJVkd6dewXbM4K5CrocJHXd9b/63DcZdOdnBe3hbC58ra
-         7tBJ6HAAMsi4b/FibjgUxb+/YKEBAeeEupQJtuTx/CPr/xe4h7IEWB05DW/o+3h6CLq/
-         Q5WU051Yzspgz7QTNIwkVTotzFjU0GSqD/51S2Rz8YLvBfOkOExMrKf/ed+gr8+z42Kh
-         LBbsgKUHDq9U3jVZ8iv1IcYBvfw68QgsczZZ4vdiVxV/oPZO7cS5XCM/gSI60wugluug
-         GdJw==
-X-Forwarded-Encrypted: i=1; AJvYcCUGSX9hOCnmmtiGMcubjnW0yMQxXua8vNnatZRgs7BhS6iXM5YXTvy5EDjUKIuBOvLuXthi8awYbSvO+B8mRjtcZ1Bf
-X-Gm-Message-State: AOJu0YxjftNJcl7NCKkf4x10aVUmrI12d4C7d52n0tOZ0k+6yuYwZHFc
-	LcfxNzXomIIFyz2lJGz8dWl+iSAKjWrEDhpQYTzDG33oaFA0w0SqosHRtA==
-X-Google-Smtp-Source: AGHT+IFB0gbqkINEYcKjXBGLNag47vSH6GSWfO94S1fYCEc9+4ApDG5bXV2oVX8c6UNsor26lr4+EA==
-X-Received: by 2002:a54:478b:0:b0:3c6:ce1:d25c with SMTP id 5614622812f47-3c984b882e5mr39980b6e.15.1715094434329;
-        Tue, 07 May 2024 08:07:14 -0700 (PDT)
+        bh=bfmS4GYwMDoZxTm5Xm/9YNc2xG7Kb4bHfxBOrnhxVkc=;
+        b=VA0DMkNMpEI6rlefmEq5+mzPMM7yJRTRF56WgarYPH3DdjOM27AQ0d+9612/VV4clJ
+         BnL3Vi0krpb/BFr2RE6rNBPmPj1Wib/FJ/AtKtZlxelJBALPG/dfWzwDR/5o6IGMKSSf
+         8Yt0pYyR1rUNw2h+EMPI5viIFeBEOVwS6bL8q2BP/73eaS1+69BOu9uo+g1HdJSwf1vR
+         uy2gmAEnTBuCKL0lw2pIFlWJQTId3ZeJBMky8D0LyCWyqcwq67yjYeB13VR6eqZ0YeuJ
+         c9uNwNoqcwvl46im1c7PG98Rz2qY/CPt7YFNX0izyP/WIDTWqZIaGY3pGasDylcelUVS
+         avrA==
+X-Forwarded-Encrypted: i=1; AJvYcCWpkhSi0V41V8l1UI6E9Lt+ZTocgRuQAesSyycnLEWg1KvxV9Pzr3yBQqqwN6dJCuRim887N2OU68JkruPNrn6FGH4h
+X-Gm-Message-State: AOJu0YzewKWGQkwXQ42B1rgW6kyfnmDd2acs02Y0U9JX/1DU7z3Xk0HC
+	QA4ObAsy00U1ZVKp2suUecdSIKHf1fgWwus3s3tVq041jwdq6QfZMXwfBg==
+X-Google-Smtp-Source: AGHT+IF0Ay53PGOjZWZjZ58NqhEzPVnxaJEbzcFR4aGVIqklvwycNnznS1HTdZMmkEm15pwRGTStVw==
+X-Received: by 2002:a05:6830:ecb:b0:6ee:6eff:ff4e with SMTP id dq11-20020a0568300ecb00b006ee6effff4emr13682610otb.22.1715094720442;
+        Tue, 07 May 2024 08:12:00 -0700 (PDT)
 Received: from [192.168.1.20] (syn-070-114-247-242.res.spectrum.com. [70.114.247.242])
-        by smtp.googlemail.com with ESMTPSA id fb16-20020a0568083a9000b003c82cfb1a5asm1853619oib.28.2024.05.07.08.07.13
+        by smtp.googlemail.com with ESMTPSA id ec4-20020a0568306e0400b006eb7e17aac5sm2499919otb.73.2024.05.07.08.11.59
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 07 May 2024 08:07:14 -0700 (PDT)
-Message-ID: <b9ade3bc-d1ae-4650-827a-c14f10d49106@gmail.com>
-Date: Tue, 7 May 2024 10:07:13 -0500
+        Tue, 07 May 2024 08:12:00 -0700 (PDT)
+Message-ID: <a7cdf7c2-a787-4dd2-8e57-677a8334575a@gmail.com>
+Date: Tue, 7 May 2024 10:11:59 -0500
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
@@ -61,87 +61,67 @@ List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 02/18] ap: accept PSK/SAE in auth depending on config
+Subject: Re: [PATCH v2 07/18] sae: verify offered group in AP mode
 To: John Brandt <brandtwjohn@gmail.com>, iwd@lists.linux.dev
 References: <20240506003518.320176-1-brandtwjohn@gmail.com>
- <20240506003518.320176-3-brandtwjohn@gmail.com>
+ <20240506003518.320176-8-brandtwjohn@gmail.com>
 Content-Language: en-US
 From: Denis Kenzior <denkenz@gmail.com>
-In-Reply-To: <20240506003518.320176-3-brandtwjohn@gmail.com>
+In-Reply-To: <20240506003518.320176-8-brandtwjohn@gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 Hi John,
 
 On 5/5/24 7:30 PM, John Brandt wrote:
-> On reception of an authentication frame, accept both PSK and SAE as AKM
-> depending on the config. Save the client's AKM for later use.
+> When receiving a Commit frame in AP mode, first verify that we support
+> the offered group before further processing the frame.
 > ---
->   src/ap.c | 29 ++++++++++++++++++++++-------
->   1 file changed, 22 insertions(+), 7 deletions(-)
+>   src/sae.c | 15 ++++++++++++++-
+>   1 file changed, 14 insertions(+), 1 deletion(-)
 > 
-> diff --git a/src/ap.c b/src/ap.c
-> index d50f9e4f..cd253ce3 100644
-> --- a/src/ap.c
-> +++ b/src/ap.c
-> @@ -132,6 +132,7 @@ struct sta_state {
->   	uint8_t *assoc_ies;
->   	size_t assoc_ies_len;
->   	uint8_t *assoc_rsne;
-> +	enum ie_rsn_akm_suite akm_suite;
->   	struct eapol_sm *sm;
->   	struct handshake_state *hs;
->   	uint32_t gtk_query_cmd_id;
-> @@ -2606,6 +2607,7 @@ static void ap_auth_cb(const struct mmpdu_header *hdr, const void *body,
->   	const uint8_t *from = hdr->address_2;
->   	const uint8_t *bssid = netdev_get_address(ap->netdev);
->   	struct sta_state *sta;
-> +	enum ie_rsn_akm_suite akm_suite;
+> diff --git a/src/sae.c b/src/sae.c
+> index 7ba9b0eb..7405a561 100644
+> --- a/src/sae.c
+> +++ b/src/sae.c
+> @@ -216,6 +216,18 @@ static int sae_valid_group(struct sae_sm *sm, unsigned int group)
+>   	return -ENOENT;
+>   }
 >   
->   	l_info("AP Authentication from %s", util_address_to_string(from));
+> +static int sae_supported_group(struct sae_sm *sm, unsigned int group)
+> +{
+> +	const unsigned int *ecc_groups = l_ecc_supported_ike_groups();
+> +	unsigned int i;
+> +
+> +	for (i = 0; ecc_groups[i]; i++)
+> +		if (ecc_groups[i] == group)
+> +			return true;
+
+Function declared as returning int, but you're returning true/false here.
+
+> +
+> +	return false;
+> +}
+> +
+>   static bool sae_pwd_seed(const uint8_t *addr1, const uint8_t *addr2,
+>   				uint8_t *base, size_t base_len,
+>   				uint8_t counter, uint8_t *out)
+> @@ -1053,7 +1065,8 @@ static int sae_verify_nothing(struct sae_sm *sm, uint16_t transaction,
+>   		return -EBADMSG;
 >   
-> @@ -2627,17 +2629,28 @@ static void ap_auth_cb(const struct mmpdu_header *hdr, const void *body,
->   		}
->   	}
->   
-> -	/* Only Open System authentication implemented here */
-> -	if (L_LE16_TO_CPU(auth->algorithm) !=
-> -			MMPDU_AUTH_ALGO_OPEN_SYSTEM) {
-> +	if ((ap->akm_suites & IE_RSN_AKM_SUITE_SAE_SHA256) &&
-> +	    (L_LE16_TO_CPU(auth->algorithm) == MMPDU_AUTH_ALGO_SAE) ) {
-> +		/* When using SAE it must be COMMIT or CONFIRM frame */
-> +		if (L_LE16_TO_CPU(auth->transaction_sequence) != 1 &&
-> +		    L_LE16_TO_CPU(auth->transaction_sequence) != 2) {
+>   	/* reject with unsupported group */
+> -	if (l_get_le16(frame) != sm->group)
+> +	if ((sm->handshake->authenticator && sae_supported_group(sm, l_get_le16(frame)) < 0) ||
 
-Can we use sae_verify_packet for this?
+nit: We still use 80 column lines.  This line is way too long.
 
-> +			ap_auth_reply(ap, from, MMPDU_REASON_CODE_UNSPECIFIED);
-> +			return;
-> +		}
-> +		akm_suite = IE_RSN_AKM_SUITE_SAE_SHA256;
+Also, this if condition will never be true due to sae_supported_group returning 
+true/false.
 
-nit: doc/coding-style.txt item M1
-
-> +	} else if ((ap->akm_suites & IE_RSN_AKM_SUITE_PSK) &&
-> +		   (L_LE16_TO_CPU(auth->algorithm) == MMPDU_AUTH_ALGO_OPEN_SYSTEM) ) {
-
-nit: Only tabs for indentation please
-
-> +		/* When using PSK it must be Open System authentication */
-> +		if (L_LE16_TO_CPU(auth->transaction_sequence) != 1) {
-> +			ap_auth_reply(ap, from, MMPDU_REASON_CODE_UNSPECIFIED);
-> +			return;
-> +		}
-> +		akm_suite = IE_RSN_AKM_SUITE_PSK;
-
-nit: ditto item M1
-
-> +	} else {
->   		ap_auth_reply(ap, from, MMPDU_REASON_CODE_UNSPECIFIED);
->   		return;
->   	}
+> +	    (!sm->handshake->authenticator && l_get_le16(frame) != sm->group))
+>   		return sae_reject(sm, SAE_STATE_COMMITTED,
+>   				MMPDU_STATUS_CODE_UNSUPP_FINITE_CYCLIC_GROUP);
 >   
 
 Regards,
 -Denis
-
