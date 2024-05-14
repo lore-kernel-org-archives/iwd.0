@@ -1,139 +1,166 @@
-Received: from mail-qt1-f182.google.com (mail-qt1-f182.google.com [209.85.160.182])
+Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00F102D60A
-	for <iwd@lists.linux.dev>; Tue, 14 May 2024 12:25:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62B24139589
+	for <iwd@lists.linux.dev>; Tue, 14 May 2024 14:19:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715689556; cv=none; b=O0sWUP7WRKIEFBIqaTApkCBdkn/QVMnfUyOmLZCKvOP5xdtztwzAMskOhE5RybEtR/GY1lnqjxR63ko22krPzZp1g+Fe+VfmnXLF37s1VywS/p1acjIO0yN4JmwucBAp3KZYuAZu1xKAsVui9rn9R97ti4Tp6wNxPbiK6EU4PqM=
+	t=1715696373; cv=none; b=IqRxOQFC4hS71eAT0QDf8KAB1OOrS7nwADvn+/QY1BGcLFMn83j9RpzGJwrh3zOzXoKeRYB5XzijK9YkIG1BcFvf1f/K6MR2bSDapdOLeMm31XDRmvfE3DkV+twB3uPwmz3ktiOpQm1/8S4Olt1yv4ucewIoWI9ReBwuJOHEIk0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715689556; c=relaxed/simple;
-	bh=K0sk8GtD/vrM3LOfTyMq1Gtgbh16+4KCaOdih8F2z2g=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:Cc:From:
-	 In-Reply-To:Content-Type; b=Q7ReACPox2xXMPHaAGDQRHPwdXMTZ9q6QEibJpfDiNBsuGT7aF5lX6+HZV/dmjvdcsJOp0ecWNV196Ok9KFu/D9nXuxhBDcTP5F/1lz+c805rLAQY9iEZ36Uup5fEvPtkkxnriD52zWpg/Po2Fw704zy1/RUEQ08G/WsQyFKskU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KVEy1MA1; arc=none smtp.client-ip=209.85.160.182
+	s=arc-20240116; t=1715696373; c=relaxed/simple;
+	bh=LQTK71j74/BzISZNk9MAR2Jasf7z9BFxfLCQpRl9QxU=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=qCqSvuUuaYyMF3nRAEV/yHbUTfWwjWqdzLq4dYDDGeCzArT9vG2yV7GigMLwgEK/eEJqwkbG+SuwX4VVY5UVk3KVi8jOAHsF6QnjrKEV3C544bZIfpIfsXZNSOoDFswbE7L66KXdYbRPcvHzRUc90LKkxfa5MRDcMrYsGW9uKgQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SO2XFv08; arc=none smtp.client-ip=209.85.128.50
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KVEy1MA1"
-Received: by mail-qt1-f182.google.com with SMTP id d75a77b69052e-43e18255597so13348031cf.3
-        for <iwd@lists.linux.dev>; Tue, 14 May 2024 05:25:54 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SO2XFv08"
+Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-41fe54cb0e3so36103425e9.2
+        for <iwd@lists.linux.dev>; Tue, 14 May 2024 07:19:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1715689554; x=1716294354; darn=lists.linux.dev;
-        h=content-transfer-encoding:in-reply-to:from:cc:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=CKZiCnlFXvj2xeWc1/fIKNUWhxwmEXn6EBqOUlVPyYg=;
-        b=KVEy1MA1eA+t8MiZY/RX/pDFATgN0TWpRbiWQVxGXsl8g4cGkgNO4kIbrcRBCaglX2
-         VPcnNCxpzXDGrQV4SVuybdS/fGgHyZKB8AtbgDoBlCLtabU30QbDgag8vRM85ex9sVna
-         Jou2IccG4t33z5sSBT5k9nhBYDiPLM25o6pQE+kvZ9q/8oEJkoTVJZa0V4aDFrmPGv/v
-         tVQsuzb6R7Wtnk3ah22J2hig5Qm+aL3lXl9VfE1YrDgXyAI9v/heud2fxiAnqFu4Crs+
-         MSgmsgMOnDbioTldPGn7TTftFfP2kiV6P+rpklqzLdkdrDUyYjxS5pK3qdX5usuTq+0h
-         VZYw==
+        d=gmail.com; s=20230601; t=1715696369; x=1716301169; darn=lists.linux.dev;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=V4519cry0Iw6LkbE+i6nxT0awlm0XMxXWFbxF1HDBDk=;
+        b=SO2XFv08qEJD8yKFDVxSs/gXT5FJlreaxBiNs3s+OUrCOW1IPrMjejp0garLW+gMD5
+         jgn3nCmWSMfWYQKfSlxS/Zi6DJLvkPEVkQ9tcmA9J1lzZ3osK7R0W9UicOzW37BCVrGV
+         vqFeQKbAvcdZ00BK9pEPVaBzL3N0vsFQ2lwNxRuOrOt7Z1BhXw5iub1drO6M10dR4lBJ
+         GC+0635+svz7owdZQIwvJP5D4cW4HfTqqXmPUd5GUV/uJKArUxdbfCHpDaipalGCkOoi
+         vQ/spC73btb4FCEUiszE9fvOcUY28ay2iJnqqIOOLhxGBBqlTqBwOuBz6b7/eD5fgOwJ
+         TL2A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715689554; x=1716294354;
-        h=content-transfer-encoding:in-reply-to:from:cc:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=CKZiCnlFXvj2xeWc1/fIKNUWhxwmEXn6EBqOUlVPyYg=;
-        b=sLHkzhwSOZfJldDjH4p8RyJsvMXsr9/T2t0ShvwNf1ikqCrxUDI8av7/mo4+cCtq5e
-         93YRLsg8SSJ3sx4S25fiWqW3tmg3Io5GR9BJUTpqgx8W7HFi5eMi7vJo5OkdKfYxiQSY
-         vDt+pn26v1jwpEro9isaQS9VK0hs8dpORhqItHaRfEOdMM2DUqltATLq9gQhf42nzgK3
-         wDEgEtSyl/S5n/KKa/nKvwV9DKhX1IfAvJFZWMg1HMljKOiOdRj60WDzRp7cR3ddgjPj
-         JnuXW6GpUb5iQa1jHoicRTRfxnD8d1488pNyY6LyRPaE9yyEW58Eno2b2tCGUnt8rYnS
-         w1cw==
-X-Gm-Message-State: AOJu0Yx2o3mUvYlfWeKqdMalev5Z6+slFgJ08t5/W9OZSR+FHaJWd7/X
-	EqFUJbGdOfDQFEIoj8TWeQube2DSTPLK3m7fDjH/UjjjGr56MBvLme3vUw==
-X-Google-Smtp-Source: AGHT+IHa14bUWHM8xGgavj9OWjEWDLOQH0ZOmkOLO1TUqLpSQrA7CyfpNrNU8SRzPyMFNAtIuoCwQw==
-X-Received: by 2002:a05:6214:4985:b0:6a0:590e:d616 with SMTP id 6a1803df08f44-6a1681a3bbdmr138110856d6.29.1715689553626;
-        Tue, 14 May 2024 05:25:53 -0700 (PDT)
-Received: from [10.102.4.159] ([208.195.13.130])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6a15f188842sm52918356d6.56.2024.05.14.05.25.52
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 14 May 2024 05:25:52 -0700 (PDT)
-Message-ID: <ce68de5c-bd18-463e-bd1d-7ab1ea300944@gmail.com>
-Date: Tue, 14 May 2024 05:25:50 -0700
+        d=1e100.net; s=20230601; t=1715696369; x=1716301169;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=V4519cry0Iw6LkbE+i6nxT0awlm0XMxXWFbxF1HDBDk=;
+        b=TGmzOSez95LcLJOPTM1OCktiOElQVtSMuRtAbX+BqTP9rlGHyLG64OzvsqlCDMfJz8
+         IpshBpc5ZxZlcChMAmimjO6IpYWoNuiZLhQVrEmkA9yHSwdH385zPeilkR+S5NK3+Rhp
+         QNNEfh8xhJxiZHZwS19zWpDTE4SsKcGtaZ5NwLjfLX4JddcHsA6eqX9WSbVo/0hx5yvv
+         9Da49Kx8++TajIkTR9o2v4cKMhzol7HzPuc5AxNmBTDs7KlEniJxCqvVktFsK3h7QcH/
+         2X0yBZ/+VpgH7hI1VEjn2atO0KeEZVSTV2gYZB/f0FpX5YKCCvzQcOGoXQ4n6+DecjwS
+         1sbw==
+X-Gm-Message-State: AOJu0YzNzSUtSFbBh0mgsA1hUt3ZeGmI82V/4xArOffUa2OBla9MXfak
+	07D/iSxt9NpqeRGS74XdaEniIExuayint3h/qLNTvEkleiXvXpp9IeRNrY3D
+X-Google-Smtp-Source: AGHT+IHsvEv/KSPY+PbeiDEt+PncJDQsZEYWxCE405f9gDFc2uggvg0NJJpmKDenf5mpcI9c18utRA==
+X-Received: by 2002:a05:600c:4e0b:b0:420:12af:c759 with SMTP id 5b1f17b1804b1-42012afc9bfmr58172715e9.9.1715696369273;
+        Tue, 14 May 2024 07:19:29 -0700 (PDT)
+Received: from LOCLAP699.dhl-toledo.locus ([195.55.200.178])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-41f9ffe26acsm153448085e9.1.2024.05.14.07.19.27
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 14 May 2024 07:19:28 -0700 (PDT)
+From: James Prestwood <prestwoj@gmail.com>
+To: iwd@lists.linux.dev
+Cc: James Prestwood <prestwoj@gmail.com>
+Subject: [PATCH 1/2] band: support band lookup fallback for buggy APs
+Date: Tue, 14 May 2024 07:19:22 -0700
+Message-Id: <20240514141923.291148-1-prestwoj@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] build: Create ell directory for ell/ell.h target
-Content-Language: en-US
-To: "iwd@lists.linux.dev" <iwd@lists.linux.dev>
-References: <20240229195654.1579749-1-prestwoj@gmail.com>
-Cc: James Prestwood <prestwoj@gmail.com>,
- Marcel Holtmann <marcel@holtmann.org>, Denis Kenzior <denkenz@gmail.com>,
- KeithG <ys3al35l@gmail.com>
-From: James Prestwood <prestwoj@gmail.com>
-In-Reply-To: <20240229195654.1579749-1-prestwoj@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-Hi,
+Its been seen that some vendors incorrectly set the 3rd byte of the
+country code which causes the band lookup to fail with the provided
+operating class. This isn't compliant with the spec, but its been
+seen out in the wild and it causes IWD to behave poorly, specifically
+with roaming since it cannot parse neighbor reports. This then
+requires IWD to do a full scan on each roam.
 
-On 2/29/24 11:56 AM, James Prestwood wrote:
-> Both ell/shared and ell/internal targets first create the ell/
-> directory within IWD. This apparently was just luck that one of
-> these always finished first in parallel builds. On my system at
-> least when building using dpkg-buildpackage IWD fails to build
-> due to the ell/ directory missing. From the logs it appears that
-> both the shared/internal targets were started but didn't complete
-> (or at least create the directory) before the ell/ell.h target:
->
-> make[1]: Entering directory '/home/jprestwood/tmp/iwd'
-> /usr/bin/mkdir -p ell
-> /usr/bin/mkdir -p ell
-> echo -n > ell/ell.h
-> /usr/bin/mkdir -p src
-> /bin/bash: line 1: ell/ell.h: No such file or directory
-> make[1]: *** [Makefile:4028: ell/ell.h] Error 1
->
-> Creating the ell/ directory within the ell/ell.h target solve
-> the issue. For reference this is the configure command dpkg
-> is using:
->
-> ./configure --build=x86_64-linux-gnu \
-> 	--prefix=/usr \
-> 	--includedir=/usr/include \
-> 	--mandir=/usr/share/man \
-> 	--infodir=/usr/share/info \
-> 	--sysconfdir=/etc \
-> 	--localstatedir=/var \
-> 	--disable-option-checking \
-> 	--disable-silent-rules \
-> 	--libdir=/usr/lib/x86_64-linux-gnu \
-> 	--runstatedir=/run \
-> 	--disable-maintainer-mode \
-> 	--disable-dependency-tracking \
-> 	--enable-tools \
-> 	--enable-dbus-policy
-> ---
->   Makefile.am | 1 +
->   1 file changed, 1 insertion(+)
->
-> diff --git a/Makefile.am b/Makefile.am
-> index 5ed6ab37..be287572 100644
-> --- a/Makefile.am
-> +++ b/Makefile.am
-> @@ -710,6 +710,7 @@ ell/internal: Makefile
->   	done > $@
->   
->   ell/ell.h: Makefile
-> +	$(AM_V_at)$(MKDIR_P) ell
->   	$(AM_V_at)echo -n > $@
->   	$(AM_V_GEN)for f in $(ell_headers) ; do \
->   		echo "#include <$$f>" >> $@ ; \
+Instead of a hard rejection, IWD can instead attempt to determine
+the band by ignoring that 3rd byte and only use the alpha2 string.
+This makes IWD slightly less strict but at the advantage of not being
+crippled when exposed to poor AP configurations.
+---
+ src/band.c | 58 +++++++++++++++++++++++++++++++++++++++++++++++++++---
+ 1 file changed, 55 insertions(+), 3 deletions(-)
 
-I noticed this patch was still in my private IWD tree and never got 
-merged. Could we take a look at this? For me (and Keith) it appears to 
-be required for debian builds. For whatever reason that build system 
-triggers the timing just right that the ell/ directory doesn't exist 
-when copying the ell source.
-
-Thanks,
-
-James
+diff --git a/src/band.c b/src/band.c
+index 906d6197..6891d06c 100644
+--- a/src/band.c
++++ b/src/band.c
+@@ -1485,15 +1485,48 @@ static const uint8_t oper_class_cn_to_global[] = {
+ 	/* 128 - 130 is a 1 to 1 mapping */
+ };
+ 
+-enum band_freq band_oper_class_to_band(const uint8_t *country,
+-					uint8_t oper_class)
++/*
++ * Annex C describes the country string encoding.
++ *
++ * If it is a country, the first two octets of this string is the two character
++ * country code as described in document ISO 3166-1. The third octet is one of
++ * the following:
++ *  1. an ASCII space character, if the regulations under which the station is
++ *     operating encompass all environments for the current frequency band in
++ *     the country,
++ *  2. an ASCII 'O' character, if the regulations under which the station is
++ *     operating are for an outdoor environment only, or
++ *  3. an ASCII 'I' character, if the regulations under which the station is
++ *     operating are for an indoor environment only.
++ *  4. an ASCII 'X' character, if the station is operating under a noncountry
++ *     entity. The first two octets of the noncountry entity is two ASCII 'XX'
++ *     characters.
++ *  5. the hexadecimal representation of the Operating Class table number
++ *     currently in use, from the set of tables defined in Annex E, e.g.,
++ *     Table E-1 is represented as x'01'.
++ */
++static enum band_freq oper_class_to_band(const uint8_t *country,
++					uint8_t oper_class,
++					bool ignore_country3)
+ {
+ 	unsigned int i;
+ 	int table = 0;
+ 
+-	if (country && country[2] >= 1 && country[2] <= 5)
++	/*
++	 * If a country is set, and the 3rd byte maps to some E-* table in the
++	 * spec use that (case 5). Only caveat here is some APs erroneously set
++	 * this 3rd byte. To work around we can fall back to case 1, where only
++	 * the first two characters are used to lookup the table.
++	 */
++	if (!ignore_country3 && country && country[2] >= 1 && country[2] <= 5)
+ 		table = country[2];
+ 	else if (country) {
++		/*
++		 * Assuming case 1, although its unlikely you would handle
++		 * cases 2 (O) or 3 (I) any differently. Case 4 (X) is unlikely
++		 * and we really wouldn't have enough information to correctly
++		 * determine the band in some obscure non-country domain.
++		 */
+ 		for (i = 0; i < L_ARRAY_SIZE(oper_class_us_codes); i++)
+ 			if (!memcmp(oper_class_us_codes[i], country, 2)) {
+ 				/* Use table E-1 */
+@@ -1542,6 +1575,25 @@ enum band_freq band_oper_class_to_band(const uint8_t *country,
+ 		return 0;
+ }
+ 
++enum band_freq band_oper_class_to_band(const uint8_t *country,
++					uint8_t oper_class)
++{
++	enum band_freq band = oper_class_to_band(country, oper_class, false);
++	if (!band) {
++		/* Fallback with no country string won't change anything */
++		if (!country)
++			return 0;
++
++		l_warn("Failed to find band with country string '%c%c %u' and "
++			"oper class %u, trying fallback",
++			country[0], country[1], country[2], oper_class);
++
++		return oper_class_to_band(country, oper_class, true);
++	}
++
++	return band;
++}
++
+ const char *band_chandef_width_to_string(enum band_chandef_width width)
+ {
+ 	switch (width) {
+-- 
+2.34.1
 
