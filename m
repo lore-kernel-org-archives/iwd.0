@@ -1,140 +1,139 @@
-Received: from mail-oo1-f44.google.com (mail-oo1-f44.google.com [209.85.161.44])
+Received: from mail-qt1-f182.google.com (mail-qt1-f182.google.com [209.85.160.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14DC82943C
-	for <iwd@lists.linux.dev>; Mon, 13 May 2024 18:00:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00F102D60A
+	for <iwd@lists.linux.dev>; Tue, 14 May 2024 12:25:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715623252; cv=none; b=R+P/9N4heBnu74d1TGMraMHgjCPzUaWwdIRnzQzSsU6FRxVaEukyfvj5C42XIpUfnbIinqpFRJuw3IwUT7uPP5w3XdcFzxPkwDKQLBK7SMetuMoMZKcN/GvtOLyHgmzI6N4oJu9xKKwT/MaW26JsjPEEC0zCBL0H+DPOq/FyJP0=
+	t=1715689556; cv=none; b=O0sWUP7WRKIEFBIqaTApkCBdkn/QVMnfUyOmLZCKvOP5xdtztwzAMskOhE5RybEtR/GY1lnqjxR63ko22krPzZp1g+Fe+VfmnXLF37s1VywS/p1acjIO0yN4JmwucBAp3KZYuAZu1xKAsVui9rn9R97ti4Tp6wNxPbiK6EU4PqM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715623252; c=relaxed/simple;
-	bh=Ewuy0Wcev3lyoyxQwNdHLbhw+LeMtSPElpSYBESyFFw=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=kewjqUyUGlZPtSu0hA6Al5QzN2ClCW3rBsWkutPxp1WPKR51WqScEQM/smZRdj0Nu91aZloWShhHCYouZYcXIw6hFZ2vU76eetNVJmFom+zkzPksSN0DhV7Wrghuyua0gUtbto5NqpbAI86bDPlbhJuR/MAV7ir47gExFhphObA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VPrpKZS6; arc=none smtp.client-ip=209.85.161.44
+	s=arc-20240116; t=1715689556; c=relaxed/simple;
+	bh=K0sk8GtD/vrM3LOfTyMq1Gtgbh16+4KCaOdih8F2z2g=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:Cc:From:
+	 In-Reply-To:Content-Type; b=Q7ReACPox2xXMPHaAGDQRHPwdXMTZ9q6QEibJpfDiNBsuGT7aF5lX6+HZV/dmjvdcsJOp0ecWNV196Ok9KFu/D9nXuxhBDcTP5F/1lz+c805rLAQY9iEZ36Uup5fEvPtkkxnriD52zWpg/Po2Fw704zy1/RUEQ08G/WsQyFKskU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KVEy1MA1; arc=none smtp.client-ip=209.85.160.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VPrpKZS6"
-Received: by mail-oo1-f44.google.com with SMTP id 006d021491bc7-5b277993a48so2682784eaf.1
-        for <iwd@lists.linux.dev>; Mon, 13 May 2024 11:00:50 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KVEy1MA1"
+Received: by mail-qt1-f182.google.com with SMTP id d75a77b69052e-43e18255597so13348031cf.3
+        for <iwd@lists.linux.dev>; Tue, 14 May 2024 05:25:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1715623250; x=1716228050; darn=lists.linux.dev;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=QvuWI6sqPVihnirRlEtyFP27P6IeDVRAKOxVUGXaxP4=;
-        b=VPrpKZS6Prb2kgK/PwwaC3lDUfOHm3kUgIc+kdWp7dSm15+ERnc61dQw7PeFiNuEWa
-         N4D/jUKZVsXfUXKO0IxCT8dAnP4P3g/FYJHaPHmvC3B2Vo0Oh4XYgQL7uPDQppPuEvHY
-         aleJFLFwWYA+SLlTbITvrIaOPKDJkEyQKdmq749hts2NHVGNO9jUKHLl/8Xw3aKc7tfr
-         NWqqLP2jd6A7EV/TYWwCFGG5G8SQiYAXjdP7zFd5PX449n2O4B/Pjbc3ZAXZJAn8HXmS
-         zH8VRZaTi42C55PdPBlYWqO3kKHbERCBJRnHsr252RJPOjPISwO0Ds4ps5ILIq80FEUM
-         s2Aw==
+        d=gmail.com; s=20230601; t=1715689554; x=1716294354; darn=lists.linux.dev;
+        h=content-transfer-encoding:in-reply-to:from:cc:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=CKZiCnlFXvj2xeWc1/fIKNUWhxwmEXn6EBqOUlVPyYg=;
+        b=KVEy1MA1eA+t8MiZY/RX/pDFATgN0TWpRbiWQVxGXsl8g4cGkgNO4kIbrcRBCaglX2
+         VPcnNCxpzXDGrQV4SVuybdS/fGgHyZKB8AtbgDoBlCLtabU30QbDgag8vRM85ex9sVna
+         Jou2IccG4t33z5sSBT5k9nhBYDiPLM25o6pQE+kvZ9q/8oEJkoTVJZa0V4aDFrmPGv/v
+         tVQsuzb6R7Wtnk3ah22J2hig5Qm+aL3lXl9VfE1YrDgXyAI9v/heud2fxiAnqFu4Crs+
+         MSgmsgMOnDbioTldPGn7TTftFfP2kiV6P+rpklqzLdkdrDUyYjxS5pK3qdX5usuTq+0h
+         VZYw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715623250; x=1716228050;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=QvuWI6sqPVihnirRlEtyFP27P6IeDVRAKOxVUGXaxP4=;
-        b=uncd4IlDnWHEcSVwX19Co3WT+OI5tK8Yv+9S3eVBQFpvubgx3lJlB4JnIh43yz+VZ4
-         6F4Y6gWpOoMDBxTg1oQ1ej9jQZWcQqe5yjzEFRbJTmvads+j7dGrqrRzBhQ0bsn8Wkak
-         KyjCgch2t93vTRrVc+i/38S2pODe4RBOnZElRXammohSMK6msFRAXLntM7l8+0GWoCWK
-         HQyriXjqSKBeXUpXzx+4qIaCdOhKoIUq53W0Wat33If7LZnwkdcnwbWkSkjTWJgCgGdH
-         /KvKNIY83bgMDAzv/gna5l2KQpVVBWYaS5w++MPMgLY7CzF9Ep+8dEzeeQHUH7AX9VPs
-         xn1A==
-X-Gm-Message-State: AOJu0YwXvh5Mmoza+yUcYIEqtpERvqqt47wPH+ajVkqYtbp1hPevCWPp
-	V8XSfvv8dm8z47vsD02PKZUo5gFRqjwel3FLtMyPBFjwXUT8F/i+dbJa+A==
-X-Google-Smtp-Source: AGHT+IFqxIHXTh9MkVDhKAU3864xp1d3H9E9T6Xzk7EvWcuTo4CqItIOYHtNtox+sUMQLQN6NCkNPg==
-X-Received: by 2002:a05:6871:878a:b0:22e:7040:3e00 with SMTP id 586e51a60fabf-24172a23576mr13483712fac.8.1715623249845;
-        Mon, 13 May 2024 11:00:49 -0700 (PDT)
-Received: from LOCLAP699.rst-02.locus ([208.195.13.130])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-792bf2a4b38sm479404385a.66.2024.05.13.11.00.48
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 13 May 2024 11:00:49 -0700 (PDT)
-From: James Prestwood <prestwoj@gmail.com>
-To: iwd@lists.linux.dev
-Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 3/3] auto-t: remove default group SAE test for specific OUI
-Date: Mon, 13 May 2024 11:00:42 -0700
-Message-Id: <20240513180042.257401-3-prestwoj@gmail.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240513180042.257401-1-prestwoj@gmail.com>
-References: <20240513180042.257401-1-prestwoj@gmail.com>
+        d=1e100.net; s=20230601; t=1715689554; x=1716294354;
+        h=content-transfer-encoding:in-reply-to:from:cc:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=CKZiCnlFXvj2xeWc1/fIKNUWhxwmEXn6EBqOUlVPyYg=;
+        b=sLHkzhwSOZfJldDjH4p8RyJsvMXsr9/T2t0ShvwNf1ikqCrxUDI8av7/mo4+cCtq5e
+         93YRLsg8SSJ3sx4S25fiWqW3tmg3Io5GR9BJUTpqgx8W7HFi5eMi7vJo5OkdKfYxiQSY
+         vDt+pn26v1jwpEro9isaQS9VK0hs8dpORhqItHaRfEOdMM2DUqltATLq9gQhf42nzgK3
+         wDEgEtSyl/S5n/KKa/nKvwV9DKhX1IfAvJFZWMg1HMljKOiOdRj60WDzRp7cR3ddgjPj
+         JnuXW6GpUb5iQa1jHoicRTRfxnD8d1488pNyY6LyRPaE9yyEW58Eno2b2tCGUnt8rYnS
+         w1cw==
+X-Gm-Message-State: AOJu0Yx2o3mUvYlfWeKqdMalev5Z6+slFgJ08t5/W9OZSR+FHaJWd7/X
+	EqFUJbGdOfDQFEIoj8TWeQube2DSTPLK3m7fDjH/UjjjGr56MBvLme3vUw==
+X-Google-Smtp-Source: AGHT+IHa14bUWHM8xGgavj9OWjEWDLOQH0ZOmkOLO1TUqLpSQrA7CyfpNrNU8SRzPyMFNAtIuoCwQw==
+X-Received: by 2002:a05:6214:4985:b0:6a0:590e:d616 with SMTP id 6a1803df08f44-6a1681a3bbdmr138110856d6.29.1715689553626;
+        Tue, 14 May 2024 05:25:53 -0700 (PDT)
+Received: from [10.102.4.159] ([208.195.13.130])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6a15f188842sm52918356d6.56.2024.05.14.05.25.52
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 14 May 2024 05:25:52 -0700 (PDT)
+Message-ID: <ce68de5c-bd18-463e-bd1d-7ab1ea300944@gmail.com>
+Date: Tue, 14 May 2024 05:25:50 -0700
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] build: Create ell directory for ell/ell.h target
+Content-Language: en-US
+To: "iwd@lists.linux.dev" <iwd@lists.linux.dev>
+References: <20240229195654.1579749-1-prestwoj@gmail.com>
+Cc: James Prestwood <prestwoj@gmail.com>,
+ Marcel Holtmann <marcel@holtmann.org>, Denis Kenzior <denkenz@gmail.com>,
+ KeithG <ys3al35l@gmail.com>
+From: James Prestwood <prestwoj@gmail.com>
+In-Reply-To: <20240229195654.1579749-1-prestwoj@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-There are already tests for UseDefaultEccGroup and this test is
-not longer valid as the static OUI list has been removed.
----
- autotests/testSAE/connection_test.py         |  7 -------
- autotests/testSAE/hw.conf                    |  3 +--
- autotests/testSAE/ssidSAE-default-group.conf | 12 ------------
- 3 files changed, 1 insertion(+), 21 deletions(-)
- delete mode 100644 autotests/testSAE/ssidSAE-default-group.conf
+Hi,
 
-diff --git a/autotests/testSAE/connection_test.py b/autotests/testSAE/connection_test.py
-index f7776385..107daa55 100644
---- a/autotests/testSAE/connection_test.py
-+++ b/autotests/testSAE/connection_test.py
-@@ -52,12 +52,6 @@ class Test(unittest.TestCase):
-         self.hostapd.wait_for_event("AP-ENABLED")
-         self.validate_connection(self.wd, "ssidSAE", self.hostapd, 19)
- 
--    def test_SAE_force_group_19(self):
--        # Vendor data from APs which require group 19 be used first
--        self.hostapd.reload()
--        self.hostapd.wait_for_event("AP-ENABLED")
--        self.validate_connection(self.wd, "ssidSAE-default-group", self.hostapd_defgroup, 19)
--
-     def test_SAE_Group20(self):
-         self.hostapd.set_value('sae_groups', '20')
-         self.hostapd.reload()
-@@ -88,7 +82,6 @@ class Test(unittest.TestCase):
-     def setUpClass(cls):
-         cls.hostapd = HostapdCLI(config='ssidSAE.conf')
-         cls.hostapd_h2e = HostapdCLI(config='ssidSAE-H2E.conf')
--        cls.hostapd_defgroup = HostapdCLI(config='ssidSAE-default-group.conf')
- 
-     @classmethod
-     def tearDownClass(cls):
-diff --git a/autotests/testSAE/hw.conf b/autotests/testSAE/hw.conf
-index 127bbb31..cc0836b7 100644
---- a/autotests/testSAE/hw.conf
-+++ b/autotests/testSAE/hw.conf
-@@ -1,9 +1,8 @@
- [SETUP]
--num_radios=4
-+num_radios=3
- start_iwd=0
- hwsim_medium=yes
- 
- [HOSTAPD]
- rad0=ssidSAE.conf
- rad1=ssidSAE-H2E.conf
--rad2=ssidSAE-default-group.conf
-diff --git a/autotests/testSAE/ssidSAE-default-group.conf b/autotests/testSAE/ssidSAE-default-group.conf
-deleted file mode 100644
-index 752e9c7b..00000000
---- a/autotests/testSAE/ssidSAE-default-group.conf
-+++ /dev/null
-@@ -1,12 +0,0 @@
--hw_mode=g
--channel=1
--ssid=ssidSAE-default-group
--
--wpa=2
--wpa_key_mgmt=SAE
--wpa_pairwise=CCMP
--sae_password=secret123
--sae_groups=19
--ieee80211w=2
--sae_pwe=0
--vendor_elements=dd0cf4f5e8050500000000000000
--- 
-2.34.1
+On 2/29/24 11:56 AM, James Prestwood wrote:
+> Both ell/shared and ell/internal targets first create the ell/
+> directory within IWD. This apparently was just luck that one of
+> these always finished first in parallel builds. On my system at
+> least when building using dpkg-buildpackage IWD fails to build
+> due to the ell/ directory missing. From the logs it appears that
+> both the shared/internal targets were started but didn't complete
+> (or at least create the directory) before the ell/ell.h target:
+>
+> make[1]: Entering directory '/home/jprestwood/tmp/iwd'
+> /usr/bin/mkdir -p ell
+> /usr/bin/mkdir -p ell
+> echo -n > ell/ell.h
+> /usr/bin/mkdir -p src
+> /bin/bash: line 1: ell/ell.h: No such file or directory
+> make[1]: *** [Makefile:4028: ell/ell.h] Error 1
+>
+> Creating the ell/ directory within the ell/ell.h target solve
+> the issue. For reference this is the configure command dpkg
+> is using:
+>
+> ./configure --build=x86_64-linux-gnu \
+> 	--prefix=/usr \
+> 	--includedir=/usr/include \
+> 	--mandir=/usr/share/man \
+> 	--infodir=/usr/share/info \
+> 	--sysconfdir=/etc \
+> 	--localstatedir=/var \
+> 	--disable-option-checking \
+> 	--disable-silent-rules \
+> 	--libdir=/usr/lib/x86_64-linux-gnu \
+> 	--runstatedir=/run \
+> 	--disable-maintainer-mode \
+> 	--disable-dependency-tracking \
+> 	--enable-tools \
+> 	--enable-dbus-policy
+> ---
+>   Makefile.am | 1 +
+>   1 file changed, 1 insertion(+)
+>
+> diff --git a/Makefile.am b/Makefile.am
+> index 5ed6ab37..be287572 100644
+> --- a/Makefile.am
+> +++ b/Makefile.am
+> @@ -710,6 +710,7 @@ ell/internal: Makefile
+>   	done > $@
+>   
+>   ell/ell.h: Makefile
+> +	$(AM_V_at)$(MKDIR_P) ell
+>   	$(AM_V_at)echo -n > $@
+>   	$(AM_V_GEN)for f in $(ell_headers) ; do \
+>   		echo "#include <$$f>" >> $@ ; \
+
+I noticed this patch was still in my private IWD tree and never got 
+merged. Could we take a look at this? For me (and Keith) it appears to 
+be required for debian builds. For whatever reason that build system 
+triggers the timing just right that the ell/ directory doesn't exist 
+when copying the ell source.
+
+Thanks,
+
+James
 
