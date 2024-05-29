@@ -1,65 +1,61 @@
-Received: from mail-qk1-f178.google.com (mail-qk1-f178.google.com [209.85.222.178])
+Received: from mail-oa1-f44.google.com (mail-oa1-f44.google.com [209.85.160.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D62874E25
-	for <iwd@lists.linux.dev>; Wed, 15 May 2024 12:22:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE13717557C
+	for <iwd@lists.linux.dev>; Wed, 29 May 2024 22:52:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715775753; cv=none; b=bqbKsNy0Eh9AvOtrNlqqdpR9ti9GPeTcFul793m6sTMC5ZyLZD/OHVdTuaUglnDtXFQE4EEMRo2e0FBEKLPiH0quy5VY45ft73stcXTOGoqOWeeIQ2Ntrn4uYOleMd2TOZUcVAc9PRDvf8jCidBw/qw2r8jXkjgcrQ07AQZU0l4=
+	t=1717023168; cv=none; b=WW5ytMz9PChOOuW4XW0+H/asM0jRwSeRCUTMoa4mwhzftjn6mgtyTG9h+7dbqqE9BmsDrHqsFIKec4tlKzBLyNcuHHJxbztat8f76/qH/2JegjhEhuGxX6QECH7V7WjMNCYYhVa490w6K/6Vo43N6jzftPfJ9G5oMg3NJ43EOUY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715775753; c=relaxed/simple;
-	bh=uoLh7ZThrih6ndfpJ1BfPHhyxIzr+KFOvg3V89yDoAw=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=idsA5Bz1arNnTnRidl20VHon9KBQh1mG0P1TZABSFMobQw7SE56iEv++M9hjITU41j0Z748+LzDqhkzGes9oeDzH7JaNuC+RhOGlbM6VjzcTxI+MDsOyYtdyTPdiprSsel/Rsob7ULPokgYL1a7JlqV0uPC6nmn9LhbSVuBTbRc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fw5BadAF; arc=none smtp.client-ip=209.85.222.178
+	s=arc-20240116; t=1717023168; c=relaxed/simple;
+	bh=BGO/slGFZU8LLKE9Jdjy4k+/y7FnyrL1MwuewGLXn/I=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=qMzjMtDuaw8ZQ5sNVZMhq9Q1LPZL0G5QWEIeEZowtWJnQT8+v3QIyAlepU0j2Eo4NY6eXnLVM/bTjJyTTI7CQBb3CBSTSZteRLeBNYmA4OWswugmuqCYJs+wnaEsy08YtZsBpaljSVPqxtB5fofIjDQoALO9yswmzBd416Mte90=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=a10tDqK9; arc=none smtp.client-ip=209.85.160.44
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fw5BadAF"
-Received: by mail-qk1-f178.google.com with SMTP id af79cd13be357-792b8d30075so468434185a.1
-        for <iwd@lists.linux.dev>; Wed, 15 May 2024 05:22:30 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="a10tDqK9"
+Received: by mail-oa1-f44.google.com with SMTP id 586e51a60fabf-24cbb884377so152276fac.0
+        for <iwd@lists.linux.dev>; Wed, 29 May 2024 15:52:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1715775749; x=1716380549; darn=lists.linux.dev;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=pfKh5Zksqm4ttq/9eaP7c7Ayyv0YPlHKaWrWdMb3sGc=;
-        b=fw5BadAFoc0+QyOQdjDBRSc0SYjGE32f8j7Md8tP8+EmF7JtxwTb2Ywyfgxy1tztHV
-         bwpTMp4UDfLTb3y77dep4hnVxiACHi7DiL30ceqlxGLK+u0oFQ5y/Qt0f8GQ1PR6n4Q9
-         ffrqn42oiT9gkfOIdQtN9Eo43lnkkg2s8rvqo0s6NXtzh55ii/FgnzsmIYYV4rFmLFl7
-         Ce5BM7tSEvtgtLE4PZv6SWSIllepvDxDIV2PKBnlpHR0WWfqX7Lb161Gjn8a5LS3X6dG
-         xYPFAlTWo0pyJ08ZW7Axw8+QbNWskOqGiXR+jUgQEb/ewWE15oHvdc8DLiQaFvPiSKcO
-         zFpw==
+        d=gmail.com; s=20230601; t=1717023166; x=1717627966; darn=lists.linux.dev;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=GVsdVcxAYkSQ+ol8w/uzTnZWeEJbqsWwLXtC1fx4RQ8=;
+        b=a10tDqK9E2VaraXhyfHAvnxmrHKpouNHTfOR71+wB+GTNXTi8ZVv5K9/cmC7kHWsuL
+         jm8FXFEvaTxXiRkVIY96pIowmV1QfTQlELX/lbZofo0Vh+9or+7DrRh0lRm6qzLQaRYj
+         jJhjV1pgD5o3R79Bi4AUwoyPvx2UCw5nG2attZcPwwmxUtKfD2fUgTM9FHpjFxBhVI5G
+         1HdzEgHH6km3vg1bqZlzAatrFfx0+2faAqrH3gBwjKEK0ZBLJzkI2UIQrgxeW0+tL1YV
+         8/1n9qjXIR3Rfi9rHc9bagFkq9PLOwCn9jS8mmnSKkg1toT6SX1DS5UwTk4ERbAreAnL
+         lepw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715775749; x=1716380549;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=pfKh5Zksqm4ttq/9eaP7c7Ayyv0YPlHKaWrWdMb3sGc=;
-        b=ptS1I2Z9CWKtb5+3kHqSRlR3kJIkweY/BQe7xlfiMIU+JYylQ7RP4tKCR2XQFIlgS5
-         DQH3sPNw5FJlqCIsszqaS8VBJvVxobBClH8oAbE6lRkFE5RKjIXmHYpB6UI8OIFNTGql
-         TETtPZbbj8bHbvIfP8vU6CN317buvpqK9jZ+259PmdnwRsdfW1OE0cYIojP5vYPT6kfI
-         9UueH2p3kzFU9nBVLw9fOaSTyUvArWg7GlvFE31Zq4EUqfblky8no8t9nouQk2JR5w8W
-         1Ey2PEohad0tLO9pMtyMWNil2cnFqOWDLn8uxtG+/26Qurt6lOclrXRkHE8Lw7dUWgWH
-         9JGw==
-X-Gm-Message-State: AOJu0YxhDfDdfEDTU19x2XF5GwXsbffsrHR64W8xEC0c1f6zIf3zpAbC
-	Pu6rLW53Tmd7cR5Npmp2ttY1lEAY71KTycqyGwnQGWlW4Q+/PlyIsgQsogXb
-X-Google-Smtp-Source: AGHT+IEL9Fwk7YyIO2cdSEGiHvAdxz60s/Vd3+PCUHYPZ1KMQWx1uMFeqLcf9nKqvVC0Apz7EBsLFQ==
-X-Received: by 2002:a05:620a:390d:b0:78d:6b42:6c17 with SMTP id af79cd13be357-792c7600fbfmr1969064585a.76.1715775749215;
-        Wed, 15 May 2024 05:22:29 -0700 (PDT)
-Received: from LOCLAP699.rst-02.locus ([208.195.13.130])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-792bf2a11e8sm669380085a.58.2024.05.15.05.22.28
+        d=1e100.net; s=20230601; t=1717023166; x=1717627966;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=GVsdVcxAYkSQ+ol8w/uzTnZWeEJbqsWwLXtC1fx4RQ8=;
+        b=SAezKPmKYg/Y/JSbuqroluuJwERPvFzsW7iYHn0QsB+OTDZt9Dh7NxHfQiQAZCbYek
+         3J9j+P5WCkATCBmVZvKCSVAZjufIbYBY5bGTvrD73fBqm09EGj3owB12T8ZU01jpcA+z
+         WRUrJo/y2VS44i7v1ACf3EYYLJ/jMJkxlT9XTZ1Zq4NCmOx4iL6DwT9i0pbTYy5Efc0S
+         O4JnScb9TDmFCNIAOqgA6yc//ac4IO++siKiuSLusHemqpgT8IsrLrsBFk8O4n3mNBWY
+         ACX8m0q5Iep8LYWRQS+UtMBaZFhFOE/NQMNeqS7WFrOPp2f9IkFPdJvS8FqKOvbupovI
+         nKUQ==
+X-Gm-Message-State: AOJu0YwkHPaAvjSBqBr/yys2ZUFkQkD8N1wPqMMmGohrqLvNAql9Ahnz
+	Do+FPAKZPjo2MwPRIYkDW5aTEWR2VO44f/GDftb3lytTcNHPw9CbgjWJuA==
+X-Google-Smtp-Source: AGHT+IFy+SjgGgQK8Ox1YYPiYNT0Jm8q0V7+dEq+KDnyhetNQn7pYen4bnIbgOtBNFvwZnwxH4DMmg==
+X-Received: by 2002:a05:6870:ec89:b0:23c:34cb:294a with SMTP id 586e51a60fabf-25060e5aa8fmr667959fac.51.1717023165574;
+        Wed, 29 May 2024 15:52:45 -0700 (PDT)
+Received: from localhost.localdomain (syn-070-114-247-242.res.spectrum.com. [70.114.247.242])
+        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-24ff6093ee7sm2033297fac.40.2024.05.29.15.52.44
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 15 May 2024 05:22:28 -0700 (PDT)
-From: James Prestwood <prestwoj@gmail.com>
+        Wed, 29 May 2024 15:52:45 -0700 (PDT)
+From: Denis Kenzior <denkenz@gmail.com>
 To: iwd@lists.linux.dev
-Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 4/4] station: refactor the printing of scan results, print SNR/load
-Date: Wed, 15 May 2024 05:22:21 -0700
-Message-Id: <20240515122221.333230-4-prestwoj@gmail.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240515122221.333230-1-prestwoj@gmail.com>
-References: <20240515122221.333230-1-prestwoj@gmail.com>
+Cc: Denis Kenzior <denkenz@gmail.com>
+Subject: [PATCH] watchlist: Remove unused APIs
+Date: Wed, 29 May 2024 17:52:30 -0500
+Message-ID: <20240529225243.261672-1-denkenz@gmail.com>
+X-Mailer: git-send-email 2.45.0
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
@@ -68,80 +64,67 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-There are a few values which are nice to see in debug logs. Namely
-the BSS load and SNR. Both of these values may not be available
-either due to the AP or local hardware limiations. Rather than print
-dummy values for these refactor the print so append the values only
-if they are set in the scan result.
+watchlist_new and watchlist_free were never used.  Get rid of them.
 ---
- src/station.c | 37 +++++++++++++++++++++++--------------
- 1 file changed, 23 insertions(+), 14 deletions(-)
+ src/watchlist.c | 17 -----------------
+ src/watchlist.h |  2 --
+ 2 files changed, 19 deletions(-)
 
-diff --git a/src/station.c b/src/station.c
-index 641068cc..2e5febee 100644
---- a/src/station.c
-+++ b/src/station.c
-@@ -402,6 +402,27 @@ static int bss_signal_strength_compare(const void *a, const void *b, void *user)
- 	return (bss->signal_strength > new_bss->signal_strength) ? 1 : -1;
+diff --git a/src/watchlist.c b/src/watchlist.c
+index c73169bc446f..899b983e65fe 100644
+--- a/src/watchlist.c
++++ b/src/watchlist.c
+@@ -48,16 +48,6 @@ static void watchlist_item_free(struct watchlist *watchlist,
+ 		l_free(item);
  }
  
-+static void station_print_scan_bss(const struct scan_bss *bss)
-+{
-+	uint32_t kbps100 = DIV_ROUND_CLOSEST(bss->data_rate, 100000);
-+	char optional[64] = {0};
-+	char *ptr = optional;
-+
-+	if (bss->have_snr)
-+		ptr += sprintf(ptr, ", snr: %d", bss->snr);
-+
-+	if (bss->have_utilization)
-+		ptr += sprintf(ptr, ", load: %u/255", bss->utilization);
-+
-+	l_debug("Processing BSS '%s' with SSID: %s, freq: %u, rank: %u, "
-+			"strength: %i, data_rate: %u.%u%s",
-+			util_address_to_string(bss->addr),
-+			util_ssid_to_utf8(bss->ssid_len, bss->ssid),
-+			bss->frequency, bss->rank, bss->signal_strength,
-+			kbps100 / 10, kbps100 % 10,
-+			optional);
-+}
-+
- /*
-  * Returns the network object the BSS was added to or NULL if ignored.
-  */
-@@ -412,14 +433,8 @@ static struct network *station_add_seen_bss(struct station *station,
- 	enum security security;
- 	const char *path;
- 	char ssid[33];
--	uint32_t kbps100 = DIV_ROUND_CLOSEST(bss->data_rate, 100000);
+-struct watchlist *watchlist_new(const struct watchlist_ops *ops)
+-{
+-	struct watchlist *watchlist;
+-
+-	watchlist = l_new(struct watchlist, 1);
+-	watchlist->items = l_queue_new();
+-	watchlist->ops = ops;
+-	return watchlist;
+-}
+-
+ void watchlist_init(struct watchlist *watchlist,
+ 					const struct watchlist_ops *ops)
+ {
+@@ -137,13 +127,6 @@ void watchlist_destroy(struct watchlist *watchlist)
+ 	watchlist->items = NULL;
+ }
  
--	l_debug("Processing BSS '%s' with SSID: %s, freq: %u, rank: %u, "
--			"strength: %i, data_rate: %u.%u",
--			util_address_to_string(bss->addr),
--			util_ssid_to_utf8(bss->ssid_len, bss->ssid),
--			bss->frequency, bss->rank, bss->signal_strength,
--			kbps100 / 10, kbps100 % 10);
-+	station_print_scan_bss(bss);
+-void watchlist_free(struct watchlist *watchlist)
+-{
+-	watchlist_clear(watchlist);
+-	l_queue_destroy(watchlist->items, NULL);
+-	l_free(watchlist);
+-}
+-
+ void __watchlist_prune_stale(struct watchlist *watchlist)
+ {
+ 	struct watchlist_item *item;
+diff --git a/src/watchlist.h b/src/watchlist.h
+index 7f5f557a2458..8ceedcefe64e 100644
+--- a/src/watchlist.h
++++ b/src/watchlist.h
+@@ -42,7 +42,6 @@ struct watchlist {
+ 	const struct watchlist_ops *ops;
+ };
  
- 	if (util_ssid_is_hidden(bss->ssid_len, bss->ssid)) {
- 		l_debug("BSS has hidden SSID");
-@@ -2655,15 +2670,9 @@ static bool station_roam_scan_notify(int err, struct l_queue *bss_list,
+-struct watchlist *watchlist_new(const struct watchlist_ops *ops);
+ void watchlist_init(struct watchlist *watchlist,
+ 					const struct watchlist_ops *ops);
+ unsigned int watchlist_add(struct watchlist *watchlist, void *notify,
+@@ -54,7 +53,6 @@ unsigned int watchlist_link(struct watchlist *watchlist,
+ 					watchlist_item_destroy_func_t destroy);
+ bool watchlist_remove(struct watchlist *watchlist, unsigned int id);
+ void watchlist_destroy(struct watchlist *watchlist);
+-void watchlist_free(struct watchlist *watchlist);
  
- 	while ((bss = l_queue_pop_head(bss_list))) {
- 		double rank;
--		uint32_t kbps100 = DIV_ROUND_CLOSEST(bss->data_rate, 100000);
- 		struct roam_bss *rbss;
+ void __watchlist_prune_stale(struct watchlist *watchlist);
  
--		l_debug("Processing BSS '%s' with SSID: %s, freq: %u, rank: %u,"
--				" strength: %i, data_rate: %u.%u",
--				util_address_to_string(bss->addr),
--				util_ssid_to_utf8(bss->ssid_len, bss->ssid),
--				bss->frequency, bss->rank, bss->signal_strength,
--				kbps100 / 10, kbps100 % 10);
-+		station_print_scan_bss(bss);
- 
- 		/* Skip the BSS we are connected to */
- 		if (!memcmp(bss->addr, station->connected_bss->addr, 6))
 -- 
-2.34.1
+2.45.0
 
