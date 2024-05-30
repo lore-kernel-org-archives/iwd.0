@@ -1,126 +1,107 @@
-Received: from mail-qv1-f52.google.com (mail-qv1-f52.google.com [209.85.219.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail-0201.mail-europe.com (mail-0201.mail-europe.com [51.77.79.158])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A776217CA1C
-	for <iwd@lists.linux.dev>; Thu, 30 May 2024 13:10:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D91C917D89B
+	for <iwd@lists.linux.dev>; Thu, 30 May 2024 13:40:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=51.77.79.158
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717074629; cv=none; b=hEGs4oTnCoUhM6PYDTp0f5pDqIIsjslS3jF26NBThSvdwFCz9wgLeOFWdrOrBiOmS3mlTIN62Elotq1KnH1LtP0u8YAprfeTirKS14eT6XDV1qbf599JohCB9yHZp6g+PJaBdiPmSYYOcXDZBA6c+Lx1vYl2R6jgIAWRjiglM/E=
+	t=1717076458; cv=none; b=nN0QVVsCzB57qrtCS87DMvVTXUwyplnLzcadz+Ote/yxWBdSPV/lNzmJzWFTTE6vkmr/mcE81wyT49lM6/d4pnzy3kaINtqYEaHX8vNYTdQtNSG2VhdbGoiaXbHi57MkyMB52lZgDNQBhzJJRV5xPP2nUmCVt5XXubXtsvyOdpM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717074629; c=relaxed/simple;
-	bh=SJAjf0ew2+/w+4DgKycldGhbgtKhXLtWnhiJptxdvuo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=Jly8JmGv9+HAAmbws3nB092KlEnprZDMDTbVicO9GBCDjoM718cCNCR29zxeM6bwlYZk4OhwnuTceKedv/ywhsqe5C25Q3OyhCE030Yyu+ur+Flxy5vXY/8YXOjxCPym1wdF8ztnWiyTpFU9ryMcR9RNdeoC9ZtrOzHZ/aurgOc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gs0VCji3; arc=none smtp.client-ip=209.85.219.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1717076458; c=relaxed/simple;
+	bh=m34K24Js20EHxzZXjgAe/Osdh2s6fdQwFNBwf9X1oAs=;
+	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=ZUoFWXBGRS91le8q1MftgeBdWNTrv4E0KdQVO1cRYlD4rOdpWWQNxygcGDLGfqVSW/Vrfz2rY6YU07LR+qTobY3uxhYViSm4GrYFkkMibtWni1U+2ANDwazHAObjbcrmJ8YQTs5bDk9LNLO6GNGlcf8VQ3eTiaepsUe2zbdaBjA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=peeters.gent; spf=pass smtp.mailfrom=peeters.gent; dkim=pass (2048-bit key) header.d=peeters.gent header.i=@peeters.gent header.b=ka0vinQE; arc=none smtp.client-ip=51.77.79.158
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=peeters.gent
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=peeters.gent
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gs0VCji3"
-Received: by mail-qv1-f52.google.com with SMTP id 6a1803df08f44-6ae0c4d23ddso4368966d6.0
-        for <iwd@lists.linux.dev>; Thu, 30 May 2024 06:10:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1717074626; x=1717679426; darn=lists.linux.dev;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=bJ+ygwuq5e3tdI/VQWMHKLpu7JMgOZN9OQIdWPrI6U4=;
-        b=gs0VCji3f+b/8qHNxE4ZhNT6yAiib7Wo97ZB46lr9WKe0oR2Ipqa/f9exwj5eWz/D5
-         zD4L2gKF2IiLv9RlNKcqv2TrHGnkSDgUg9cR5EyVQuG12C0du94JeGVeLjyP0YfYp08V
-         j3BtvB4dvHg2wQZ3cJ6RRxcIRuq+y4LUBNoUItsUIydHHv7qooLfO1C/Mpg+EhdhY0Tt
-         SEZokCSXMb6KGaQ4580qSTEVenTlY6xTmyEG59ARAJqcHhCuNfUB3uRMJ8uFU9NAlHKI
-         UXtrAeTdcSEkHfV7YA06AHyYMIWPkI7NhwlTqJUDAo+qBGNtU9WJQgObC5IVtyHGggmA
-         /HMw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717074626; x=1717679426;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=bJ+ygwuq5e3tdI/VQWMHKLpu7JMgOZN9OQIdWPrI6U4=;
-        b=QnYpm2cPvFhpqhm9lU/lryiDOgH3jsjiVPbzvow5rHfkFO4C07DZmZItelsUtnshMB
-         3d8YWMhE7FkZx+FuPXRVz3Au4WLZMQ0Zb6wEsXAFiKNo/eCz13zEuuW5ZxJNkhPELeXt
-         DzGETQC2B8LNr1lP87yuTtAFIZYyqc7LstCZyBNAuEZ+eOvierIcqo+XiuXwpq4asvrJ
-         NcOqwOA9IpnHu+FdNREd/RIQtZf8FaBVU5Yvkc+3FzWaOtOVioO7nqLYHQFx7n6v0JtI
-         +wyhECLbQxMFwmgxBWzvCh3dJPL2EiJTn6FcyN06BhqH5dtcbAwIs2Q9jSa57K14d4AA
-         VMHA==
-X-Forwarded-Encrypted: i=1; AJvYcCWuOtqimA+txQNvr+NVNa6hvaJmRkY/maxxL12mzDuBcvIWHRld6KjrLkQDwMJmZUQH0MAcmcEnpmkg6cwnD8qG9agj
-X-Gm-Message-State: AOJu0Yxa9x+9R16v/o488ONSbrqkiWTK+ku1FeP9h/NYQatRaAfhMy5J
-	UtIBVXFvPHXYLA2oQPm96lNL7FT47eMy9IcA2mLePooa2HQA7IHVN9NFs9xa
-X-Google-Smtp-Source: AGHT+IHssUGZUun7mZ5lC/8kzMj4dJg4JDDhOJnKe54EuvyDQavJIfBS47K4Q88qLshB+63CQPnXDw==
-X-Received: by 2002:a05:6214:5b0c:b0:6ad:786a:5e35 with SMTP id 6a1803df08f44-6ae0cccfbb8mr16036986d6.62.1717074626317;
-        Thu, 30 May 2024 06:10:26 -0700 (PDT)
-Received: from [10.102.4.159] ([208.195.13.130])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6ad7a626a6asm42392626d6.63.2024.05.30.06.10.25
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 30 May 2024 06:10:25 -0700 (PDT)
-Message-ID: <5efbc990-b2fa-4bc0-864f-8d33b54407f3@gmail.com>
-Date: Thu, 30 May 2024 06:10:24 -0700
+	dkim=pass (2048-bit key) header.d=peeters.gent header.i=@peeters.gent header.b="ka0vinQE"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=peeters.gent;
+	s=protonmail2; t=1717076443; x=1717335643;
+	bh=SDqqRmT4Cl1H8rwS7ioCmayaxHdI4G03z5ZdGAiWkGA=;
+	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
+	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
+	 Message-ID:BIMI-Selector;
+	b=ka0vinQE5aoHMNkycAZ/VywepBJM1cKYBsC2/UAsi4b22a9ry3cwsgsBhOfYobx1m
+	 UwkZ1ufswnTFtuDGBAtxuvuVewvQ/anlW5lIhhdy+4vELUFuXmYAI6F4tsymdV+354
+	 FP1pWhMe9tlqYmYPWC5RKChQtOmZ1uSKSj2glVFq0gs+Jfz/VHo4w8rXRGDS/gHiFb
+	 wfmXOouC8rrJJ73FMmvK6jrgvH0xuo35EC/LsnfxiYeIGSKkQiAWs+52+2pXSKbmET
+	 KzKUjbMnIYwLEu8qhAFRPfBF7Gsjnn/0SaATTVG+uyVyxveBlJIqIJkYorhwSRjmDU
+	 up45OYgdSmmYA==
+Date: Thu, 30 May 2024 13:40:38 +0000
+To: James Prestwood <prestwoj@gmail.com>
+From: Laura Peeters <laura@peeters.gent>
+Cc: "iwd@lists.linux.dev" <iwd@lists.linux.dev>
+Subject: Re: Bug when ttls start message is sent with tls_msg_len=0?
+Message-ID: <41FLzNr1wtrsfKFkZM0rMARBMcMTku8jAsn-Jgrsq1FO_Toq-t41UDHVXmSL9P7qSld0ULkyhImIup0G3M33hZZ6ADdntSK00735qr_AeNs=@peeters.gent>
+In-Reply-To: <5efbc990-b2fa-4bc0-864f-8d33b54407f3@gmail.com>
+References: <tpitoeMEXJxiLQiWJBuau4l3V6w-zuBf8bQVFFXHyArcn6AZBp4Mb5TLsDLxqMLgD_uGDNQ2eKnChB5wbsB82NZpb-KdBfCYrnVcm5kDFRs=@peeters.gent> <5efbc990-b2fa-4bc0-864f-8d33b54407f3@gmail.com>
+Feedback-ID: 91347878:user:proton
+X-Pm-Message-ID: ef1dd6d14366f3e3d075195eed4393c7c4cac1cf
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: Bug when ttls start message is sent with tls_msg_len=0?
-To: Laura Peeters <laura@peeters.gent>,
- "iwd@lists.linux.dev" <iwd@lists.linux.dev>
-References: <tpitoeMEXJxiLQiWJBuau4l3V6w-zuBf8bQVFFXHyArcn6AZBp4Mb5TLsDLxqMLgD_uGDNQ2eKnChB5wbsB82NZpb-KdBfCYrnVcm5kDFRs=@peeters.gent>
-Content-Language: en-US
-From: James Prestwood <prestwoj@gmail.com>
-In-Reply-To: <tpitoeMEXJxiLQiWJBuau4l3V6w-zuBf8bQVFFXHyArcn6AZBp4Mb5TLsDLxqMLgD_uGDNQ2eKnChB5wbsB82NZpb-KdBfCYrnVcm5kDFRs=@peeters.gent>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Hi Laura,
+Hi James,
 
-On 5/30/24 5:16 AM, Laura Peeters wrote:
-> hi all,
->
-> Recently our radius servers at work got upgraded to freeradius 3.2.4.
-> It seems to be that in freeradius 3.2.3 and earlier the TTLS start message was sent without L flag (and hence without length set)
-> Freeradius 3.2.4 on the other hand seems to always set te L flag, now the message gets sent with both S and L flags set (and length as 0). From my initial reading of the RFC, this seems to be allowed.
+On Thursday, 30 May 2024 at 15:10, James Prestwood <prestwoj@gmail.com> wro=
+te:
+> My interpretation is that spec is somewhat ambiguous on this... The L
+> flag indicates the frame is fragmented:
 
-My interpretation is that spec is somewhat ambiguous on this... The L 
-flag indicates the frame is fragmented:
+not really true, the M flag indicates that the frame is fragmented,
+the L flag indicates that the Message Length is included (which is redundan=
+t in unfragmented frames)
 
-"The L flag is set to indicate the presence of the four-octet TLS 
-Message Length field, and MUST be set for the first fragment of a 
-fragmented TLS message or set of messages."
+"Unfragmented messages MAY have the L bit set and include
+the length of the message (though this information is redundant)."
+=E2=80=94 RFC 5281, Section 9.2.2
 
-So a fragmented packet with a length of zero certainly makes no sense at 
-all IMO.
+This paragraph is actually quoted in the relevant code in `eap_tls_init_req=
+uest_assembly()`
+That code then correctly returns -ENOMSG, however, if tls_msg_len=3D=3D0 we=
+ never hit that code and return with -EINVAL earlier
 
-But this is is set in a TLS-Start message since the S flag is set 
-(right?). I can't find anything to indicate if you can fragment a 
-TLS-Start message, except broadly:
+>=20
+> "The L flag is set to indicate the presence of the four-octet TLS
+> Message Length field, and MUST be set for the first fragment of a
+> fragmented TLS message or set of messages."
+>=20
+> So a fragmented packet with a length of zero certainly makes no sense at
+> all IMO.
+>=20
+> But this is is set in a TLS-Start message since the S flag is set
+> (right?). I can't find anything to indicate if you can fragment a
+> TLS-Start message, except broadly:
+>=20
+> "TLS handshake messages SHOULD NOT be fragmented into multiple TLS
+> records if they fit within a single TLS record."
+>=20
+> I quickly googled around and this all appears to be a configurable
+> option in freeradius. I can't link to the section directly but in this
+> docs page [1] there appears to be a configurable "length_included" option=
+:
 
-"TLS handshake messages SHOULD NOT be fragmented into multiple TLS 
-records if they fit within a single TLS record."
+while turning that off is indeed likely to "fix" this issue, the documentat=
+ion of that parameter states:
 
-I quickly googled around and this all appears to be a configurable 
-option in freeradius. I can't link to the section directly but in this 
-docs page [1] there appears to be a configurable "length_included" option:
+  #  This configuration item is here only to work around
+  #  historical issues with misbehaving clients.  In most cases,
+  #  it does not need to be changed.
 
-          /*
-           *      We don't need to always include the length
-           *      (just in the first fragment) but it is
-           *      configurable for compatibility.
-           */
+Which would classify iwd as a misbehaving client according to the freeradiu=
+s developers.
 
-          length_included = eap_tls_session->include_length;
+Given that iwd already correctly handles the L flag being present in unfrag=
+mented frames for tls_msg_len > 0 I still believe this is an iwd bug.
+=20
+Greetings
+Laura
 
-I'll let others comment, maybe we need a compatibility option in IWD, 
-but I don't think this is a bug by any means.
-
-[1] https://doc.freeradius.org/tls_8c_source.html
-
-> This results in iwd throwing a "Fragmented pkt size is outside of allowed boundaries [1, 65536]" error because tls_msg_len is expected to not be zero in `eap_tls_init_request_assembly()`.
->
-> Because this change in freeradius does not impact any of my coleagues using macOS, windows, or wpa_supplicant, I think it is safe to say that this is a bug in iwd, and that a length of zero should be allowed.
-> I can not seem to find a specific reason why we would need to fail on a length of zero. allowing zero would in this case hit the `tls_msg_len == len` condition and make `eap_tls_init_request_assembly()` return with -ENOMSG, which is then correctly handled in `eap_tls_common_handle_request()`
->
-> Greetings
-> Laura
->
-> ps: I'm not on the list (given that I'm mostly just a (code-savy) user), so please keep me cc-ed on this issue.
->
+ps: I'm not on the list (given that I'm mostly just a (code-savy) user), so=
+ please keep me cc-ed on this issue.
