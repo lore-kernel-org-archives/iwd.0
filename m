@@ -1,62 +1,62 @@
 Received: from mail-qk1-f181.google.com (mail-qk1-f181.google.com [209.85.222.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0800613BC31
-	for <iwd@lists.linux.dev>; Tue, 18 Jun 2024 16:59:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6931613AD12
+	for <iwd@lists.linux.dev>; Tue, 18 Jun 2024 16:59:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718729951; cv=none; b=Y2t9AcXcZVNPfRNNy1TeW6cG6tUeLoEX/wYkWcmXzWUWd863afNTx4URtxqpXMvQ9bU5Ve/Zmw0Q9bM+3ydpgPh1JCm2ZLqFPKniMZvMuzuPcR/W5CQWvSxhjccMWeStt1d2/jkxffeA/JKRW/SUpZraqniuNOFntumNDHn07aM=
+	t=1718729953; cv=none; b=UcgDm4mTUk7tNVtt6XUKeOz0r3wgfR/TnlH6W4nSdb69/WIGRZt5vHb/vfl/I1mqbQcW6moOmt3kBWOAxOFLnTCPvD4u6c3/2nJHgClUuFKzrYFynVTiAl3s6Sqk3hkyT40nOwBmexNHrOd71t0VPHCeSdcYcI5Q3/R4U5eTHrM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718729951; c=relaxed/simple;
-	bh=1f0d615K+oWHY4fZX+gIJLmlr8SAxj4iBQJBduSXNCQ=;
+	s=arc-20240116; t=1718729953; c=relaxed/simple;
+	bh=d4aQiARAjHBxBw3HNTLNiEesJ/4Ik0DfP7TPhYRIqYw=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=r59sBwgXH2wMuIOScsHOSl3KLH/u0msQQo5GudQZgtxvEI1Xl/+pDvSZJ8AASF+/ZSEq0AXy3N59p5wJ0W0yzkq21YOB20FgjvZ82aTlImZfpTfsgN3toUGAZogCJgNdQcmcYlMJkGy2OUB+jFgI3UUROC2e+qfN1uwSRUvp3Og=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Kwkc38ky; arc=none smtp.client-ip=209.85.222.181
+	 MIME-Version; b=m/Hw3SoQlDRG622dCZCxuJ7ykteH6+r2puZY22hbnUKCmEm7F0w7h8mTJ1JSnT6JsEWS5OQ+R0PYNorhdYW7QnFO8KK77doBSQZTOXIERcykNVyl0U8RqdVMvY+fkRao53NfYpjPLJoLZPI17zjJjGcS8MjwBBzK23aS1MIbfro=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mh8bdcrN; arc=none smtp.client-ip=209.85.222.181
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Kwkc38ky"
-Received: by mail-qk1-f181.google.com with SMTP id af79cd13be357-797e2834c4eso2073085a.0
-        for <iwd@lists.linux.dev>; Tue, 18 Jun 2024 09:59:09 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mh8bdcrN"
+Received: by mail-qk1-f181.google.com with SMTP id af79cd13be357-7955ddc6516so400077785a.1
+        for <iwd@lists.linux.dev>; Tue, 18 Jun 2024 09:59:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1718729948; x=1719334748; darn=lists.linux.dev;
+        d=gmail.com; s=20230601; t=1718729951; x=1719334751; darn=lists.linux.dev;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=lbN+oW9si7tCvQ8TmgJ5F2whYRufSAGMcQWP4dm6WT4=;
-        b=Kwkc38ky/gGqkCeA8ZCzNv40FMOfIWNqRoLnMgC9nlAmXAbsZaAZCkPzVCtbD1f3jY
-         O9qFEVavfu0sh6lzmj2GVHlcz4gvZYWcJCjGNt8/yLeqS6N3iqK1PWDFaSzBRRG9B58s
-         +TEP+t0aqG+UUQUMOkawLK1fmwZXSBdK3vzCfxwQf+bq8XeOCOkJGV5L6SEMOJx1uoix
-         kqFIuc2ARsW3SZPV80pwH6oqLllgcmkz7LAQXRIo1tf9E0hmj1267MqLgsTkX96RmFSU
-         4H+aihQ1OgBcLzJeHxTag34JQpiUhpZ4e3NSxkrbPSTBYBfA6BtrJq7USv0Ql4T4sHU3
-         i7jQ==
+        bh=YugUbaB++Sy+7ZvVbpCjBKUT8aoIJZhlP/HBkUlkHjg=;
+        b=mh8bdcrNMvRSHnJ7LeEKW0OAaBPOFDCUqet+PWAJOILBiQYFSjgOfT6qiP5BRayiFN
+         08yZ+jGq+uzZElPxbiiBMpoLfdpwAtDRPazLvJaLt7R5j34OGfRpNXme2ESG0EqR5JUB
+         Usl6O9BaL/QjkwkMMvqtnZ9OTCS0i9+A5Bw2ZEZQ8S1mipYWX+4CHV2twYD8brSskQZX
+         ni2tj/feKJTnsQG/wd+I6JUHSecCG2JLaeUlf+yWP8i3n9zKzs4bp5opNuHJ27MRWz9F
+         jQsODQSWFYF3VybdDWpbSY1M+RZwVyoctXXmeF1G0vtVMCWh0kIirbHKtSuT2iY7WRjI
+         FH6A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718729948; x=1719334748;
+        d=1e100.net; s=20230601; t=1718729951; x=1719334751;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=lbN+oW9si7tCvQ8TmgJ5F2whYRufSAGMcQWP4dm6WT4=;
-        b=AUGBiTAJlaEz9q2peuDyk54CQf8whoULILtbi+PSTJDswkUOUjrGUgPDeEzY+8KeHw
-         T8qaQItT4nR3MhzuxTLkI66KL5Snwh+k0co6XjaVma3lojluZnvZiYR092442WRicqeA
-         usEDnt36HUREA50ZFoHMY95u8C0PEibO4Ttu+0yy/WGuCHelvpH+mVNuiMBxVHIPjPyb
-         mZJ9qH5k1HiQMoHy1L2hfj4It9U/pLVGjYr3UAjVt+mQq26ZCJ3rG8XmcscNgKgHvuJQ
-         wAWrRoZ0e4b5lhTLiod0gPoo7562M367sYOORoSzYBw7kLNntpyYfk1WD7FXdr2iEj/I
-         0qQw==
-X-Gm-Message-State: AOJu0Yz2E4s65FrRcELS9d09uNEe6mq2++kmCbIwZxGwX1tQ+7mBi4gE
-	cAntzSttVJMZeHGKrNLMAPLkF1wtCw59RxtSsXS1uNloQNMN07U8UsG3xg==
-X-Google-Smtp-Source: AGHT+IE8Y1AtN2NoFYMo/gPJu9JUH8WOmG/2KWivkDe/fR/a6OgeVP26HtLCQNer3H9b/vWkQGFYwA==
-X-Received: by 2002:a05:620a:4141:b0:795:4e67:1ef5 with SMTP id af79cd13be357-79bb347ce14mr70563885a.11.1718729947525;
-        Tue, 18 Jun 2024 09:59:07 -0700 (PDT)
+        bh=YugUbaB++Sy+7ZvVbpCjBKUT8aoIJZhlP/HBkUlkHjg=;
+        b=PWmUfiuyH7Qm4sh/KFTN+M2g2tj1CaoPLzQM8GCHSQ86oOO/k0jLN7QybNfxE2FtjP
+         I4pKT7KvoF07HKrKzrYsY/tToYynP8beCTu+Wi9RVg7FTlZTXAM8XZAJXNIxDdzkBPdd
+         ywwJFmVNhXFrdk5Tsfjam7cWol7psDH17U70gGKEriSKuhVzfBvaWdRRcrf00C2J5S0S
+         1P/p18MHmdRt268w01fupksm/h1Kr6ZuPqtAAQHkj/0G24lQa80V8988qhlOr7AOOgvE
+         eUBDRbUU5MBBN3yLDDdJvwhxzlz7/f8sKWb+Jvy7S67tZjJE9+tZM8rCTjMvs0F6CErr
+         7Zwg==
+X-Gm-Message-State: AOJu0YxY/QZ+5gJHTV6Kr6nxMlltnANP+tkEHgikjGq3xCFNjwbND8Z7
+	BX/1uqCPjt5UQZxvN3CUxemS4vsd6w6x2PvO5pxQGkx8AmaD/+MPN3Al8g==
+X-Google-Smtp-Source: AGHT+IG7AUVQnRTafTcFJODn51tADr5q8C9bQNFU+yY6c4R+lXU5HuLikr+Lon/KF1dlSpe0aTXZ1g==
+X-Received: by 2002:a05:620a:4506:b0:797:8ee3:9f01 with SMTP id af79cd13be357-79bb3e602e0mr25128785a.34.1718729950113;
+        Tue, 18 Jun 2024 09:59:10 -0700 (PDT)
 Received: from LOCLAP699.rst-02.locus ([208.195.13.130])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-798b49e4c82sm533688785a.88.2024.06.18.09.59.06
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-798b49e4c82sm533688785a.88.2024.06.18.09.59.08
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 18 Jun 2024 09:59:07 -0700 (PDT)
+        Tue, 18 Jun 2024 09:59:09 -0700 (PDT)
 From: James Prestwood <prestwoj@gmail.com>
 To: iwd@lists.linux.dev
 Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 08/10] scan: use GET_SURVEY for SNR calculation in ranking
-Date: Tue, 18 Jun 2024 09:58:52 -0700
-Message-Id: <20240618165854.113598-8-prestwoj@gmail.com>
+Subject: [PATCH 09/10] scan: add flag if BSS load was advertised
+Date: Tue, 18 Jun 2024 09:58:53 -0700
+Message-Id: <20240618165854.113598-9-prestwoj@gmail.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240618165854.113598-1-prestwoj@gmail.com>
 References: <20240618165854.113598-1-prestwoj@gmail.com>
@@ -68,265 +68,76 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This issues a GET_SURVEY dump after scan results are available and
-populates the survey information within the scan results. Currently
-the only value obtained is the noise for a given frequency but the
-survey results structure was created if in the future more values
-need to be added.
+For ranking purposes the utilization was defaulted to a valid (127)
+which would not change the rank if that IE was not found in the
+scan results. Historically this was printed (debug) as part of the
+scan results but that was removed as it was somewhat confusing. i.e.
+did the AP _really_ have a utilization of 127? or was the IE not
+found?
 
-From the noise, the SNR can be calculated. This is then used in the
-ranking calculation to help lower BSS ranks that are on high noise
-channels.
+Since it is useful to see the BSS load if that is advertised add a
+flag to the scan_bss struct to indicate if the IE was present which
+can be checked.
 ---
- src/scan.c | 156 ++++++++++++++++++++++++++++++++++++++++++++++++++---
- src/scan.h |   2 +
- 2 files changed, 151 insertions(+), 7 deletions(-)
+ src/scan.c | 14 ++++++++------
+ src/scan.h |  1 +
+ 2 files changed, 9 insertions(+), 6 deletions(-)
 
 diff --git a/src/scan.c b/src/scan.c
-index 55d560d4..76ea379b 100644
+index 76ea379b..5091ad77 100644
 --- a/src/scan.c
 +++ b/src/scan.c
-@@ -132,6 +132,18 @@ struct scan_context {
- 	 */
- 	unsigned int get_fw_scan_cmd_id;
- 	struct wiphy *wiphy;
-+
-+	unsigned int get_survey_cmd_id;
-+};
-+
-+struct scan_survey {
-+	int8_t noise;
-+};
-+
-+struct scan_survey_results {
-+	struct scan_survey survey_2_4[14];
-+	struct scan_survey survey_5[196];
-+	struct scan_survey survey_6[233];
- };
+@@ -1344,6 +1344,8 @@ static bool scan_parse_bss_information_elements(struct scan_bss *bss,
+ 						NULL) < 0)
+ 				l_warn("Unable to parse BSS Load IE for "
+ 					MAC, MAC_STR(bss->addr));
++			else
++				bss->have_utilization = true;
  
- struct scan_results {
-@@ -140,6 +152,9 @@ struct scan_results {
- 	uint64_t time_stamp;
- 	struct scan_request *sr;
- 	struct scan_freq_set *freqs;
-+	struct scan_survey_results survey;
-+
-+	bool survey_parsed : 1;
- };
+ 			break;
+ 		case IE_TYPE_VENDOR_SPECIFIC:
+@@ -1533,7 +1535,6 @@ static struct scan_bss *scan_parse_attr_bss(struct l_genl_attr *attr,
+ 	size_t beacon_ies_len;
  
- static bool start_next_scan_request(struct wiphy_radio_work_item *item);
-@@ -217,6 +232,9 @@ static void scan_context_free(struct scan_context *sc)
- 	if (sc->get_fw_scan_cmd_id && nl80211)
- 		l_genl_family_cancel(nl80211, sc->get_fw_scan_cmd_id);
+ 	bss = l_new(struct scan_bss, 1);
+-	bss->utilization = 127;
+ 	bss->source_frame = SCAN_BSS_BEACON;
  
-+	if (sc->get_survey_cmd_id && nl80211)
-+		l_genl_family_cancel(nl80211, sc->get_survey_cmd_id);
-+
- 	wiphy_state_watch_remove(sc->wiphy, sc->wiphy_watch_id);
+ 	while (l_genl_attr_next(attr, &type, &len, &data)) {
+@@ -1704,10 +1705,12 @@ static void scan_bss_compute_rank(struct scan_bss *bss)
+ 		rank *= RANK_6G_FACTOR;
  
- 	l_free(sc);
-@@ -1663,6 +1681,8 @@ static void scan_bss_compute_rank(struct scan_bss *bss)
- {
- 	static const double RANK_HIGH_UTILIZATION_FACTOR = 0.8;
- 	static const double RANK_LOW_UTILIZATION_FACTOR = 1.2;
-+	static const double RANK_HIGH_SNR_FACTOR = 1.2;
-+	static const double RANK_LOW_SNR_FACTOR = 0.8;
- 	double rank;
- 	uint32_t irank;
- 	/*
-@@ -1689,6 +1709,13 @@ static void scan_bss_compute_rank(struct scan_bss *bss)
- 	else if (bss->utilization <= 63)
- 		rank *= RANK_LOW_UTILIZATION_FACTOR;
- 
-+	if (bss->have_snr) {
-+		if (bss->snr <= 15)
-+			rank *= RANK_LOW_SNR_FACTOR;
-+		else if (bss->snr >= 30)
-+			rank *= RANK_HIGH_SNR_FACTOR;
+ 	/* Rank loaded APs lower and lightly loaded APs higher */
+-	if (bss->utilization >= 192)
+-		rank *= RANK_HIGH_UTILIZATION_FACTOR;
+-	else if (bss->utilization <= 63)
+-		rank *= RANK_LOW_UTILIZATION_FACTOR;
++	if (bss->have_utilization) {
++		if (bss->utilization >= 192)
++			rank *= RANK_HIGH_UTILIZATION_FACTOR;
++		else if (bss->utilization <= 63)
++			rank *= RANK_LOW_UTILIZATION_FACTOR;
 +	}
-+
- 	irank = rank;
  
- 	if (irank > USHRT_MAX)
-@@ -1824,6 +1851,41 @@ int scan_bss_rank_compare(const void *a, const void *b, void *user_data)
- 	return (bss->rank > new_bss->rank) ? 1 : -1;
- }
+ 	if (bss->have_snr) {
+ 		if (bss->snr <= 15)
+@@ -1734,7 +1737,6 @@ struct scan_bss *scan_bss_new_from_probe_req(const struct mmpdu_header *mpdu,
  
-+static bool scan_survey_get_snr(struct scan_results *results,
-+					uint32_t freq, int32_t signal,
-+					int8_t *snr)
-+{
-+	uint8_t channel;
-+	enum band_freq band;
-+	int8_t noise = 0;
-+
-+	if (!results->survey_parsed)
-+		return false;
-+
-+	channel = band_freq_to_channel(freq, &band);
-+	if (L_WARN_ON(!channel))
-+		return false;
-+
-+	switch (band) {
-+	case BAND_FREQ_2_4_GHZ:
-+		noise = results->survey.survey_2_4[channel].noise;
-+		break;
-+	case BAND_FREQ_5_GHZ:
-+		noise = results->survey.survey_5[channel].noise;
-+		break;
-+	case BAND_FREQ_6_GHZ:
-+		noise = results->survey.survey_6[channel].noise;
-+		break;
-+	}
-+
-+	if (noise) {
-+		*snr = signal - noise;
-+		return true;
-+	}
-+
-+	return false;
-+}
-+
- static void get_scan_callback(struct l_genl_msg *msg, void *user_data)
- {
- 	struct scan_results *results = user_data;
-@@ -1849,6 +1911,10 @@ static void get_scan_callback(struct l_genl_msg *msg, void *user_data)
- 		bss->time_stamp = results->time_stamp -
- 					seen_ms_ago * L_USEC_PER_MSEC;
- 
-+	bss->have_snr = scan_survey_get_snr(results, bss->frequency,
-+						bss->signal_strength / 100,
-+						&bss->snr);
-+
- 	scan_bss_compute_rank(bss);
- 	l_queue_insert(results->bss_list, bss, scan_bss_rank_compare, NULL);
- }
-@@ -1925,11 +1991,88 @@ static void get_scan_done(void *user)
- 	l_free(results);
- }
- 
-+static void get_survey_callback(struct l_genl_msg *msg, void *user_data)
-+{
-+	struct scan_results *results = user_data;
-+	struct scan_survey_results *survey = &results->survey;
-+	struct l_genl_attr attr;
-+	uint32_t freq;
-+	int8_t noise;
-+	uint8_t channel;
-+	enum band_freq band;
-+
-+	if (nl80211_parse_attrs(msg, NL80211_ATTR_SURVEY_INFO, &attr,
-+				NL80211_ATTR_UNSPEC) < 0)
-+		return;
-+
-+	if (nl80211_parse_nested(&attr, NL80211_ATTR_SURVEY_INFO,
-+					NL80211_SURVEY_INFO_FREQUENCY, &freq,
-+					NL80211_SURVEY_INFO_NOISE, &noise,
-+					NL80211_ATTR_UNSPEC) < 0)
-+		return;
-+
-+	channel = band_freq_to_channel(freq, &band);
-+	if (!channel)
-+		return;
-+
-+	/* At least one frequency was surveyed */
-+	results->survey_parsed = true;
-+
-+	switch (band) {
-+	case BAND_FREQ_2_4_GHZ:
-+		survey->survey_2_4[channel].noise = noise;
-+		break;
-+	case BAND_FREQ_5_GHZ:
-+		survey->survey_5[channel].noise = noise;
-+		break;
-+	case BAND_FREQ_6_GHZ:
-+		survey->survey_6[channel].noise = noise;
-+		break;
-+	}
-+}
-+
-+static void get_results(struct scan_results *results)
-+{
-+	struct l_genl_msg *scan_msg;
-+
-+	scan_msg = l_genl_msg_new_sized(NL80211_CMD_GET_SCAN, 8);
-+
-+	l_genl_msg_append_attr(scan_msg, NL80211_ATTR_WDEV, 8,
-+					&results->sc->wdev_id);
-+	results->sc->get_scan_cmd_id = l_genl_family_dump(nl80211, scan_msg,
-+						get_scan_callback,
-+						results, get_scan_done);
-+}
-+
-+static void get_survey_done(void *user_data)
-+{
-+	struct scan_results *results = user_data;
-+	struct scan_context *sc = results->sc;
-+
-+	sc->get_survey_cmd_id = 0;
-+
-+	get_results(results);
-+}
-+
-+static bool scan_survey(struct scan_results *results)
-+{
-+	struct scan_context *sc = results->sc;
-+	struct l_genl_msg *survey_msg;
-+
-+	survey_msg = l_genl_msg_new(NL80211_CMD_GET_SURVEY);
-+	l_genl_msg_append_attr(survey_msg, NL80211_ATTR_WDEV, 8,
-+				&sc->wdev_id);
-+	sc->get_survey_cmd_id = l_genl_family_dump(nl80211, survey_msg,
-+						get_survey_callback, results,
-+						get_survey_done);
-+
-+	return sc->get_survey_cmd_id != 0;
-+}
-+
- static void scan_get_results(struct scan_context *sc, struct scan_request *sr,
- 				struct scan_freq_set *freqs)
- {
- 	struct scan_results *results;
--	struct l_genl_msg *scan_msg;
- 
- 	results = l_new(struct scan_results, 1);
- 	results->sc = sc;
-@@ -1938,13 +2081,12 @@ static void scan_get_results(struct scan_context *sc, struct scan_request *sr,
- 	results->bss_list = l_queue_new();
- 	results->freqs = freqs;
- 
--	scan_msg = l_genl_msg_new_sized(NL80211_CMD_GET_SCAN, 8);
-+	if (scan_survey(results))
-+		return;
-+	else
-+		l_warn("failed to start a scan survey");
- 
--	l_genl_msg_append_attr(scan_msg, NL80211_ATTR_WDEV, 8,
--					&sc->wdev_id);
--	sc->get_scan_cmd_id = l_genl_family_dump(nl80211, scan_msg,
--						get_scan_callback,
--						results, get_scan_done);
-+	get_results(results);
- }
- 
- static void scan_wiphy_watch(struct wiphy *wiphy,
+ 	bss = l_new(struct scan_bss, 1);
+ 	memcpy(bss->addr, mpdu->address_2, 6);
+-	bss->utilization = 127;
+ 	bss->source_frame = SCAN_BSS_PROBE_REQ;
+ 	bss->frequency = frequency;
+ 	bss->signal_strength = rssi;
 diff --git a/src/scan.h b/src/scan.h
-index 516b6152..0bfc9e47 100644
+index 0bfc9e47..06753b82 100644
 --- a/src/scan.h
 +++ b/src/scan.h
-@@ -75,6 +75,7 @@ struct scan_bss {
- 	uint64_t parent_tsf;
- 	uint8_t *wfd;		/* Concatenated WFD IEs */
- 	ssize_t wfd_size;	/* Size of Concatenated WFD IEs */
-+	int8_t snr;
- 	bool mde_present : 1;
- 	bool cc_present : 1;
- 	bool cap_rm_neighbor_report : 1;
-@@ -89,6 +90,7 @@ struct scan_bss {
- 	bool dpp_configurator : 1;
+@@ -91,6 +91,7 @@ struct scan_bss {
  	bool sae_pw_id_used : 1;
  	bool sae_pw_id_exclusive : 1;
-+	bool have_snr : 1;
+ 	bool have_snr : 1;
++	bool have_utilization : 1;
  };
  
  struct scan_parameters {
