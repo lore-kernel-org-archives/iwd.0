@@ -1,62 +1,62 @@
-Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
+Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DCFD1DFC5
-	for <iwd@lists.linux.dev>; Tue, 25 Jun 2024 13:06:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66A1714D28C
+	for <iwd@lists.linux.dev>; Tue, 25 Jun 2024 13:06:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719320804; cv=none; b=V36aESHwsfj67j3065kdgo3Ws2mTGZOpsNaOKw81RF1VCP7kAnG6zRQURoHInG8/zzFnZUo6J1Htx+joCcr0jI1ROh29iq+POhj2303p+bBQSbMa1gPKGSHp15u5yPQpmIwuZq6LtA/eC1xg5kS+KVdsz/ueZySOHTVgvvKydhM=
+	t=1719320805; cv=none; b=g5i1p1pZccTXazeSMhs+GIcEGmct48KLPaYcM5XR2tw6G20KuR/MbY37lnndqcipDs6ObABCZeZb3N3y3ZLsskTfgrMFhMmVHaEvtD7IyMEAL7nnIwn7+DLY9JK/MGlJVnm+7PEfJGHuMlZtjjygDeNCp+QXOlEYZH9oC2HJ/uI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719320804; c=relaxed/simple;
-	bh=CoC/KIdxvjtpsPj6dQFrj4n+ScD1uofc7OC15kF1aqQ=;
+	s=arc-20240116; t=1719320805; c=relaxed/simple;
+	bh=S5h0/COxgm0SpL29UrN3tnd96ZIrTl+ZSzPBft+cC+8=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=rqtSB0hCJ1YOp9hnHHZz8XRyodeBWRoxzVNFXjuERWneJGy/dEUcKavt3CWLLBSUim9KJdpEAATArBedOWnIj0dexZydVc0p0E/MDTjWxj0fbHPEJxRWMrVZCDh3L5ZWzlO/kYttOc4DNW1ENe6R00GI7fZP94OYip7PGwxVaDY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=H4TwR2oY; arc=none smtp.client-ip=209.85.214.174
+	 MIME-Version; b=nJq6QeSjosimR7h+wzu9rpVtRvsfpBXficXcx/EbpwGu7dy1X6gXAOfmrxmjDNBZuQUvy9vGZwti9JWX7JO67mfkRb6SzXEn5ONkbChM6rw6hpt0P/1Wo78pKpGGFUHD/ofnHmMlaesCq+4+XPq0PFsQul2jAbVwXcgHFUA+wt8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KbnIqs/3; arc=none smtp.client-ip=209.85.214.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="H4TwR2oY"
-Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-1f4a5344ec7so37383335ad.1
-        for <iwd@lists.linux.dev>; Tue, 25 Jun 2024 06:06:42 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KbnIqs/3"
+Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-1f4a5344ec7so37383655ad.1
+        for <iwd@lists.linux.dev>; Tue, 25 Jun 2024 06:06:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1719320802; x=1719925602; darn=lists.linux.dev;
+        d=gmail.com; s=20230601; t=1719320803; x=1719925603; darn=lists.linux.dev;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=n7s5jUFXHrWv1UL5cLoznJmUrDZSIR9KIuI8ExjIwP0=;
-        b=H4TwR2oYPAu9n/W9F2mlhrezwatakEpf75kS6EKs34Z5MUXKjTmOjQVMRf+2/lcqT4
-         7HC6mfv59D6SlaTL7cVTEDgn/xr9OjmMarzt6l4CiK+3Guz+Mre0Pc8KQ3ovPDIWLFR6
-         evzRnGT/kI3WXwUpm5jiBt1hlcnnDF8uFZoy6MaVXrYJBYUVrtpYuoeYUM4jd1GJb4RN
-         Arn9EApVAxsJJXwmf/sHrgyztWT/j6921dfyaeY4wtCxZLmitlQiLm68NkM3Fq5ip5lx
-         6MABDWAEk9WF2YE7ANngENtOa+9xrrC1z9ZjlagMC+6C8UIgaXvXLpY7FWVAIlQmYdD5
-         fm4g==
+        bh=k8CBQYgpPSbhoWM3/U9KW2bBBLwbvBk02G8XBXzJ5KI=;
+        b=KbnIqs/3HExu/tqM14xFQvxVTbyDRSS1yhp6LYQwM8E5eyR19XS2HP29jxvqAzuXaJ
+         USW4f5abMczUlrFx639b58lB7bimdiwAcy6YvaKMLX8q2ECPhmTepMg307YlRG5vPaWQ
+         Isav8CQ7L6xwC6xQsM76sxU0dNhmrpr7nNLxpcv6Yuv6juSXH0FStlHVvvWF0Xx5Lz9d
+         0xcYGlxu+1ZyE25p0GAhWXRkQnJ68mlJQO+6+cMfiYXWP0Sge2H1NjxGDdW1nK2VA+b+
+         iuzEE8fDB7sNbuuyNY8fY5CFKcHA/dB1gNuJZ8wTQ/jL+5Sk+SR3I+Btd1DV+i5oDArv
+         3Ujg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719320802; x=1719925602;
+        d=1e100.net; s=20230601; t=1719320803; x=1719925603;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=n7s5jUFXHrWv1UL5cLoznJmUrDZSIR9KIuI8ExjIwP0=;
-        b=N16aJUT6btYeLkSL29e/X0euUeUUX+IMRD0HdfyOfF6erGL6ya+R4YZF8ZG11vPdK4
-         E9hEvhHaZ58avz+7HdnCnmVkQcOODEwmupxxMgciIk+gY9pKWvpouOoqfNtyVR4MCfB5
-         b4NIZE19nf8RShuqB43LG/VfqF3OAC35+BzhQD3Mx/W/NXnnztxxZxpkAZ128WBvltm5
-         uZ/MaVOqYgsodbBJD+fcl46buc/747brJnuzeHgyUN6vXbpP9Qkv1QoUHZuzkH/GuYFm
-         uM92A70ZFGir4TXpgJAJvsdmNyfO3wVyzbnbaM1Dzm+fXf6V91mVbfWPL0F61pXZEsFT
-         WQLQ==
-X-Gm-Message-State: AOJu0Yymk20/MrVHuFi/TY6CHJ4nqptxmIeveTZ4QcPzn3Fhap8SIIqq
-	kxjQ948mMJDuz06YS0wBnb8gPA1vHDf8kf6cYQ8aytHjjZHzSfAYgbtLjA==
-X-Google-Smtp-Source: AGHT+IFGe98nHmrug9NH51Sp4zzQdT1kFfbVCuRX72MsTrRs/5Ak4r/wWEOMyirOgUaoDaBlb30XSg==
-X-Received: by 2002:a17:902:d2d0:b0:1f4:6fad:ba59 with SMTP id d9443c01a7336-1fa5e674ea3mr58912375ad.14.1719320801851;
-        Tue, 25 Jun 2024 06:06:41 -0700 (PDT)
+        bh=k8CBQYgpPSbhoWM3/U9KW2bBBLwbvBk02G8XBXzJ5KI=;
+        b=KBoPS8RptkMf2cpr7LhYPSp8Nc+ZfYawBaA3Zb9Ygxp5J6039wADYnYPuxxiXjZPcL
+         RTJ4cKqr0Tuo5moF3EWUC21h+RP1e0BpkjxEG73CYnE4V5fpAjxY2ujkOOZIFM+BDc05
+         vDacZ1sEXsMIWTtbDdxRTTlhXESjvS78phenIfdQ4sQh2h1+gZGOIcR7LhtN1tzgulqK
+         ROyNeNobWh276PHWd90ZEOdp5XWZ7N78Vc6fq6nFH4TupH53ub+PZVIDyLYy6f++hgd7
+         SBj2iYdZD3mN/tV+Cemiq7kaPuvjC7nno8GgZsMpuqQnV3RTZzv34G/OKoN09oT8vllg
+         dIgw==
+X-Gm-Message-State: AOJu0YyJ0UG/QDSr4uSH8+BoIcP/Z7MfnBmrLry5U54LHFRajxMtkrYa
+	Tc5ET3hQZp05+HrvXN4H5wFkkFdkxCu6jWxIfvHOkRDes2udlLhvtqEEdg==
+X-Google-Smtp-Source: AGHT+IEuxsQFux/lhjtSIB6EbP4rTAbosXJ62BV9V/nk9iyOtSbLVYD5NYObOQ17ogr5/i6JnUHnrw==
+X-Received: by 2002:a17:903:1cb:b0:1fa:3b97:c93d with SMTP id d9443c01a7336-1fa5e698394mr45490855ad.15.1719320803385;
+        Tue, 25 Jun 2024 06:06:43 -0700 (PDT)
 Received: from LOCLAP699.localdomain ([208.195.13.130])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1f9eb3d5bf2sm80778305ad.189.2024.06.25.06.06.40
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1f9eb3d5bf2sm80778305ad.189.2024.06.25.06.06.42
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 25 Jun 2024 06:06:41 -0700 (PDT)
+        Tue, 25 Jun 2024 06:06:43 -0700 (PDT)
 From: James Prestwood <prestwoj@gmail.com>
 To: iwd@lists.linux.dev
 Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 2/7] nl80211util: use nl80211_parse_attrs/nested for get_key_seq
-Date: Tue, 25 Jun 2024 06:06:19 -0700
-Message-Id: <20240625130624.385553-2-prestwoj@gmail.com>
+Subject: [PATCH 3/7] netdev: reuse NETDEV_EVENT_{AUTHENTICATING,ASSOCIATING}
+Date: Tue, 25 Jun 2024 06:06:20 -0700
+Message-Id: <20240625130624.385553-3-prestwoj@gmail.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240625130624.385553-1-prestwoj@gmail.com>
 References: <20240625130624.385553-1-prestwoj@gmail.com>
@@ -68,109 +68,53 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This really reduces the number of checks needed and overall function
-length by using the helper APIs.
----
- src/nl80211util.c | 51 +++++++++++++++++++++++------------------------
- 1 file changed, 25 insertions(+), 26 deletions(-)
+The authenticating event was not used anymore and the associating
+event use was questionable (after the CMD_CONNECT callback).
 
-diff --git a/src/nl80211util.c b/src/nl80211util.c
-index ac4ad223..eaf9f610 100644
---- a/src/nl80211util.c
-+++ b/src/nl80211util.c
-@@ -184,6 +184,7 @@ static attr_handler handler_for_nl80211(int type)
- 		return extract_iovec;
- 	case NL80211_ATTR_WIPHY_BANDS:
- 	case NL80211_ATTR_SURVEY_INFO:
-+	case NL80211_ATTR_KEY:
- 		return extract_nested;
- 	case NL80211_ATTR_KEY_IDX:
- 		return extract_u8;
-@@ -208,6 +209,18 @@ static attr_handler handler_for_survey_info(int type)
- 	return NULL;
- }
- 
-+static attr_handler handler_for_key(int type)
-+{
-+	switch (type) {
-+	case NL80211_KEY_SEQ:
-+		return extract_iovec;
-+	default:
-+		break;
-+	}
-+
-+	return NULL;
-+}
-+
- struct attr_entry {
- 	uint16_t type;
- 	void *data;
-@@ -322,6 +335,9 @@ int nl80211_parse_nested(struct l_genl_attr *attr, int type, int tag, ...)
- 	case NL80211_ATTR_SURVEY_INFO:
- 		handler = handler_for_survey_info;
- 		break;
-+	case NL80211_ATTR_KEY:
-+		handler = handler_for_key;
-+		break;
- 	default:
- 		return -ENOTSUP;
- 	}
-@@ -568,46 +584,29 @@ struct l_genl_msg *nl80211_build_get_key(uint32_t ifindex, uint8_t key_index)
- 
- const void *nl80211_parse_get_key_seq(struct l_genl_msg *msg)
+No other modules actually utilize these events but they are useful
+for autotests. Move these events around to map 1:1 when the kernel
+sends the auth/assoc events.
+---
+ src/netdev.c | 12 ++++++++----
+ 1 file changed, 8 insertions(+), 4 deletions(-)
+
+diff --git a/src/netdev.c b/src/netdev.c
+index bada1ab5..153001ab 100644
+--- a/src/netdev.c
++++ b/src/netdev.c
+@@ -2422,10 +2422,6 @@ static void netdev_driver_connected(struct netdev *netdev)
  {
--	struct l_genl_attr attr, nested;
--	uint16_t type, len;
--	const void *data;
-+	struct l_genl_attr nested;
-+	struct iovec iov;
+ 	netdev->connected = true;
  
--	if (l_genl_msg_get_error(msg) < 0 || !l_genl_attr_init(&attr, msg)) {
-+	if (l_genl_msg_get_error(msg) < 0 ||
-+			nl80211_parse_attrs(msg, NL80211_ATTR_KEY, &nested,
-+						NL80211_ATTR_UNSPEC) < 0) {
- 		l_error("GET_KEY failed for the GTK: %i",
- 			l_genl_msg_get_error(msg));
- 		return NULL;
+-	if (netdev->event_filter)
+-		netdev->event_filter(netdev, NETDEV_EVENT_ASSOCIATING, NULL,
+-					netdev->user_data);
+-
+ 	/*
+ 	 * We register the eapol state machine here, in case the PAE
+ 	 * socket receives EAPoL packets before the nl80211 socket
+@@ -2919,6 +2915,10 @@ static void netdev_authenticate_event(struct l_genl_msg *msg,
+ 		return;
  	}
  
--	while (l_genl_attr_next(&attr, &type, &len, &data)) {
--		if (type != NL80211_ATTR_KEY)
--			continue;
--
--		break;
--	}
--
--	if (type != NL80211_ATTR_KEY || !l_genl_attr_recurse(&attr, &nested)) {
-+	if (nl80211_parse_nested(&nested, NL80211_ATTR_KEY, NL80211_KEY_SEQ,
-+					&iov, NL80211_ATTR_UNSPEC)) {
- 		l_error("Can't recurse into ATTR_KEY in GET_KEY reply");
- 		return NULL;
- 	}
++	if (netdev->event_filter)
++		netdev->event_filter(netdev, NETDEV_EVENT_AUTHENTICATING,
++					NULL, netdev->user_data);
++
+ 	/*
+ 	 * During Fast Transition we use the authenticate event to start the
+ 	 * reassociation step because the FTE necessary before we can build
+@@ -3040,6 +3040,10 @@ static void netdev_associate_event(struct l_genl_msg *msg,
+ 	if (!netdev->connected || netdev->aborting)
+ 		return;
  
--	while (l_genl_attr_next(&nested, &type, &len, &data)) {
--		if (type != NL80211_KEY_SEQ)
--			continue;
--
--		break;
--	}
--
--	if (type != NL80211_KEY_SEQ) {
--		l_error("KEY_SEQ not returned in GET_KEY reply");
--		return NULL;
--	}
--
--	if (len != 6) {
-+	if (iov.iov_len != 6) {
- 		l_error("KEY_SEQ length != 6 in GET_KEY reply");
- 		return NULL;
- 	}
- 
--	return data;
-+	return iov.iov_base;
- }
- 
- struct l_genl_msg *nl80211_build_cmd_frame(uint32_t ifindex,
++	if (netdev->event_filter)
++		netdev->event_filter(netdev, NETDEV_EVENT_ASSOCIATING,
++					NULL, netdev->user_data);
++
+ 	if (!netdev->ap && !netdev->in_ft) {
+ 		netdev->associated = true;
+ 		netdev->in_reassoc = false;
 -- 
 2.34.1
 
