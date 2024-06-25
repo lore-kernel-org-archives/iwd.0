@@ -1,98 +1,114 @@
-Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
+Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D8241B14E6
-	for <iwd@lists.linux.dev>; Thu, 20 Jun 2024 16:04:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68FF11DFC5
+	for <iwd@lists.linux.dev>; Tue, 25 Jun 2024 13:06:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718899450; cv=none; b=RJpfU8A7ygAyd9gdhC8pkdIBDb8pbG0WN30CPTCFvfNRid0WFulxpR/9dmy+vIS5itTP+S+ZJqmNzQNf+cjGkPeh6MfjZaq7zZrMFmk/t0TBNXQuzZbkclgoRUM6EPxROfG/99nic7DD7f27SsVbFctnuXPENs+s+4OTOcnBP54=
+	t=1719320802; cv=none; b=L7aNOhUi1oOvLeN0tnf93/iGXh3PGvMgKBAZb/sgGaXRV6KSLFfpyF2VNqwGoiisjb2jMP3xcL4vKI2n/Wyqxaw7yF5gvWCry/Ves3aK121HG6IQDdvzowy6xqhZC0ZV0EUftvSL6/1z9EqrS/OHqQTZZh8fzwPIuQzMbPoxb/w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718899450; c=relaxed/simple;
-	bh=SkHg6HEVPsIgVMoqLkCkKSFLoofw6Ft0AmEyRMKkFG0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=MzjnF6r6mV0nJSanG74YfUqRa5YbBUWfy3S7Sfj/o4cV7H5iPOvPUF5s5kcr4uJg1WjCkBOubQrM1uIwjTTMcBFDqA5G7Dpm/ZGBPZig5anl2etTKZemnpbZ9JdHLD/Wg1pPkX1EvgSKcBu/BOwyzH6EZ0KpACoTXsEqifsz6zE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QBbgyya4; arc=none smtp.client-ip=209.85.214.176
+	s=arc-20240116; t=1719320802; c=relaxed/simple;
+	bh=RCaWVQcR9A7imwYjqT8S60TtbVUlnoG2+25cuKluqgg=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=df/11BDVuEMV7ucgaHod/dfR79yX/89+Pqt3LmphtFzEVXn68Gq+WFTDBYxb4P6ahSge30iCE9pnDqtaNH7Q5zY9Q+Cv+KVSNJDzMCuz/1vyUwPv7fpEQeMtCLNjuzEmmF/7os9zBYEvynqwE4rzGe1iN3gEorJjNo4pRcbbs4Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=B52gwPkb; arc=none smtp.client-ip=209.85.214.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QBbgyya4"
-Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-1f9bf484d9fso9418055ad.1
-        for <iwd@lists.linux.dev>; Thu, 20 Jun 2024 09:04:08 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="B52gwPkb"
+Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-1f9b523a15cso39335905ad.0
+        for <iwd@lists.linux.dev>; Tue, 25 Jun 2024 06:06:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1718899448; x=1719504248; darn=lists.linux.dev;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=OEZvHTwmF0tJiKbkKZBK/4TzwtbcqCMhHWp7KbrcYoE=;
-        b=QBbgyya4ADwNuh/aPAWuD7e9h9jTd1ta2S57Ld2s1ecSw5PJQruTu0UTo+o5uzXfIj
-         AZOgh+npPibF43y4wpN6+XDoYMgCyUOF/LxVjGwE5JTjZa0SHQiXaXpM5UikA49WKkEZ
-         MQRxM506sYPMVtpIjc0lxgxCStP3cukwL2Do6exjoFv9K6gJkz7NNviu+rXfQH8SNeTj
-         VhJcUbTlbEjjtE/oPo+kOWWYDrS+gI4WhlxT1Sk7zq36qK936jZYHnB667WbzMk0guhx
-         8qiFLquyAfR7Rxsp3Bdcy9dCz0OyHWY6cyXsxMXmd0XDR/hEFLQgmns8dKvRXqtkB5kc
-         ZarA==
+        d=gmail.com; s=20230601; t=1719320800; x=1719925600; darn=lists.linux.dev;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Fs2IB9eeSxruGP/2upHGcxD2i9Ylwf0yAcwE+BbQGhU=;
+        b=B52gwPkboJjZA48CsaxFpaPOxTUZgYtPOS84MibYmOcjaTEVz5CqVAmpmAIgN5e4RQ
+         lgvs7vsVl7HpGjt0eLXHNSlSFRSs0hC3Hucb4+/041nV8Hrldn8JxIV8eWMBMvkDCotf
+         sqN7uc8FU1yrxM00DUTMCVOICH+299LEvehZFFgfGeb3tqBSFRVhJf7+qzXEMZ7dJPgW
+         IbzM35GPolMoYIH+/lmI1nyfqeadwpca44WzIxOHwItIoI0E1urHGVCeBegORD21jSft
+         DZRRum4SP4IOiKzimtCAv374OwWUWKmKGDSXocVRdmg8HPdbPswmkA4EcwGASd4syh3w
+         nVdg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718899448; x=1719504248;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=OEZvHTwmF0tJiKbkKZBK/4TzwtbcqCMhHWp7KbrcYoE=;
-        b=qBUjlcfRugrAEcnsX2bVw4JPHG8aSIN3Q/Kr9vFIFdAyYvhCC4diz+dVyRCLXo0it9
-         GZp/6lgpQ9WSsaF6WVQPeN8f3DM30v/1uhIv03sTAjqlvaPU+rShK8S/YiTBQUo3YBWT
-         kltZuHFrUHEY5NeauEJz6DDizjNZZjbzT3m55+7bvO/kdYrCbVkK0mKK9/WACPAVy3DK
-         1AX2KHM/Uf3CBNO5GS8P5SNjn9u8wWbpQ+AO597GylssC9uC+fBJOKQq57Mwa7qzsUfR
-         W0dvgNsuHAM1CP544/XmCMMqJ1v5cVHMdlMA0bUHy380bhWKI39EZMtCU9H+mJU2Tmdy
-         Co5A==
-X-Forwarded-Encrypted: i=1; AJvYcCXZGJ+7T8j1B9ugXCkxSKCSFrxGEfRMJpcYvdnPZC6JejOJCm1+D4ycptW0PdFlfWVPSv8lpkhej0C157l0CvplhjXh
-X-Gm-Message-State: AOJu0YyrlGaJlujyWm4sSqXDRTCdNYe88+bFvzocJ8FmJke5vqcxMT3V
-	SVTydQs6av2HZUvStLxMXe2X1KS1Q8bCKa3405QgK1pbMrcC3loNPeUHQQ==
-X-Google-Smtp-Source: AGHT+IG5dV9zoWqDKGzUCHxbcpUDXiRXpZPLPGNXnSfp3roC1axpCuSwQacLXpXN9TzhMo8dRel/xw==
-X-Received: by 2002:a17:90a:d911:b0:2c3:2f5a:17d4 with SMTP id 98e67ed59e1d1-2c7b3aa6398mr8371656a91.4.1718899448292;
-        Thu, 20 Jun 2024 09:04:08 -0700 (PDT)
-Received: from [10.102.4.159] ([208.195.13.130])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2c7e4ff97eesm1892167a91.3.2024.06.20.09.04.06
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 20 Jun 2024 09:04:07 -0700 (PDT)
-Message-ID: <2e66dd82-bcfe-4bcc-9eb7-13c9532e6581@gmail.com>
-Date: Thu, 20 Jun 2024 09:04:04 -0700
+        d=1e100.net; s=20230601; t=1719320800; x=1719925600;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Fs2IB9eeSxruGP/2upHGcxD2i9Ylwf0yAcwE+BbQGhU=;
+        b=IsTIQYXChRAAS2rs2WfTFd+dknueen55wHNPbpEFFzGdkLe3MG5eDc0JLRS3f8Zely
+         G5+K/qWHDdn9rUfgxgIeEvaMo05BNNW0/nrBxx5hjWSfLaHqaqEzLxuxWUREP6JNwT3m
+         CGnod8WXQquPwenziJYAwzZVLUVqLnvOB3dQj/DghC915sX7p17XDbq7pfEdTqcRzyLd
+         Q7Is1zCSmycfUXPp2J/KlDt8PTUNrWV4Xppsr0RVF8AWBdWehzAjErKpGtMnbqEd9NY1
+         CTi0U9T7EoYmCt/08T6akxYFcF9UcihkTN1+y4J8LJbvnEEGQ7llzBU+dJJkvipdY9zj
+         Vpcg==
+X-Gm-Message-State: AOJu0YwbU1qHNyoHxJuNFaSkqtrXpkxYm3eYnKOgE5HSqrhOsQYuOZDj
+	FgrCRxrNk8egXRUTRbYl/in6ZwGABhTsmlAygvspkBih9iu/ICL4R4xOTg==
+X-Google-Smtp-Source: AGHT+IH1ZovZkbXzsnTe/KBFEpj6pBiq9Lt8zuLL84yhTSr1BuJqlcKbUUkTjJHlruLcu9c3EnD3QA==
+X-Received: by 2002:a17:903:228b:b0:1f9:f6e6:5ada with SMTP id d9443c01a7336-1fa0fb04498mr118361715ad.22.1719320800252;
+        Tue, 25 Jun 2024 06:06:40 -0700 (PDT)
+Received: from LOCLAP699.localdomain ([208.195.13.130])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1f9eb3d5bf2sm80778305ad.189.2024.06.25.06.06.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 25 Jun 2024 06:06:39 -0700 (PDT)
+From: James Prestwood <prestwoj@gmail.com>
+To: iwd@lists.linux.dev
+Cc: James Prestwood <prestwoj@gmail.com>
+Subject: [PATCH 1/7] netdev: use nl80211_parse_attrs for deauth event
+Date: Tue, 25 Jun 2024 06:06:18 -0700
+Message-Id: <20240625130624.385553-1-prestwoj@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: SAE/WPA3 in AP mode config question
-To: KeithG <ys3al35l@gmail.com>, iwd@lists.linux.dev
-References: <CAG17S_P52iGw9j12MrP0OwL7ZxENH6gj17er1vXR58R3qRS3Kw@mail.gmail.com>
-Content-Language: en-US
-From: James Prestwood <prestwoj@gmail.com>
-In-Reply-To: <CAG17S_P52iGw9j12MrP0OwL7ZxENH6gj17er1vXR58R3qRS3Kw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-Hi Keith,
+Especially for parsing a single attribute, nl80211_parse_attrs
+makes the most sense to use here.
+---
+ src/netdev.c | 16 ++++------------
+ 1 file changed, 4 insertions(+), 12 deletions(-)
 
-On 6/20/24 8:58 AM, KeithG wrote:
-> Group,
->
-> This page shows how to set up a simple ap config:
-> https://iwd.wiki.kernel.org/ap_mode
->
-> The AP using this is set up with wpa2, I believe.
->
-> How do we tell iwd to use SAE/WPA3 authentication in such a config
-> file? I also did not see a flag in the help on setting it while using
-> iwctl interactively.
+diff --git a/src/netdev.c b/src/netdev.c
+index 5b79d267..bada1ab5 100644
+--- a/src/netdev.c
++++ b/src/netdev.c
+@@ -1328,12 +1328,10 @@ static void netdev_cmd_disconnect_cb(struct l_genl_msg *msg, void *user_data)
+ static void netdev_deauthenticate_event(struct l_genl_msg *msg,
+ 							struct netdev *netdev)
+ {
+-	struct l_genl_attr attr;
+-	uint16_t type, len;
+-	const void *data;
+ 	const struct mmpdu_header *hdr = NULL;
+ 	const struct mmpdu_deauthentication *deauth;
+ 	uint16_t reason_code;
++	struct iovec iov;
+ 
+ 	l_debug("");
+ 
+@@ -1349,17 +1347,11 @@ static void netdev_deauthenticate_event(struct l_genl_msg *msg,
+ 	 * deauthenticating immediately afterwards
+ 	 */
+ 
+-	if (L_WARN_ON(!l_genl_attr_init(&attr, msg)))
++	if (L_WARN_ON(nl80211_parse_attrs(msg, NL80211_ATTR_FRAME, &iov,
++						NL80211_ATTR_UNSPEC) < 0))
+ 		return;
+ 
+-	while (l_genl_attr_next(&attr, &type, &len, &data)) {
+-		switch (type) {
+-		case NL80211_ATTR_FRAME:
+-			hdr = mpdu_validate(data, len);
+-			break;
+-		}
+-	}
+-
++	hdr = mpdu_validate(iov.iov_base, iov.iov_len);
+ 	if (L_WARN_ON(!hdr))
+ 		return;
+ 
+-- 
+2.34.1
 
-There isn't support yet in IWD. There was some prep work done [1] but 
-the actual support for the AP to enable it has not been merged.
-
-[1] 
-https://lore.kernel.org/iwd/b2fa3788-dce9-4ce5-81a9-b4fd7e4acaf3@gmail.com/T/#t
-
-
->
-> Regards,
->
-> Keith
->
