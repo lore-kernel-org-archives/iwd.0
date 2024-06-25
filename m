@@ -1,62 +1,62 @@
-Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
+Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94B291482F8
-	for <iwd@lists.linux.dev>; Tue, 25 Jun 2024 13:06:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CD581482F8
+	for <iwd@lists.linux.dev>; Tue, 25 Jun 2024 13:06:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719320809; cv=none; b=V9+uStsPyOevcnYtaoW88B9OJMPB558N4TLwYFVgpu/xsCBpr862/SEzW8dvx3uaGy+wk8TCFJs5wO5lU9HrVQHnlgzhLWEQReG7G7wS0UT5BSycZGNiKDRaEkmrGzH+yOhyK6foK1vFZUHRtmhEQ4XQqFzKxT7hHVaYX3+vtZI=
+	t=1719320811; cv=none; b=joieuL8nuZyj+L72ASant5dsHMEvYS/CPyOLczutzw3TWz7gUwr4IpSNTKf0cK5SVpRFfQbbtbcf6BKh1I+2hI3tPTZosD7AsA8WSpEWJzYxPgH85MzQP1kpdzbSdWn8UrI0HeKOeDxkFO3g5GUDrQqR/GghqvMm/BgJHoFiQ7o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719320809; c=relaxed/simple;
-	bh=2/YIDZntCC+bKNXCrqR05azYPO5cmwgfNe7FvsobFVw=;
+	s=arc-20240116; t=1719320811; c=relaxed/simple;
+	bh=aN0GS/eB6all4xDAa/Tzsg3Zwk60lecIW4QrPGFpgU4=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=E2vkAypDVoOhWu9Fu6IiZ/Hh3r51E0XhdXE10atYhgK/zJZIvSje/NVScz/0NsZMuJMXrd3bozvIPJnfqVP4NOMGG4rLOu/yYEMwoR/ztDCwVzEDz/ALGu2W9oSlYKrgZcy0CZ8y2PiC6taLp+qAxMtJrP733KX756F2vD9V0b8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CNFQfYun; arc=none smtp.client-ip=209.85.214.173
+	 MIME-Version; b=YyakUWZpYtafJ72fnxi0bbmME5zUZzEAumDFonzDH8USre3YyZqHhsN3MXkVcEaPpjzikbb1ByxIeSfztLE5RYPR2bHIE2jRmAJHSnzpeWwiKMTeuiEPP5d0TFmuRt6QvaBmFcfrsCtuAXq73hVkBPZSFMEj3fZqpRambJo3qSs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jqhApJwB; arc=none smtp.client-ip=209.85.214.177
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CNFQfYun"
-Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-1f4c7b022f8so47480985ad.1
-        for <iwd@lists.linux.dev>; Tue, 25 Jun 2024 06:06:48 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jqhApJwB"
+Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-1f480624d10so45291815ad.1
+        for <iwd@lists.linux.dev>; Tue, 25 Jun 2024 06:06:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1719320808; x=1719925608; darn=lists.linux.dev;
+        d=gmail.com; s=20230601; t=1719320809; x=1719925609; darn=lists.linux.dev;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=lXiAgG1s+6d04RN5hd5w1iSdbqu45wAyYTOnPDQxZyM=;
-        b=CNFQfYun457D62Xaosia29Ojgy6vdvAYkDCKD+QzOwODm+HPzOaM0jy8aJcxuEW+ed
-         x84n/JYvaEFhSM8axWs/qnZVKkYOpUgGBWikD6RU/b7kJj3bwQUMwvU1Ey5uU91ufe5C
-         ZjlD09yeTQLh6VjwkfL5SMwH9tqmbZpG5izJ36H4xFcJ27mOW69odQOCOvGXnN/BPCum
-         0l+b7KrOeFOcL3wwCcOrVg9LjlEAdqodOF88VGzrkFxD8/p5jcZjEHTFhvThcmlDKnix
-         uvjw0+UXQAL1afwKZM4ERNZiQ9P0YX566TQn6NokiETa6lM0wnk74KNVjxuRv3X6r5I9
-         Hr2w==
+        bh=s+FQS0cnw/y+Ndkc1EwDfHBGbMpY9IQFB0Xs/Fy5F6g=;
+        b=jqhApJwBBQx3IJHNsNxvCy1uUsI84KsQ1pevEIywhYLq692YMTMoA0PhpMVq7avNuq
+         nlTK2lOAljiyVdGGS8bZWVAPQFVsnqrur0EMUbmequZjvedjfjeNuq5/c+Nt+szDwUcy
+         YJ0ow32DBPaDvE74lZPHufkSGZHcZyVp1IK2cPyCIgjjCpWMPgyH5YVFcIaQFbPLatwH
+         LeOFfce5zkpAYj9K+iJKXnsIOORJ7MShh6UvI7qPSCr4aIR/2hu7PNOY3Tk+fovTF1x0
+         SsX7et36RcJVtK2Ol1cEnBi7lH9j0YrURWvjwn4fHuboisfyOndH0bAGzj5Qcmule9Td
+         X04A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719320808; x=1719925608;
+        d=1e100.net; s=20230601; t=1719320809; x=1719925609;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=lXiAgG1s+6d04RN5hd5w1iSdbqu45wAyYTOnPDQxZyM=;
-        b=aVEdZGOlHebhbfzwhVfrdNvP6uGCjzeWwCdWzLNBzXHuuUI7LrnM4m1xXE7yT+L21U
-         qpC07W+nK0sGnTgcIeNIaTVW3+ODfoGPqKeaLVrPIsXYfpCLeN3qVP7vXDqMlL9enaPU
-         eH7MD7/8S/ja64cOVmBrL5p38aNQSTuJpuaxwrwA7usi01kabEjkv7sEigjgI1xGg6EG
-         bjTPRoe9YCWIau9yZRDg5ar7w8Vv6QbezWVzNJmXqfLCOItCTDzdame0qjr1tgwXpPXH
-         vcis4TqRHjRttXJD7Pv555SUt4Qhs/ST98qceTkV0kPlArivMxmVVL+a3Cm5cXqXukRZ
-         mLHA==
-X-Gm-Message-State: AOJu0Ywk+WvRUKJH6qDF55E8sMD4qwlELEuuiuHL+HgmvCTXGgTf72U9
-	VcIE7W6Y9qtSzqKixsVF1mj0sl0QcGnp5arWYOiKHiLVDvJPiwY6OR2A8Q==
-X-Google-Smtp-Source: AGHT+IF07DgU+eGZOmeyHUxDD5bmEv2fPPScoNGsjqPISdJ17zkYNgZ1CSzIpkb7qH7jXCZ0/5sVtQ==
-X-Received: by 2002:a17:902:e846:b0:1fa:4b9:d002 with SMTP id d9443c01a7336-1fa23bdf6c0mr98149675ad.23.1719320807714;
-        Tue, 25 Jun 2024 06:06:47 -0700 (PDT)
+        bh=s+FQS0cnw/y+Ndkc1EwDfHBGbMpY9IQFB0Xs/Fy5F6g=;
+        b=ULaWwjrZSFrKW+UVluteqrzO3zqtBjydgU28E9OgG3kglEUoKcrXm5O9Bou5hnD9Q0
+         ExIHu/CY/UIdhnrLkk/XdOgZejOoZLrkimtoi99XWSI1x1/0Kja0zHpOUnzctlOwPcEK
+         0TUFhTGGuZO/G9irLjPC85yO8o2ZEv3tNFZGRJr4olfBxuWYZ+UInePfBOTxUFy5c+2Y
+         3OmC09McSzm3SsQEgcLpB+gCT8GmMMV77v2RylsXBVMIr/kBJ+Md1cVEMQhMyii9ieDe
+         gyJsHabnH8ztcZHZooknY+OGvnU81FJH9sJm9fNdvCY27UiYTatvgF0Hr/PmRm5YOA42
+         pEeA==
+X-Gm-Message-State: AOJu0YyFmkUZlTHLZs7wqhO/dxdKKqXOKygOaU7C1+e4XstZJxEyW3Za
+	XjTuhAddxd9ghjHOQeFaSlhX8aVpo01TeaX0rZkDRlCiupCn8FU2FIfUug==
+X-Google-Smtp-Source: AGHT+IExavZECHWpnL2VAZHYWaujwKouRridi4Izh6e2CHzGb6U7Iqt+PM1eLbtk4q797DUc73PVaw==
+X-Received: by 2002:a17:903:18d:b0:1f9:aa05:878f with SMTP id d9443c01a7336-1fa1c7f72fcmr108709615ad.0.1719320809166;
+        Tue, 25 Jun 2024 06:06:49 -0700 (PDT)
 Received: from LOCLAP699.localdomain ([208.195.13.130])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1f9eb3d5bf2sm80778305ad.189.2024.06.25.06.06.46
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1f9eb3d5bf2sm80778305ad.189.2024.06.25.06.06.47
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 25 Jun 2024 06:06:47 -0700 (PDT)
+        Tue, 25 Jun 2024 06:06:48 -0700 (PDT)
 From: James Prestwood <prestwoj@gmail.com>
 To: iwd@lists.linux.dev
 Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 6/7] station: add debug event prior to sending an FT-auth frame
-Date: Tue, 25 Jun 2024 06:06:23 -0700
-Message-Id: <20240625130624.385553-6-prestwoj@gmail.com>
+Subject: [PATCH 7/7] auto-t: add test for a deauth coming in during an FT-roam
+Date: Tue, 25 Jun 2024 06:06:24 -0700
+Message-Id: <20240625130624.385553-7-prestwoj@gmail.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240625130624.385553-1-prestwoj@gmail.com>
 References: <20240625130624.385553-1-prestwoj@gmail.com>
@@ -69,22 +69,35 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
 ---
- src/station.c | 2 ++
- 1 file changed, 2 insertions(+)
+ autotests/testPSK-roam/failed_roam_test.py | 15 +++++++++++++++
+ 1 file changed, 15 insertions(+)
 
-diff --git a/src/station.c b/src/station.c
-index 1e8846b4..509d919c 100644
---- a/src/station.c
-+++ b/src/station.c
-@@ -2449,6 +2449,8 @@ static bool station_fast_transition(struct station *station,
- 		goto done;
- 	}
+diff --git a/autotests/testPSK-roam/failed_roam_test.py b/autotests/testPSK-roam/failed_roam_test.py
+index 8cce8bb5..60bcf366 100644
+--- a/autotests/testPSK-roam/failed_roam_test.py
++++ b/autotests/testPSK-roam/failed_roam_test.py
+@@ -149,6 +149,21 @@ class Test(unittest.TestCase):
+         condition = 'obj.state == DeviceState.disconnected'
+         self.wd.wait_for_object_condition(device, condition)
  
-+	station_debug_event(station, "ft-authenticating");
++    def test_ft_deauth_before_association(self):
++        self.rule2.enabled = True
++        self.rule3.enabled = True
 +
- 	if (station->connected_bss->frequency == bss->frequency) {
- 		ft_authenticate_onchannel(netdev_get_ifindex(station->netdev),
- 						bss);
++        device = self.wd.list_devices(1)[0]
++
++        self.connect(self.wd, device, self.bss_hostapd[0])
++
++        device.wait_for_event('ft-authenticating', timeout=60)
++
++        self.bss_hostapd[1].deauthenticate(device.address)
++
++        condition = 'obj.state == DeviceState.disconnected'
++        self.wd.wait_for_object_condition(device, condition)
++
+     def setUp(self):
+         self.wd = IWD(True)
+ 
 -- 
 2.34.1
 
