@@ -1,103 +1,127 @@
-Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mout-b-203.mailbox.org (mout-b-203.mailbox.org [195.10.208.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CD581482F8
-	for <iwd@lists.linux.dev>; Tue, 25 Jun 2024 13:06:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF5068BEF
+	for <iwd@lists.linux.dev>; Wed, 26 Jun 2024 09:31:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.10.208.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719320811; cv=none; b=joieuL8nuZyj+L72ASant5dsHMEvYS/CPyOLczutzw3TWz7gUwr4IpSNTKf0cK5SVpRFfQbbtbcf6BKh1I+2hI3tPTZosD7AsA8WSpEWJzYxPgH85MzQP1kpdzbSdWn8UrI0HeKOeDxkFO3g5GUDrQqR/GghqvMm/BgJHoFiQ7o=
+	t=1719394266; cv=none; b=cL0JEJc5U1G4xY0zmoEfeMsMYP7v3gekOgp8jIEc9s/ABYiohJoUGT2Nf68Q5UdEsaUthmTcHrnWFHWoVlY5BL9pbIkYNsXEubH8fK5G0u8edxfM2XpM2pD2jQXl5TTuv/xw+62dqtPvFBLoFb12hTVK3b3P/zCj9k/CJlq0reA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719320811; c=relaxed/simple;
-	bh=aN0GS/eB6all4xDAa/Tzsg3Zwk60lecIW4QrPGFpgU4=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=YyakUWZpYtafJ72fnxi0bbmME5zUZzEAumDFonzDH8USre3YyZqHhsN3MXkVcEaPpjzikbb1ByxIeSfztLE5RYPR2bHIE2jRmAJHSnzpeWwiKMTeuiEPP5d0TFmuRt6QvaBmFcfrsCtuAXq73hVkBPZSFMEj3fZqpRambJo3qSs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jqhApJwB; arc=none smtp.client-ip=209.85.214.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1719394266; c=relaxed/simple;
+	bh=R7sxcrO6X5ggq7JF7PSruq1Sn6Sfwd2w48fGGqoQRRI=;
+	h=Message-ID:Date:MIME-Version:From:Subject:To:Content-Type; b=h7Mnowp9NH64R2oCA9SLgXUvCBOm/J5IvxcQSQP8oZBCxq7He87A9FG7c8EPiNjtrDZWGG4xPCvSnPF5fqJ0lQZzgzhllujij3tAK7v9NTTqzw79nyPXHD0M727olOPeMS/OREED/SjGQ1LIISqemAVC6R2ic2UtUNK8WmM89vw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tavla.de; spf=pass smtp.mailfrom=tavla.de; dkim=pass (2048-bit key) header.d=tavla.de header.i=@tavla.de header.b=CnpkyDda; arc=none smtp.client-ip=195.10.208.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tavla.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tavla.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jqhApJwB"
-Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-1f480624d10so45291815ad.1
-        for <iwd@lists.linux.dev>; Tue, 25 Jun 2024 06:06:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1719320809; x=1719925609; darn=lists.linux.dev;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=s+FQS0cnw/y+Ndkc1EwDfHBGbMpY9IQFB0Xs/Fy5F6g=;
-        b=jqhApJwBBQx3IJHNsNxvCy1uUsI84KsQ1pevEIywhYLq692YMTMoA0PhpMVq7avNuq
-         nlTK2lOAljiyVdGGS8bZWVAPQFVsnqrur0EMUbmequZjvedjfjeNuq5/c+Nt+szDwUcy
-         YJ0ow32DBPaDvE74lZPHufkSGZHcZyVp1IK2cPyCIgjjCpWMPgyH5YVFcIaQFbPLatwH
-         LeOFfce5zkpAYj9K+iJKXnsIOORJ7MShh6UvI7qPSCr4aIR/2hu7PNOY3Tk+fovTF1x0
-         SsX7et36RcJVtK2Ol1cEnBi7lH9j0YrURWvjwn4fHuboisfyOndH0bAGzj5Qcmule9Td
-         X04A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719320809; x=1719925609;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=s+FQS0cnw/y+Ndkc1EwDfHBGbMpY9IQFB0Xs/Fy5F6g=;
-        b=ULaWwjrZSFrKW+UVluteqrzO3zqtBjydgU28E9OgG3kglEUoKcrXm5O9Bou5hnD9Q0
-         ExIHu/CY/UIdhnrLkk/XdOgZejOoZLrkimtoi99XWSI1x1/0Kja0zHpOUnzctlOwPcEK
-         0TUFhTGGuZO/G9irLjPC85yO8o2ZEv3tNFZGRJr4olfBxuWYZ+UInePfBOTxUFy5c+2Y
-         3OmC09McSzm3SsQEgcLpB+gCT8GmMMV77v2RylsXBVMIr/kBJ+Md1cVEMQhMyii9ieDe
-         gyJsHabnH8ztcZHZooknY+OGvnU81FJH9sJm9fNdvCY27UiYTatvgF0Hr/PmRm5YOA42
-         pEeA==
-X-Gm-Message-State: AOJu0YyFmkUZlTHLZs7wqhO/dxdKKqXOKygOaU7C1+e4XstZJxEyW3Za
-	XjTuhAddxd9ghjHOQeFaSlhX8aVpo01TeaX0rZkDRlCiupCn8FU2FIfUug==
-X-Google-Smtp-Source: AGHT+IExavZECHWpnL2VAZHYWaujwKouRridi4Izh6e2CHzGb6U7Iqt+PM1eLbtk4q797DUc73PVaw==
-X-Received: by 2002:a17:903:18d:b0:1f9:aa05:878f with SMTP id d9443c01a7336-1fa1c7f72fcmr108709615ad.0.1719320809166;
-        Tue, 25 Jun 2024 06:06:49 -0700 (PDT)
-Received: from LOCLAP699.localdomain ([208.195.13.130])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1f9eb3d5bf2sm80778305ad.189.2024.06.25.06.06.47
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 25 Jun 2024 06:06:48 -0700 (PDT)
-From: James Prestwood <prestwoj@gmail.com>
-To: iwd@lists.linux.dev
-Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 7/7] auto-t: add test for a deauth coming in during an FT-roam
-Date: Tue, 25 Jun 2024 06:06:24 -0700
-Message-Id: <20240625130624.385553-7-prestwoj@gmail.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240625130624.385553-1-prestwoj@gmail.com>
-References: <20240625130624.385553-1-prestwoj@gmail.com>
+	dkim=pass (2048-bit key) header.d=tavla.de header.i=@tavla.de header.b="CnpkyDda"
+Received: from smtp102.mailbox.org (smtp102.mailbox.org [10.196.197.102])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mout-b-203.mailbox.org (Postfix) with ESMTPS id 4W8GW625QSz9v2d
+	for <iwd@lists.linux.dev>; Wed, 26 Jun 2024 11:24:50 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tavla.de; s=MBO0001;
+	t=1719393890;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=A/f4gHgs7AsejHpyLZnYy6Nv0FSi8kTmE41yUTUAyqY=;
+	b=CnpkyDdaQbpJc7bqifCJf2z2r/g22cseMGte3ZkEgz9tknBEkuUKOf93Fyhp7CYY71PVHs
+	E/LPhXH++3fmjg13xyancJXNLlfnpSaAT4S/FISlaNjSNA0omZDjPT0yq/Kq06RO2B84H4
+	QJAgRR/z43W8V1BKuW1ETzDjQH8KBV9F7clNLIL5W7NZbILTFXdIez0bfOZXxI5wNsQJlU
+	WkY0lSnCzui3xCuuKhvpnYcxCTW5mHyoCA7nJnWPDhTCr3SuPc2JQeu8DJWBw2LHwLtZH3
+	06QYXfQkDZDVp9rioo4C6vN8FpUxP6OlU5rPU+Dta02y3vz73W9woeiW0rK5Hw==
+Message-ID: <e088f7e6-c455-4635-9edd-a51c619654d4@tavla.de>
+Date: Wed, 26 Jun 2024 11:24:49 +0200
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
+Content-Language: en-GB, de-DE
+From: Martin Petzold <martin.petzold@tavla.de>
+Organization: TAVLA Technology GmbH
+Subject: No re-connect using systemd-networkd and IWD
+To: "iwd@lists.linux.dev" <iwd@lists.linux.dev>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
----
- autotests/testPSK-roam/failed_roam_test.py | 15 +++++++++++++++
- 1 file changed, 15 insertions(+)
+Dear all,
 
-diff --git a/autotests/testPSK-roam/failed_roam_test.py b/autotests/testPSK-roam/failed_roam_test.py
-index 8cce8bb5..60bcf366 100644
---- a/autotests/testPSK-roam/failed_roam_test.py
-+++ b/autotests/testPSK-roam/failed_roam_test.py
-@@ -149,6 +149,21 @@ class Test(unittest.TestCase):
-         condition = 'obj.state == DeviceState.disconnected'
-         self.wd.wait_for_object_condition(device, condition)
- 
-+    def test_ft_deauth_before_association(self):
-+        self.rule2.enabled = True
-+        self.rule3.enabled = True
-+
-+        device = self.wd.list_devices(1)[0]
-+
-+        self.connect(self.wd, device, self.bss_hostapd[0])
-+
-+        device.wait_for_event('ft-authenticating', timeout=60)
-+
-+        self.bss_hostapd[1].deauthenticate(device.address)
-+
-+        condition = 'obj.state == DeviceState.disconnected'
-+        self.wd.wait_for_object_condition(device, condition)
-+
-     def setUp(self):
-         self.wd = IWD(True)
- 
--- 
-2.34.1
+I have some serious issues with the Wi-Fi connection using 
+systemd-networkd and IWD. Our devices are fixed at a place and have only 
+a single Wi-Fi network configured. There is also an Ethernet device, but 
+no cable connected. Wi-Fi configuration and connection work well using 
+iwctl. However, some of our devices lose the connection to this network 
+and DO NOT re-connect. We have seen this with several devices and 
+different routers. Some devices also do not have this problem. It seems 
+to depend on the stability of the connection. But I am also talking 
+about this issue like 1m away from the router - for such devices only 
+rarely.
+
+SETUP
+
+SoM: Variscite DART-IMX8M-PLUS
+SoC: NXP i.MX8M Plus
+Wi-Fi Chip: Laird Sterling LWB5 (Infineon CYW43353)
+Antenna: Laird FlexPIFA
+RootFS: Debian bullseye
+Kernel: NXP Kernel 5.10.52
+Driver: Laird 8.2.0.16
+Network Daemon: systemd-networkd 247.x
+Wi-Fi Daemon: IWD 1.14
+
+CONFIGURATION
+
+-> Blacklisted "brcmfmac" kernel module
+-> Enabled Kernel "Networking support > RF switch subsystem support" 
+(but as far as I understand the Laird driver does not support RF Kill)
+-> Added [Scan] and [Blacklist] section later, problem still exists 
+(however, I could reproduce that re-connect works better if I switch 
+on/off Wi-Fi SSID)
+
+##### /etc/systemd/network/20-wlan0.network
+
+[Match]
+Name=wlan0
+
+[Network]
+DHCP=yes
+
+[Link]
+RequiredForOnline=no
+
+##### /etc/iwd/main.conf
+
+[General]
+UseDefaultInterface=true
+
+[Network]
+NameResolvingService=systemd
+
+[Scan]
+InitialPeriodicScanInterval=10
+MaximumPeriodicScanInterval=10
+
+[Blacklist]
+InitialTimeout=10
+MaximumTimeout=10
+
+#####
+
+OPTIONS
+
+A. Try "IgnoreCarrierLoss=5s" in systemd -> but this is not about re-connect
+B. Switch to Debian Bookworm (with systemd  and IWD ) and NXP Kernel 
+6.1.36 -> is already WIP
+C. Switch to new Laird firmware 11.x
+
+-> Which option could be promising?
+-> Do you have any other idea, how to address this issue?
+
+Thanks,
+
+Martin
 
