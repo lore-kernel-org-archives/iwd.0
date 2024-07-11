@@ -1,191 +1,90 @@
-Received: from mout-b-210.mailbox.org (mout-b-210.mailbox.org [195.10.208.40])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f176.google.com (mail-qt1-f176.google.com [209.85.160.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3716516419
-	for <iwd@lists.linux.dev>; Tue,  2 Jul 2024 08:01:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.10.208.40
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB13C42AB5
+	for <iwd@lists.linux.dev>; Thu, 11 Jul 2024 22:09:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719907287; cv=none; b=b20jE99cEM/rfwnZIgJpyahj2cnHhStDlXu8k4f+zLPnFaZx8i3KMurFZUuD5t2kgwIvDrIbsLRdjWAknKOE/Ijic0ID23U+WILUPnxfhqKc4gNU3shMepnXS4XxTWjM+NryoqzhmKMF++TZzmxmxDs+mpJBBfkrDy5HgIfvVaw=
+	t=1720735750; cv=none; b=PNI2/IzxxQBdSbuswM5KmtYyY0g9sbSZnqOJY6mGfGNqJT995KBZTmp5YqkWps5MkyXFLahq565EVb9hof5s4z6RVw0E2XszjRCdqqQV2uZ4o1rfVOCSziciSItfBVEwQVDOUw3RA520Zo1vifdOpiacJtZxQFdA3M+xHFzsiOA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719907287; c=relaxed/simple;
-	bh=Yz4J2nWKmbG4164GgfCTICTyAJXaQpfOx8WgllvGBmk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:Cc:From:
-	 In-Reply-To:Content-Type; b=J51ETHbDmEOUWxs2NhCIj6IcL41iKnOyYOgml4ElYJGv9yQkefaP3rrvd6Y/wJ6DVtRTTIRKJg7pXq7U+YTE+71MfKhV4uL4okgGQPy1kaceEXLjiQD/xOYUPxtR0XlTcyWQ0YyDmjPFWMGjs5dUAM1f3hbCouaMU+/wm6jn5jc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tavla.de; spf=pass smtp.mailfrom=tavla.de; dkim=pass (2048-bit key) header.d=tavla.de header.i=@tavla.de header.b=FCHEVmvx; arc=none smtp.client-ip=195.10.208.40
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tavla.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tavla.de
+	s=arc-20240116; t=1720735750; c=relaxed/simple;
+	bh=LFEMYZBAHkrMq22X7mktEF/xiaYSgJzkwWw5SnI04qk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=T0a6mf2w74igso4XmUiuY7n9zdt06Dw5jANGW+XcljOBEJ29+QSfqWmJHB22lSHHtSg3rFccZzfN9fCXzVF33SbCdYYp4s9VJ+foKSki74Js2wrMnvlgt0D1wEW0EHEtzUOkbRnqQHBT5rFYv2eGH6/u3aT3IzmZ8NceRJpSHyY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=getcruise.com; spf=pass smtp.mailfrom=getcruise.com; dkim=pass (2048-bit key) header.d=getcruise.com header.i=@getcruise.com header.b=QSKRiQTS; arc=none smtp.client-ip=209.85.160.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=getcruise.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=getcruise.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=tavla.de header.i=@tavla.de header.b="FCHEVmvx"
-Received: from smtp1.mailbox.org (smtp1.mailbox.org [IPv6:2001:67c:2050:b231:465::1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mout-b-210.mailbox.org (Postfix) with ESMTPS id 4WCw9H6NnBzDtXD;
-	Tue,  2 Jul 2024 09:52:03 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tavla.de; s=MBO0001;
-	t=1719906723;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=3IeWLXPMW4kiLX4mb+t2Nuy1KQY+LW9Htd1AaVXtocc=;
-	b=FCHEVmvxfIQLo1DqBgtcBWN7gSMVjEon/h29n3zHY7/mj5z2zN98yePef2DXM5Scd1Wjkl
-	r0riRG8190+PCZggdxcPHqYLw7S/Di3v/uAFY8tsrjVQVh5gix5DrmfthUrCx+X3pXTWW4
-	CeU16Fr2mdd/BsiqTJ4URV1alwQ2cuK8eLR3w3MNr01v5I5+Z1NWUEI6D51Oxn4potG3fO
-	IwDR0M/jfvppislF2FXcpPqFa+71Tp84yPnZGyv7VLq5uT2vpZ4hwUjFyBn2gNyQqDn6bf
-	AiJUSzNIc/S0uWN4BUGOCLFQ4Zq9/OkEfaY7Y4OJd3E8Irv2lsRf/OVHwoLKHw==
-Message-ID: <8c7ff992-2f03-4e4f-97bc-36eab3727d44@tavla.de>
-Date: Tue, 2 Jul 2024 09:52:02 +0200
+	dkim=pass (2048-bit key) header.d=getcruise.com header.i=@getcruise.com header.b="QSKRiQTS"
+Received: by mail-qt1-f176.google.com with SMTP id d75a77b69052e-44930ea05b8so9518801cf.1
+        for <iwd@lists.linux.dev>; Thu, 11 Jul 2024 15:09:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=getcruise.com; s=google; t=1720735747; x=1721340547; darn=lists.linux.dev;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=z18pq+Vgr6uqSx1eJ3RrQius6tP4iiCG1qwc7U7agAY=;
+        b=QSKRiQTS5RM3tIvhAE67oioqfauCzgLXHdFhDZxKp6Y/DDQmBZ0WyfETT8h7/cv9AQ
+         qFNLdifVx5HdxBcVK4WzbJWb9g+4N14G23Q4w3j2mhCkl/RntnrbFNCgcN++jt76Wtoz
+         nRf++ViG/NCNTOoALBdSOHCSrzaNGbze8P1ampWsusyaMuR6eHuUkBezgKFeFYzXgCIT
+         Ji1EUJWUZGbhwEoDk2puSVRRLXFllCg5mNzvpN0vOIXFatEo9X6rse3l/3guuLjLPuh/
+         UVkJPhZ1n2xofU9scFE/6aYDJapHnrkcEl53JtSmboml13WRCNo6nI9SsNha/gMTJIYn
+         73xw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1720735747; x=1721340547;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=z18pq+Vgr6uqSx1eJ3RrQius6tP4iiCG1qwc7U7agAY=;
+        b=LdtaEZ16ckicCutbBJB6pYI1jAP5Zhbz+aCPKV0RI6ZxhTdyFr0NdqyGMzIl5oLgRG
+         oluSfZR6rHSSMptH5Cocfuu9fGH7CF3Yu4SKOk5o7qee4Qc3ifuX/HW8CLfOlLKjM0/U
+         W6zNWRzmblPG7ZAWSCN28578VWYnMZMFrZ3sjxPoMDz5T8z1B+9+k+DPJWPG50bBn8Rx
+         epdRqv2CWdM28ohZhT8RoepsmPhUcyo694psyMKgujTUCZeUuFQkpUr0AxMJ7v7KlaSw
+         jwyYOOU4EQf4ICIRDk/LKAw83sTFG8k7bqiMYWlaO4y9CzOgREeSQckoK/GmEWcyByxM
+         UsYg==
+X-Gm-Message-State: AOJu0YyJU4hCKOaTxmJw5fgnV56VZcNkVGuerx52EnZOAn+JYObXRigd
+	jTmbHDCWNgus6JgC1PkJI0FxY47iWTsBHOkV9RBwHGWuBbhhee7LKGisW4BEiG7rhkL5h9taX5L
+	UR2/dWChtfePwsPiPCXwF0nSI+P5zGPBjv8jXY3ycZR6K0sX9wxbaBrpWZqZMeANWI7Q6t537ij
+	xCsoPpFrnNpyVN81MelMV9RVV/7TKIdgD46FiOuUl+GoE=
+X-Google-Smtp-Source: AGHT+IHV+2YDUp+IkEOWyc1OGtq6VHL/xURmmkLCWFMTQXq/NhNAh5kYZAhbplBudCDQTGcgi5Us8w==
+X-Received: by 2002:a05:622a:52:b0:446:710c:fed0 with SMTP id d75a77b69052e-447fa89b992mr116295311cf.29.1720735747353;
+        Thu, 11 Jul 2024 15:09:07 -0700 (PDT)
+Received: from localhost.localdomain ([140.177.191.129])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-44c2c6b9f31sm17062361cf.80.2024.07.11.15.09.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 11 Jul 2024 15:09:07 -0700 (PDT)
+From: Steve Schrock <steve.schrock@getcruise.com>
+To: iwd@lists.linux.dev
+Cc: Steve Schrock <steve.schrock@getcruise.com>
+Subject: [PATCH] main: set the identity in the logger
+Date: Thu, 11 Jul 2024 22:07:50 +0000
+Message-ID: <20240711220753.17831-1-steve.schrock@getcruise.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Subject: Re: No re-connect using systemd-networkd and IWD
-To: Denis Kenzior <denkenz@gmail.com>
-References: <e088f7e6-c455-4635-9edd-a51c619654d4@tavla.de>
- <c8cc4e80-1f3e-4393-8e21-54804628f5b0@gmail.com>
-Content-Language: en-GB, de-DE
-Cc: "iwd@lists.linux.dev" <iwd@lists.linux.dev>
-From: Martin Petzold <martin.petzold@tavla.de>
-Organization: TAVLA Technology GmbH
-In-Reply-To: <c8cc4e80-1f3e-4393-8e21-54804628f5b0@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 4WCw9H6NnBzDtXD
 
-Hi Denis,
+This causes "iwd" to be output in each message sent to syslog to help
+quickly identify iwd messages.
+---
+ src/main.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-to sum-up: We think there is such a serious issue in IWD 1.14. We can 
-reproduce that IWD does not re-connect if we hard-kill the network 
-(either by pulling the power of the router or just renaming the SSID 
-back and forth). Work-around may be our configuration in certain setups 
-(see below). Maybe worth fixing this for Debian bullseye 1.14.
-
-Am 26.06.24 um 16:57 schrieb Denis Kenzior:
-> Hi Martin,
->
-> On 6/26/24 4:24 AM, Martin Petzold wrote:
->> Dear all,
->>
->> I have some serious issues with the Wi-Fi connection using 
->> systemd-networkd and IWD. Our devices are fixed at a place and have 
->> only a single Wi-Fi network configured. There is also an Ethernet 
->> device, but no cable connected. Wi-Fi configuration and connection 
->> work well using iwctl. However, some of our devices lose the 
->> connection to this network and DO NOT re-connect. We have seen this 
->> with several devices and different routers. Some devices also do not 
->> have this problem. It seems to depend on the stability of the 
->> connection. But I am also talking about this issue like 1m away from 
->> the router - for such devices only rarely.
->>
->> SETUP
->>
->> SoM: Variscite DART-IMX8M-PLUS
->> SoC: NXP i.MX8M Plus
->> Wi-Fi Chip: Laird Sterling LWB5 (Infineon CYW43353)
->> Antenna: Laird FlexPIFA
->> RootFS: Debian bullseye
->> Kernel: NXP Kernel 5.10.52
->> Driver: Laird 8.2.0.16
->> Network Daemon: systemd-networkd 247.x
->> Wi-Fi Daemon: IWD 1.14
->
-> Is iwd version really that old?  We're at 2.18 now.
-
-Yes, because it is the default package in Debian bullseye. We will now 
-switch to Debian bookworm with IWD 2.3.
-
->
-> What kind of authentication is being used on the network? PSK or 
-> 802.1X?  Do you have logs (preferably with debugging enabled) around 
-> the time this happens?
->
-WPA2-PSK
->>
->> CONFIGURATION
->>
->> -> Blacklisted "brcmfmac" kernel module
->> -> Enabled Kernel "Networking support > RF switch subsystem support" 
->> (but as far as I understand the Laird driver does not support RF Kill)
->> -> Added [Scan] and [Blacklist] section later, problem still exists 
->> (however, I could reproduce that re-connect works better if I switch 
->> on/off Wi-Fi SSID)
->
-> These options were added to take care of certain routers misbehaving.  
-> For example, one of the APs in an ESS not responding to association 
-> requests but still sending beacons / probe responses.  Modifying the 
-> parameters from defaults should not be generally necessary, I think?
->
-We are not 100% sure, but maybe these "[Scan]" and / or "[Blacklist]" 
-options actually solve our problem. I would recommend these options to 
-everyone having this re-connect problem using a fixed device setup and 
-single WiFi network.
->>
->> ##### /etc/systemd/network/20-wlan0.network
->>
->> [Match]
->> Name=wlan0
->>
->> [Network]
->> DHCP=yes
->>
->> [Link]
->> RequiredForOnline=no
->>
->> ##### /etc/iwd/main.conf
->>
->> [General]
->> UseDefaultInterface=true
->>
->> [Network]
->> NameResolvingService=systemd
->>
->> [Scan]
->> InitialPeriodicScanInterval=10
->> MaximumPeriodicScanInterval=10
->>
->
-> This will just make iwd scan more aggressively, without fixing the 
-> underlying issue.  Aggressive scanning isn't really necessary unless 
-> you're moving through your environment very fast.  You mentioned that 
-> your devices are stationary.
-It does not seem to re-connect. Thus, maybe it does not detect the 
-network anymore. Just now I can't say if "[Scan]" or the “[Blacklist]“ 
-options help.
->
->> [Blacklist]
->> InitialTimeout=10
->> MaximumTimeout=10
-It would make sense that this helps, because we are talking about 
-"currently misbehaving or misconfigured". Maybe IWD 1.14 is far far to 
-aggressive (or in terms of network loss miss-behaving) regarding 
-unstable connections.
->>
->> #####
->>
->> OPTIONS
->>
->> A. Try "IgnoreCarrierLoss=5s" in systemd -> but this is not about 
->> re-connect
->> B. Switch to Debian Bookworm (with systemd  and IWD ) and NXP Kernel 
->> 6.1.36 -> is already WIP
->> C. Switch to new Laird firmware 11.x
->>
->> -> Which option could be promising?
->> -> Do you have any other idea, how to address this issue?
->>
->
-> Upgrading to latest iwd and logs [1] of the issue occurring would be 
-> the steps I'd start with.
-
-We will switch to newer kernel and IWD 2.3 as well as newer 
-systemd-networkd very soon - already in testing. We will then also test 
-the scenario again without these configuration parameters. We may also 
-have some time to check logs and run more tests with debug enabled.
-
-Best regards,
-
-Martin
+diff --git a/src/main.c b/src/main.c
+index acbfdc0c34b2..93d4e87c653a 100644
+--- a/src/main.c
++++ b/src/main.c
+@@ -531,6 +531,8 @@ int main(int argc, char *argv[])
+ 	else
+ 		l_log_set_stderr();
+ 
++	l_log_set_ident("iwd");
++
+ 	if (check_crypto() < 0)
+ 		return EXIT_FAILURE;
+ 
+-- 
+2.43.0
 
