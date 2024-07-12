@@ -1,113 +1,87 @@
-Received: from mail-io1-f46.google.com (mail-io1-f46.google.com [209.85.166.46])
+Received: from mail-qk1-f172.google.com (mail-qk1-f172.google.com [209.85.222.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA19E1DFE3
-	for <iwd@lists.linux.dev>; Fri, 12 Jul 2024 16:09:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E364486AFA
+	for <iwd@lists.linux.dev>; Fri, 12 Jul 2024 16:31:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720800569; cv=none; b=dP+1i9XWX3jAUAkKmW8fflZwvyKYat3bqtw3y/IbpdEBWk89/seuC4q9wDJrbJhUBdLH8IYlhvwLmdWO6wOhuyT3tZ9rO5y8VxVw3caV0qMxXUKJRRrXD4sALIP1arNg89vXjK4QVCt1Hm454lb4xbemHMr+s77pgiXtD/f3Uwc=
+	t=1720801872; cv=none; b=uiMH0boCq52NFWWCRlWzpUe/lw/D9OLRiNCVsAm33su7+FzvW1SAIME9DeE2WvtInjuFyshs18SiwgLYceQF3oBO6saEG9cRP5cQDF+VSShYc6lPMPRhM1ZWFM1FdhAmvmnxk+OQV8kpe6CUglA/vaaqFS2nmMuZy/OGQyCrJjk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720800569; c=relaxed/simple;
-	bh=hZtdih5Azfu89MCDuZiR+bpEuWfB2LE4Y4p4fc2G5c4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=oGVRnLtQYO9dyTETH7871bBNJ6J9WIj4ohLlN9yR99GiR70SfCr9mAthlCRPFSkPf/NfZcO5Q1TLo59oOKpIB065J3wQU4DQmW469HEJl+Tt0rjGDF0CntnI/bgTmD9GsyIDetEdoH4DWaLRFP+O2QT/IU1aJ9/dJS7BwXtM9XI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KKhxh79l; arc=none smtp.client-ip=209.85.166.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1720801872; c=relaxed/simple;
+	bh=wMQZwd0kijRta11by/h13ptnB9sJofcJ5eL/EkgPaLQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=mWdSTmKMNE/8iQOjfgNUFqddAHiEPes2cR9Z4IC6uTqRJ8afCQWQhdSSy2uEy8GHALhRUhM2qEk2ACEJimwkTx5mt2j1ci4oaHfIuhhxAh5H+NmuJ5/jac/BLFOnaQz6tftMJ7t1lFTkb+IbtLuKDFwNOEW3JtS2f8S3SBk991M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=getcruise.com; spf=pass smtp.mailfrom=getcruise.com; dkim=pass (2048-bit key) header.d=getcruise.com header.i=@getcruise.com header.b=a78rOyI/; arc=none smtp.client-ip=209.85.222.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=getcruise.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=getcruise.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KKhxh79l"
-Received: by mail-io1-f46.google.com with SMTP id ca18e2360f4ac-80a2939265cso26945139f.3
-        for <iwd@lists.linux.dev>; Fri, 12 Jul 2024 09:09:27 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=getcruise.com header.i=@getcruise.com header.b="a78rOyI/"
+Received: by mail-qk1-f172.google.com with SMTP id af79cd13be357-79f083f5cb6so130546585a.3
+        for <iwd@lists.linux.dev>; Fri, 12 Jul 2024 09:31:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1720800567; x=1721405367; darn=lists.linux.dev;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=mTYD1eRapuRJsUoXP9FNCv4jA2/oJAVrMoqHdPtvY8Q=;
-        b=KKhxh79lYS0Sj7kBn1C7X8upjyM2E3WPn095gtL3sFK7+Y8Gl1HCqiTKP4lZW5WfBK
-         oJ+qHdq+e4asODxCcwkDHY1CC+NP3bSqEXv0qAUAQTGN917ILBKjTd+hxbFzVnuMxtHp
-         /Is2uAMZKh2OJ9CsLFb7YKtXtsHp6ZZ6dcIhPxcobEm1LStkskw14o5QAyKr6BrAkz+r
-         EK7sJXMuvZMP9RBfbYEJ2l9s1t5a+spsziphHI5M2bO0tzVAi2/5U0HGidsg+rnzCXtg
-         UdOYAlK9TVsvk2oeSATfnjrAcEsiArT3RMTTs5Q4MoNGR1ZONjQKzCIHMh+CQdiBv/3W
-         pb6A==
+        d=getcruise.com; s=google; t=1720801869; x=1721406669; darn=lists.linux.dev;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=vXJ4FW4MhB+xJaezk+LLHIHZAbbkJot+ITDY9QeClBE=;
+        b=a78rOyI/IbwLlbV8lBAGG80ycxz9WilK/xcoYlpCTA5WrlW1Z/qdawqSJZjU5n3ZHo
+         vbPxM64zU7ibN1NYfJTG7EWgtcoERopQE2kZlySKLuawzB/yZgKEi80mSziJNY8nJV9q
+         0q/fxnJ8FDQbsH+KNEh9//i53HtNP8kxUG57JAugqtZ3byzJZJQVLmIcUGV7OZJBQBX7
+         qwSO48ZrqXtF7bWwYI1ZtKouIjfe0SH7pOx9GCb7CXcziaPICL0WouUdyh/5DOWG7xk0
+         ZhHp7WIv7GpHqCcYepa+iqEcXPWhWWqKLv/Pg5E17RUy1vJBTz7ZYgUaXzPLusEosMQe
+         rZsw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720800567; x=1721405367;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=mTYD1eRapuRJsUoXP9FNCv4jA2/oJAVrMoqHdPtvY8Q=;
-        b=rl9lCvXObWlgQQB1QfBArNdWUcLyAmQza1T0LSnQb4zY6YJjHWaQBHxTlT17+CNVih
-         Rppm1vgSAbrNAKdtV0lIMvHMswgcJNEPf/3j8Lw+cnnrJYdTS9PUiljiJxRlMZqmTkFk
-         xqoTSb08afWu10LQ6XjR23ibnQeFK3oCfAVBsE8DlLMSLuDvPhjoPMItK1xWdkti6DOO
-         XoVcdRflDA2NnCMnPmD+Zdlx5rlu0FreGpV+36etPf6RtokGEnJQdVaov+5BwCtYacaW
-         5znth2VT0f/szrcPHfCtfnSrEXKhlmNHHNM8Qn14Ao4kNf/05cGVP2QGD0bMTgmZ43Fj
-         Gn5g==
-X-Forwarded-Encrypted: i=1; AJvYcCUDMkkFFRm0bDxPMh0nlIs3atVWEad5/z+4mqcjDXEWZJVdbeVdotPM2XZeOKUsdNA3/xoRhQOKrP2zRC4N9BqsVGet
-X-Gm-Message-State: AOJu0YwwvICKajB5MEMUDmzwydicwLL2K3kWfOuoKo2t13PHbjyLSpst
-	uoZsDHTuEHq8EwvrfJh/x9/xOnIfpl+qr2dz9kp6ysQTvGVw2cq9yGGN9Q==
-X-Google-Smtp-Source: AGHT+IGqxIK4opRun18r4RfI/6LiG7WF3Z8NDjwFa6COXP4H3CzymxMyUABnROgiVi3RKBuhcT4X/g==
-X-Received: by 2002:a5e:d809:0:b0:7fa:cd1e:963d with SMTP id ca18e2360f4ac-80003ca8f80mr1288207339f.15.1720800566867;
-        Fri, 12 Jul 2024 09:09:26 -0700 (PDT)
-Received: from ?IPV6:2605:a601:ad99:2e00:e9ed:d1b6:6b3c:b7f3? ([2605:a601:ad99:2e00:e9ed:d1b6:6b3c:b7f3])
-        by smtp.googlemail.com with ESMTPSA id 8926c6da1cb9f-4c0b1bf8284sm2508520173.98.2024.07.12.09.09.26
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 12 Jul 2024 09:09:26 -0700 (PDT)
-Message-ID: <59f20eb3-7f41-47fe-9010-9ac4f9a48fd6@gmail.com>
-Date: Fri, 12 Jul 2024 11:09:25 -0500
+        d=1e100.net; s=20230601; t=1720801869; x=1721406669;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=vXJ4FW4MhB+xJaezk+LLHIHZAbbkJot+ITDY9QeClBE=;
+        b=bRLps98M5o/xUDu59j/fgL2F3ei5bbcK3Auj2fh6r7hhhiV/Nkhe/wweCmkwJbS9FD
+         MYOkakHACGW8ek4opPDMW+VOnAmItv/llFDSpWT4FnG3pMOKMooSgJLqLR6RKj+4D45k
+         OtKIAu73X9YxM46zavkiYb3XJQ+rpZvjvBXck5GKt5KKXwY8S15g+lXf+CyciGFhzYuu
+         4EDq/YNVxOu/NaXhTA0jTVfI2cBULpAwDyfiECq0e/EP7YtnioerX9Rsa7KFkqi2BNsk
+         Ev1HeAnEaeCyTyS6FUC/zVQzWyKgApjioTBovda4m3vcW74jfTUJtXTjpMHpm2eQhV60
+         jmfw==
+X-Gm-Message-State: AOJu0YzGzsb9xDG8f0sVE/OwyXgckhAWXk0sYGmTXnwRJJrqL9Q4SnKM
+	IOMN0gojPLCjFApDAh+Fq860AAnamJYBuQo3YgE8OqsoG30ixP+KHO3qWS3THFRuGLyUPoahSkq
+	lYzrU8d6Mw81YYPbrwRVukX+WeAfivyNWV9YoECkJF/JrkbuKLSAj4qow+FZoDK+S4tukR2lcE7
+	Z98HIJd+I5zYwG8wc3M3kJWW7wEoWNjCl9qimuUbvyODM=
+X-Google-Smtp-Source: AGHT+IGt+wdm4sbo7UP9osjU22buZpvT1+l1qtla+RCNVhMyS7mBz20CM9WClUl9n0/AR6MyfMdVTw==
+X-Received: by 2002:a05:620a:470b:b0:79f:1559:272e with SMTP id af79cd13be357-79f19ae387dmr1596816685a.61.1720801868679;
+        Fri, 12 Jul 2024 09:31:08 -0700 (PDT)
+Received: from localhost.localdomain ([140.177.191.129])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-79f19028ab0sm415943185a.64.2024.07.12.09.31.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 12 Jul 2024 09:31:08 -0700 (PDT)
+From: Steve Schrock <steve.schrock@getcruise.com>
+To: iwd@lists.linux.dev
+Cc: Steve Schrock <steve.schrock@getcruise.com>
+Subject: [PATCH] main: update usage with logger option
+Date: Fri, 12 Jul 2024 16:29:39 +0000
+Message-ID: <20240712162954.23746-1-steve.schrock@getcruise.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] main: remove static from const strlen
-To: "dangling ." <kasperkantz@outlook.com>,
- "iwd@lists.linux.dev" <iwd@lists.linux.dev>
-References: <DM4PR14MB4880D5598D181E5FE126C54BA7A62@DM4PR14MB4880.namprd14.prod.outlook.com>
-Content-Language: en-US
-From: Denis Kenzior <denkenz@gmail.com>
-In-Reply-To: <DM4PR14MB4880D5598D181E5FE126C54BA7A62@DM4PR14MB4880.namprd14.prod.outlook.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-Hi,
+---
+ src/main.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-On 7/11/24 7:33 PM, dangling . wrote:
->  From bc0f427f81b5b25f1c706c66e455dc9ea5686266 Mon Sep 17 00:00:00 2001
-> From: kasper <kasperkantz@outlook.com>
+diff --git a/src/main.c b/src/main.c
+index 93d4e87c653a..beaf228fb3cd 100644
+--- a/src/main.c
++++ b/src/main.c
+@@ -154,6 +154,7 @@ static void usage(void)
+ 		"\t-p, --phys             Phys to manage\n"
+ 		"\t-P, --nophys           Phys to ignore\n"
+ 		"\t-d, --debug            Enable debug output\n"
++		"\t-l, --logger           Override default stderr logging\n"
+ 		"\t-v, --version          Show version\n"
+ 		"\t-h, --help             Show help options\n");
+ }
+-- 
+2.43.0
 
-I need a full name in order to accept this patch.
-
-> Date: Fri, 12 Jul 2024 00:23:56 +0000
-> Subject: [PATCH] main: remove static from const strlen To fix this error:
->   src/p2putil.c: In function 'p2p_get_random_string':   src/p2putil.c:2641:37:
->   error: initializer element is not constant    2641 |         static const int
->   set_size = strlen(CHARSET);         |
->   ^~~~~~
-> 
-> ---
->   src/p2putil.c | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-
-Why did you send 3 of the same one?
-
-> diff --git a/src/p2putil.c b/src/p2putil.c
-> index d1f114d0..ef0f988c 100644
-> --- a/src/p2putil.c
-> +++ b/src/p2putil.c
-> @@ -2638,7 +2638,7 @@ void p2p_get_random_string(char *buf, size_t len)
->   {
->   #define CHARSET "ABCDEFGHIJKLMNOPQRSTUVWXYZ" "abcdefghijklmnopqrstuvwxyz" \
->                  "0123456789"
-> -       static const int set_size = strlen(CHARSET);
-> +       const int set_size = strlen(CHARSET);
-> 
->          l_getrandom(buf, len);
-> 
-> --
-> 2.45.2
-
-Regards,
--Denis
