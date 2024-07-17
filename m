@@ -1,90 +1,167 @@
-Received: from mail-ot1-f48.google.com (mail-ot1-f48.google.com [209.85.210.48])
+Received: from mail-qk1-f172.google.com (mail-qk1-f172.google.com [209.85.222.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 374CA49638
-	for <iwd@lists.linux.dev>; Fri, 12 Jul 2024 21:25:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A643181311
+	for <iwd@lists.linux.dev>; Wed, 17 Jul 2024 14:00:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720819503; cv=none; b=tRcCbTzm83ejXxgrqZcI5x70id9e6uDHFFFYyYKX0mTHGaNIM/5xLaWsARgkRa3/f2YUu9nE4f87T56DOEuQNxhn/PpeB1h1PEEEKFKlHiEwOAyARHF/7zBWTuuAuf97kemwv/NR/mlYZmAIHcWjrWdFn8WZBVoRzcbGapZzjiA=
+	t=1721224845; cv=none; b=NDB78GM3c9DOzp2IsrqVq+5wbqVSm/QiINHANwKC+eig5EE3PehUxRNIxNEfjojmYvJndYE5yEno/M/ml/pU3pQcQ9Kj/6+epwM/CdY4S56Ux1scH6nd5PUZjYtHzkZo61pJzGeVy2PXtJ2c0pa5pqBHngmHdJEQMfHJmg5ZCGE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720819503; c=relaxed/simple;
-	bh=rWmU2Z9f8izR7E7n30BJ0TfcOAcJR8JKQ9+1lp7OuEM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=DhG0B/lzMjcJT/sT7Dccfuz3qA+QudgCP5jltLsHn653dtiFM2zb3iPrAvshqGW2JT2VLDgvpgBwFKStqB6RwAgQ/c4XifrULzD3wwactLAtBJ1VX4vowGAuiURoEyId5oXasOkQtiNA3o4QHbz+puBlJrbutNHxq594lWeQr/U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=J0+yYe/B; arc=none smtp.client-ip=209.85.210.48
+	s=arc-20240116; t=1721224845; c=relaxed/simple;
+	bh=cCsHgV8WDXYVCih+4qwcuZvAoj1JFnYsdwtzlaX/3tE=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=NbJHCiTUGPtE9/PUL5mJnaobGaFj07EuIsa/Agl2deSrC4TYaz35sTwTENzd+74PhbFoDai3MBFgqgzBIF25yrgmDupcE0rXGPg+1i1ZPiEG0bzdbtS26DLRzPONzO60Ku52zlVAAZvCugtxqpYWVxoNFeLx2zZXzHMhU0xmBZc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=P4Kd0tX2; arc=none smtp.client-ip=209.85.222.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="J0+yYe/B"
-Received: by mail-ot1-f48.google.com with SMTP id 46e09a7af769-70211abf4cbso1543671a34.3
-        for <iwd@lists.linux.dev>; Fri, 12 Jul 2024 14:25:02 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="P4Kd0tX2"
+Received: by mail-qk1-f172.google.com with SMTP id af79cd13be357-79f08b01ba6so71818085a.0
+        for <iwd@lists.linux.dev>; Wed, 17 Jul 2024 07:00:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1720819501; x=1721424301; darn=lists.linux.dev;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=4+S/e7J2UYfIXax9ExiUbHGa0DcJoKCWSfcFloito0M=;
-        b=J0+yYe/BRD9W4zzSCfd8oGimFZASbVa2QPAM0L3G2QliHq2QzgSdFar/D//8MSIFkT
-         Xjr1Rcw3d1a2KRovBl2IX4M2SkKF0Vz5FongrAJNM87Pp3nicE8W77RnNtu9sVZCOEgG
-         y0S7x3YcZyum0Av/ahXX1EvoN1gtCH/QD9VghlWk3Yue5pNISjSLBKvvx/FoUdNrNI7A
-         CjYY6Epn3CwhekeGt4ea0yrpROxzo06Pr34U1bmXOB3Fo9A+P1nMgzQgUdvgbNQDBgY8
-         EX60NGNln1yxB+o3xaPtoFZLPye9XYnlBYILgwpLOexrlWai1AMTfB95zUiWGUtl22jv
-         Tiig==
+        d=gmail.com; s=20230601; t=1721224843; x=1721829643; darn=lists.linux.dev;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=pfr/GCpfKxCAelDwcRewfzmzaZSCStziFEG6XlEtMdA=;
+        b=P4Kd0tX2Dke0F8TBwnowIbPuSPXsgPSrMf/zCwf/uBe/pP2+yoNwGxs1/WKRA8WEtK
+         XtdwtRvenQlABV1ikOL8rJVJymYQbfKFbt5U0oCOwJpn5x2Yd3s8otX9VZwcXzfT6Cm1
+         SHY0hwO++p9ZQN5G917lMxVLfBxhPb7UE+hDnz1aIrlFV7cm6TLe74XvpDaevQLFP37g
+         ug2tt4n/DqGVXWkSGgfewS3dmkBdTWhDfXjbDWnHa/QNN6t4gherwjEXB4duN3i5B3S9
+         9UAEYjfEqYTVImoxZSDEWhf3WNpq5DoghGqFJcLyjLF9rLjnrBEyDJQwpPegwiMKpetT
+         yEFg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720819501; x=1721424301;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=4+S/e7J2UYfIXax9ExiUbHGa0DcJoKCWSfcFloito0M=;
-        b=FjFo9citE0O2zkPDMGQR+bfV3unsYst9kWlWADHBDSERNX6U7naWcbd0vAcuVCfj5G
-         2PhdZfOzdSOQrhObiOpqJhdkyRXrGchJVBQ108BrWyzx5IBBtcC7S8FZSCGzFXJcwCAN
-         zEXi1E7a76Sw+kl9A85eBRa+SAwIWAAkIj3uwy6pHfJHCZHyS0SflE6mxV0QvJpaMuhL
-         Gq6oRt/lw3uz6qphumKveidyaPTqBPjv8qc0pFQRFRgAg+lvh7kbPG/FMULC75iVwbB9
-         YRmUpWnAMYlJ6r0+8AT/6G+t+2w6ovtnK+c4pVn/jyhgFccygsOUNNippJM/+JMHqq9x
-         OLYQ==
-X-Forwarded-Encrypted: i=1; AJvYcCX2xlN32U+v525TTzJmGuz5VdBEWq11VfyHT5VmYRJYdm4xqotZk3Oq35uNh+fimkRo/ria93WEiKWCjbZW3P27swS4
-X-Gm-Message-State: AOJu0YySVacWOu5e0oqAe61qBl9X5btueekS6U5PVL2EttzMIh2bkSnH
-	9w8KmA9docxKbI+31nQA96iTG5X7tV0dUt3RGrCG1HuXpUjYowS6
-X-Google-Smtp-Source: AGHT+IFXS6iiXzjWEP4PMPV1p5NDcPr0rKuwbLm0othlwwrz1sTenhlmiPO1HkCjeK/BwvsCG8mv+w==
-X-Received: by 2002:a05:6830:4c5:b0:703:68c2:8356 with SMTP id 46e09a7af769-70375a1f063mr12785714a34.17.1720819501282;
-        Fri, 12 Jul 2024 14:25:01 -0700 (PDT)
-Received: from ?IPV6:2605:a601:ad99:2e00:e9ed:d1b6:6b3c:b7f3? ([2605:a601:ad99:2e00:e9ed:d1b6:6b3c:b7f3])
-        by smtp.googlemail.com with ESMTPSA id 46e09a7af769-7044934ae4asm1166897a34.80.2024.07.12.14.25.00
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 12 Jul 2024 14:25:01 -0700 (PDT)
-Message-ID: <ed69aafd-d81b-4f8e-9907-383485d21aae@gmail.com>
-Date: Fri, 12 Jul 2024 16:25:00 -0500
+        d=1e100.net; s=20230601; t=1721224843; x=1721829643;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=pfr/GCpfKxCAelDwcRewfzmzaZSCStziFEG6XlEtMdA=;
+        b=F/RUbjZDysKpgoF2+ELrC2l1IRtNEj72oU2Q6ycXCDLnq1nJQbXdzrx9mfpI0WqsH8
+         SQTfhrzHsxuP0+AAkdmv9wE6A61GnPN+OZjVfZCcuZy/ry9DI/dGYb1Jof5GdYiNEMHx
+         liWeeG5TAVPBjyP2nwbIED6yRYutahT6LvrY1YlI/nHcCsPPBh7EtUi7Po4xdofzbQx8
+         pN2LIk/8fkO5DbnfcMqF5OXedEhfnpBwQzgLIDGBPjefV/7jb+NF4RtmfWsBEDERTQF4
+         lptTVwwW1AqZvAV7UFL1lfQrinLPO8hz02L5pjMbbAT2maUlK8ubjgrT9q36N44AR5JI
+         2AFA==
+X-Gm-Message-State: AOJu0YwoVs4W53nrxnlr3H09l5ivXF+s7fX02EnyZqhXBDTpafL6Pu25
+	boeeVecF/8TufPXZonL1Ixe6JbK/49NvLL6/8Wg39lV8At5jyd3WnPddTA==
+X-Google-Smtp-Source: AGHT+IFJzuwSJFN9dIHcD7fzZ4JOx1jvdzS3/cBKTNOrS6iiD2T6szHU9lB1OhNjl1jhMQgZt428+Q==
+X-Received: by 2002:a05:620a:179f:b0:79f:c5d:2177 with SMTP id af79cd13be357-7a17ccfdfd5mr877440285a.34.1721224814642;
+        Wed, 17 Jul 2024 07:00:14 -0700 (PDT)
+Received: from LOCLAP699.localdomain ([50.78.19.50])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7a160bbe839sm403383885a.40.2024.07.17.07.00.13
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 17 Jul 2024 07:00:14 -0700 (PDT)
+From: James Prestwood <prestwoj@gmail.com>
+To: iwd@lists.linux.dev
+Cc: James Prestwood <prestwoj@gmail.com>
+Subject: [PATCH] netdev: handle disconnect event during the 4-way handshake
+Date: Wed, 17 Jul 2024 07:00:09 -0700
+Message-Id: <20240717140009.2648885-1-prestwoj@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] main: remove static from const strlen
-To: Kasper Kantz <kasperkantz@outlook.com>, iwd@lists.linux.dev
-References: <DM4PR14MB488070291579BF883BDD0195A8A62@DM4PR14MB4880.namprd14.prod.outlook.com>
-Content-Language: en-US
-From: Denis Kenzior <denkenz@gmail.com>
-In-Reply-To: <DM4PR14MB488070291579BF883BDD0195A8A62@DM4PR14MB4880.namprd14.prod.outlook.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-Hi Kasper,
+If a disconnect arrives during the 4-way handshake this would result
+in netdev sending a disconnect event to station. If this is a
+reassociation this case is unhandled in station and causes a hang as
+it expects any connection failure to be handled via the reassociation
+callback, not a random disconnect event.
 
-On 7/12/24 2:32 PM, Kasper Kantz wrote:
->   src/p2putil.c: In function 'p2p_get_random_string':
->   src/p2putil.c:2641:37: error: initializer element is not constant     2641 |
->          static const int set_size = strlen(CHARSET);         |
->                       ^~~~~~
-> ---
->   src/p2putil.c | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
-> 
+To handle this case the disconnect event can check if there is a
+pending connect callback and call that instead of the event handler.
 
-I modified the prefix to read: p2putil: (s/main/p2putil)
+Below are logs showing the "Unexpected disconnect event" which
+prevents IWD from cleaning up its state and ultimately results in a
+hang:
 
-Applied, thanks.
+Jul 16 18:16:13: src/station.c:station_transition_reassociate()
+Jul 16 18:16:13: event: state, old: connected, new: roaming
+Jul 16 18:16:13: src/wiphy.c:wiphy_radio_work_done() Work item 65 done
+Jul 16 18:16:13: src/wiphy.c:wiphy_radio_work_next() Starting work item 66
+Jul 16 18:16:13: src/netdev.c:netdev_mlme_notify() MLME notification Del Station(20)
+Jul 16 18:16:13: src/netdev.c:netdev_link_notify() event 16 on ifindex 6
+Jul 16 18:16:13: src/netdev.c:netdev_mlme_notify() MLME notification Deauthenticate(39)
+Jul 16 18:16:13: src/netdev.c:netdev_deauthenticate_event()
+Jul 16 18:16:13: src/netdev.c:netdev_mlme_notify() MLME notification New Station(19)
+Jul 16 18:16:13: src/station.c:station_netdev_event() Associating
+Jul 16 18:16:13: src/netdev.c:netdev_mlme_notify() MLME notification Authenticate(37)
+Jul 16 18:16:13: src/netdev.c:netdev_authenticate_event()
+Jul 16 18:16:13: src/netdev.c:netdev_mlme_notify() MLME notification Associate(38)
+Jul 16 18:16:13: src/netdev.c:netdev_associate_event()
+Jul 16 18:16:13: src/netdev.c:netdev_link_notify() event 16 on ifindex 6
+Jul 16 18:16:13: src/netdev.c:netdev_mlme_notify() MLME notification Connect(46)
+Jul 16 18:16:13: src/netdev.c:netdev_connect_event()
+Jul 16 18:16:13: src/netdev.c:netdev_connect_event() aborting and ignore_connect_event not set, proceed
+Jul 16 18:16:13: src/netdev.c:netdev_connect_event() expect_connect_failure not set, proceed
+Jul 16 18:16:13: src/netdev.c:parse_request_ies()
+Jul 16 18:16:13: src/netdev.c:netdev_connect_event() Request / Response IEs parsed
+Jul 16 18:16:13: src/netdev.c:netdev_get_oci()
+Jul 16 18:16:13: src/netdev.c:netdev_link_notify() event 16 on ifindex 6
+Jul 16 18:16:13: src/netdev.c:netdev_link_notify() event 16 on ifindex 6
+Jul 16 18:16:13: src/netdev.c:netdev_link_notify() event 16 on ifindex 6
+Jul 16 18:16:13: src/netdev.c:netdev_get_oci_cb() Obtained OCI: freq: 5220, width: 3, center1: 5210, center2: 0
+Jul 16 18:16:13: src/eapol.c:eapol_start()
+Jul 16 18:16:13: src/netdev.c:netdev_unicast_notify() Unicast notification Control Port Frame(129)
+Jul 16 18:16:13: src/netdev.c:netdev_control_port_frame_event()
+Jul 16 18:16:13: src/eapol.c:eapol_handle_ptk_1_of_4() ifindex=6
+Jul 16 18:16:13: src/netdev.c:netdev_mlme_notify() MLME notification Control Port TX Status(139)
+Jul 16 18:16:14: src/netdev.c:netdev_mlme_notify() MLME notification Notify CQM(64)
+Jul 16 18:16:14: src/netdev.c:netdev_cqm_event() Signal change event (above=1 signal=-60)
+Jul 16 18:16:17: src/netdev.c:netdev_link_notify() event 16 on ifindex 6
+Jul 16 18:16:17: src/netdev.c:netdev_mlme_notify() MLME notification Del Station(20)
+Jul 16 18:16:17: src/netdev.c:netdev_mlme_notify() MLME notification Deauthenticate(39)
+Jul 16 18:16:17: src/netdev.c:netdev_deauthenticate_event()
+Jul 16 18:16:17: src/netdev.c:netdev_mlme_notify() MLME notification Disconnect(48)
+Jul 16 18:16:17: src/netdev.c:netdev_disconnect_event()
+Jul 16 18:16:17: Received Deauthentication event, reason: 15, from_ap: true
+Jul 16 18:16:17: src/wiphy.c:wiphy_radio_work_done() Work item 66 done
+Jul 16 18:16:17: src/station.c:station_disconnect_event() 6
+Jul 16 18:16:17: Unexpected disconnect event
+Jul 16 18:16:17: src/netdev.c:netdev_link_notify() event 16 on ifindex 6
+Jul 16 18:16:17: src/wiphy.c:wiphy_reg_notify() Notification of command Reg Change(36)
+Jul 16 18:16:17: src/wiphy.c:wiphy_update_reg_domain() New reg domain country code for (global) is XX
+---
+ src/netdev.c | 15 ++++++++++++++-
+ 1 file changed, 14 insertions(+), 1 deletion(-)
 
-Regards,
--Denis
+diff --git a/src/netdev.c b/src/netdev.c
+index 7a335894..c6be05b5 100644
+--- a/src/netdev.c
++++ b/src/netdev.c
+@@ -1270,6 +1270,8 @@ static void netdev_disconnect_event(struct l_genl_msg *msg,
+ 	uint16_t reason_code = 0;
+ 	bool disconnect_by_ap = false;
+ 	netdev_event_func_t event_filter;
++	netdev_connect_cb_t connect_cb;
++	void *user_data;
+ 	void *event_data;
+ 
+ 	l_debug("");
+@@ -1310,9 +1312,20 @@ static void netdev_disconnect_event(struct l_genl_msg *msg,
+ 
+ 	event_filter = netdev->event_filter;
+ 	event_data = netdev->user_data;
++	connect_cb = netdev->connect_cb;
++	user_data = netdev->user_data;
+ 	netdev_connect_free(netdev);
+ 
+-	if (!event_filter)
++	/*
++	 * If a deauth frame come in after the connect event during the 4-way
++	 * handshake we need to handle this via the connect callback since its
++	 * still effectively a connection failure.
++	 */
++	if (connect_cb) {
++		connect_cb(netdev, NETDEV_RESULT_AUTHENTICATION_FAILED,
++				&reason_code, user_data);
++		return;
++	} else if (!event_filter)
+ 		return;
+ 
+ 	if (disconnect_by_ap)
+-- 
+2.34.1
+
