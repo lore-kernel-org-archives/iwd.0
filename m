@@ -1,170 +1,180 @@
-Received: from mail-oo1-f47.google.com (mail-oo1-f47.google.com [209.85.161.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from DB3PR0202CU003.outbound.protection.outlook.com (mail-northeuropeazon11021092.outbound.protection.outlook.com [52.101.65.92])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 561AA181BB5
-	for <iwd@lists.linux.dev>; Wed, 17 Jul 2024 16:33:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.47
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721233997; cv=none; b=R+ZZZVwPOA8jED6cnqfTzzFlhKUICHg6Yd+sGi1f3X7HZtV2LsPHUPBj8l0pIpy67HRiVwI8gkJKZYSCyGYcvPgwM6IUYq+rgCZwfIakKWIxJFK9cxoIOtAOkYqXLOetLPU7UASgXhQSMdRl4zvElRrbkcdSX52OICik79Ds95g=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721233997; c=relaxed/simple;
-	bh=MY8Z3SFTmPoFkkNetUcOaoelvieWGFcsIeNfkMlYNqQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=OO/D/hGQPKlpuKendl4lR22FVsPGZtaCxpcCeBYQYx0lSuiYXQpk8Buo7KL5GxwDutXCrqKqss7kp4AplEQjCRjL1bXCvXan1Vd2wMFMe7SVhrNYGJPD35xmDpFC4Cd95/UgjAEBj6GFZdhXiHQH29vUh5I8Euc+j5QujPVUbiA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OhyPsIea; arc=none smtp.client-ip=209.85.161.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 441A218EAB
+	for <iwd@lists.linux.dev>; Wed, 17 Jul 2024 19:35:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.65.92
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1721244920; cv=fail; b=d5hgOtXEudysSV57MDi2rixpgqx1VvVdbtblFLXmSTTuiKjOMehojjsVUZt4Ri6kMItMy0gyHKFbsh5Q14w2zll3nE7eoIzENKf2goPUPMaGJEI/HAnP6ymbM9pUiF5TPtSt8yrhIsDMRWp0a3bIvOkY4GiYr/mVEXAZF0fdX3M=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1721244920; c=relaxed/simple;
+	bh=fLcAP5FABDg8ODiTZxQlfbs+xmD4jX4QSWkuskcCShY=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=hQwbL0SBg2XXlHCvjQLvsyHgXvMSXAU4N/tDAKZRQWE8WsPEIY7i93mFC1JjL25A4uv3g3swZAigeEgXhV+8Ty055pP7UQ15ZO0OeDQpP3gPs7L0VDT+J2UwY3X0vdL16Cp4IYlL0Btup3tkYF32y7n+6HbadC5y6f0LY/7oapU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bang-olufsen.dk; spf=pass smtp.mailfrom=bang-olufsen.dk; dkim=pass (1024-bit key) header.d=bang-olufsen.dk header.i=@bang-olufsen.dk header.b=p2MKYTFt; arc=fail smtp.client-ip=52.101.65.92
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bang-olufsen.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bang-olufsen.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OhyPsIea"
-Received: by mail-oo1-f47.google.com with SMTP id 006d021491bc7-5c1d2f7ab69so588031eaf.3
-        for <iwd@lists.linux.dev>; Wed, 17 Jul 2024 09:33:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1721233995; x=1721838795; darn=lists.linux.dev;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=5L4bLaP6MNZZtHb7YbONlFK7PorUwC9YTeeRHO5va/U=;
-        b=OhyPsIea1TIpmB1jg+f4QISbZ44A1wKxqBPEbwsoCGWQbwZTT7EBt7cGUy0SmKeVOn
-         AWiLAL5udjMI/LG5vMejWbbKvjCvU/nehRmV3yEgavDB3lJNXb9BV69I5f5zv94k2iqr
-         iYKgbQHsrGDUCQokshKjb3yRNOrt4EAXY5Qk4ibryGsjDr6mAH3fDuxaSAPKSKPcssOy
-         MqiL7lDLL8+znabNo1SJPtCXrV7VtAwFQX5GJM3r9MGlo7PztT7KI9V6TIGOZHuhlT2d
-         l+Lcubs7jBMreGfJ1ljBpCEQaTPdMUMS36RQL7B91ZmjKuYWc0fCtYhZbLBLm8QBNeh2
-         XFlQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721233995; x=1721838795;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=5L4bLaP6MNZZtHb7YbONlFK7PorUwC9YTeeRHO5va/U=;
-        b=Fx//4QSbYwGZU7zweuDmmoWsnPONjJqdAHuEjCMH89CRQ5/6cp//bBJNGdbaRyRqTx
-         /aQaQbgfm8NFvDcNeLk5mtNYvS7JObCcsLKND1MKLOw6NyhbFRrp0Cu/QVhJGCcOLCqm
-         qhJDIAPB+YeCpuiurAFnIIQKzOUWSF/WNfRalVIJLG8dIpFqIRAGsTZDX9Eo+AQa6AE4
-         dGr0Q1rFPAGuEKGr2xvfleNB9aRxuId/L3vU5Te5rmYtzszZmvkJlCMxH5/erdPh6ort
-         YKi0XxltW1PWh6knF+CMbHBaWjOsJ1PY4NHIw+L3WqvQIU25Bglvyab5/4rZMxxCzvuC
-         5U/A==
-X-Forwarded-Encrypted: i=1; AJvYcCWUScTvxjhCXS24Rsm7eUjZ1k041AETSsbmJRfDs6GfqWr1hMR824xmkb8G2Bzfny0xVXndxZ6Po1wl+chOFk1hox8J
-X-Gm-Message-State: AOJu0Yyno80gDL0DqhDt9w//3iqbIWENmDsIHGhKBMM/t7+GOoy6ppdZ
-	BcohNhF3nShwNhToOymasnPzWDTlBJLJJjb9Z3OBm04/r3aW9K02
-X-Google-Smtp-Source: AGHT+IFJcqad0TW0c0vpxVlG4ph5Q+u6tJT54ucR+VMz468BWDQA1z5xulWpBekx1f/vSrPPH3ARPg==
-X-Received: by 2002:a05:6820:88f:b0:5c4:396e:4217 with SMTP id 006d021491bc7-5d4165556d7mr2947725eaf.0.1721233995278;
-        Wed, 17 Jul 2024 09:33:15 -0700 (PDT)
-Received: from [192.168.1.22] (syn-070-114-247-242.res.spectrum.com. [70.114.247.242])
-        by smtp.googlemail.com with ESMTPSA id 006d021491bc7-5d3ca599c74sm333288eaf.13.2024.07.17.09.33.14
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 17 Jul 2024 09:33:15 -0700 (PDT)
-Message-ID: <e006aeeb-9929-4787-864e-6f3a6993e62b@gmail.com>
-Date: Wed, 17 Jul 2024 11:33:14 -0500
+	dkim=pass (1024-bit key) header.d=bang-olufsen.dk header.i=@bang-olufsen.dk header.b="p2MKYTFt"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=Iob7JLUY/MHIIU1d79aHPweeKHV2Bt8SAGLLS2ROlAyj8vzleVzFe3Ui/GC9SljOHj2UrXeUCxeg1CTRmpjGr4nK0qrizYUPAT38VdzFWGuFNw9vXy2WXEDu1hFu1B2XJCubOSVO/T46q+3tHVeCVykp6RaS/KBSwHJ59sHxFZFdiiLOzXV8eCqUBetx20Bxz4HdIiwXHVmDAZ4+a4TwYMLfiyj2SReyAook2ZTlVFyd2VXkJH1jCHAoaZkHR7aSdSZBaGQ36hHXjLzj7YWRwwMfCc212XQlelVotv65t9nADTiXnA6w6LkW6fVuxczwofSkrDWwmChd/pvxC2BE2A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=fLcAP5FABDg8ODiTZxQlfbs+xmD4jX4QSWkuskcCShY=;
+ b=wcLqTpVrsrcTIjP9D73tXUbPozReY65SVwNywWXcfJKCSnZRrHWP+b78C0QWLc0OC3Fb9ZNap6/gI1KwChoq3271FFmgKg8aotHzTFk+dqTbFSPTf6WRn6bA1HtRyZtHn5kZZmROaDS1L9IbORpKmk4pTcr8iOwEQEusOdLRLr0At8XasdBpqT2FB44UdD7ZN+Phm6RqFcBPxM0s2KXVVhJGClDDoTWdGS1vyOIq0KJX3B3LY9W3+nJFF6zG0gGs3XtgIYgEklge5BZAJQXtw054F+wYM/3Mc0VB0yFgbvvGbPVRYdEqxsgSMai0Jp8bmXHqx5j/lU0hmb24++XqLA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=bang-olufsen.dk; dmarc=pass action=none
+ header.from=bang-olufsen.dk; dkim=pass header.d=bang-olufsen.dk; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bang-olufsen.dk;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=fLcAP5FABDg8ODiTZxQlfbs+xmD4jX4QSWkuskcCShY=;
+ b=p2MKYTFt1tAAFSoVjgYLX8f9iljKhC2ISdFSRpsdR0og1xyLuEgvYHvSgqQDu0jB4rfBDCPK3aFbz/vT7zf4f80QRohhd365dFbzEIMnq2tMx0BB2+K+CA6yWPfsaQwbiWN62457JSV8hQOY7O34SD+VvsKyM4eiJitL8zFisOo=
+Received: from AS8PR03MB8805.eurprd03.prod.outlook.com (2603:10a6:20b:53e::20)
+ by PAWPR03MB9716.eurprd03.prod.outlook.com (2603:10a6:102:2f2::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7762.31; Wed, 17 Jul
+ 2024 19:35:14 +0000
+Received: from AS8PR03MB8805.eurprd03.prod.outlook.com
+ ([fe80::6ac3:b09a:9885:d014]) by AS8PR03MB8805.eurprd03.prod.outlook.com
+ ([fe80::6ac3:b09a:9885:d014%3]) with mapi id 15.20.7784.016; Wed, 17 Jul 2024
+ 19:35:14 +0000
+From: =?utf-8?B?QWx2aW4gxaBpcHJhZ2E=?= <ALSI@bang-olufsen.dk>
+To: James Prestwood <prestwoj@gmail.com>
+CC: "iwd@lists.linux.dev" <iwd@lists.linux.dev>, =?utf-8?B?UGVkcm8gQW5kcsOp?=
+	<PEDA@bang-olufsen.dk>
+Subject: Re: [PATCH] netdev: handle disconnect event during the 4-way
+ handshake
+Thread-Topic: [PATCH] netdev: handle disconnect event during the 4-way
+ handshake
+Thread-Index: AQHa2FpVRa8w/qTuXE+jlMip0WtAF7H7UC8A
+Date: Wed, 17 Jul 2024 19:35:14 +0000
+Message-ID: <egk54l4s2ylywom72plctncrjbvwvd4h3ddcrnlnbqecl5f2l4@pd7ojuwyivf2>
+References: <20240717140009.2648885-1-prestwoj@gmail.com>
+ <a3c34f70-9620-4a27-ac76-ab55b2bc636c@gmail.com>
+In-Reply-To: <a3c34f70-9620-4a27-ac76-ab55b2bc636c@gmail.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=bang-olufsen.dk;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: AS8PR03MB8805:EE_|PAWPR03MB9716:EE_
+x-ms-office365-filtering-correlation-id: d0b38a24-47f3-48ac-562b-08dca69794ae
+x-ms-exchange-atpmessageproperties: SA
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|1800799024|376014|366016|38070700018;
+x-microsoft-antispam-message-info:
+ =?utf-8?B?MVJnMWFaZllYN3lFU09IVVQxbXg1bTVHNDNhWkNpZDhZU3JnVWNPNFZObEdO?=
+ =?utf-8?B?WDdNblVGZk1oNGdYTFM2M0NBb1VUZk90SU01bFFSM2VET1VsSHNwNVVaR2hs?=
+ =?utf-8?B?TlE4aklpWUtML09UMndiQkpJSUtqZElIUDlxMXd0ZHh1RGdFT1IyUHdYc1oy?=
+ =?utf-8?B?eWx2bzZnZ3FsWGx3TWpiM0tGaVo4OXRiN0YyY2Y5UXFlbnhocVBUTzVLWHEv?=
+ =?utf-8?B?M2NHbGk2ME1MQ1BzZWtBNjlnS0VYV3J4OW52SVBvOFJPOWc4L21jVXc5SlQw?=
+ =?utf-8?B?Y1FCUldUckw4ZURNb2dDcThRTkRKRlYzU2VpeEprcGRVMHpvb25hbWxsZ1Rh?=
+ =?utf-8?B?VXhRUFlkeTFHMkZFVG9tODhwVFBHQi9lLzFiditHb3VOU0drV1FoTEQwMk1G?=
+ =?utf-8?B?ekNFT1FiajV5cHdjNmNuck4xTkg3NEVnOFhtQm4rWHlRK1lLRHhKTW90S3Br?=
+ =?utf-8?B?elMzd080MlVnSGdkU0x5c3V0cG52Vml2TEFtUytRWlAwR28yMThZVjhMWitZ?=
+ =?utf-8?B?Z2VNMTVPdDRTYzZhWWhHSFduZ015RlJHeEJLeGxaOFhUdDdnL20rcU1ZTCtK?=
+ =?utf-8?B?K3ZNY2h3ZzJZU2wwZVMzY2lyTUNJS2djV0UwQmxHRGw0a201Q1RCcytGQzJq?=
+ =?utf-8?B?eUc3ZWxoSW9TQ2pUeGJjRFpPYVlxMjB0ODM2RUFPUXhEV2xvdHZreGJndXY4?=
+ =?utf-8?B?WjRBK3BRUHhBeXAxOTZycWlEYnhLTmVRbkRzWjNZQWZPOWpGOTVzWkNhLzc3?=
+ =?utf-8?B?ZjE1VmJZTXh2OEtIbmZyTk54MkxMWE52K3dwbUdqaCtXK0tMU0RXL05CdUpB?=
+ =?utf-8?B?bUZUZ0VYbENFR0hhaUpMOThTM3h6VXM1WjYyREdPcVVWcTE1ckFibldzQUVV?=
+ =?utf-8?B?TStlSjNOYkxOOXl2cXVtc28yS2REbW10RFhIS3BpM2lURmVrdEp5cGVyZkg5?=
+ =?utf-8?B?TGlPWExTVTVUaFhldkdrOHR5U2hBaXB4azJSNHA5Y1FVWXc5Ukd2ZUlycENE?=
+ =?utf-8?B?clBhbVFWSHZiQkkvZUEwME1BRU9MS3NEWGxiZnh2UG1LcFJWZFdBbFM3VStU?=
+ =?utf-8?B?NnRjajZ1UlYxQlFzeGhlZUt5dUxjMkowdFdOSFJsVkdPZ2RnUmdxNjVPUEdO?=
+ =?utf-8?B?dTBWN3M5SG91bGVTelJucEpZS1hNdGpXTkNzdjViUVpHa2I1ellFalZjdXVE?=
+ =?utf-8?B?VlNhS2JTTHFrdmFHSWg2S1hHcHVlbU03MVBpby91Um1KSXJLL2xTWWJuYmly?=
+ =?utf-8?B?dUVlU29UcXZwdTI0RjdSQzFDSkY3VE1GajB4dXdva3Nya3dyNkhpc3UxQUMy?=
+ =?utf-8?B?TFFUS2R4TktXMWlHUVA1SEZzVlNOUG11SzNWQUN3ZTdGcWJZK2p5OGpEbXE3?=
+ =?utf-8?B?di9jWGlGZDg1TjdCaFExM0Y2TmdaTFhmV0lzMS95aWhCK2hhZXpFaEpudXhz?=
+ =?utf-8?B?NkZpRzR2WHlzUVpHdklsYUc4TEp3NmdNN2pwNzNYVWtYYVlYY3dEMWZJVXlI?=
+ =?utf-8?B?TEhHelgyV3hMOEhjWXR0dkh3OEN5V3paQnJYcHhKeTRsSVd2U1FsL2NlQkhh?=
+ =?utf-8?B?TzFVbWVWUy9YQ09qeUprc1Y5WjZuSTUvSi9hb2lhVnJ1RUtoN0s0dUxWaTRj?=
+ =?utf-8?B?eFRpMksxZzgyM3JRRjBscG9Oams3Qnk0Rkl0N1hZenNiQlRneDB5VXFWTmth?=
+ =?utf-8?B?blhVdzFTWEt0eDZvSzgvemNsWklvUWdDeXBreXhRdUJkbXBXdk1pTmNGNjQz?=
+ =?utf-8?B?MVA4ZFNjQ3U5Wks3bVNqNXlhbG11ZFl6alU0KytMdkhab2htME5LeUJIMDUr?=
+ =?utf-8?Q?O1AvJ97ErEbnYXOkQNT8aOg4zYVr6wLa2iUCw=3D?=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AS8PR03MB8805.eurprd03.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(366016)(38070700018);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?utf-8?B?Y3NFdllGVjA4a2xrUmVaL1RVd0U4dFBZcjFGUlU3MSttYlRQQzZUakcvSnhO?=
+ =?utf-8?B?MGc3RWFITmxIeTNtRWc0bVJFNE1RdDI0RGpROWFCb2xCUHBnZkhwRWJYMUpy?=
+ =?utf-8?B?N3czY3RFdTlYbC9ia1U1aWFORWJZQWhzbmZCR3RRb2NjeE4vbVZsRkNSSnBC?=
+ =?utf-8?B?M0lCa244dDJ6QStSUXlNVWRmQmhQWUkvdnVuZWNjVlZobnZkWHllL2MrVTF1?=
+ =?utf-8?B?TXQwZWYxajJYWEtsa2VBa2pmY1ptazNZS0J6RnV6TTNwUGtSQjBId2pnR3A4?=
+ =?utf-8?B?ODBnOEpGVmVJVnN4M2ZmY1BUWDNvOWpWYno0VkladG9FclEwNzR2TlY1cnNQ?=
+ =?utf-8?B?R2toRnp0T2JTY3lZOUVDZng2RXI2eTYvOWFMbDdaR3FVVTJZMm9qeXB2TmV2?=
+ =?utf-8?B?OWdrUU8yRVYycUNQSS83S0tZZ2Q0dGVLRmlhMGlobnB5UkZXVUs5WWQvdU9T?=
+ =?utf-8?B?WFJHQ0lacVV1NFFUKzJkSk1zU0x2Snc4ay80TTRqN2xSdUExa0ZIVVpBMVVu?=
+ =?utf-8?B?WXlNRGUyaFk3dTBjNEZFTkZzMHJuVWFxM1Vkb3BhZkNIZ1lVKzlPdDdPajc4?=
+ =?utf-8?B?UEdJOGNqS1RYUlpHYVBMQ1RoMHdZN3MzVWFzalhYaUk3M2hUMjM2TzZ2Tmpv?=
+ =?utf-8?B?SDBSVDcyRVFBUkFKTDh2eHhHUmMwUmpDVmc4UlJnc0VlNlR5aXpIbGE2TG54?=
+ =?utf-8?B?SCtpd2RjMWpzQm5nNUQ0YUE3ZXlLMlVJQXJIM2dMOTV2UFA2TEdOemVjc1Jx?=
+ =?utf-8?B?SG1meUZ2bkJMOGNnSU5zUUFnWFRzWml4VUFvN3EzaWV4Ukh5dzRxNkNKSlIr?=
+ =?utf-8?B?cDBuTE83cENtNW5SR3hLdUVpS0hkSThrSkplTXZ6QVJpTjlXOWNnWHNRTndD?=
+ =?utf-8?B?S3FxZ2c5SG9QaFo3aVlmU0F3ZUxWdmp4ZkpLQW9mQmpiMzBrblZOVDJYNUla?=
+ =?utf-8?B?SnBQc0IvNlhHcEt0WHY2bWN3MzA1cTlnbk93WjJlS2RIVXNlL2VNUUlwS3Bj?=
+ =?utf-8?B?UXJ4cFVNT3NUYWxSK2h5S0RHK1V2cEVGQmw2OWdVYTNqbCszNXN5Q1ptUlBD?=
+ =?utf-8?B?NFBjQlhNRHprOTIyem9MMjR4RjRicWFSV2p0MzBSRlppUWdvOU9YS0t6SGVK?=
+ =?utf-8?B?dmNjUytxclgvUlJaT2F5VGgzZFFiT0x2cG9OQkhzWTJ6REZkamQrZFNmaE9Q?=
+ =?utf-8?B?ODVmdzB6aWk3UEkwNGF1RDBVVlUvUCtzYzZKSjhuNHFPb1dUNDJJSXlUTEpN?=
+ =?utf-8?B?a1djWnViZUhNbjNlQ2YzNG81V0svbU9XQjRuMmU2cXgwbE5rcVhVbndLeENl?=
+ =?utf-8?B?bTU5VFFYeXUxbFhDcEJSUTRuS3I4MlhWV1AzVGJlRHV5WWhqOUR6eVBJWXlk?=
+ =?utf-8?B?VWl1VWtaMWdELzl6MHJ0R3hPa3IyMmFBUWxmQ2luWTBCU1hUY21BN1RuZmhI?=
+ =?utf-8?B?NklaWjlIcktESnNBNTR2QjU1VVBVS1pWeitjVGZqWUE5eXhnaHN2QnBkNHhY?=
+ =?utf-8?B?MGFneHJRK00zWHgvMlY3Yy9vYTFIV0xXT3QrNzQ2N0tBTzZTeTIzYnBkY2VP?=
+ =?utf-8?B?QmU5Z2IrclVSK01uQjdJNjB1VGdwb0JudnhKRzFaMktvS3g5UVUreW1mK0hL?=
+ =?utf-8?B?QWtKVUh3UkJxQit2cStHdll0bzBoOFZUQ2FON1FaMnpLdVRDckFJL0tmZWxs?=
+ =?utf-8?B?SDN5OUM1VlRXcHRZYjNvTGJLQ1VaSGxmVlFWbzV1amRYMHdFc0xPUGg3VXB3?=
+ =?utf-8?B?dXIzSGdLMFN0MzlkRVdsRURqOUloMXg2WTJjdkIrTG4zVFQrQXBtOUlsQWF1?=
+ =?utf-8?B?bHNGa2l1L0l4Rk9uUDEvY1Y2bWFvVHdLSURJYnJYUDBZNDI2YmxSZjhmT3l6?=
+ =?utf-8?B?NFI5WFBlMGpxMVB3YlJPbEtYV1Avb1p5dEF3elJtZnVCaGQ2VVcvanBJc0lv?=
+ =?utf-8?B?ek5VcFI0Ry90R1FOR2dnVGNiTUpvbzNLVHdGQTE5aUVDVWxWd3plSVgrb3JV?=
+ =?utf-8?B?TDB3ZGY4R0V5dlVqdWtCWTVmRlJWRTdVQ3FERGMwRmJGVHpaajVsTlo2eUpT?=
+ =?utf-8?B?RFQzOXdYTmFTNkFJeXMwVE1BL2ZOekY0RW5IWEYrWkFBLy9tUjBCK1c1WWFs?=
+ =?utf-8?Q?wR/WNtMS6Bu7n1NhOZBoZhqeW?=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <9370D76698CA7B40B691BF387F1DDCA1@eurprd03.prod.outlook.com>
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] netdev: handle disconnect event during the 4-way
- handshake
-To: James Prestwood <prestwoj@gmail.com>, iwd@lists.linux.dev
-References: <20240717140009.2648885-1-prestwoj@gmail.com>
-Content-Language: en-US
-From: Denis Kenzior <denkenz@gmail.com>
-In-Reply-To: <20240717140009.2648885-1-prestwoj@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+X-OriginatorOrg: bang-olufsen.dk
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: AS8PR03MB8805.eurprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: d0b38a24-47f3-48ac-562b-08dca69794ae
+X-MS-Exchange-CrossTenant-originalarrivaltime: 17 Jul 2024 19:35:14.4135
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 210d08b8-83f7-470a-bc96-381193ca14a1
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: HQyJ93oCx7nSmX7LaN1LsBLwMtXxfZ0/QGky4SMc4/J8xjdKMjAgRrZqet/3j4KqW/D5PeuNZ/u+c1ajJBsYaw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PAWPR03MB9716
 
-Hi James,
-
-On 7/17/24 9:00 AM, James Prestwood wrote:
-> If a disconnect arrives during the 4-way handshake this would result
-> in netdev sending a disconnect event to station. If this is a
-> reassociation this case is unhandled in station and causes a hang as
-> it expects any connection failure to be handled via the reassociation
-> callback, not a random disconnect event.
-> 
-> To handle this case the disconnect event can check if there is a
-> pending connect callback and call that instead of the event handler.
-> 
-> Below are logs showing the "Unexpected disconnect event" which
-> prevents IWD from cleaning up its state and ultimately results in a
-> hang:
-> 
-> Jul 16 18:16:13: src/station.c:station_transition_reassociate()
-> Jul 16 18:16:13: event: state, old: connected, new: roaming
-> Jul 16 18:16:13: src/wiphy.c:wiphy_radio_work_done() Work item 65 done
-> Jul 16 18:16:13: src/wiphy.c:wiphy_radio_work_next() Starting work item 66
-> Jul 16 18:16:13: src/netdev.c:netdev_mlme_notify() MLME notification Del Station(20)
-> Jul 16 18:16:13: src/netdev.c:netdev_link_notify() event 16 on ifindex 6
-> Jul 16 18:16:13: src/netdev.c:netdev_mlme_notify() MLME notification Deauthenticate(39)
-> Jul 16 18:16:13: src/netdev.c:netdev_deauthenticate_event()
-> Jul 16 18:16:13: src/netdev.c:netdev_mlme_notify() MLME notification New Station(19)
-> Jul 16 18:16:13: src/station.c:station_netdev_event() Associating
-> Jul 16 18:16:13: src/netdev.c:netdev_mlme_notify() MLME notification Authenticate(37)
-> Jul 16 18:16:13: src/netdev.c:netdev_authenticate_event()
-> Jul 16 18:16:13: src/netdev.c:netdev_mlme_notify() MLME notification Associate(38)
-> Jul 16 18:16:13: src/netdev.c:netdev_associate_event()
-> Jul 16 18:16:13: src/netdev.c:netdev_link_notify() event 16 on ifindex 6
-> Jul 16 18:16:13: src/netdev.c:netdev_mlme_notify() MLME notification Connect(46)
-> Jul 16 18:16:13: src/netdev.c:netdev_connect_event()
-> Jul 16 18:16:13: src/netdev.c:netdev_connect_event() aborting and ignore_connect_event not set, proceed
-> Jul 16 18:16:13: src/netdev.c:netdev_connect_event() expect_connect_failure not set, proceed
-> Jul 16 18:16:13: src/netdev.c:parse_request_ies()
-> Jul 16 18:16:13: src/netdev.c:netdev_connect_event() Request / Response IEs parsed
-> Jul 16 18:16:13: src/netdev.c:netdev_get_oci()
-> Jul 16 18:16:13: src/netdev.c:netdev_link_notify() event 16 on ifindex 6
-> Jul 16 18:16:13: src/netdev.c:netdev_link_notify() event 16 on ifindex 6
-> Jul 16 18:16:13: src/netdev.c:netdev_link_notify() event 16 on ifindex 6
-> Jul 16 18:16:13: src/netdev.c:netdev_get_oci_cb() Obtained OCI: freq: 5220, width: 3, center1: 5210, center2: 0
-> Jul 16 18:16:13: src/eapol.c:eapol_start()
-> Jul 16 18:16:13: src/netdev.c:netdev_unicast_notify() Unicast notification Control Port Frame(129)
-> Jul 16 18:16:13: src/netdev.c:netdev_control_port_frame_event()
-> Jul 16 18:16:13: src/eapol.c:eapol_handle_ptk_1_of_4() ifindex=6
-> Jul 16 18:16:13: src/netdev.c:netdev_mlme_notify() MLME notification Control Port TX Status(139)
-> Jul 16 18:16:14: src/netdev.c:netdev_mlme_notify() MLME notification Notify CQM(64)
-> Jul 16 18:16:14: src/netdev.c:netdev_cqm_event() Signal change event (above=1 signal=-60)
-> Jul 16 18:16:17: src/netdev.c:netdev_link_notify() event 16 on ifindex 6
-> Jul 16 18:16:17: src/netdev.c:netdev_mlme_notify() MLME notification Del Station(20)
-> Jul 16 18:16:17: src/netdev.c:netdev_mlme_notify() MLME notification Deauthenticate(39)
-> Jul 16 18:16:17: src/netdev.c:netdev_deauthenticate_event()
-> Jul 16 18:16:17: src/netdev.c:netdev_mlme_notify() MLME notification Disconnect(48)
-> Jul 16 18:16:17: src/netdev.c:netdev_disconnect_event()
-> Jul 16 18:16:17: Received Deauthentication event, reason: 15, from_ap: true
-> Jul 16 18:16:17: src/wiphy.c:wiphy_radio_work_done() Work item 66 done
-> Jul 16 18:16:17: src/station.c:station_disconnect_event() 6
-> Jul 16 18:16:17: Unexpected disconnect event
-> Jul 16 18:16:17: src/netdev.c:netdev_link_notify() event 16 on ifindex 6
-> Jul 16 18:16:17: src/wiphy.c:wiphy_reg_notify() Notification of command Reg Change(36)
-> Jul 16 18:16:17: src/wiphy.c:wiphy_update_reg_domain() New reg domain country code for (global) is XX
-> ---
->   src/netdev.c | 15 ++++++++++++++-
->   1 file changed, 14 insertions(+), 1 deletion(-)
-> 
-
-<snip>
-
-> @@ -1310,9 +1312,20 @@ static void netdev_disconnect_event(struct l_genl_msg *msg,
->   
->   	event_filter = netdev->event_filter;
->   	event_data = netdev->user_data;
-> +	connect_cb = netdev->connect_cb;
-> +	user_data = netdev->user_data;
->   	netdev_connect_free(netdev);
->   
-> -	if (!event_filter)
-> +	/*
-> +	 * If a deauth frame come in after the connect event during the 4-way
-> +	 * handshake we need to handle this via the connect callback since its
-> +	 * still effectively a connection failure.
-> +	 */
-> +	if (connect_cb) {
-> +		connect_cb(netdev, NETDEV_RESULT_AUTHENTICATION_FAILED,
-> +				&reason_code, user_data);
-> +		return;
-> +	} else if (!event_filter)
->   		return;
-
-Can we use netdev_disconnected() instead?
-
->   
->   	if (disconnect_by_ap)
-
-Regards,
--Denis
+SGkgSmFtZXMsDQoNCk9uIFdlZCwgSnVsIDE3LCAyMDI0IGF0IDA4OjAyOjE3QU0gR01ULCBKYW1l
+cyBQcmVzdHdvb2Qgd3JvdGU6DQo+ICsgQ0MgQWx2aW4NCj4gDQo+IFlvdSBoYWQgb3JpZ2luYWxs
+eSByZXBvcnRlZCBbMV0gYSBzaW1pbGFyIGlzc3VlIGJ1dCBpdCB3YXMgdW5jbGVhciBleGFjdGx5
+DQo+IHdoYXQgd2FzIGhhcHBlbmluZyBhdCB0aGUgdGltZS4gSSBiZWxpZXZlIHRoaXMgaXMgdGhl
+IHNhbWUgcHJvYmxlbS4gVGhpcyBtYXkNCj4gbm90IGJlIHRoZSBmaW5hbCB2ZXJzaW9uIG9mIGEg
+Zml4LCBidXQgSSB3YW50ZWQgdG8gQ0MgeW91IGluIGNhc2UgeW91IHN0aWxsDQo+IHdlcmUgc2Vl
+aW5nIHRoaXMgYW5kIHdhbnRlZCB0byB0ZXN0IGl0Lg0KPiANCj4gWzFdIGh0dHBzOi8vbG9yZS5r
+ZXJuZWwub3JnL2l3ZC8yMDIzMDQwMzE0MTkyNy4yMzUwMTQtMS1hbHZpbkBwcXJzLmRrLw0KDQpJ
+dCdzIGJlZW4gYSB3aGlsZSBzaW5jZSBJIGRlYWx0IHdpdGggdGhpcyBwcm9ibGVtLCBhbmQgaW4g
+dGhlIG1lYW4gdGltZQ0Kd2UgaGF2ZSBiZWVuIHVzaW5nIHRoZSBvcmlnaW5hbCBwYXRjaCBJIHNl
+bnQgdG8gdGhlIGxpc3QgYXMgc2VlbiBpbiB5b3VyDQpsaW5rLiBVbmZvcnR1bmF0ZWx5IEkgZG9u
+J3QgcmVjYWxsIGhvdyBJIHJlcHJvZHVjZWQgdGhpcyBpc3N1ZSwgYnV0DQptYXliZSBteSBjb2xs
+ZWFndWUgUGVkcm8gKCtjYykgcmVtZW1iZXJzLg0KDQpSZWdhcmRsZXNzLCBhIHN0YXRpYyBjb2Rl
+IGFuYWx5c2lzIHN1Z2dlc3RzIHRoYXQgeW91ciBwYXRjaCB5aWVsZHMgdGhlDQpzYW1lIHJlc3Vs
+dCwgc28gSSB0aGluayB0aGlzIGlzIGdvb2QgLSBvbmUgbGVzcyBwYXRjaCBmb3IgdXMgdG8gYXBw
+bHkgOikNCg0KRG8geW91IGhhdmUgc29tZSBlYXNpbHkgY29tbXVuaWNhYmxlIHN0ZXBzIHRvIHJl
+cHJvZHVjZSB0aGlzIGlzc3VlIG9uDQp5b3VyIGVuZD8NCg0KVGhhbmtzIGZvciBmb2xsb3dpbmcg
+dXAgb24gdGhpcyENCg0KS2luZCByZWdhcmRzLA0KQWx2aW4=
