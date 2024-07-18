@@ -1,119 +1,110 @@
-Received: from mail-qv1-f51.google.com (mail-qv1-f51.google.com [209.85.219.51])
+Received: from mail-yb1-f182.google.com (mail-yb1-f182.google.com [209.85.219.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45EF31CD26
-	for <iwd@lists.linux.dev>; Wed, 17 Jul 2024 21:18:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CA0613AA39
+	for <iwd@lists.linux.dev>; Thu, 18 Jul 2024 11:45:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721251132; cv=none; b=MXQhwgcHntgGjnU4q7LxqKCschS7AzemxhCS8EWHJq7/itvlGREZJf8g6LtWg/0w+mWeUOPwpkciIjieH1NFFc2c7DzWgwVf07sNecX2khQ5RHfuE8y6C+0q+vNPlAprmkglW6Y0PHcLBm9utRMerfMRcKOrrwKZMB+aboejHkY=
+	t=1721303121; cv=none; b=RKEx4Pdce7dUgdeHpaRZMW/m/ypj71vV08agXIrDsISkkt7fBFvZIJ/rgMnk1Thhz/gYR7V/sgusaAQmADAakg/XS9wPlzVlYjkVH1DEpeFLp34O9o/1FUDZUBsOzwHYIdrC4i5+OwLry3bH6ln3LWw2o7gl1XfDza3aHFoFqa0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721251132; c=relaxed/simple;
-	bh=KWtSn6EcnuE/E52JWa0/GHFdN4ZXpUhXuFXppyO8WcQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=krxmu+NpxbrPzocZwjNOsfANf28zeMWqAwmAp3XRDMDvuHllT7CLOnf+THVHy1nmKDwpbG66LZIhAvYNP0+VfxczD99PqzecABZ1bN946bvaccc76uveSk7flgfoifOMMoy/ML7CV3SV/r6YSvrc/nHZS6o58POFtrZ1BZwuw8k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OOroKzJN; arc=none smtp.client-ip=209.85.219.51
+	s=arc-20240116; t=1721303121; c=relaxed/simple;
+	bh=EkoOn3dpDpQzEEVwsPsHcNdOnhGOx1B0BPKQbeFu6wg=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=AQJ4i5XWZlAOY1oG0TNFX78pjaum7DCR83nNFvU1PsFhS1YJXyR2LfF7+zN99ZnKlDVbfI20uJNAMzSqRQKhuriUpfCEBCIlK+6tYLG78LaGfVuJpIco1XyDnI5Pjc8HKSfNPcju77AImvwYANtWlXCmFaiUEeJ12iagI2SF6Rg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=T2Kfk6R7; arc=none smtp.client-ip=209.85.219.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OOroKzJN"
-Received: by mail-qv1-f51.google.com with SMTP id 6a1803df08f44-6b5f46191b5so840096d6.3
-        for <iwd@lists.linux.dev>; Wed, 17 Jul 2024 14:18:47 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="T2Kfk6R7"
+Received: by mail-yb1-f182.google.com with SMTP id 3f1490d57ef6-e05f2adab8bso689768276.1
+        for <iwd@lists.linux.dev>; Thu, 18 Jul 2024 04:45:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1721251126; x=1721855926; darn=lists.linux.dev;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=kQW4oGawQjM824KnDLrqtd/zRSKBH2LITVGqcL/Y+Ak=;
-        b=OOroKzJN8vPsudKuMHQtxCwv1Oiz6EQ2iFFYGINdf81Jr8up0cKX2IyurmmX/1u2VJ
-         ldcLDQHTbuDSW03nxVEGWuGYTZeSYDJ1yR155IysQmqy9O1EcRUcTRpPVplapCpC7YW+
-         zZFFRfbQvlQCH73fcmaal/zlBaV/c03jHrz4gkm7cmmWSxgVyTtdIkgA/ehM98+TVcSM
-         nK/RogI3GCAB7ueEFcS8iZ8jsPjHeCqUKB6MxSmc5pi6CzX/HMtJ/N7sC3f3NbmBwRC4
-         qGuf0YXIN5V0ZPk0b6zz4NZF6Gz8gk0YEzoZUy7OujXeeidn6wEooMqkJ4FtLNm6ViwN
-         2X7g==
+        d=gmail.com; s=20230601; t=1721303119; x=1721907919; darn=lists.linux.dev;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=fs9uBDk2AKuSpZ/cJ2wKHccSIh0serP7VMqC6HxMKvM=;
+        b=T2Kfk6R79rAj9qDQrgaUB6lbg6GUglENmm/1NY+oyOy0oDa437QUQDwFGis3kMz5u3
+         k4DSCJ8BuDxb2w8Anu+J9zzELBs0iV605vXmLjA9wcJlex21OTc0Mit04rAlU7nxkHgT
+         8lOmSWNtj02FUefXaldvy4ui/3W94xAcVQeu3Ry6vG0FJtsLs7wteCnMgceGBEmJ7a2d
+         GSAsx0oALZ5cuk5uU9BzUMki44x2STR67DEJgriMA1knvIBLNpa/MKdO9Mq0Y/FVkTye
+         zVignzufQygcnqcDS9jZYpchGe/aqfCokTktMweFXtvma+ChTfF7ccuFQ6goOwLogPKw
+         fOYg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721251126; x=1721855926;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=kQW4oGawQjM824KnDLrqtd/zRSKBH2LITVGqcL/Y+Ak=;
-        b=fO3RBplmNRxTdUUPRn2523IxTKkeLLUZnKYuGv0wUIPn87hwqm4fePujI1bNsAfBkr
-         jax0rfBa0j3mwpNgjGdG7uiEjBlapUR/XsHe0gOw9lFQt/iCaditFFsN65Qo7X9I1/uS
-         d7sBNvQ+/m2k6qIkK9CWCFW5Wd29WntmAsJ2aqjvMVCUuJPpQomT7mD0Lmf+ZlK7OaVv
-         dEcEGtWZGScJqcacrVKNjsfrzJOXRVHWDUhqSYDBqs2+MI0YepjUNhte62i4s63ak0q3
-         bcid5CUDMSPjHQlPYgzMoEGt+Rj4s9s/MtiCOW6IZlbVTJtxa6ta47+vJFhawtd5+8hs
-         r6ng==
-X-Gm-Message-State: AOJu0YxAGh8xZDVM4pCZ3VgM3KRobXOKq9vWxjGIsV3aTHqR3ba/oUXb
-	xbHA5OVRp0oag8qIxSyUvIpIgiQhM9ZVdRvdSRUjIz+gEHjIY/Rr5i2rkQ==
-X-Google-Smtp-Source: AGHT+IFcj7ZUdxoGDRsumpnBpYRyQWV7aEYBsIP8GR9NfxoEtI3MGdb5qvb9MNL85KrYsjvYmysYtw==
-X-Received: by 2002:a05:6214:2b0f:b0:6b4:fbec:952f with SMTP id 6a1803df08f44-6b78cacf392mr39676406d6.25.1721251126146;
-        Wed, 17 Jul 2024 14:18:46 -0700 (PDT)
-Received: from [10.102.4.159] ([208.195.13.130])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6b79c4cd2efsm2365666d6.23.2024.07.17.14.18.43
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 17 Jul 2024 14:18:45 -0700 (PDT)
-Message-ID: <0bcb2fdf-69c2-4bc3-84ce-52b72d60836b@gmail.com>
-Date: Wed, 17 Jul 2024 14:18:42 -0700
+        d=1e100.net; s=20230601; t=1721303119; x=1721907919;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=fs9uBDk2AKuSpZ/cJ2wKHccSIh0serP7VMqC6HxMKvM=;
+        b=lox7hatMWn1QvDWUFr8VsDLu5gl4RptBTmX4P5AzvOAxjw1X9fBf8L6lI1K9ZoO88B
+         D6n4xVooaaEGPafbbplGFZZwiU8eqCopNlc/W3LdfRLsPjyRJ78WPN7FIbNbG8S8cg6j
+         XGvhZNB4XQOfrxv7WR+BaW2JbLvJsB0xRGbgOiNVBuc8edfXWnxW8Gz+GjXk5BGJwmF2
+         O9jYcJO1hfvBFEsKCWofm9MJaLXFwch3GF3Kl5OMkznmBHPGUEWu7VCJLcaXldA+INJM
+         csr+BDKDTI15jv3t4vV2QCe4XI+YVjrWxplDrARn2E2CvFwryb+W0Il9FzmHoSv88w6V
+         QF6g==
+X-Gm-Message-State: AOJu0Yyj2ueoaxiEMhdT3nNyUCcavh/qI/uM5yIYSs5qVBtiuTE+EmbN
+	86kW+wp02YGfZIb3X02o6Yj2vEGlGjcD28hTZVsrAtXCCPgaETOl9OobTw==
+X-Google-Smtp-Source: AGHT+IEiMaKUPLGkZ32DsDmC+kQyybzv1YCb58M6LLwHRU0tE1aukkEtYMyXAIphMkRFG5N+rCKBaw==
+X-Received: by 2002:a05:6902:e0d:b0:e03:62f2:8294 with SMTP id 3f1490d57ef6-e05ed798cf4mr5473495276.43.1721303118668;
+        Thu, 18 Jul 2024 04:45:18 -0700 (PDT)
+Received: from LOCLAP699.localdomain ([208.195.13.130])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6b79c5138bbsm7292006d6.61.2024.07.18.04.45.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 18 Jul 2024 04:45:18 -0700 (PDT)
+From: James Prestwood <prestwoj@gmail.com>
+To: iwd@lists.linux.dev
+Cc: James Prestwood <prestwoj@gmail.com>
+Subject: [PATCH v2 00/11] Refactor to unify connect failure code path
+Date: Thu, 18 Jul 2024 04:45:03 -0700
+Message-Id: <20240718114514.2916258-1-prestwoj@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] netdev: handle disconnect event during the 4-way
- handshake
-To: =?UTF-8?Q?Alvin_=C5=A0ipraga?= <ALSI@bang-olufsen.dk>
-Cc: "iwd@lists.linux.dev" <iwd@lists.linux.dev>,
- =?UTF-8?Q?Pedro_Andr=C3=A9?= <PEDA@bang-olufsen.dk>
-References: <20240717140009.2648885-1-prestwoj@gmail.com>
- <a3c34f70-9620-4a27-ac76-ab55b2bc636c@gmail.com>
- <egk54l4s2ylywom72plctncrjbvwvd4h3ddcrnlnbqecl5f2l4@pd7ojuwyivf2>
-Content-Language: en-US
-From: James Prestwood <prestwoj@gmail.com>
-In-Reply-To: <egk54l4s2ylywom72plctncrjbvwvd4h3ddcrnlnbqecl5f2l4@pd7ojuwyivf2>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-Hi Alvin,
+v2:
+ * Combined two earlier patch sets (autotests and netdev patch)
+ * Call netdev_disconnected() rather than handle the logic manually
+ * Add new NETDEV_RESULT_DISCONNECTED to cover any disconnect issued
+   by the AP during the connection stage. This cover the 4-way
+   handshake or key setting, or anything in between.
 
-On 7/17/24 12:35 PM, Alvin Šipraga wrote:
-> Hi James,
->
-> On Wed, Jul 17, 2024 at 08:02:17AM GMT, James Prestwood wrote:
->> + CC Alvin
->>
->> You had originally reported [1] a similar issue but it was unclear exactly
->> what was happening at the time. I believe this is the same problem. This may
->> not be the final version of a fix, but I wanted to CC you in case you still
->> were seeing this and wanted to test it.
->>
->> [1] https://lore.kernel.org/iwd/20230403141927.235014-1-alvin@pqrs.dk/
-> It's been a while since I dealt with this problem, and in the mean time
-> we have been using the original patch I sent to the list as seen in your
-> link. Unfortunately I don't recall how I reproduced this issue, but
-> maybe my colleague Pedro (+cc) remembers.
->
-> Regardless, a static code analysis suggests that your patch yields the
-> same result, so I think this is good - one less patch for us to apply :)
->
-> Do you have some easily communicable steps to reproduce this issue on
-> your end?
+There are some additional unrelated patches, and more autotest fixes
+that were needed as a result of some prior changes
 
-I was able to write an autotest for it that took that code path. Its 
-basically just as you thought from your previous thread. If a deauth 
-frame comes in during the 4-way handshake or key settings during a 
-reassociate roam it triggers that "Unexpected disconnect" path in 
-station, causing IWD to hang up and not clean up its state.
+James Prestwood (11):
+  station: print unknown channel number in neighbor report
+  netdev: add NETDEV_RESULT_DISCONNECTED
+  station: handle NETDEV_RESULT_DISCONNECTED
+  station: update logic for handshake failure
+  netdev: handle disconnect event during a connection
+  eapol: move HANDSHAKE_STARTED_EVENT to eapol_start()
+  station: add handshake-started debug event
+  auto-t: add clear_events() to IWD class
+  auto-t: add reason/test arguments to hostapd deauthenticate
+  auto-t: Add deauth during the 4-way handshake test
+  auto-t: a few random autotest fixes
 
-I just wanted to check in with you that its being fixed. Denis and I 
-have been discussing it and my ML patch still isn't quite how he wants 
-it, but we think we know how it should be handled.
+ autotests/testEncryptedProfiles/ssidCCMP.psk  |   3 +
+ .../disconnect_during_handshake_test.py       | 112 ++++++++++++++++++
+ autotests/testPSK-roam/failed_roam_test.py    |   3 +
+ autotests/testPSK-roam/ft-psk-ccmp-1.conf     |   2 +-
+ autotests/testPSK-roam/ft-psk-ccmp-2.conf     |   2 +-
+ autotests/testPSK-roam/ft-psk-ccmp-3.conf     |   2 +-
+ autotests/testPSK-roam/main.conf              |   3 +
+ .../testPSK-roam/roam_ap_disconnect_test.py   |  12 +-
+ autotests/util/hostapd.py                     |   6 +-
+ autotests/util/iwd.py                         |   6 +
+ src/eapol.c                                   |   4 +-
+ src/netdev.c                                  |  19 +--
+ src/netdev.h                                  |   2 +
+ src/p2p.c                                     |   1 +
+ src/station.c                                 |  39 ++++--
+ 15 files changed, 184 insertions(+), 32 deletions(-)
+ create mode 100644 autotests/testPSK-roam/disconnect_during_handshake_test.py
 
-Thanks,
-James
+-- 
+2.34.1
 
->
-> Thanks for following up on this!
->
-> Kind regards,
-> Alvin
