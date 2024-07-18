@@ -1,62 +1,62 @@
-Received: from mail-qv1-f48.google.com (mail-qv1-f48.google.com [209.85.219.48])
+Received: from mail-yb1-f180.google.com (mail-yb1-f180.google.com [209.85.219.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D0AD13212D
-	for <iwd@lists.linux.dev>; Thu, 18 Jul 2024 11:45:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84CF212FB0A
+	for <iwd@lists.linux.dev>; Thu, 18 Jul 2024 11:45:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721303126; cv=none; b=qs5xCJcIt0Qsf9dFe+GSe6w6WNSlgNPA74iAQnCZ3vgtK6Je+AZSoBflyoisv0S/ZMcwtVXcocs7QOeWJpyIjEYq4vCQOKRSG8Bd+rtq6kgWiujfnBE08lc7FU7yYYq1ORhEcfOLWhplTzJhomhfa6VhrrlCg/RICH6tI3E6krI=
+	t=1721303127; cv=none; b=GTIpCHKm8SxnWLhJXItchR+17nKoYjB0+GqjO1Fv4/+bDTkNxQOPWguJUY5jqJNetSxBZiOUtGDzRaBDzSkagPUP6JzjcRIad7w8lJtvx9F5xN3nTcGu4fnIfqvTdX8YWcqlwoBtNJO5y+PdMhf+Y+A5GSnP4lcU9vs69+hm2j0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721303126; c=relaxed/simple;
-	bh=uxyi1LybGNHO7jQgU8Nek9BiwsBMQOdVAAFWWa8RhEI=;
+	s=arc-20240116; t=1721303127; c=relaxed/simple;
+	bh=SlFNNFuF6eChmtPDA34jZcaRxqUKmN1ZUmJrp4u0G4c=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=QYIcQYa6dcEMvoW7erKFObzc13/BXdX/H51Bja3tE6RmuVf2RrJZsHsAPFASWcysArNQnU9tR/oBlZ+mtilJTVZARXph39VEM5qLTCx/3dmAnEvmuoOSjD4tZV7uG2hFTgJvlDwB0Cp8rGWlRhYiX7WW4sS0ksWU5wzRF5ucfd4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=L1K0CZKO; arc=none smtp.client-ip=209.85.219.48
+	 MIME-Version; b=D+I+UvdZfvnhoOblZHKBGIDKLpazb/a9HP3w1RkQhejdYbhOOFQYtQqB+eTXjuFNqc+EOkjZtPeNBfmc2ov7rETO2ziMDFJiz06chKpqQpP9TVNzxEIUQEnhxmOsmfMqRpbrVZAnDSXI0d5ZStmYD8Qn3+iyNtdKGwOgtv3aNks=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FqxTn1Qq; arc=none smtp.client-ip=209.85.219.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="L1K0CZKO"
-Received: by mail-qv1-f48.google.com with SMTP id 6a1803df08f44-6b78c3670d0so4266946d6.1
-        for <iwd@lists.linux.dev>; Thu, 18 Jul 2024 04:45:24 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FqxTn1Qq"
+Received: by mail-yb1-f180.google.com with SMTP id 3f1490d57ef6-e026a2238d8so741720276.0
+        for <iwd@lists.linux.dev>; Thu, 18 Jul 2024 04:45:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1721303123; x=1721907923; darn=lists.linux.dev;
+        d=gmail.com; s=20230601; t=1721303124; x=1721907924; darn=lists.linux.dev;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=k5P6LbPCO10338QjJWBDL6Cm++KD9oA/T0WxmZtO828=;
-        b=L1K0CZKOIO6TGCeuWPjl9yHjlO0+GGNW2j99O/hDIAOgtg//mOI65sq0M3BxFsI7sw
-         hYK47U3Ax3FSKKzAzCoLcZ2s71XXLN6fyTKmb1OZ8WBGjpokK65+jRBKub9UtTjjX2hv
-         aWOtOYbW6VJ97v8ItIdC/cJrwJ3unnsQ+eqAVjGUAvzbwaBqnM98BsUhJj1XaSyasxdH
-         SVOASxfoLVOz5kH7QlH/lP31RnzZ5TsURRzEJYlhQOoiK4DKUyh2pNN7CnVvhAeJTN7H
-         vGPWNf2TSpnXg3BKgWzMvi/yTh0OdhvTl/Oc10dIAfGe7pL2jpECGazFHPh5InCjpHNI
-         oOSQ==
+        bh=8sx3fRRnExPI828g4V9j8aSQ8ixzMKUs5b6fnOjrfq0=;
+        b=FqxTn1QqO0YGAkhlDIz4hnXxXJKQdDA2K2Fd34oRdSb9bo9ZTlAup359BKoexfZlgQ
+         pV864LvCQM1tQ3FNpmaueP49KW6zuf+iXEB6iyCDnLlFOnDIczb4F9tZSiwYa3/PRGgA
+         X8s7UNUuq+15ibJG41b50ckYYz7rasUNRXt/LwNatCgQnmA/adAakL/xCVpLdNq703Dz
+         fZ2cDjcRxgUyIxYxjc2JPtH+cCdNVmWNQqokfSCpj5cMdstW/ZvKYNasCRPNwkrnXMpP
+         536ZMn68dwRNskfPOZVqkxpLn6UFZRGW0SVTjZCVjdurMh3JadceKbEX49ur8ezz6F7r
+         xCSA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721303123; x=1721907923;
+        d=1e100.net; s=20230601; t=1721303124; x=1721907924;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=k5P6LbPCO10338QjJWBDL6Cm++KD9oA/T0WxmZtO828=;
-        b=wu9zI/LKPF09EBnY9HFWF4zFdO9cWpD7RQ7ASg3VobjAOAF7QRhxc2faYUM7W86Mtu
-         Frsbhe+6HUNBwlN1vWJ8X8LapHHeWFPkGuCHdpaQzfXPlNtsx/PjuOrcjaCkmykUENAX
-         +1oqG7vbWXcGcQFdYXwTJ+W6yw8DRPe9hQX23E+mCCwzOqfYnPhlJOp7Fj5ke/J5eeXK
-         l8p8lvhGs1uZ8GmnoXk6iBPcFkY0WRN2PAmMMBom2S+bEhq2wJn8QfvWC8aesuayV+Vu
-         Gl+nE5qPgtaSMbW1Eyxvy7aps7Y3PYedz93YumwV7qLfIAbcZmLc1pxsJJVng70xArAA
-         KuUg==
-X-Gm-Message-State: AOJu0Yx3SiCfoJtXt0m1BgMP+HlwFYBfBHbIQiFLnhWxSzWGbP+lhrEw
-	GXsv0jT6K46XOqsX5sDcZWG9GXtRCqBZcXLnXqw2QOD6YJ/xMcw8s/8wsA==
-X-Google-Smtp-Source: AGHT+IGNeeGEBOgfEbBSGQyE73628CyO7AkdyAUhA1mrXQCOgzLFx5wYjqJX/tU9L+6bHKmHDubqLA==
-X-Received: by 2002:a05:6214:19c3:b0:6b5:e24b:bb0a with SMTP id 6a1803df08f44-6b78e38ae18mr60877316d6.58.1721303123145;
-        Thu, 18 Jul 2024 04:45:23 -0700 (PDT)
+        bh=8sx3fRRnExPI828g4V9j8aSQ8ixzMKUs5b6fnOjrfq0=;
+        b=XUbJBWwDcNLZh3vnCr2frJX7zRGCVTCZfTEaLliLe+zWe3b8bF69oQis9jYiK7sHfy
+         K7uqtNlZkBz+XSGd9px0QEmnhRy3G2KSlkJcNYjpjg3LOsK6adqQnCtXujmqdKdMJT8l
+         uIjKFt/SmuUNZ5Rw231X3NUnq85du9BXFIqcQI0JdvJO6uvk83oXpPbLkhO42TiRVmUg
+         0x79SWMG2yUkH4Hdo3Q3eGAljsyYZV1N3YHlKyFhuQZNJFECM4Z04wHXl6r0y7/kF1kv
+         +B62atJ6r6rJxZ3gfimnxUh6CKGDgH+HBQeuZ7gVh5tjHKoq6Ie6/K/dO9j0SGPpkYJX
+         XwJA==
+X-Gm-Message-State: AOJu0YyjOJMUbF2qbI2U6k5+ZFlO7QZTAsJWypNjGq739Xxn8df92r0T
+	YVImYAMRPS6gKoUYkfaBPPk4JLDvSoeYOUnAR7kpO3wB8ibMdgnJ+Doq8g==
+X-Google-Smtp-Source: AGHT+IGkfGZifAiJPCRqYkBvPhOq4NYnRWnPy4nQ7FnROeyxVrszjyA2MrkFeV4w0kugcOIeKq2Hxg==
+X-Received: by 2002:a05:6902:124a:b0:e08:551c:9305 with SMTP id 3f1490d57ef6-e08551c9789mr877443276.47.1721303124213;
+        Thu, 18 Jul 2024 04:45:24 -0700 (PDT)
 Received: from LOCLAP699.localdomain ([208.195.13.130])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6b79c5138bbsm7292006d6.61.2024.07.18.04.45.22
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6b79c5138bbsm7292006d6.61.2024.07.18.04.45.23
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 18 Jul 2024 04:45:22 -0700 (PDT)
+        Thu, 18 Jul 2024 04:45:23 -0700 (PDT)
 From: James Prestwood <prestwoj@gmail.com>
 To: iwd@lists.linux.dev
 Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH v2 04/11] station: update logic for handshake failure
-Date: Thu, 18 Jul 2024 04:45:07 -0700
-Message-Id: <20240718114514.2916258-5-prestwoj@gmail.com>
+Subject: [PATCH v2 05/11] netdev: handle disconnect event during a connection
+Date: Thu, 18 Jul 2024 04:45:08 -0700
+Message-Id: <20240718114514.2916258-6-prestwoj@gmail.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240718114514.2916258-1-prestwoj@gmail.com>
 References: <20240718114514.2916258-1-prestwoj@gmail.com>
@@ -68,35 +68,109 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-After adding the NETDEV_RESULT_DISCONNECTED enum, handshake failures
-initiated by the AP come in via this result so the existing logic
-to call network_connect_failed() was broken. We could still get a
-handshake failure generated internally, so that has been preserved
-(via NETDEV_RESULT_HANDSHAKE_FAILED) but a check for a 4-way
-handshake timeout reason code was also added.
----
- src/station.c | 8 +++++++-
- 1 file changed, 7 insertions(+), 1 deletion(-)
+If a disconnect arrives at any point during the 4-way handshake or
+key setting this would result in netdev sending a disconnect event
+to station. If this is a reassociation this case is unhandled in
+station and causes a hang as it expects any connection failure to
+be handled via the reassociation callback, not a random disconnect
+event.
 
-diff --git a/src/station.c b/src/station.c
-index abbfc3dd..62b05c35 100644
---- a/src/station.c
-+++ b/src/station.c
-@@ -3368,7 +3368,13 @@ static void station_connect_cb(struct netdev *netdev, enum netdev_result result,
- 	continue_autoconnect = station->state == STATION_STATE_CONNECTING_AUTO;
+To handle this case we can utilize netdev_disconnected() along with
+the new NETDEV_RESULT_DISCONNECTED result to ensure the connect
+callback gets called if it exists (indicating a pending connection)
+
+Below are logs showing the "Unexpected disconnect event" which
+prevents IWD from cleaning up its state and ultimately results in a
+hang:
+
+Jul 16 18:16:13: src/station.c:station_transition_reassociate()
+Jul 16 18:16:13: event: state, old: connected, new: roaming
+Jul 16 18:16:13: src/wiphy.c:wiphy_radio_work_done() Work item 65 done
+Jul 16 18:16:13: src/wiphy.c:wiphy_radio_work_next() Starting work item 66
+Jul 16 18:16:13: src/netdev.c:netdev_mlme_notify() MLME notification Del Station(20)
+Jul 16 18:16:13: src/netdev.c:netdev_link_notify() event 16 on ifindex 6
+Jul 16 18:16:13: src/netdev.c:netdev_mlme_notify() MLME notification Deauthenticate(39)
+Jul 16 18:16:13: src/netdev.c:netdev_deauthenticate_event()
+Jul 16 18:16:13: src/netdev.c:netdev_mlme_notify() MLME notification New Station(19)
+Jul 16 18:16:13: src/station.c:station_netdev_event() Associating
+Jul 16 18:16:13: src/netdev.c:netdev_mlme_notify() MLME notification Authenticate(37)
+Jul 16 18:16:13: src/netdev.c:netdev_authenticate_event()
+Jul 16 18:16:13: src/netdev.c:netdev_mlme_notify() MLME notification Associate(38)
+Jul 16 18:16:13: src/netdev.c:netdev_associate_event()
+Jul 16 18:16:13: src/netdev.c:netdev_link_notify() event 16 on ifindex 6
+Jul 16 18:16:13: src/netdev.c:netdev_mlme_notify() MLME notification Connect(46)
+Jul 16 18:16:13: src/netdev.c:netdev_connect_event()
+Jul 16 18:16:13: src/netdev.c:netdev_connect_event() aborting and ignore_connect_event not set, proceed
+Jul 16 18:16:13: src/netdev.c:netdev_connect_event() expect_connect_failure not set, proceed
+Jul 16 18:16:13: src/netdev.c:parse_request_ies()
+Jul 16 18:16:13: src/netdev.c:netdev_connect_event() Request / Response IEs parsed
+Jul 16 18:16:13: src/netdev.c:netdev_get_oci()
+Jul 16 18:16:13: src/netdev.c:netdev_link_notify() event 16 on ifindex 6
+Jul 16 18:16:13: src/netdev.c:netdev_link_notify() event 16 on ifindex 6
+Jul 16 18:16:13: src/netdev.c:netdev_link_notify() event 16 on ifindex 6
+Jul 16 18:16:13: src/netdev.c:netdev_get_oci_cb() Obtained OCI: freq: 5220, width: 3, center1: 5210, center2: 0
+Jul 16 18:16:13: src/eapol.c:eapol_start()
+Jul 16 18:16:13: src/netdev.c:netdev_unicast_notify() Unicast notification Control Port Frame(129)
+Jul 16 18:16:13: src/netdev.c:netdev_control_port_frame_event()
+Jul 16 18:16:13: src/eapol.c:eapol_handle_ptk_1_of_4() ifindex=6
+Jul 16 18:16:13: src/netdev.c:netdev_mlme_notify() MLME notification Control Port TX Status(139)
+Jul 16 18:16:14: src/netdev.c:netdev_mlme_notify() MLME notification Notify CQM(64)
+Jul 16 18:16:14: src/netdev.c:netdev_cqm_event() Signal change event (above=1 signal=-60)
+Jul 16 18:16:17: src/netdev.c:netdev_link_notify() event 16 on ifindex 6
+Jul 16 18:16:17: src/netdev.c:netdev_mlme_notify() MLME notification Del Station(20)
+Jul 16 18:16:17: src/netdev.c:netdev_mlme_notify() MLME notification Deauthenticate(39)
+Jul 16 18:16:17: src/netdev.c:netdev_deauthenticate_event()
+Jul 16 18:16:17: src/netdev.c:netdev_mlme_notify() MLME notification Disconnect(48)
+Jul 16 18:16:17: src/netdev.c:netdev_disconnect_event()
+Jul 16 18:16:17: Received Deauthentication event, reason: 15, from_ap: true
+Jul 16 18:16:17: src/wiphy.c:wiphy_radio_work_done() Work item 66 done
+Jul 16 18:16:17: src/station.c:station_disconnect_event() 6
+Jul 16 18:16:17: Unexpected disconnect event
+Jul 16 18:16:17: src/netdev.c:netdev_link_notify() event 16 on ifindex 6
+Jul 16 18:16:17: src/wiphy.c:wiphy_reg_notify() Notification of command Reg Change(36)
+Jul 16 18:16:17: src/wiphy.c:wiphy_update_reg_domain() New reg domain country code for (global) is XX
+---
+ src/netdev.c | 19 +++++--------------
+ 1 file changed, 5 insertions(+), 14 deletions(-)
+
+diff --git a/src/netdev.c b/src/netdev.c
+index 153001ab..2d70fc38 100644
+--- a/src/netdev.c
++++ b/src/netdev.c
+@@ -1243,8 +1243,7 @@ static void netdev_disconnect_event(struct l_genl_msg *msg,
+ 	const void *data;
+ 	uint16_t reason_code = 0;
+ 	bool disconnect_by_ap = false;
+-	netdev_event_func_t event_filter;
+-	void *event_data;
++	enum netdev_event event;
  
- 	if (station->state == STATION_STATE_CONNECTING) {
--		bool during_eapol = result == NETDEV_RESULT_HANDSHAKE_FAILED;
-+		/*
-+		 * Either a handshake failure (generated internally) or a 4-way
-+		 * handshake timeout should trigger the PSK to be asked for
-+		 * again. Set during_eapol accordingly.
-+		 */
-+		bool during_eapol = result == NETDEV_RESULT_HANDSHAKE_FAILED ||
-+			reason == MMPDU_REASON_CODE_4WAY_HANDSHAKE_TIMEOUT;
- 		network_connect_failed(station->connected_network,
- 								during_eapol);
- 	}
+ 	l_debug("");
+ 
+@@ -1282,19 +1281,11 @@ static void netdev_disconnect_event(struct l_genl_msg *msg,
+ 	l_info("Received Deauthentication event, reason: %hu, from_ap: %s",
+ 			reason_code, disconnect_by_ap ? "true" : "false");
+ 
+-	event_filter = netdev->event_filter;
+-	event_data = netdev->user_data;
+-	netdev_connect_free(netdev);
++	event = disconnect_by_ap ? NETDEV_EVENT_DISCONNECT_BY_AP :
++				NETDEV_EVENT_DISCONNECT_BY_SME;
+ 
+-	if (!event_filter)
+-		return;
+-
+-	if (disconnect_by_ap)
+-		event_filter(netdev, NETDEV_EVENT_DISCONNECT_BY_AP,
+-						&reason_code, event_data);
+-	else
+-		event_filter(netdev, NETDEV_EVENT_DISCONNECT_BY_SME,
+-						&reason_code, event_data);
++	netdev_disconnected(netdev, NETDEV_RESULT_DISCONNECTED,
++				event, reason_code);
+ }
+ 
+ static void netdev_cmd_disconnect_cb(struct l_genl_msg *msg, void *user_data)
 -- 
 2.34.1
 
