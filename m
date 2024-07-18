@@ -1,62 +1,62 @@
-Received: from mail-yb1-f176.google.com (mail-yb1-f176.google.com [209.85.219.176])
+Received: from mail-qv1-f41.google.com (mail-qv1-f41.google.com [209.85.219.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3D5B13AA5D
-	for <iwd@lists.linux.dev>; Thu, 18 Jul 2024 11:45:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BC4313B288
+	for <iwd@lists.linux.dev>; Thu, 18 Jul 2024 11:45:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721303122; cv=none; b=UQ2LhJUCyP49L4v1iBptEzU2YanBDYQXu2LSJMiovJOvlSLLte7P1WjFOuRdz0yJ4scfEmd4poav9elq5uGRdHaN/OAsJc1cMDvx1GHDkFKpOQrUsaiZb44I9ig7xTaF7oIRd5nxNxbFDWhtGOzSGUVUvuSiPLbppar5LeF8dcs=
+	t=1721303123; cv=none; b=NUwjK5T5Ur3FjyL3bQMOt4YNHOQ/yoBAQmx/3BWVnWMhX6+JP+Of/LB8zD01ozEimm4tnjQ6h665OK87Gn/tE03E/rbRwuoB8WcI5KMf1C8JRJ7Jkf15t2kOQynQg1rdaIfQQpMfqSuldjwhpRLfZpfQDUXFlP3rRz96WasY38o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721303122; c=relaxed/simple;
-	bh=UrwEPTXWo7X5+8wjdxyu7T9hXlAnwefwROVAdXlnRrc=;
+	s=arc-20240116; t=1721303123; c=relaxed/simple;
+	bh=JreGr0sHLZLl4XeUk5L1hDKAt+cr/UAmnzI7wM9H2Ps=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=BMSBcKVhAGDf/ofeNek5wyTwNp8FWqkIVjFU6ymG6s72grRAUipEu1MOWGPUGVClTNUg5OMe18OkOpmOIIiKYGpGkoPSYbb7mGJI26FGB/WOO+LW+PDN15tIi63PGMlhwTqZZnPm1ubEmfYlW2loqykTH9gn9ofmypA5AUUMucg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WsjfdxqL; arc=none smtp.client-ip=209.85.219.176
+	 MIME-Version; b=lOme1F/KZTM3DUrX8bgAgrm7s0Ubpr9xrUFvq0fMBkVVJirGx9Eu08GsbZPt9YDGQNAP4xzbsxS4IJhLkEAxq7JMNzi0Gsi5CdQmT6eV4PYfK67bOyEvvLBZ8HSxEyT+fLZw0Lagx+TtNAggbl7TLggE2k8P+zRS/2FN5xq3OQ8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XyeNk5BK; arc=none smtp.client-ip=209.85.219.41
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WsjfdxqL"
-Received: by mail-yb1-f176.google.com with SMTP id 3f1490d57ef6-e05a2949284so697235276.1
-        for <iwd@lists.linux.dev>; Thu, 18 Jul 2024 04:45:20 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XyeNk5BK"
+Received: by mail-qv1-f41.google.com with SMTP id 6a1803df08f44-6b78c980981so3966736d6.2
+        for <iwd@lists.linux.dev>; Thu, 18 Jul 2024 04:45:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1721303120; x=1721907920; darn=lists.linux.dev;
+        d=gmail.com; s=20230601; t=1721303121; x=1721907921; darn=lists.linux.dev;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=kdisNiv81zFmrAFtxMDr6J899+B4KH4hNn79r3VP1ik=;
-        b=WsjfdxqLtGsZ1Tz6w34VklIc8inG02wR+7xw6MIw0EThT/gTyE2nmvnYvKW8vN7wZh
-         iSizqI5PTUu7wJTLNM8tMzZjRSp3+Lkr5cqDQyBmw17u5n22d6TJD/zqrvkmRQ4G15SG
-         qeJDzsu1EEatsno0+uY2L5lL4I1bgpJ8xVMqBZ015N9gWLAizX4pMyCJFqApqsFGdQL8
-         RcYJNlAX9ZR7v1X8kCZ1hbQpBetumfs+Nmi4xxL+pmjenctuUFYgpnkf9AV7pvfE3Rcx
-         6r+6snuTovzQckmfBFwS9Ulle7VdJrISObvQ+2j7jUOINccW83U9ea1k08Hl9J81fBt+
-         xlpA==
+        bh=R2woAQ/OajhFJ9iSHb0ikY2m+Ui2/rCm2lDgkMgMWzc=;
+        b=XyeNk5BKiCn8uW9fBqeJl8hdmH05Q6LpeMo/+dnyhDJxCSXGoZsrpnHIVGwnW6HxAC
+         AWvfGFjuyYzMbhObIBzSdVWiY21/rLsYgOgwC8GHNkeqrPRWxZnEja6LNvJ/YVJvDmyn
+         qWYAp0GB3C+vN3Fa6RK8UKM8eddCoB7PKwpmCC41bJs2S7Key0PUEG/klqb5WqiLnfqJ
+         NjqQH9ll+mYrlsCZ/kxwTZIa0kpJkokBWsWhuoxiU1WxJgxsA/WvtqM0k9XsMM3EyZGu
+         bg+6hWFRjnVD80gerlPdFWRWlgFJa+XJoXFS+zPgPmojNPZxyPkP5l9OOuzNVJH6+jJS
+         hMgw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721303120; x=1721907920;
+        d=1e100.net; s=20230601; t=1721303121; x=1721907921;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=kdisNiv81zFmrAFtxMDr6J899+B4KH4hNn79r3VP1ik=;
-        b=sKgcRHleaByl43ja5lioO+Z+btpFkTZqZB0bKJdK1WSk/eI9euPa+mSYcjXoNpEO7P
-         mbotZax07NvRDPWaMe9w2r8oq/PzoPkzRcHPdIKwgQGQwiyyr4QeAlnCJT78KMc0By41
-         7+1OaocL1LwU7LhQISjYQ47HPfdnldMblDU5GGY22MpQgS8P1TgZ4NfTpOWo2FSiBecb
-         ByUi3weD0xlhbKbG9wWFNvj/AzOUqiWIgYsmQQpGJWTycui+KZZSNVkIiN/SeykvG3HX
-         XHyK8n8MXUVlJUUdInLVK5AeGVrwqDuGm082zBLb7iyqKq5/9NcMq68w7XE1v8SN+aoR
-         uvkw==
-X-Gm-Message-State: AOJu0YzBr30MRcFk55PRRT712WzRY3046gA5yo8wuKLECLqRWNXrZn5N
-	QZdDilPMcCCwvwQrFz+Y5gXpxsaZupLV5flw4GXbvEJ85qIufTT/eDEwbw==
-X-Google-Smtp-Source: AGHT+IEgZyy1cNepK5w7ssGtXZdFWLXWFjV/QiCldGJcAocYSHifUJNZs7r/cE77E6an583AQl8vMw==
-X-Received: by 2002:a05:6902:12cc:b0:e03:9b03:f749 with SMTP id 3f1490d57ef6-e05feaf0295mr3018976276.23.1721303119759;
-        Thu, 18 Jul 2024 04:45:19 -0700 (PDT)
+        bh=R2woAQ/OajhFJ9iSHb0ikY2m+Ui2/rCm2lDgkMgMWzc=;
+        b=c0hkGJPBJG0uB9VR2O6xk5C44PYtR/Gc1142BcZq7w3JWVH4H1lQyxcxQtCTrQarr6
+         EvXL5baG7OapasMCCVTcw9DcT9GpM02yKcQPwNWib22aT+a0B1Etw8qdXVkC3/mPYNw+
+         sPAZy5V8RgJUHSkAyQAFjIUo+yJXCaVEv0EBQncu8Bnt/or5Vngw8Pl4hkByCNRLgnQE
+         zukaPf2VzePdRAZVt/IAC7YmsERJUDjifeF8nyMXQiiyFbc6ZqdAxpvab4HHIq8mvrOk
+         8NDhjCLwwkO25DeNvd3ANNQ321XatU8Cmjni0iaTbdpfoSeM6iAyn7oZRtyFtEd8En91
+         5xKA==
+X-Gm-Message-State: AOJu0Yz04g1Qb4pjDjEIISjsZL/jAt8oF4LZuiknTDtlhf3PeOU1lFLX
+	SV/db+oHQfspQmx0dVptHbysKHetaNKMDkcoRBLIj+NYACFrqiu0fV9CeQ==
+X-Google-Smtp-Source: AGHT+IHJEJ/YlGJUQepGunHpBUBBENtPX58g1Fmt4Vr67orhOzlCCCGymIV3GWtcJKgp6JjuUCVd8Q==
+X-Received: by 2002:ad4:5be8:0:b0:6b5:da13:bf42 with SMTP id 6a1803df08f44-6b78e464d26mr53253566d6.58.1721303120825;
+        Thu, 18 Jul 2024 04:45:20 -0700 (PDT)
 Received: from LOCLAP699.localdomain ([208.195.13.130])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6b79c5138bbsm7292006d6.61.2024.07.18.04.45.18
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6b79c5138bbsm7292006d6.61.2024.07.18.04.45.19
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 18 Jul 2024 04:45:19 -0700 (PDT)
+        Thu, 18 Jul 2024 04:45:20 -0700 (PDT)
 From: James Prestwood <prestwoj@gmail.com>
 To: iwd@lists.linux.dev
 Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH v2 01/11] station: print unknown channel number in neighbor report
-Date: Thu, 18 Jul 2024 04:45:04 -0700
-Message-Id: <20240718114514.2916258-2-prestwoj@gmail.com>
+Subject: [PATCH v2 02/11] netdev: add NETDEV_RESULT_DISCONNECTED
+Date: Thu, 18 Jul 2024 04:45:05 -0700
+Message-Id: <20240718114514.2916258-3-prestwoj@gmail.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240718114514.2916258-1-prestwoj@gmail.com>
 References: <20240718114514.2916258-1-prestwoj@gmail.com>
@@ -68,25 +68,60 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-If the channel number resulted in a failure to parse the neighbor
-report entry, print it for debugging.
+This new result is meant to handle cases where a disconnect
+event (deauth/disassoc) was received during an ongoing connection.
+Whether that's during authentication, association, the 4-way
+handshake, or key setting.
 ---
- src/station.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ src/netdev.h  | 2 ++
+ src/p2p.c     | 1 +
+ src/station.c | 1 +
+ 3 files changed, 4 insertions(+)
 
+diff --git a/src/netdev.h b/src/netdev.h
+index 671d0d40..db0440d0 100644
+--- a/src/netdev.h
++++ b/src/netdev.h
+@@ -36,6 +36,7 @@ enum netdev_result {
+ 	NETDEV_RESULT_HANDSHAKE_FAILED,
+ 	NETDEV_RESULT_KEY_SETTING_FAILED,
+ 	NETDEV_RESULT_ABORTED,
++	NETDEV_RESULT_DISCONNECTED,
+ };
+ 
+ enum netdev_event {
+@@ -86,6 +87,7 @@ typedef void (*netdev_command_cb_t)(struct netdev *netdev, int result,
+  * NETDEV_RESULT_HANDSHAKE_FAILED - MMPDU_REASON_CODE
+  * NETDEV_RESULT_KEY_SETTING_FAILED - unused
+  * NETDEV_RESULT_ABORTED - unused.
++ * NETDEV_RESULT_DISCONNECTED - MMPDU_REASON_CODE
+  */
+ typedef void (*netdev_connect_cb_t)(struct netdev *netdev,
+ 					enum netdev_result result,
+diff --git a/src/p2p.c b/src/p2p.c
+index 205d4fcb..e8c7c5de 100644
+--- a/src/p2p.c
++++ b/src/p2p.c
+@@ -1366,6 +1366,7 @@ static void p2p_netdev_connect_cb(struct netdev *netdev,
+ 	case NETDEV_RESULT_ASSOCIATION_FAILED:
+ 	case NETDEV_RESULT_HANDSHAKE_FAILED:
+ 	case NETDEV_RESULT_KEY_SETTING_FAILED:
++	case NETDEV_RESULT_DISCONNECTED:
+ 		/*
+ 		 * In the AUTHENTICATION_FAILED and ASSOCIATION_FAILED
+ 		 * cases there's nothing to disconnect.  In the
 diff --git a/src/station.c b/src/station.c
-index 509d919c..3ead4326 100644
+index 3ead4326..01f6b78e 100644
 --- a/src/station.c
 +++ b/src/station.c
-@@ -1835,7 +1835,7 @@ static uint32_t station_freq_from_neighbor_report(const uint8_t *country,
- 			band = BAND_FREQ_5_GHZ;
- 		else {
- 			l_debug("Ignored: 0 oper class with an unusual "
--				"channel number");
-+				"channel number %u", info->channel_num);
- 
- 			return 0;
- 		}
+@@ -3319,6 +3319,7 @@ static void station_connect_cb(struct netdev *netdev, enum netdev_result result,
+ 		blacklist_remove_bss(station->connected_bss->addr);
+ 		station_connect_ok(station);
+ 		return;
++	case NETDEV_RESULT_DISCONNECTED:
+ 	case NETDEV_RESULT_HANDSHAKE_FAILED:
+ 		/* reason code in this case */
+ 		if (station_retry_with_reason(station, l_get_u16(event_data)))
 -- 
 2.34.1
 
