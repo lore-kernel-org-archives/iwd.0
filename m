@@ -1,115 +1,113 @@
-Received: from mail-qv1-f48.google.com (mail-qv1-f48.google.com [209.85.219.48])
+Received: from mail-oa1-f47.google.com (mail-oa1-f47.google.com [209.85.160.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE620145B32
-	for <iwd@lists.linux.dev>; Fri, 19 Jul 2024 18:19:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 815D72BB05
+	for <iwd@lists.linux.dev>; Fri, 19 Jul 2024 20:33:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721413174; cv=none; b=uI/Fd022/54Ko6iP3NUvNPJ/20GmCwdhitDHxDqn3V9JEnwVY46/srNpPhhT/IDlZuBD6VvzVQyVmJa5OJ9Nb7mBpuYjbu1lW3nequ7cNezQQ7RcBVhLJWXevA0/CiTpABS+qcTAoCNxcZpzSK2PUyKc8aziRyXx8R8+DCKh1ek=
+	t=1721421210; cv=none; b=q7cCO1jDnMHw168kfR3t64L9MlxWb3MINI5eG+q+VvYzI+4OpNLCsxSMlQit2uV7P81IWBM4uWiKQIoHJk44buWzDe1eleK5XTrUo0a7jn8OIYUvminBkX2Bp50ZJHSgKbf7fXLGNAekBC+R6uIDS43tZwMTEhUMUblbMJ0YLr4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721413174; c=relaxed/simple;
-	bh=5p5mxDQd1yC58tDQQPv8FDBhI5WyP6gCwRS6nzjzjy8=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=h5KHVY5DjUKGFZXLMoGX8DATJ5oQ+9cyqfvHm6W5c9o8WrghEVpXndsTNgCeJyoi25zgBRZVahAtHQGWj2+sGfV/q1yB7bKgs9tJKqEBDDO0cGOhyM1xdyR/WlE65lOnjFH/lbBTZqeVPEjtv2jRrgNAbqf+OZQvZ0BVO4kUSvk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CF/4IIDj; arc=none smtp.client-ip=209.85.219.48
+	s=arc-20240116; t=1721421210; c=relaxed/simple;
+	bh=o+vUZA+x53qx+Sh7vyS4AGgGnBNIV5cRcLRBhA3pbX0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=skbSCmlR30n0TREka5Vjpac1E6DRVFGNhPU4pGt/YIpyKxS6GBJKJTAE0J0htvg+ykwUlGL13Tqt3mQ333oEQlT1KZZtCC07pWi7X7ehcfoy7S/67K2EC1R9jh+57GsOD9ZAHheFnPhkrIsmoCPlHV33hBwbGnn7aRBRpTIrw3g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UYfs90n1; arc=none smtp.client-ip=209.85.160.47
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CF/4IIDj"
-Received: by mail-qv1-f48.google.com with SMTP id 6a1803df08f44-6ad86f3cc34so12550736d6.1
-        for <iwd@lists.linux.dev>; Fri, 19 Jul 2024 11:19:32 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UYfs90n1"
+Received: by mail-oa1-f47.google.com with SMTP id 586e51a60fabf-260209df55dso1009616fac.2
+        for <iwd@lists.linux.dev>; Fri, 19 Jul 2024 13:33:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1721413171; x=1722017971; darn=lists.linux.dev;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=FjBf2ep2Dc6h5RWzrq6gbLC8DBexaXb2Y4eo9NWRI90=;
-        b=CF/4IIDjzyKcixTc++nZ9xoh8CREYl2gatmvMW+AuMsOyV344B7Q9kluTU2m2AVekp
-         JWfp2hGgXLcW8JMehU5joAxgqKtDkHmYwW+ySnbE2baWDCscuU7BXwM45s+9sj1D6rqa
-         wsb3zxVNpy9552NU7JLKvmHj/I6L4PaYKVdx7fPe1lvbBHKeJXhPuv1nofaP1z+fpT7a
-         HCM+DNwh9GdTXWSwmYutcAA1jIOYbt6el7qhHd29JXk+FkEFVEWqKmqBj7BWc3DCQk43
-         QAw6i9xEIlfU7sPaq4LZNW0mIhIWqmNGh+Q4Vlljr8GHSIxKuWSStnsWuuiNP66PIGJ6
-         Gknw==
+        d=gmail.com; s=20230601; t=1721421208; x=1722026008; darn=lists.linux.dev;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:to:subject:user-agent:mime-version:date:message-id:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=hTQXW+KGl5lZX9iad0toMM2Lwvk3xHZzJPfmsr2WPxM=;
+        b=UYfs90n18DtfaUrzAtAIryTIUt6bx1qIGDyoIzKSIBeYZV6BHI5hd4HSuYal+OFFx9
+         OeISOn9taDfFeE20OyuoT+8Ob34hABuberzzqipr1ItK5Kl0oMBwJNcJtCrL237A8xpt
+         cJTse704OEbnU373A8H+5OrfNHyMdQLBjxZmX3qjDrK8nBe1MtcioBKoBaITpSGgP9XR
+         AXjm714NNzysTu8ugQ/zfqyMFvcJxSt0kchU9pm41VyP0fE4y/5u7km/7CkJ5Q3vP07D
+         joILAT8mtxfpBhyLvKDSmowAveOzsiI1n4hqV1PlziuoNy51NfNvLSMWB44B/Txqe8/5
+         toiA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721413171; x=1722017971;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=FjBf2ep2Dc6h5RWzrq6gbLC8DBexaXb2Y4eo9NWRI90=;
-        b=KVsrV8OBb/UipMiHLc0LcqVzzgG9ok+mTLoH/BqhN9SOn2ksgZ/bUiJ88HtCsycs+i
-         VRTQ3clQief1p+dSEqCvJwcm2InDlRy/9jH2LosWfGDZEU87EjcIlAUbz+BNPTPyYMQL
-         QxEVhAxoAHdM98/YKQ6yVonS/pHjJzeZD95ygyl4M5Q3JGBPUMOyIz/AzrKwlEZweS8l
-         rttMJh1Of55QiUQnVaNkAlVHbTnzYwrAVwJhqNzoP5Fb1oK9XRl+8Pm0Jf9ZyC/PdYVV
-         nZPH7ebqYiiHDVg3v8Osw93ZzUtoENbvRc7xjJ4z0NVoJKLkBbxxanCbuvt9Me+OFY5R
-         0j2w==
-X-Gm-Message-State: AOJu0Yxl13U3i+XPcUwvlzb6ctj2ZHBvYEeKrN5BqZ0mGvBgj2kJ3RxG
-	c952DziKrXuVBXAfg4gsLIQosjzxyomyvW8mzGuV3cjcXlCrIOZMWXEfJw==
-X-Google-Smtp-Source: AGHT+IFZOqt/iNHg3o0f3ndW5FcLX7eg6ZuhKBFxUNNqvPY5a3Ru9Fi6fLqlQrI7JRHK9MNT5DVp+g==
-X-Received: by 2002:a05:6214:29ea:b0:6b7:a3f1:3251 with SMTP id 6a1803df08f44-6b95a794074mr9477156d6.51.1721413171471;
-        Fri, 19 Jul 2024 11:19:31 -0700 (PDT)
-Received: from LOCLAP699.localdomain ([50.170.153.202])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6b7ac9cb02esm10589106d6.91.2024.07.19.11.19.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 19 Jul 2024 11:19:30 -0700 (PDT)
-From: James Prestwood <prestwoj@gmail.com>
-To: iwd@lists.linux.dev
-Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 2/2] auto-t: add test for DPP starting while connecting
-Date: Fri, 19 Jul 2024 11:19:26 -0700
-Message-Id: <20240719181926.3888420-2-prestwoj@gmail.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240719181926.3888420-1-prestwoj@gmail.com>
-References: <20240719181926.3888420-1-prestwoj@gmail.com>
+        d=1e100.net; s=20230601; t=1721421208; x=1722026008;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=hTQXW+KGl5lZX9iad0toMM2Lwvk3xHZzJPfmsr2WPxM=;
+        b=HU9usFmA45P0TgKZYYe2GKESXZNV+hhUbKgTZ4fb+YVXxvIx96vcpQHf08TJbIeXrW
+         aWBE+kKrj5JFtdJg62hAfBdm7n97rP0xFvRvuTT/yiOGBTDT+Fgon9Qd3mAirShR8tqX
+         LN5r/VIeL/lMCMYtGB7SWqWHDBneTNnS4LWG1kY8+cR1zCOJrNb2zhragipcXId4Oxwk
+         /slYbUwJrE4N+rsNC+EfRuj1bGRlxdpqCKoRWgJG0/14fP0CUOl7IJfeR+f57LaMLtSC
+         oOfIx4rIfIycNaMcZle16y0bwta+Kvu4h0poutvxwa756lK+Ea/eb55g3B6eVtCdUvgR
+         5YQg==
+X-Forwarded-Encrypted: i=1; AJvYcCX208DqBLbuPQMdZSbDrG97ySKZgqKn5ZsFbgMMYfNazLZe1H07ikJ2SEKYVoPu4ie5+nHR7x1SJgdzpusDJKH4BOAQ
+X-Gm-Message-State: AOJu0YzPRSinHSpaW32oedTc29fR4DKSbOVHAv9QRlyCKX4zFDf8SLOy
+	IU4exqsvACH6tCnBb4Oh0f+5EvpwW0QjC5DVRzN0WHPxWMsouSo4
+X-Google-Smtp-Source: AGHT+IEUo5ZEkY+Ho07ZS0pUzz2ulMT+RmNUcjxV2eCTFk3O7EGq3ZqVN2XxJ3oycnBaXm+1WOfRKA==
+X-Received: by 2002:a05:6870:3041:b0:261:21ad:9244 with SMTP id 586e51a60fabf-26121ad973emr721265fac.39.1721421208364;
+        Fri, 19 Jul 2024 13:33:28 -0700 (PDT)
+Received: from [192.168.1.22] (syn-070-114-247-242.res.spectrum.com. [70.114.247.242])
+        by smtp.googlemail.com with ESMTPSA id 586e51a60fabf-2610c715436sm464506fac.1.2024.07.19.13.33.27
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 19 Jul 2024 13:33:28 -0700 (PDT)
+Message-ID: <abdda292-7c90-4705-9c81-9e11ffaedd10@gmail.com>
+Date: Fri, 19 Jul 2024 15:33:27 -0500
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/2] dpp: relax requirement on IWD being in a disconnected
+ state
+To: James Prestwood <prestwoj@gmail.com>, iwd@lists.linux.dev
+References: <20240719181926.3888420-1-prestwoj@gmail.com>
+Content-Language: en-US
+From: Denis Kenzior <denkenz@gmail.com>
+In-Reply-To: <20240719181926.3888420-1-prestwoj@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
----
- autotests/testDPP/pkex_test.py | 20 +++++++++++++++++++-
- 1 file changed, 19 insertions(+), 1 deletion(-)
+Hi James,
 
-diff --git a/autotests/testDPP/pkex_test.py b/autotests/testDPP/pkex_test.py
-index db355225..f3124290 100644
---- a/autotests/testDPP/pkex_test.py
-+++ b/autotests/testDPP/pkex_test.py
-@@ -4,7 +4,7 @@ import unittest
- import sys
- 
- sys.path.append('../util')
--from iwd import IWD, SharedCodeAgent
-+from iwd import IWD, SharedCodeAgent, DeviceState
- from iwd import DeviceProvisioning
- from wpas import Wpas
- from hostapd import HostapdCLI
-@@ -210,6 +210,24 @@ class Test(unittest.TestCase):
- 
-         self.assertIn("SendHostname=true", settings)
- 
-+    def test_existing_incorrect_profile(self):
-+        self.hapd.reload()
-+        self.hapd.wait_for_event('AP-ENABLED')
-+        IWD.copy_to_storage("existingProfile.psk", "/tmp/ns0/", "ssidCCMP.psk")
-+
-+        # Start connecting
-+        self.device[1].autoconnect = True
-+        self.wd.wait_for_object_condition(self.device[1], 'obj.state == DeviceState.connecting')
-+
-+        # We should be able to start DPP despite the connecting state
-+        self.device[1].dpp_pkex_enroll('secret123', identifier="test")
-+
-+        self.start_iwd_pkex_configurator(self.device[0])
-+        self.assertEqual(self.device[1].state, DeviceState.connecting)
-+
-+        condition = 'obj.state == DeviceState.connected'
-+        self.wd.wait_for_object_condition(self.device[1], condition)
-+
-     def test_existing_hidden_network(self):
-         self.hapd_hidden.reload()
-         self.hapd_hidden.wait_for_event('AP-ENABLED')
--- 
-2.34.1
+On 7/19/24 1:19 PM, James Prestwood wrote:
+> Initially this made sense and for a completely unconfigured device
+> there is little to no downside to limiting IWD's state to
+> disconnected (or autoconnect states).
+>
 
+What about periodic scanning?
+
+> Where this poses a problem is if the device has been configured
+> incorrectly, for example with an invalid PSK. IWD will continue to
+> try and connect to the network, blocking DPP from ever being
+> started and always returning busy. Even if you timed it perfectly
+> to start DP between connection attempts it would be canceled right
+> away when IWD tried connecting again.
+
+As in station_get_connected_network() returns non NULL?
+
+> 
+> Instead we can relax this requirement by allowing DPP to start even
+> if IWD is connecting, and only cancel DPP when IWD's state
+> transitions to connnected. Since DPP effectively blocks the wiphy
+> work queue once it is started it will prevent any further connection
+> attempts until it completes.
+
+But if iwd is connecting, station_get_connected_network() is true and we've 
+already sent the connection request?  So, you're inserting DPP work which will 
+run after the connection attempt fails?
+
+Have you looked into how WSC does this?
+
+> ---
+>   src/dpp.c | 48 +++++++++++++++++++++++++++++++++++++++++++-----
+>   1 file changed, 43 insertions(+), 5 deletions(-)
+
+FYI, CI is failing the DPP test for this set.
+
+Regards,
+-Denis
