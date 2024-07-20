@@ -1,93 +1,117 @@
-Received: from mail-oi1-f174.google.com (mail-oi1-f174.google.com [209.85.167.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fout7-smtp.messagingengine.com (fout7-smtp.messagingengine.com [103.168.172.150])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2EE9146A85
-	for <iwd@lists.linux.dev>; Fri, 19 Jul 2024 21:00:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1521F3201
+	for <iwd@lists.linux.dev>; Sat, 20 Jul 2024 05:46:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.150
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721422806; cv=none; b=k4LtPEArouxvV3qyTklcZcSMUfAHCAR3UIsJvdf3SPKrLl5wH9n2waq5uJj9daF4WECw8chL4yae/e74yrBagMfXQluN+OG2yVSn5qUVERr1m4dQ2P1Wm3p0z5tjNn1kHaACK/tpRvbwvqX5z4RUPjdSFiP8cw/OqNFRHfj7SzE=
+	t=1721454376; cv=none; b=p3Feu7CrssrOdFhdw2zfhbf9La5wZ0IE6AOS/l5RspbuwKhLULUuqBgEhvry3Pwp+UCkIswLfFjq18cWOa6sl688Bwtb9ZmpGCunlJJWFy9WS5D9hSzBZfnmK5YU1Glm+z5RdZko3r8X0SbiFbj8U3nj/tmIFVo2y23Wb2iR4bo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721422806; c=relaxed/simple;
-	bh=PEImxl5wXUhehcTaUZMAAlNAZ0wfU/ehtPW97PXTRrA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=BkV8wL+DCy8aJOsTEbcU3q6y35cFvJj7St5PeqyHPIHGWQp/iS+nq/R7nd1IOI+NS2UyLK3FqfRq0zdTjTczZOgZBvqF9eWTwqP1B/CIUJMi5mZgUgI/oy4Ug/MWEVEEK4fTHbPcpNcIiIyEUB7Vpv4u5hnoFzqkl6dr1KcpICM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=H6jYz53m; arc=none smtp.client-ip=209.85.167.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1721454376; c=relaxed/simple;
+	bh=VNjpjAMk5Ztbn9TxStfpI/AdrLUz0s9LCrZfy5b0ebw=;
+	h=MIME-Version:Message-Id:Date:From:To:Subject:Content-Type; b=KaGzQxRR9xbVzx8s1PJhOcDaGb8G0Skjpe6Xv2qwCVxvHCuGDAE5kq/I3sVxlFea4bJxLcknLfIqWPzp9bVRsf1KSADUmGCd/F6Vl9/k7YXA+NjrSjGNOn6DJr+jL+9p9VM2Kn63kJRwQxXIbuQlOru3BDAJunKKwJOypmV7C+g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fastmail.com; spf=pass smtp.mailfrom=fastmail.com; dkim=pass (2048-bit key) header.d=fastmail.com header.i=@fastmail.com header.b=gTD7/Y85; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=GJjzh6Hw; arc=none smtp.client-ip=103.168.172.150
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fastmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="H6jYz53m"
-Received: by mail-oi1-f174.google.com with SMTP id 5614622812f47-3d92df7e83cso1238170b6e.0
-        for <iwd@lists.linux.dev>; Fri, 19 Jul 2024 14:00:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1721422804; x=1722027604; darn=lists.linux.dev;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=tQkpzjyRI0o3UY/5DLBQbRojX+ion1sNE31+EIHRXQU=;
-        b=H6jYz53mJMMSdSvvIokCT8LaMkoF8PSNQLktw+1AvFTdHMmWmTZdzKELW9H04upiWA
-         Lz19pcSDxWQetIS6PB6iYWw0ZYU+etqYYmNFvLuzcLp6twFNXWJ+zrZfw8IfFz8QAxPK
-         Bm+sdnq7gAMBG+xdw60mFeV2TA+XVOhM8iNdnbFVZeuiDWD74R5ciFdMuNgBtUvkoafT
-         tk1ZvWnfvH7vy+0XgNN0oDx8pkmusuZdv6jS+C0wvBC4V9lyNJxKcRbf2/78EGneorJa
-         MWtJ9KHIqkej/2jwCg8jC2oJc9kDgHTeFRAeL7ni6QD1iO3y0uDfdiLZd3qMGMwMjZOi
-         I7uw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721422804; x=1722027604;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=tQkpzjyRI0o3UY/5DLBQbRojX+ion1sNE31+EIHRXQU=;
-        b=XIPsDiCrhsfjHefLy3523A9Jlb+EeMZ6tli5p3SCmuLiisF+hJQVDbQ0jEVmTivO00
-         R+YIhGJAmXsg65MHCA9UpMCjQsRvlAfcc+Hd1RZl6yZ9BVu0YbL5mKbOJqhDLdN5Ihy2
-         ksur/s24YlD+sDUESsxutYHP3rScmvJsM3Lhko1Lr65RwfsdqsMHoNlkvViGsXumhtwA
-         FbFBBCjNAq+P6J91ECmdkVCrWDd2CexcCKy0FNeFhHXBIaVIah1xaBwahZS/oOkAnMWD
-         p7cC/XB4BX7jrsua7HxNqiCZx2PocQ9alnXrZN0UzPWlsMUgeW/W22SwfEAlOpx4+7ge
-         MKDA==
-X-Forwarded-Encrypted: i=1; AJvYcCUnLDDwm9zlvd+Ctb8H1Qhkg1tAS4RW7RRs39H5/WcGC1901DCdG4iELqpok3bgW0PN15W4V+KIw8ilACHAcwMuiKz+
-X-Gm-Message-State: AOJu0YzlvC/bHpE+bQZmkKQuikI105EtgHs4PBqAKgH4zCVhgqtyrbBS
-	ftsSFbjS2XSTdjwJKEExB+FYvpsKpsUX7qwfgyjdTEip5tdG0ijZmHG8FA==
-X-Google-Smtp-Source: AGHT+IFOSo2/eqWxaq/AICu3UMAfICtrxoz+eACSN1JcYqh6TfjGIoFsSw2kFSoKXIDW3sHMz5oWdw==
-X-Received: by 2002:a05:6808:1407:b0:3d9:dabc:7b7d with SMTP id 5614622812f47-3dae64fdb11mr395845b6e.15.1721422803866;
-        Fri, 19 Jul 2024 14:00:03 -0700 (PDT)
-Received: from [192.168.1.22] (syn-070-114-247-242.res.spectrum.com. [70.114.247.242])
-        by smtp.googlemail.com with ESMTPSA id 5614622812f47-3dae0969c8fsm428626b6e.12.2024.07.19.14.00.03
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 19 Jul 2024 14:00:03 -0700 (PDT)
-Message-ID: <8a021f22-346a-43c1-9b2a-49bcdc1deed5@gmail.com>
-Date: Fri, 19 Jul 2024 16:00:02 -0500
+	dkim=pass (2048-bit key) header.d=fastmail.com header.i=@fastmail.com header.b="gTD7/Y85";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="GJjzh6Hw"
+Received: from compute9.internal (compute9.nyi.internal [10.202.2.228])
+	by mailfout.nyi.internal (Postfix) with ESMTP id 29324138006B
+	for <iwd@lists.linux.dev>; Sat, 20 Jul 2024 01:46:14 -0400 (EDT)
+Received: from imap47 ([10.202.2.97])
+  by compute9.internal (MEProxy); Sat, 20 Jul 2024 01:46:14 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fastmail.com; h=
+	cc:content-type:content-type:date:date:from:from:in-reply-to
+	:message-id:mime-version:reply-to:subject:subject:to:to; s=fm3;
+	 t=1721454374; x=1721540774; bh=WbqPGWYDa81ql3l0NpsipjmEAs+nYBWu
+	llH7geJx+2w=; b=gTD7/Y85vm8yy64c89ZEI7pgvdnRs9S3tqW0sLr7zfEjFm3W
+	62lzBT96P1+2W38WHaDGgmt/Akwe8YyCf98kGWP/dMinBnLjeBhtv16pM0iOuNmy
+	ywibH5FUPcZvckzhTZdxfRgc+iCa8Z4EKxASHvK6j0Tqss6Ux8aVdR0IjvXl/FjX
+	DmrDLuimBkQ7Z+bUhJ5Q6GMDUMJj4+VTvmUVs/XoDrz/nU0yOQ0hne2Jx7jvlUBi
+	IJT39PU1pL4TbM3RfvNYDS+RPWNI1lWRD68ZfO8Nyi84Gz0Dv3bdthEuuw9tqw7J
+	0/TEkUs+Jbn0fzyD1v5l/0TcNUpJa/UxjWOI1g==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:message-id
+	:mime-version:reply-to:subject:subject:to:to:x-me-proxy
+	:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
+	1721454374; x=1721540774; bh=WbqPGWYDa81ql3l0NpsipjmEAs+nYBWullH
+	7geJx+2w=; b=GJjzh6HwmZsr8Sb43gTHRVWGqsKkbrmIX0MlWqTaiARbZ9lwvnh
+	I/XXoV2L996SKUMpZCiGLPw0uGl+/LKD76p9w4g7p4k0jV0+w29aat2c5K/QEM5P
+	KIwDMKke3w/oS87IWA5ZZb4QdQj4wmH4/Y4FItS7f5oPA5dBpumgKYPETI4BpzhF
+	MeKledeM3G6wEOu3v8D2AhSkYfjTOrCbqjCWuSxLSjOCVTtRzlKDb32CRGKNIHvD
+	i7T7A9+woDz7sJi5se9Ag6QOUVOV9HGX7iBwWkUY/5wD+XjxO6PtAFEv5VLf0Hip
+	yJ8GZCuOtEcAP8ZxA7NvzDRTYVZz01BqE+Q==
+X-ME-Sender: <xms:Jk-bZoWKlKX2J4WA3R4_W-LoDh9maxKCbNL4MR1uAhMpdHWI-5SRCA>
+    <xme:Jk-bZsmUREVX4Lpy6rf2QHMm-vm3zbdWYVgh4Nx_KAT8XIcXNCW0PK7ijupbPYJeo
+    f5_zkMeCJ97MD8f2pA>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeftddrhedvgddutdduucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
+    uceurghilhhouhhtmecufedttdenucenucfjughrpefofgggkfffhffvufgtsehttdertd
+    erredtnecuhfhrohhmpedfofhoghgvnhhsucflvghnshgvnhdfuceomhhoghhjsehfrghs
+    thhmrghilhdrtghomheqnecuggftrfgrthhtvghrnhepteeujefhffektdefieejfeduud
+    ejjeehkeehvdefjeeuveduhedvkefhveduudeunecuvehluhhsthgvrhfuihiivgeptden
+    ucfrrghrrghmpehmrghilhhfrhhomhepmhhoghhjsehfrghsthhmrghilhdrtghomh
+X-ME-Proxy: <xmx:Jk-bZsZHjIpJgKRxig3Ytci8JgSypgAA7VD5uGxD52_zMRfOQh14qA>
+    <xmx:Jk-bZnXfoSkwQoTqF399416IFPx3-Or3zYU0K6X71SKDzHBC-SKn2w>
+    <xmx:Jk-bZikHz9pXgn9uKzALkwWScotmvScOCNKgMHMT9h_erxGdMqCD4Q>
+    <xmx:Jk-bZsd-R9OErWmqHb4Gaf8N-TL1jm2Av0uUiXwSB5V-HtpPHl3Jbw>
+    <xmx:Jk-bZptXlH5E_H-9V7jKBUBjeudx3KCV1U8HWJL-WVfbMklas5J1SONo>
+Feedback-ID: i9549465d:Fastmail
+Received: by mailuser.nyi.internal (Postfix, from userid 501)
+	id 00921A60078; Sat, 20 Jul 2024 01:46:13 -0400 (EDT)
+X-Mailer: MessagingEngine.com Webmail Interface
+User-Agent: Cyrus-JMAP/3.11.0-alpha0-568-g843fbadbe-fm-20240701.003-g843fbadb
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/2] dpp: relax requirement on IWD being in a disconnected
- state
-To: James Prestwood <prestwoj@gmail.com>, iwd@lists.linux.dev
-References: <20240719181926.3888420-1-prestwoj@gmail.com>
- <abdda292-7c90-4705-9c81-9e11ffaedd10@gmail.com>
- <74956b29-14c9-47ae-ac7e-4294f52d2147@gmail.com>
-Content-Language: en-US
-From: Denis Kenzior <denkenz@gmail.com>
-In-Reply-To: <74956b29-14c9-47ae-ac7e-4294f52d2147@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Message-Id: <3554030d-7309-459c-8e91-ee34a0fe677b@app.fastmail.com>
+Date: Sat, 20 Jul 2024 05:45:53 +0000
+From: "Mogens Jensen" <mogj@fastmail.com>
+To: iwd@lists.linux.dev
+Subject: iwd 2.19 segfault?
+Content-Type: text/plain
 
-Hi James,
+Hi,
 
->>
->> Have you looked into how WSC does this?
-> I hadn't, but looks like it waits for a disconnected state before starting? We 
-> could do this too in DPP I guess. Just check if station is in any pending 
-> connecting states (connecting/connecting_auto), set a flag, and start DPP when 
-> station signals its disconnected.
+I'm using iwd 2.19 on kernel 6.6.40. Yesterday, after booting the
+system, no wlan interface was found. I have never experienced this
+situation before, system had not been updated recently and no recent
+configuration changes.
 
-My view on this is that the user has explicitly indicated that they want to 
-connect to a new network, so any ongoing autoconnect in station should be canceled.
+Following was found in kernel message buffer:
 
-Also, I think it would be good to be consistent between DPP and WSC.  In the end 
-they implement the same use case.  Whatever we do for one should be the same for 
-the other.
+[   13.585766] wlan0: send auth to 00:16:3e:21:cf:ab (try 1/3)
+[   13.585997] traps: iwd[2446] general protection fault ip:55c8166f5107 sp:7ffde5888d90 error:0 in iwd[55c8166c8000+ea000]
+[   13.613989] wlan0: aborting authentication with 00:16:3e:21:cf:ab by local choice (Reason: 3=DEAUTH_LEAVING)
+
+Rebooting system and wlan interface was missing again. This time
+the message was different:
+
+[   11.623212] wlan0: send auth to 00:16:3e:21:cf:ab (try 1/3)
+[   11.623519] iwd[2443]: segfault at 1411 ip 0000000000001411 sp 00007ffc64376348 error 14 in iwd[55e26592f000+3000] likely on CPU 2 (core 2, socket 0)
+[   11.623558] Code: Unable to access opcode bytes at 0x13e7.
+[   11.657372] wlan0: aborting authentication with 00:16:3e:21:cf:ab by local choice (Reason: 3=DEAUTH_LEAVING)
+
+Rebooting system again and problem still persists:
+
+[   11.981208] wlan0: send auth to 00:16:3e:21:cf:ab (try 1/3)
+[   11.981515] traps: iwd[2442] general protection fault ip:558bac8fe107 sp:7ffdab42aca0 error:0 in iwd[558bac8d1000+ea000]
+[   11.997438] wlan0: aborting authentication with 00:16:3e:21:cf:ab by local choice (Reason: 3=DEAUTH_LEAVING)
+
+After a third reboot, the wlan interface was available again and
+everything works as normal. I have rebooted many times since, but the
+problem has not occured again.
+
+Any ideas on why this occured out of nowhere? Have you seen something
+like this before?
+
+Thanks in advance.
+
 
 Regards,
--Denis
+Mogens Jensen
