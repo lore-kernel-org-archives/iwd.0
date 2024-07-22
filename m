@@ -1,62 +1,62 @@
-Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
+Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B2CF16C6B0
-	for <iwd@lists.linux.dev>; Mon, 22 Jul 2024 18:29:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42CEF16C849
+	for <iwd@lists.linux.dev>; Mon, 22 Jul 2024 18:29:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721672980; cv=none; b=oVM6Gd2ddozX/xvwME9C8BCcq93Ir8LaAUxhvLopUc6LbI9caIePuruBJ70LKMaWeHiF3d/ndUJJZOCClvXrHNoMqC7rLmU4CjPNNN3XdJfQIQ1EpoS2CX5vGGAaeFQN28n3uAT1W9h90oullNVjZxwu878Qd3qamAZiCdTIWoM=
+	t=1721672980; cv=none; b=b/nlLSTSjhqfFcKjefYAYruczihrrF+35VujYuKmSmgpznaY5EQ9pxpSA/jvyUxe52UQI1AgrtiYtdaTT/WyG0ilpVpPaI9g/5FhzVIOViBGUvo9TIg13EtwEWnen4BxjE6lLIphDtnMVozvPkEiyM5kMSAJsLEqugMnUWfxCkY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1721672980; c=relaxed/simple;
-	bh=0aKaNlchXAfpifcJRt69jwR82Y/yUOcGdPTqEana/Iw=;
+	bh=BJHLYn4a21S7jdJH+9Q1Jmqq1q59HI4hcOCAJMco91g=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=hCHR/1Vd/vVChY9KU5Hm0UxHsj1sWMuqKCiPKlq0yfUhCceyX9SYSEBOyOOKJQ43QtcuWEtFAOBHYayK8sZNQwAJfAmJxJK5mf9J5+0hn7X1/FDc2XRg53RI6O0S2i2k+750s2fyXbJtLyHmOYaWoMdmIxewUZKJppSwwTbuFSM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mNX+AuNk; arc=none smtp.client-ip=209.85.214.179
+	 MIME-Version; b=jgTE/YqtgC9wTS1n34kua+1r9tVfWfroPBRZjlrffugHpu1hPn2U2hzW94bSlEmnHGphdKZxBeGL9vk3JGXN6qd7UGzdl6TTKY1MW+NIrWCqI01VLcbbNhNK77UUiUpFmnGviGzpL/4KwlwOuDjMdvYdABSQ72qMiy2VnOfpjAI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IwP+emwf; arc=none smtp.client-ip=209.85.214.181
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mNX+AuNk"
-Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-1fd640a6454so22729505ad.3
-        for <iwd@lists.linux.dev>; Mon, 22 Jul 2024 11:29:38 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IwP+emwf"
+Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-1fc49c1f3e5so34302635ad.1
+        for <iwd@lists.linux.dev>; Mon, 22 Jul 2024 11:29:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1721672977; x=1722277777; darn=lists.linux.dev;
+        d=gmail.com; s=20230601; t=1721672978; x=1722277778; darn=lists.linux.dev;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=EEMjiconc0/ACjkmCoOZFJDsYrqSNvF3TRXhZUy6ijw=;
-        b=mNX+AuNkQ/8Bh9GGBS31/L5voWy/x+UZ3her3/DA2LBuhmtLRdj+3LROrr76R7nqg5
-         ANaqE6Y94TTHsD1e2jQjCiGkZfpQKnOXhgCI+f6Ul5hRtcL0u60grEHHwwmFpBAp78w1
-         Nx3b+N4r3XAXoVFwt88lxbvLS39MbOISwwcsZy7MXdcSWYH9RF/YcPrOs8IwICZjtx3R
-         oU6OnNsx3beKO/isax0jbpDMN5wHsyWIrBXcdrEso0BINAvhLraZWXxnEo34Qv1B+Txq
-         JiSjfgeVHDaZHL7dIC2OZiwA0hVmjyvw+eEIOlhuf/WiBSCKzBrHTUPJHWXZUyshA6Ek
-         JJtA==
+        bh=DBXouCzHAGxvW2umhZYkML822JM3qwt4qA7iC1rTMpw=;
+        b=IwP+emwfL1yRS6mmXphf8DDSmLDi86gLMsz/ZZvXjOlknx0vC3b2XOj2yGUfDmSIZ9
+         VusJbKT+/C3FThB6XvcnFfDq+X/+zm/dXYIiukfm4+EsmcN4XhoMnMAJ8jrcttJPmad9
+         dckL4xwILv/OCtuCIsX+8QVo0fVClW/kE6pNBUJFylrqwZat2kvRXoCZtgY9aNF7dYcw
+         hdaLgi3sTC8MUPH5DshDSJ97q98vxGTHBTzweoY/zldJSI2WARUTyrB1SZQRh4A3cJli
+         uSmMbfl9MGx72PEZ5Ufpl09OQVqMk28L/Q8taeLufN3c3Fd/u8KU5BZVRooaqbWruwSY
+         J/Zg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721672977; x=1722277777;
+        d=1e100.net; s=20230601; t=1721672978; x=1722277778;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=EEMjiconc0/ACjkmCoOZFJDsYrqSNvF3TRXhZUy6ijw=;
-        b=f9C7Q0xxXXBnBkn4VRgYtqx10ub/kz4WFcuWd/dt9Y4OpcfD85+obFsC88wdDSecyZ
-         Ntx+CBMubY5TUpJJQpVjV2FCIRwskKBbZOx4LlOnzLidvocDvsImwT8OSSoP+SiQ9AHG
-         MujGWYSEkRoMRwTs3EZY1INWMDSAi3FZf0a6JoZewmX0yetElMjf/UjCr8cH3AKhsoxJ
-         t9INXxOnHkmpNvAWGaQc0GDetYS96eSWg62q+T6RjwZEKN+EtUEcS67/fdyF9urOkAlH
-         JWC/dsjmUeS/sIk/l6hUaLdhW2nYO+vv2k+VgfPsleYrmVGZEqoscU5uHjsHUu1H/gty
-         Mu1w==
-X-Gm-Message-State: AOJu0Yy4iULxbzggksIWCd9pTIuQx0XifCuKAP9y0g/XkpgUTlWVQZZs
-	zfn+iCAFdCYWme96PZNFDO6Fg4JCQbjcdTg2tfPJe7016yRECAlsfzb39g==
-X-Google-Smtp-Source: AGHT+IE9wSjVt0e5JVUlzedtMcjvFMxyVyhG8yJ8opGdLuceGBbU4zHCIXv7ktALgGLNl3krte77ng==
-X-Received: by 2002:a17:902:e88b:b0:1fd:672f:2b34 with SMTP id d9443c01a7336-1fd7457d357mr48764525ad.33.1721672977184;
-        Mon, 22 Jul 2024 11:29:37 -0700 (PDT)
+        bh=DBXouCzHAGxvW2umhZYkML822JM3qwt4qA7iC1rTMpw=;
+        b=KEo6u7ryjfw8/zE1XwXZuzqRL3hFU+ICXUbHBU1Cv5FyLaAsaytf7GfyD6HVwSIomY
+         2jDzHr2+tqYWl0MxGS3w9ajLSw3mDCW+xolRj2buBwV3ZJPEONRZbxYAbNsyxv4Aayox
+         d8qroh7hnux3ev/6gxHaUpUJ2Qtiy+JpYQPE+W7ymVzPPPDpqYFnv+JGENo38v/1AXks
+         uGISDBlJHsWlZc5BXr7cz09+0C2VioYf/g/S0su6bLUxxkrr622kmrUmAQdBpZFc8TCv
+         UxI6AnYsT6KK3sioE83+CN+jG2foAtbxfLzPYmoTgY+xftTtUoKl0WxoXFP9d3l07RgS
+         AeBw==
+X-Gm-Message-State: AOJu0YydUAkMWxEtGDyQE1behbMYG/bx47NB/KhrtvwyD/6LAwuunM07
+	6dpGfJAhNd8YJBY8UkcB0kh9wtNZy29FsL0fghBEgQcwJ3Sm6Uay50w/wg==
+X-Google-Smtp-Source: AGHT+IEEgmovHUoPz0OKYfZ/SO/7oop6AmN7hHPvIRhoBCKg1LM9nEK/5yR58DquQziEhM8JDrMt7A==
+X-Received: by 2002:a17:902:ec90:b0:1fd:9238:40f with SMTP id d9443c01a7336-1fd9238072amr33208245ad.22.1721672978054;
+        Mon, 22 Jul 2024 11:29:38 -0700 (PDT)
 Received: from LOCLAP699.localdomain (h69-130-12-20.bendor.broadband.dynamic.tds.net. [69.130.12.20])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1fd8dff753bsm33622625ad.243.2024.07.22.11.29.36
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1fd8dff753bsm33622625ad.243.2024.07.22.11.29.37
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 22 Jul 2024 11:29:36 -0700 (PDT)
+        Mon, 22 Jul 2024 11:29:37 -0700 (PDT)
 From: James Prestwood <prestwoj@gmail.com>
 To: iwd@lists.linux.dev
 Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH v2 3/5] dpp: explicitly disconnect station if enrollee is started
-Date: Mon, 22 Jul 2024 11:29:30 -0700
-Message-Id: <20240722182932.4091008-3-prestwoj@gmail.com>
+Subject: [PATCH v2 4/5] auto-t: add DPP tests for state change checks
+Date: Mon, 22 Jul 2024 11:29:31 -0700
+Message-Id: <20240722182932.4091008-4-prestwoj@gmail.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240722182932.4091008-1-prestwoj@gmail.com>
 References: <20240722182932.4091008-1-prestwoj@gmail.com>
@@ -68,368 +68,164 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Prior to now the DPP state was required to be disconnected before
-DPP would start. This is inconvenient for the user since it requires
-extra state checking and/or DBus method calls. Instead model this
-case like WSC and issue a disconnect to station if DPP is requested
-to start.
-
-The other conditions on stopping DPP are also preserved and no
-changes to the configurator role have been made, i.e. being
-disconnected while configuring still stops DPP. Similarly any
-connection made during enrolling will stop DPP.
-
-It should also be noted that station's autoconfigure setting is also
-preserved and set back to its original value upon DPP completing.
 ---
- src/dpp.c | 195 +++++++++++++++++++++++++++++++++++++++---------------
- 1 file changed, 143 insertions(+), 52 deletions(-)
+ autotests/testDPP/pkex_test.py         |  20 ++++-
+ autotests/testDPP/state_change_test.py | 107 +++++++++++++++++++++++++
+ 2 files changed, 126 insertions(+), 1 deletion(-)
+ create mode 100644 autotests/testDPP/state_change_test.py
 
-diff --git a/src/dpp.c b/src/dpp.c
-index 6f05aae9..b04477ca 100644
---- a/src/dpp.c
-+++ b/src/dpp.c
-@@ -193,6 +193,7 @@ struct dpp_sm {
- 	bool roc_started : 1;
- 	bool channel_switch : 1;
- 	bool mutual_auth : 1;
-+	bool autoconnect : 1;
- };
+diff --git a/autotests/testDPP/pkex_test.py b/autotests/testDPP/pkex_test.py
+index db355225..3d3ea6d1 100644
+--- a/autotests/testDPP/pkex_test.py
++++ b/autotests/testDPP/pkex_test.py
+@@ -4,7 +4,7 @@ import unittest
+ import sys
  
- static const char *dpp_role_to_string(enum dpp_capability role)
-@@ -469,6 +470,8 @@ static void dpp_free_auth_data(struct dpp_sm *dpp)
+ sys.path.append('../util')
+-from iwd import IWD, SharedCodeAgent
++from iwd import IWD, SharedCodeAgent, DeviceState
+ from iwd import DeviceProvisioning
+ from wpas import Wpas
+ from hostapd import HostapdCLI
+@@ -210,6 +210,24 @@ class Test(unittest.TestCase):
  
- static void dpp_reset(struct dpp_sm *dpp)
- {
-+	struct station *station = station_find(netdev_get_ifindex(dpp->netdev));
+         self.assertIn("SendHostname=true", settings)
+ 
++    def test_existing_incorrect_profile(self):
++        self.hapd.reload()
++        self.hapd.wait_for_event('AP-ENABLED')
++        IWD.copy_to_storage("existingProfile.psk", "/tmp/ns0/", "ssidCCMP.psk")
 +
- 	if (dpp->uri) {
- 		l_free(dpp->uri);
- 		dpp->uri = NULL;
-@@ -549,12 +552,19 @@ static void dpp_reset(struct dpp_sm *dpp)
- 	dpp_property_changed_notify(dpp);
- 
- 	dpp->interface = DPP_INTERFACE_UNBOUND;
++        # Start connecting
++        self.device[1].autoconnect = True
++        self.wd.wait_for_object_condition(self.device[1], 'obj.state == DeviceState.connecting')
 +
-+	if (station) {
-+		if (dpp->station_watch)
-+			station_remove_state_watch(station, dpp->station_watch);
++        # We should be able to start DPP despite the connecting state
++        self.device[1].dpp_pkex_enroll('secret123', identifier="test")
 +
-+		/* Set the old autoconnect state back to what it was */
-+		if (dpp->role == DPP_CAPABILITY_ENROLLEE)
-+			station_set_autoconnect(station, dpp->autoconnect);
-+	}
- }
- 
- static void dpp_free(struct dpp_sm *dpp)
- {
--	struct station *station = station_find(netdev_get_ifindex(dpp->netdev));
--
- 	dpp_reset(dpp);
- 
- 	if (dpp->own_asn1) {
-@@ -572,13 +582,6 @@ static void dpp_free(struct dpp_sm *dpp)
- 		dpp->boot_private = NULL;
- 	}
- 
--	/*
--	 * Since this is called when the netdev goes down, station may already
--	 * be gone in which case the state watch will automatically go away.
--	 */
--	if (station)
--		station_remove_state_watch(station, dpp->station_watch);
--
- 	known_networks_watch_remove(dpp->known_network_watch);
- 
- 	l_free(dpp);
-@@ -3721,6 +3724,9 @@ static void dpp_frame_watch(struct dpp_sm *dpp, uint16_t frame_type,
- 					L_UINT_TO_PTR(frame_type), NULL);
- }
- 
-+static void dpp_start_enrollee(struct dpp_sm *dpp);
-+static bool dpp_start_pkex_enrollee(struct dpp_sm *dpp);
++        self.start_iwd_pkex_configurator(self.device[0])
++        self.assertEqual(self.device[1].state, DeviceState.disconnected)
 +
- /*
-  * Station is unaware of DPP's state so we need to handle a few cases here so
-  * weird stuff doesn't happen:
-@@ -3734,27 +3740,50 @@ static void dpp_frame_watch(struct dpp_sm *dpp, uint16_t frame_type,
-  *     DPP finishes.
-  *
-  * Other conditions shouldn't ever happen i.e. configuring and going into a
-- * connecting state or enrolling and going to a disconnected/roaming state.
-+ * connecting state or enrolling and going to a roaming state.
-  */
- static void dpp_station_state_watch(enum station_state state, void *user_data)
- {
- 	struct dpp_sm *dpp = user_data;
- 
--	if (dpp->state == DPP_STATE_NOTHING)
-+	if (dpp->state == DPP_STATE_NOTHING ||
-+					dpp->interface == DPP_INTERFACE_UNBOUND)
- 		return;
- 
- 	switch (state) {
- 	case STATION_STATE_DISCONNECTED:
-+		/* DPP-initiated disconnect, the enrollee can now start */
-+		if (dpp->role == DPP_CAPABILITY_ENROLLEE) {
-+			l_debug("Starting enrollee after disconnect");
++        condition = 'obj.state == DeviceState.connected'
++        self.wd.wait_for_object_condition(self.device[1], condition)
 +
-+			if (dpp->interface == DPP_INTERFACE_DPP)
-+				dpp_start_enrollee(dpp);
-+			else
-+				dpp_start_pkex_enrollee(dpp);
+     def test_existing_hidden_network(self):
+         self.hapd_hidden.reload()
+         self.hapd_hidden.wait_for_event('AP-ENABLED')
+diff --git a/autotests/testDPP/state_change_test.py b/autotests/testDPP/state_change_test.py
+new file mode 100644
+index 00000000..d52f2b12
+--- /dev/null
++++ b/autotests/testDPP/state_change_test.py
+@@ -0,0 +1,107 @@
++#!/usr/bin/python3
 +
-+			return;
-+		}
++import unittest
++import sys
 +
-+		break;
- 	case STATION_STATE_DISCONNECTING:
-+		/* Normal part of disconnecting prior to enrolling */
-+		if (dpp->role == DPP_CAPABILITY_ENROLLEE)
-+			return;
++sys.path.append('../util')
++from iwd import IWD, SharedCodeAgent, DeviceState
++from iwd import DeviceProvisioning
++from wpas import Wpas
++from hostapd import HostapdCLI
++from hwsim import Hwsim
++from config import ctx
++from time import time
++import os
 +
-+		/* fall through */
- 	case STATION_STATE_ROAMING:
- 	case STATION_STATE_FT_ROAMING:
- 	case STATION_STATE_FW_ROAMING:
-+		/*
-+		 * An enrollee will always be disconnected prior to starting
-+		 * so a roaming condition should never happen.
-+		 */
- 		if (L_WARN_ON(dpp->role == DPP_CAPABILITY_ENROLLEE))
--			dpp_reset(dpp);
-+			goto reset;
- 
- 		if (dpp->role == DPP_CAPABILITY_CONFIGURATOR) {
- 			l_debug("Disconnected while configuring, stopping DPP");
--			dpp_reset(dpp);
-+			goto reset;
- 		}
- 
- 		break;
-@@ -3762,28 +3791,22 @@ static void dpp_station_state_watch(enum station_state state, void *user_data)
- 	case STATION_STATE_CONNECTED:
- 	case STATION_STATE_CONNECTING_AUTO:
- 	case STATION_STATE_NETCONFIG:
--		if (L_WARN_ON(dpp->role == DPP_CAPABILITY_CONFIGURATOR))
--			dpp_reset(dpp);
--
--		if (dpp->role == DPP_CAPABILITY_ENROLLEE) {
--			l_debug("Connecting while enrolling, stopping DPP");
--			dpp_reset(dpp);
--		}
--
--		break;
--
--	/*
--	 * Autoconnect states are fine for enrollees. This makes it nicer for
--	 * the user since they don't need to explicity Disconnect() to disable
--	 * autoconnect, then re-enable it if DPP fails.
--	 */
- 	case STATION_STATE_AUTOCONNECT_FULL:
- 	case STATION_STATE_AUTOCONNECT_QUICK:
--		if (L_WARN_ON(dpp->role == DPP_CAPABILITY_CONFIGURATOR))
--			dpp_reset(dpp);
-+		/*
-+		 * The user could have issued a connection request during
-+		 * enrolling, in which case DPP should be canceled. We should
-+		 * never hit this case as a configurator as a disconnect would
-+		 * need to come prior.
-+		 */
-+		L_WARN_ON(dpp->role == DPP_CAPABILITY_CONFIGURATOR);
- 
--		break;
-+		goto reset;
- 	}
++class Test(unittest.TestCase):
++    def auto_connect(self):
++        IWD.copy_to_storage('ssidCCMP.psk')
++        self.device.autoconnect = True
 +
-+reset:
-+	l_debug("Resetting DPP after station state change (state=%u)", state);
-+	dpp_reset(dpp);
- }
- 
- static void dpp_create(struct netdev *netdev)
-@@ -3793,7 +3816,6 @@ static void dpp_create(struct netdev *netdev)
- 	uint8_t dpp_conf_response_prefix[] = { 0x04, 0x0b };
- 	uint8_t dpp_conf_request_prefix[] = { 0x04, 0x0a };
- 	uint64_t wdev_id = netdev_get_wdev_id(netdev);
--	struct station *station = station_find(netdev_get_ifindex(netdev));
- 
- 	dpp->netdev = netdev;
- 	dpp->state = DPP_STATE_NOTHING;
-@@ -3839,8 +3861,6 @@ static void dpp_create(struct netdev *netdev)
- 				sizeof(dpp_conf_request_prefix),
- 				dpp_handle_config_request_frame, dpp, NULL);
- 
--	dpp->station_watch = station_add_state_watch(station,
--					dpp_station_state_watch, dpp, NULL);
- 	dpp->known_network_watch = known_networks_watch_add(
- 					dpp_known_network_watch, dpp, NULL);
- 
-@@ -3927,6 +3947,64 @@ static void dpp_start_presence(struct dpp_sm *dpp, uint32_t *limit_freqs,
- 	dpp_start_offchannel(dpp, dpp->current_freq);
- }
- 
-+static int dpp_disconnect_started(struct dpp_sm *dpp)
-+{
-+	int ret = 0;
-+	struct station *station = station_find(netdev_get_ifindex(dpp->netdev));
++        condition = 'obj.state == DeviceState.connected'
++        self.wd.wait_for_object_condition(self.device, condition)
 +
-+	/* Unusual case, but an enrollee could still be started */
-+	if (!station)
-+		return false;
++    def test_configurator_stops_on_disconnect(self):
++        self.auto_connect()
 +
-+	dpp->autoconnect = station_get_autoconnect(station);
-+	station_set_autoconnect(station, false);
++        self.device.dpp_start_configurator()
 +
-+	switch (station_get_state(station)) {
-+	case STATION_STATE_AUTOCONNECT_QUICK:
-+	case STATION_STATE_AUTOCONNECT_FULL:
-+		/* Should never happen since we just set autoconnect false */
-+		l_warn("Still in autoconnect state after setting false!");
++        self.device.disconnect()
 +
-+		/* fall through */
-+	case STATION_STATE_DISCONNECTED:
-+		ret = false;
-+		goto register_watch;
-+	case STATION_STATE_ROAMING:
-+	case STATION_STATE_FT_ROAMING:
-+	case STATION_STATE_FW_ROAMING:
-+	case STATION_STATE_CONNECTING:
-+	case STATION_STATE_CONNECTING_AUTO:
-+	case STATION_STATE_CONNECTED:
-+	case STATION_STATE_NETCONFIG:
-+		/*
-+		 * For any connected or connection in progress state, start a
-+		 * disconnect
-+		 */
-+		ret = station_disconnect(station);
-+		if (ret < 0)
-+			goto error;
++        condition = 'obj.state == DeviceState.disconnected'
++        self.wd.wait_for_object_condition(self.device, condition)
 +
-+		/* fall through */
-+	case STATION_STATE_DISCONNECTING:
-+		l_debug("Delaying DPP start until after disconnect");
++        self.assertEqual(self.device._device_provisioning.started, False)
 +
-+		ret = true;
-+		goto register_watch;
-+	}
++    def test_enrollee_stops_on_connect(self):
++        # Scan to get a list of networks
++        self.device.scan()
++        self.wd.wait_for_object_condition(self.device, 'obj.scanning == True')
++        self.wd.wait_for_object_condition(self.device, 'obj.scanning == False')
 +
-+error:
-+	l_warn("failed to start disconnecting (%d)", ret);
-+	station_set_autoconnect(station, dpp->autoconnect);
++        self.device.dpp_start_enrollee()
 +
-+	return ret;
++        network = self.device.get_ordered_network("ssidCCMP")
++        network.network_object.connect()
 +
-+register_watch:
-+	dpp->station_watch = station_add_state_watch(station,
-+						dpp_station_state_watch,
-+						dpp, NULL);
-+	return ret;
-+}
++        condition = 'obj.state == DeviceState.connected'
++        self.wd.wait_for_object_condition(self.device, condition)
 +
- static void dpp_start_enrollee(struct dpp_sm *dpp)
- {
- 	uint32_t freq = band_channel_to_freq(6, BAND_FREQ_2_4_GHZ);
-@@ -3955,27 +4033,27 @@ static struct l_dbus_message *dpp_dbus_start_enrollee(struct l_dbus *dbus,
- 						void *user_data)
- {
- 	struct dpp_sm *dpp = user_data;
--	struct station *station = station_find(netdev_get_ifindex(dpp->netdev));
-+	int ret;
- 
- 	if (dpp->state != DPP_STATE_NOTHING ||
- 				dpp->interface != DPP_INTERFACE_UNBOUND)
- 		return dbus_error_busy(message);
- 
--	/*
--	 * Station isn't actually required for DPP itself, although this will
--	 * prevent connecting to the network once configured.
--	 */
--	if (station && station_get_connected_network(station)) {
--		l_warn("cannot be enrollee while connected, please disconnect");
--		return dbus_error_busy(message);
--	} else if (!station)
--		l_debug("No station device, continuing anyways...");
--
- 	dpp->state = DPP_STATE_PRESENCE;
- 	dpp->role = DPP_CAPABILITY_ENROLLEE;
- 	dpp->interface = DPP_INTERFACE_DPP;
- 
--	dpp_start_enrollee(dpp);
-+	ret = dpp_disconnect_started(dpp);
-+	if (ret < 0) {
-+		dpp_reset(dpp);
-+		return dbus_error_from_errno(ret, message);
-+	} else if (ret == false)
-+		dpp_start_enrollee(dpp);
++        self.assertEqual(self.device._device_provisioning.started, False)
 +
-+	/*
-+	 * If a disconnect was started/in progress the enrollee will start once
-+	 * that has finished
-+	 */
- 
- 	dpp->pending = l_dbus_message_ref(message);
- 
-@@ -4111,6 +4189,9 @@ static struct l_dbus_message *dpp_start_configurator_common(
- 
- 	dpp_property_changed_notify(dpp);
- 
-+	dpp->station_watch = station_add_state_watch(station,
-+					dpp_station_state_watch, dpp, NULL);
++    def test_enrollee_disconnects_automatically(self):
++        self.auto_connect()
 +
- 	l_debug("DPP Start Configurator: %s", dpp->uri);
- 
- 	reply = l_dbus_message_new_method_return(message);
-@@ -4361,7 +4442,7 @@ static struct l_dbus_message *dpp_dbus_pkex_start_enrollee(struct l_dbus *dbus,
- 	struct dpp_sm *dpp = user_data;
- 	const char *key;
- 	const char *id;
--	struct station *station = station_find(netdev_get_ifindex(dpp->netdev));
-+	int ret;
- 
- 	l_debug("");
- 
-@@ -4369,9 +4450,6 @@ static struct l_dbus_message *dpp_dbus_pkex_start_enrollee(struct l_dbus *dbus,
- 				dpp->interface != DPP_INTERFACE_UNBOUND)
- 		return dbus_error_busy(message);
- 
--	if (station && station_get_connected_network(station))
--		return dbus_error_busy(message);
--
- 	if (!dpp_parse_pkex_args(message, &key, &id))
- 		goto invalid_args;
- 
-@@ -4384,8 +4462,18 @@ static struct l_dbus_message *dpp_dbus_pkex_start_enrollee(struct l_dbus *dbus,
- 	dpp->state = DPP_STATE_PKEX_EXCHANGE;
- 	dpp->interface = DPP_INTERFACE_PKEX;
- 
--	if (!dpp_start_pkex_enrollee(dpp))
--		goto invalid_args;
-+	ret = dpp_disconnect_started(dpp);
-+	if (ret < 0) {
-+		dpp_reset(dpp);
-+		return dbus_error_from_errno(ret, message);
-+	} else if (ret == false)
-+		if (!dpp_start_pkex_enrollee(dpp))
-+			goto invalid_args;
++        self.device.dpp_start_enrollee()
 +
-+	/*
-+	 * If a disconnect was started/in progress the PKEX enrollee will start
-+	 * once that has finished
-+	 */
- 
- 	return l_dbus_message_new_method_return(message);
- 
-@@ -4470,6 +4558,9 @@ static struct l_dbus_message *dpp_start_pkex_configurator(struct dpp_sm *dpp,
- 	dpp_reset_protocol_timer(dpp, DPP_PKEX_PROTO_TIMEOUT);
- 	dpp_property_changed_notify(dpp);
- 
-+	dpp->station_watch = station_add_state_watch(station,
-+					dpp_station_state_watch, dpp, NULL);
++        condition = 'obj.state == DeviceState.disconnected'
++        self.wd.wait_for_object_condition(self.device, condition)
 +
- 	if (dpp->pkex_key)
- 		l_debug("Starting PKEX configurator for single enrollee");
- 	else
++    def test_enrollee_autoconnect_stays_on(self):
++        # Put in an autoconnecting state, no saved profile though
++        self.device.autoconnect = True
++
++        self.device.dpp_start_enrollee()
++
++        # DPP should set autoconnect false, but then re-enable after it stops
++        self.wd.wait_for_object_condition(self.device, "obj.autoconnect == False")
++        self.wd.wait_for_object_condition(self.device._device_provisioning, "obj.started == True")
++
++        # Stop DPP
++        self.device.dpp_stop()
++        self.wd.wait_for_object_condition(self.device, "obj.autoconnect == True")
++
++    def test_enrollee_autoconnect_stays_off(self):
++        # Autoconnect should be off by default
++
++        self.device.dpp_start_enrollee()
++
++        # DPP should set autoconnect false, but stay off after it stops
++        self.wd.wait_for_object_condition(self.device, "obj.autoconnect == False")
++        self.wd.wait_for_object_condition(self.device._device_provisioning, "obj.started == True")
++
++        # Stop DPP
++        self.device.dpp_stop()
++        self.wd.wait_for_object_condition(self.device, "obj.autoconnect == False")
++
++    def setUp(self):
++        self.wd = IWD(True)
++        self.device = self.wd.list_devices(1)[0]
++
++    def tearDown(self):
++        self.wd.stop()
++        self.wd = None
++
++    @classmethod
++    def setUpClass(cls):
++        hapd = HostapdCLI(config="hostapd.conf")
++        hapd.reload()
++
++        hapd.wait_for_event("AP-ENABLED")
++
++    @classmethod
++    def tearDownClass(cls):
++        pass
++
++if __name__ == '__main__':
++    unittest.main(exit=True)
+\ No newline at end of file
 -- 
 2.34.1
 
