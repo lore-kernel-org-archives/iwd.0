@@ -1,61 +1,65 @@
-Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
+Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C62C16C6B0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31CCA16C849
 	for <iwd@lists.linux.dev>; Mon, 22 Jul 2024 18:29:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721672978; cv=none; b=F4FEwhCxVYLtuNiOc4A63IQDJtq+AxkCW63MIgfyqYOf9wjzsI1LCwn9zZjlKkfrqd2/BtuF2RgjSGtX/E2ax10HulPL0lzY0BvEfDIh7QJ9zraCHayx/HxqXMIAwyqk0VlbWjDQGnUTfo4jMngNTBDIRPc+XXkyZrK69dPD8u0=
+	t=1721672978; cv=none; b=qFcMSswCk/+VF+hN/BLk2pPOJGP/0KGl+msxUV+NNsuzGOEXJ09ymw2QY6+5qFRMQDXfTGx/A7sMacsqI/x27Dixye1/frV6hr3nIPdZ5Nk4RBTK2vbXxxZxQi/R0mysVCm6qZ5odXQA0K+mkPoy9q6rrkOlsSpi0s0pVT7a3CU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1721672978; c=relaxed/simple;
-	bh=tagP61yNJmsAJHKBfhm8LSjmJzcOwd3jJl1WkTP1lMI=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=ND2/5i35Zun68xMlQ5kHToR81/q3ziIoHWrHaD7vb5tU9vjUM7NWY9uRx/pnoAoayP32UEbYXtVUTfNwznf7g2fH76ZTWFeyVmDvdddXjfxmiFAWlLdeZzNl2Y4qeQw8cWJo8QZCbEm8kfJb16lf+d+V18qcKaxeOiugiVje7/8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WYYcwPPV; arc=none smtp.client-ip=209.85.214.179
+	bh=KovdUaiRySIwerb98Kd+zhsa3wjgebvYTwUnK+k+Em0=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=ECA8TG26tWJbXszQH5aE4/KdIp/HveX9YpsLt8aChPrbCZ8igXvrT8SWjG1wptyddUyCT0dpUv44wcoYiCgkYoUNnEhKugIKl9HQ5ifUllZEjDIDS6O2Z1w9uUwk/46uHZwlPkAcUHuP4LzysiPWIiv8+g7tTM1DBJeTvxGzPbc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Qzw18BMu; arc=none smtp.client-ip=209.85.214.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WYYcwPPV"
-Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-1fb3b7d0d3aso26421455ad.2
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Qzw18BMu"
+Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-1fc56fd4de1so265645ad.0
         for <iwd@lists.linux.dev>; Mon, 22 Jul 2024 11:29:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1721672975; x=1722277775; darn=lists.linux.dev;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=Vr4cagXRKHoGrtK5CjJX/9SHrVXecHUstDwjaCnMSGk=;
-        b=WYYcwPPVsG82D1nwLl5E9rybmgEmmwb4UjB4/HXfiNhLD1o1yWVjZLiUC66Pa9Lhbn
-         FlK8dpoRSNwOtliRCam+8gfdWfHCfN8RpoATS+/SNHDsqEZGQxuC/yKsiaWldHxHZOcB
-         H96K+7NxSfvW3CQUgGMiVRzIl6/8RH6u3ejMKborg9MgZhHUV6G2GXVOYcZdkAw0PW/Z
-         mAzTbKYEu2i3Shhd0aBO5DLxOmyVLCauEfKQlvNpPcQSwU3+CDNOHBBNt2/XwCcSfoBI
-         Qb1OKl0krLXpA1z6Ne9nvvRLvB5HshcKKU+PEKY7auX35qABpsl4N0LQJsBMJWRjCJDT
-         pbeg==
+        d=gmail.com; s=20230601; t=1721672976; x=1722277776; darn=lists.linux.dev;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ATevjVQZFZhSyTTg7te/+mB6KTD3bHMCcurSBbbb+Ow=;
+        b=Qzw18BMuAPh6Pp1+ZwfnpxlDb0c8fklNP2aBViTzLyRtJysotGS+aMB5kcuuc6+edK
+         pQCa7f9E4WfCprY3tblaeuiLxu9wgXeOrt9P62+QIKp/RqsxYPYvrwlRSHT+SaCtWDo4
+         JQDYbKEeRukW0CbmUF8LECitKqPUknlel3OSYywZgYh1TedLrghIGfs6sJfxSYxkoRQE
+         /u2EdHInE2JeX3VN6C/XOjWHwfHenOSJtRxJKVSF8xuLM3P7BPg4RHei1lMJLHFEl0Gy
+         m7OaV+zY29o0PTjsGsDGUJ/giGvu73cBgxakz2mj4Pp3DrnrR2JarNX1JlOou8d65Myz
+         Mp6g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721672975; x=1722277775;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Vr4cagXRKHoGrtK5CjJX/9SHrVXecHUstDwjaCnMSGk=;
-        b=s6KY/k9As2cVsQG9I2C7lyZgOLpqdHL+rzfGsaL3Y6utIW2NI16GImYeirJIqYdPoK
-         hRHu0DtT02VhGDztx6cQJY/avPCFJNHsqZhadIhXsTWcDYLqnnTr5w+p8N5CPzkq0RwQ
-         LbmlpyzPYZkIxwq1uPDbgimUXdkowaOqkPu7v4kVAUDRCL/68i8MWwpT/56GE92n/5pP
-         mS/UpAXoLz/rhTSqPleNl31Hn7DmnSZhLF4zrIhRp8l/nv/8439ApLkaGAnWDXvtypl7
-         dGG1Mo3vwzhX151gOT0dRq8UQlpLVQLL84nqf4IQkDxrMxKZSmzs05QcLKxqTMoLMypM
-         Ea+Q==
-X-Gm-Message-State: AOJu0YxA9pQmva7MFRnJm910m1JWlwOjVoOUz1Gne1kNgvN9+rON+f0E
-	Sf10msM77yNa1KmM4nHorMLwcsQE/JCXmE+ZMQF2gKewWKIwHluYzgpNOQ==
-X-Google-Smtp-Source: AGHT+IEUfNIw8aqPQt2qS8a/qfF81HzEaQ0+TzOY7KE+CZWS/uhTqLu4mnYbsB4bLr5P0+Ds3KBwCw==
-X-Received: by 2002:a17:903:190:b0:1fd:93d2:fb76 with SMTP id d9443c01a7336-1fd93d30197mr33752215ad.31.1721672975269;
-        Mon, 22 Jul 2024 11:29:35 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1721672976; x=1722277776;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ATevjVQZFZhSyTTg7te/+mB6KTD3bHMCcurSBbbb+Ow=;
+        b=wSrX1/9kCSQtAut3KHucbPD7+WF03TZutLqHhx4T6z7eV4v0/DAUZmbg8PvpO8kyEA
+         kdcLUFc7jPC2z5cQaBHygyk+AAEcPFNkPw/A1uKPSAjBYVoqTnEBWaASwxa1lYD758nP
+         ZKIHss2JChy0zdqBPOM9Nzmopq6HpKI9VnPhscaPKcyD8lwQQyXp+2pGlBHMmZaSby8h
+         qjeK9XiZvuZAgqxzRg7iWxwe28qXpetWlqHlo8g1Odhh518lFb3phg+8kVsmFQEATwAf
+         iMAocsuFFp5ffMPAxBr/CEY+/9qLje5fBZ+pMYHqVVvm3DXwnfL3CuWVbN000+WBl5PB
+         6ogw==
+X-Gm-Message-State: AOJu0YxGH7ZCwm1qWsBhC0Jk50Bkl5fkQ71Q1wbMp7eqbxvL8yIlYId5
+	oxDP2MwHyawt9cQ9AecQhZguCazRPYz22siXsnVyu4lyd7+jx2s++OsmCA==
+X-Google-Smtp-Source: AGHT+IHefumNCjKUIUGAX7Q5qYTOA4zUY7DVCgwcOFOxEPmXZgEGrNtH8adnN0DZ6bzt4kz/Sb0lOA==
+X-Received: by 2002:a17:902:dac9:b0:1f9:e2c0:d962 with SMTP id d9443c01a7336-1fc5b63500fmr185969015ad.31.1721672976065;
+        Mon, 22 Jul 2024 11:29:36 -0700 (PDT)
 Received: from LOCLAP699.localdomain (h69-130-12-20.bendor.broadband.dynamic.tds.net. [69.130.12.20])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1fd8dff753bsm33622625ad.243.2024.07.22.11.29.34
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1fd8dff753bsm33622625ad.243.2024.07.22.11.29.35
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 22 Jul 2024 11:29:34 -0700 (PDT)
+        Mon, 22 Jul 2024 11:29:35 -0700 (PDT)
 From: James Prestwood <prestwoj@gmail.com>
 To: iwd@lists.linux.dev
 Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH v2 1/5] dpp: factor out PKEX/DPP start prep into function
-Date: Mon, 22 Jul 2024 11:29:28 -0700
-Message-Id: <20240722182932.4091008-1-prestwoj@gmail.com>
+Subject: [PATCH v2 2/5] station: add station_get_autoconnect
+Date: Mon, 22 Jul 2024 11:29:29 -0700
+Message-Id: <20240722182932.4091008-2-prestwoj@gmail.com>
 X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20240722182932.4091008-1-prestwoj@gmail.com>
+References: <20240722182932.4091008-1-prestwoj@gmail.com>
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
@@ -64,126 +68,42 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-In order to slightly rework the DPP state machine to handle
-automatically disconnecting (for enrollees) functions need to be
-created that isolate everything needed to start DPP/PKEX in case
-a disconnect needs to be done first.
+Gets the current autoconenct setting. This is not the current
+autoconnect state. Will be used in DPP to reset station's autoconnect
+setting back to what it was prior to DPP, in case of failure.
 ---
- src/dpp.c | 64 +++++++++++++++++++++++++++++++------------------------
- 1 file changed, 36 insertions(+), 28 deletions(-)
+ src/station.c | 5 +++++
+ src/station.h | 1 +
+ 2 files changed, 6 insertions(+)
 
-diff --git a/src/dpp.c b/src/dpp.c
-index 567fe8d2..6f05aae9 100644
---- a/src/dpp.c
-+++ b/src/dpp.c
-@@ -3927,12 +3927,34 @@ static void dpp_start_presence(struct dpp_sm *dpp, uint32_t *limit_freqs,
- 	dpp_start_offchannel(dpp, dpp->current_freq);
+diff --git a/src/station.c b/src/station.c
+index ca0e6a38..db069981 100644
+--- a/src/station.c
++++ b/src/station.c
+@@ -1726,6 +1726,11 @@ bool station_set_autoconnect(struct station *station, bool autoconnect)
+ 	return true;
  }
  
-+static void dpp_start_enrollee(struct dpp_sm *dpp)
++bool station_get_autoconnect(struct station *station)
 +{
-+	uint32_t freq = band_channel_to_freq(6, BAND_FREQ_2_4_GHZ);
-+
-+	dpp->uri = dpp_generate_uri(dpp->own_asn1, dpp->own_asn1_len, 2,
-+					netdev_get_address(dpp->netdev), &freq,
-+					1, NULL, NULL);
-+
-+	l_ecdh_generate_key_pair(dpp->curve, &dpp->proto_private,
-+					&dpp->own_proto_public);
-+
-+	l_debug("DPP Start Enrollee: %s", dpp->uri);
-+
-+	/*
-+	 * Going off spec here. Select a single channel to send presence
-+	 * announcements on. This will be advertised in the URI. The full
-+	 * presence procedure can be implemented if it is ever needed.
-+	 */
-+	dpp_start_presence(dpp, &freq, 1);
-+
-+	dpp_property_changed_notify(dpp);
++	return station->autoconnect;
 +}
 +
- static struct l_dbus_message *dpp_dbus_start_enrollee(struct l_dbus *dbus,
- 						struct l_dbus_message *message,
- 						void *user_data)
+ static void station_roam_state_clear(struct station *station)
  {
- 	struct dpp_sm *dpp = user_data;
--	uint32_t freq = band_channel_to_freq(6, BAND_FREQ_2_4_GHZ);
- 	struct station *station = station_find(netdev_get_ifindex(dpp->netdev));
+ 	l_debug("%u", netdev_get_ifindex(station->netdev));
+diff --git a/src/station.h b/src/station.h
+index a38327e4..50f0be12 100644
+--- a/src/station.h
++++ b/src/station.h
+@@ -88,6 +88,7 @@ uint32_t station_add_event_watch(station_event_watch_func_t func,
+ void station_remove_event_watch(uint32_t id);
  
- 	if (dpp->state != DPP_STATE_NOTHING ||
-@@ -3949,30 +3971,14 @@ static struct l_dbus_message *dpp_dbus_start_enrollee(struct l_dbus *dbus,
- 	} else if (!station)
- 		l_debug("No station device, continuing anyways...");
+ bool station_set_autoconnect(struct station *station, bool autoconnect);
++bool station_get_autoconnect(struct station *station);
  
--	dpp->uri = dpp_generate_uri(dpp->own_asn1, dpp->own_asn1_len, 2,
--					netdev_get_address(dpp->netdev), &freq,
--					1, NULL, NULL);
--
- 	dpp->state = DPP_STATE_PRESENCE;
- 	dpp->role = DPP_CAPABILITY_ENROLLEE;
- 	dpp->interface = DPP_INTERFACE_DPP;
- 
--	l_ecdh_generate_key_pair(dpp->curve, &dpp->proto_private,
--					&dpp->own_proto_public);
--
--	l_debug("DPP Start Enrollee: %s", dpp->uri);
-+	dpp_start_enrollee(dpp);
- 
- 	dpp->pending = l_dbus_message_ref(message);
- 
--	/*
--	 * Going off spec here. Select a single channel to send presence
--	 * announcements on. This will be advertised in the URI. The full
--	 * presence procedure can be implemented if it is ever needed.
--	 */
--	dpp_start_presence(dpp, &freq, 1);
--
--	dpp_property_changed_notify(dpp);
--
- 	return NULL;
- }
- 
-@@ -4246,19 +4252,12 @@ static void dpp_pkex_scan_destroy(void *user_data)
- 	dpp->pkex_scan_id = 0;
- }
- 
--static bool dpp_start_pkex_enrollee(struct dpp_sm *dpp, const char *key,
--				const char *identifier)
-+static bool dpp_start_pkex_enrollee(struct dpp_sm *dpp)
- {
- 	_auto_(l_ecc_point_free) struct l_ecc_point *qi = NULL;
- 
--	if (identifier)
--		dpp->pkex_id = l_strdup(identifier);
--
--	dpp->pkex_key = l_strdup(key);
- 	memcpy(dpp->peer_addr, broadcast, 6);
--	dpp->role = DPP_CAPABILITY_ENROLLEE;
--	dpp->state = DPP_STATE_PKEX_EXCHANGE;
--	dpp->interface = DPP_INTERFACE_PKEX;
-+
- 	/*
- 	 * In theory a driver could support a lesser duration than 200ms. This
- 	 * complicates things since we would need to tack on additional
-@@ -4376,7 +4375,16 @@ static struct l_dbus_message *dpp_dbus_pkex_start_enrollee(struct l_dbus *dbus,
- 	if (!dpp_parse_pkex_args(message, &key, &id))
- 		goto invalid_args;
- 
--	if (!dpp_start_pkex_enrollee(dpp, key, id))
-+	dpp->pkex_key = l_strdup(key);
-+
-+	if (id)
-+		dpp->pkex_id = l_strdup(id);
-+
-+	dpp->role = DPP_CAPABILITY_ENROLLEE;
-+	dpp->state = DPP_STATE_PKEX_EXCHANGE;
-+	dpp->interface = DPP_INTERFACE_PKEX;
-+
-+	if (!dpp_start_pkex_enrollee(dpp))
- 		goto invalid_args;
- 
- 	return l_dbus_message_new_method_return(message);
+ int __station_connect_network(struct station *station, struct network *network,
+ 				struct scan_bss *bss, enum station_state state);
 -- 
 2.34.1
 
