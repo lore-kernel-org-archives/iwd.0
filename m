@@ -1,65 +1,61 @@
-Received: from mail-pg1-f180.google.com (mail-pg1-f180.google.com [209.85.215.180])
+Received: from mail-qv1-f48.google.com (mail-qv1-f48.google.com [209.85.219.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B72B16FF48
-	for <iwd@lists.linux.dev>; Mon, 22 Jul 2024 18:29:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20BF813BAF1
+	for <iwd@lists.linux.dev>; Tue, 23 Jul 2024 14:45:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721672981; cv=none; b=dWfRBVyw306SfAbXc3a17Quf5kvsBPWQNa2yRR0gV3LGQQ2p0GytVG1ZuUapCoHqF/obLY361ashT/AJwSdPiXQZqIep9KPAvBedj6yHGVsmlv1Ol07PvdyRqH84vnFMfA0ngUrYwo7RljRNYwAxIaREyFWjOKZVDRg0/W7x9nE=
+	t=1721745949; cv=none; b=bdDOVO918VQ50W6w5aXzA3jgqJ7POWK951xSSy5wB69/nTmUx/axrc0ve8e44tD7LJw/eo4f77i9o7XHy6kLveJ5LFWSKxxfOtilLqseu+51aPNj9uMuh7uXLyyn58uA2rdkeb6xo2TIskbW5bxH6C7SornsB2v2Gy92RS4esUk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721672981; c=relaxed/simple;
-	bh=mCt6Xtmel1g2crR4xVoXnJOIqgOGjh07XWdEPK1P49E=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=EocPj5tqDjYeJHYQhSNl597eBGbzaqrIE0jtwS9vnMQd3+qkIoWweCFCZ5c+jEmhaDENeoSEs89UiInyHpjzjSeWFA2jyovsQqZFkFamIy2Ij39viPUziD8gHech+eQNaSb4L14S/YmRd909nuAO4+NyozYW4GTxcxW4k0tp72Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Alu1RiD0; arc=none smtp.client-ip=209.85.215.180
+	s=arc-20240116; t=1721745949; c=relaxed/simple;
+	bh=8Ls0klZhqbFaiciC/Vypmg0MAvKaC+fQCqwqltt7tCM=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Rjs2DKpuSpo9Kk2MvHm0XRNcTxDal8QfL2TxwXlU9tprW3koYkJn5/+I4OAnXUJFuLp9bj0iyoLp/p2ESvK3XFP/VWoiVGm9nvYv57nUPtXrpC453UWsRv3LLUTJvfSzxzXoBPaBE8rwlg4tO+x7csl2icomLaUGtCyR6qegpdc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iv/qEoew; arc=none smtp.client-ip=209.85.219.48
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Alu1RiD0"
-Received: by mail-pg1-f180.google.com with SMTP id 41be03b00d2f7-7163489149eso3547963a12.1
-        for <iwd@lists.linux.dev>; Mon, 22 Jul 2024 11:29:40 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iv/qEoew"
+Received: by mail-qv1-f48.google.com with SMTP id 6a1803df08f44-6b798e07246so40616186d6.2
+        for <iwd@lists.linux.dev>; Tue, 23 Jul 2024 07:45:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1721672979; x=1722277779; darn=lists.linux.dev;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=/cgZmPeKwEp2fof8B0EwCkazZEK5jk3BKEv55QGJ6d0=;
-        b=Alu1RiD0MlTp9mZovgecOrxB3ldPVciGHVBUsByC0FmPHmXG3hDzMKFvieOPvJ0/lc
-         1CvDOhv0qlVvOliiDdBNWothY6ldwIYnDTikPPYkv3MomxrsZuAHMHQVXcuXn7AWBR1k
-         41KKpwpDDQx/Uv6UvTthbD9S5oZIxC/HLHL52s9WIqWKRoSS8uxXXv+HmROiJqPbBgVf
-         vcuYD0aphimsWx+JlzVH3ItH8yEaFPW9E+SL3VCZAQTm+RCrUpabu6hjKWOSAkrndKI/
-         qpFjBXNYs9Nl1TTwkdWRX3+iKsLKo3L+VXqxWhgvG7Iq7/zFczeueycJQNCwhWvOYoCV
-         17tw==
+        d=gmail.com; s=20230601; t=1721745947; x=1722350747; darn=lists.linux.dev;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=jeWJ91ooDAFtP/GFcg8A/hkuvWyagdO69Ca0pK7pTCs=;
+        b=iv/qEoewZHsXfo2Z01hJYH5WAeVMcFYcfQjApKDMNFBU4F1b+W6LwwaP/tj7MsFAoU
+         RBX23FYB1KnYXXWPAZ8VwpYYOc8nKmN4+dWlfuUOKIT/TDhev9xcjqQ4COItY7bH6Kdq
+         kLitAhJ5cF1IwzE1dDSF8kwzf6g6TAV1Sfja5bSrDc5K7cPuxOiEMmudHh5b2wToTwHW
+         83Lpyx+C/isXFYuB61alQrRLL3CfCuGCSEbfmknn22v6yQveK4xOKJJx/SUmLLMCq4tX
+         4DJjShKc4NwNfe0oNFeNIqat7bjxY76RjvAayyHN/j9LdXfcIPd5rOc/L4MMFVaw6I0B
+         xGEg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721672979; x=1722277779;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=/cgZmPeKwEp2fof8B0EwCkazZEK5jk3BKEv55QGJ6d0=;
-        b=NRykzWm8HiKPbQkrXQEk4cdzz651qox+3o696ggtvsu1iWnQJ6CBA5sifLiGsGjtxD
-         IKfMdfqQV1Yv5cmrzyWp8gD80mjumXuhlQRrz2ziYQgU2J7Ao0XHNFYzKKaFRDta5lSK
-         aVgw8lekOTDlbs2A3S9lPL+T8bFjYGZ8+cvTXA3cU04bGhab6o/yuh6Ixz8W77BsGl1F
-         MSO6zuC+MD5/uGPB5KgPen44Gg4d5Ai/k3TxUI3Dz6Rs12asD/yFNc32BFCvtkAFgJyb
-         caE9L6NMMMjEAZBZJp3R9nOKxjVkPLgneiHY29eEZpfuHyFPMhsQX70DfXbpnf47qmhz
-         0sCg==
-X-Gm-Message-State: AOJu0YwG0zuannPeSjzQUmWCA3yPS4xU0mMMZToH6BX1fPFknPgkBr6Q
-	dJVHg7As0E6yKLjt1c8mjLbkPPPz6JdovFE7lnnRwtvnfGSoYLppPAkF2w==
-X-Google-Smtp-Source: AGHT+IEa7ym4GZpU12BxEche2vLV1fMjVlSaWt262UOOMuDzTA2fWHCGm+YvZZC27j8nt5NTohDcNw==
-X-Received: by 2002:a05:6a21:9986:b0:1be:ca24:9647 with SMTP id adf61e73a8af0-1c4285b75c4mr9861986637.8.1721672979427;
-        Mon, 22 Jul 2024 11:29:39 -0700 (PDT)
-Received: from LOCLAP699.localdomain (h69-130-12-20.bendor.broadband.dynamic.tds.net. [69.130.12.20])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1fd8dff753bsm33622625ad.243.2024.07.22.11.29.38
+        d=1e100.net; s=20230601; t=1721745947; x=1722350747;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=jeWJ91ooDAFtP/GFcg8A/hkuvWyagdO69Ca0pK7pTCs=;
+        b=fM0DUTC9PuPIYPiy5RFlfAMzB8pHknUGjo51DybR6RkUC035/GF+iy0DiZeu+oksNI
+         JdRWkTekIHUBAuK/f/b8KXcch24ERqFw73YFeTr9aYoquThzHRJeSk1TKtLCFIWRGshK
+         8BFJiZLfoRVIpYvSP5oOGblTjPMah4MnWC+9rSAhDGR9Vm+kQ0CSgLRBSfZmGKD1x8xT
+         OJM+sAz2H+SnYVQfNOAhlbR72Jkr29cok6mj9XEwgXaAVh3WD+OBJE66HJHCSRaHMqDO
+         KpSydNZGRuUj7RBQjKM2I20bMK1OyPqOzlqtT03/AUuIvFSEyw1KD+qe8VKZpoNqP0ZG
+         iCxw==
+X-Gm-Message-State: AOJu0Yz4Mn5W/7jiqj8y+Ig1DMRq8hHS2TJ6mxG8Uuy5mwDo4GVFUIYQ
+	gthrWUqdGRFMdgkSMCdXKiJQSzAhk70d+o1tX7L6GeLHx3OdvQCCvA8UQg==
+X-Google-Smtp-Source: AGHT+IEk0Of4fe7/zCeGSzb5i5w10416jlsFGl5+Saq8gG8hOCPV9/FVRItOVNQputZ66EyoPsJGNQ==
+X-Received: by 2002:a05:6214:4018:b0:6b5:e202:bd78 with SMTP id 6a1803df08f44-6b95a74df3amr128430716d6.44.1721745946664;
+        Tue, 23 Jul 2024 07:45:46 -0700 (PDT)
+Received: from LOCLAP699.locus-rst-dev-locuspark.locus ([152.193.78.90])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6b7acaf3bc3sm48374386d6.125.2024.07.23.07.45.45
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 22 Jul 2024 11:29:38 -0700 (PDT)
+        Tue, 23 Jul 2024 07:45:46 -0700 (PDT)
 From: James Prestwood <prestwoj@gmail.com>
 To: iwd@lists.linux.dev
 Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH v2 5/5] auto-t: fix several DPP tests after station state changes
-Date: Mon, 22 Jul 2024 11:29:32 -0700
-Message-Id: <20240722182932.4091008-5-prestwoj@gmail.com>
+Subject: [RFC] doc: Document new BSS affinity method calls
+Date: Tue, 23 Jul 2024 07:45:40 -0700
+Message-Id: <20240723144540.985197-1-prestwoj@gmail.com>
 X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240722182932.4091008-1-prestwoj@gmail.com>
-References: <20240722182932.4091008-1-prestwoj@gmail.com>
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
@@ -68,101 +64,82 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-After the station state changes in DPP setting autoconnect=True was
-causing DPP to stop prior to being able to scan for the network.
-Instead we can start autoconnect earlier so we aren't toggling the
-property while DPP is running.
----
- autotests/testDPP/connection_test.py |  6 ++----
- autotests/testDPP/pkex_test.py       | 15 ++++++---------
- 2 files changed, 8 insertions(+), 13 deletions(-)
+This documents new DBus methods that expose a bit more control to how
+IWD roams. The new methods are:
 
-diff --git a/autotests/testDPP/connection_test.py b/autotests/testDPP/connection_test.py
-index f72a412d..e4f07af7 100644
---- a/autotests/testDPP/connection_test.py
-+++ b/autotests/testDPP/connection_test.py
-@@ -38,20 +38,18 @@ class Test(unittest.TestCase):
+SetConnectedBssAffinity()
+UnsetConnectedBssAffinity()
+
+Setting the affinity on the connected BSS effectively "locks" IWD to
+that BSS (except at critical RSSI levels, explained below). This can
+be useful for clients that have access to more information about the
+environment than IWD. For example, if a client is stationary there
+is likely no point in trying to roam until it has moved elsewhere.
+
+A new main.conf option would also be added:
+
+[General].CriticalRoamThreshold
+
+This would be the new roam threshold set after
+SetConnectedBssAffinity() is called. If the RSSI continues to drop
+below this level IWD would (attempt to) roam.
+---
+ doc/station-api.txt | 22 ++++++++++++++++++++++
+ src/iwd.config.rst  |  8 ++++++++
+ 2 files changed, 30 insertions(+)
+
+diff --git a/doc/station-api.txt b/doc/station-api.txt
+index 05dd137e..3dc2376b 100644
+--- a/doc/station-api.txt
++++ b/doc/station-api.txt
+@@ -135,6 +135,28 @@ Methods		void Scan()
+ 			Possible Errors: [service].Error.InvalidArguments
+ 					 [service].Error.NotFound
  
-     def test_iwd_as_enrollee_scan_after(self):
-         self.wpas.disconnect()
-+        self.device.autoconnect = True
-         uri = self.device.dpp_start_enrollee()
- 
-         self.wpas.dpp_configurator_create(uri)
-         self.wpas.dpp_configurator_start('ssidCCMP', 'secret123')
- 
--        self.hapd.reload()
--
-         with self.assertRaises(Exception):
-             self.device.get_ordered_network('ssidCCMP', scan_if_needed=False)
- 
-+        self.hapd.reload()
-         self.hapd.wait_for_event('AP-ENABLED')
- 
--        self.device.autoconnect = True
--
-         condition = 'obj.state == DeviceState.connected'
-         self.wd.wait_for_object_condition(self.device, condition)
- 
-diff --git a/autotests/testDPP/pkex_test.py b/autotests/testDPP/pkex_test.py
-index 3d3ea6d1..a651c6f6 100644
---- a/autotests/testDPP/pkex_test.py
-+++ b/autotests/testDPP/pkex_test.py
-@@ -160,10 +160,8 @@ class Test(unittest.TestCase):
- 
-     def test_pkex_iwd_to_iwd(self):
-         self.start_iwd_pkex_configurator(self.device[0])
--
--        self.device[1].dpp_pkex_enroll('secret123', identifier="test")
--
-         self.device[1].autoconnect = True
-+        self.device[1].dpp_pkex_enroll('secret123', identifier="test")
- 
-         condition = 'obj.state == DeviceState.connected'
-         self.wd.wait_for_object_condition(self.device[1], condition)
-@@ -176,10 +174,8 @@ class Test(unittest.TestCase):
- 
-     def test_pkex_configurator_with_agent(self):
-         self.start_iwd_pkex_configurator(self.device[0], agent=True)
--
--        self.device[1].dpp_pkex_enroll('secret123', identifier="test")
--
-         self.device[1].autoconnect = True
-+        self.device[1].dpp_pkex_enroll('secret123', identifier="test")
- 
-         condition = 'obj.state == DeviceState.connected'
-         self.wd.wait_for_object_condition(self.device[1], condition)
-@@ -198,8 +194,8 @@ class Test(unittest.TestCase):
- 
-         self.start_iwd_pkex_configurator(self.device[0])
- 
--        self.device[1].dpp_pkex_enroll('secret123', identifier="test")
-         self.device[1].autoconnect = False
-+        self.device[1].dpp_pkex_enroll('secret123', identifier="test")
- 
-         condition = 'obj.state == DeviceState.connected'
-         self.wd.wait_for_object_condition(self.device[1], condition)
-@@ -240,8 +236,9 @@ class Test(unittest.TestCase):
- 
-         self.start_iwd_pkex_configurator(self.device[0], profile='ssidHidden.psk')
- 
--        self.device[1].dpp_pkex_enroll('secret123', identifier="test")
-         self.device[1].autoconnect = False
-+        self.device[1].dpp_pkex_enroll('secret123', identifier="test")
++		void SetConnectedBssAffinity()
 +
++			Sets a high affinity/preference to the currently
++			connected BSS. Specifically, calling this will reduce
++			the roam threshold down to a critical level set by
++			[General].CriticalRoamThreshold. This effectively locks
++			the client onto the current BSS unless the signal
++			quality becomes extremely poor.
++
++			If IWD roams or disconnects the affinity will be reset.
++
++			Possible Errors: net.connman.iwd.NotConnected
++
++		void UnsetConnectedBssAffinity()
++
++			Unset a prior call to SetConnectedBssAffinity(). This
++			moves the roaming threshold back up to the default level
++			(RoamThreshold/RoamThreshold5GHz).
++
++			Possible Errors: net.connman.iwd.NotConnected
++					 net.connman.iwd.NotConfigured
++
+ Properties	string State [readonly]
  
-         condition = 'obj.state == DeviceState.connected'
-         self.wd.wait_for_object_condition(self.device[1], condition)
-@@ -257,8 +254,8 @@ class Test(unittest.TestCase):
-         self.hapd_hidden.wait_for_event('AP-ENABLED')
-         self.start_iwd_pkex_configurator(self.device[0], profile='ssidHidden.psk')
+ 			Reflects the general network connection state.  One of:
+diff --git a/src/iwd.config.rst b/src/iwd.config.rst
+index e31b1ffa..232337ae 100644
+--- a/src/iwd.config.rst
++++ b/src/iwd.config.rst
+@@ -130,6 +130,14 @@ The group ``[General]`` contains general settings.
+        This value can be used to control how aggressively **iwd** roams when
+        connected to a 5GHz access point.
  
--        self.device[1].dpp_pkex_enroll('secret123', identifier="test")
-         self.device[1].autoconnect = False
-+        self.device[1].dpp_pkex_enroll('secret123', identifier="test")
++   * - CriticalRoamThreshold
++     - Value: rssi dBm value, from -100 to 1, default: **-82**
++
++       The threshold at which IWD will roam regardless of the affinity set to
++       the current BSS. This is only used if the SetConnectedBssAffinity() DBus
++       method is called, at which point this value becomes the new roam
++       threshold.
++
+    * - RoamRetryInterval
+      - Value: unsigned int value in seconds (default: **60**)
  
-         condition = 'obj.state == DeviceState.connected'
-         self.wd.wait_for_object_condition(self.device[1], condition)
 -- 
 2.34.1
 
