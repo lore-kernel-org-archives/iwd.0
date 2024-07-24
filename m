@@ -1,108 +1,91 @@
-Received: from mail-qt1-f178.google.com (mail-qt1-f178.google.com [209.85.160.178])
+Received: from mail-ot1-f53.google.com (mail-ot1-f53.google.com [209.85.210.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6277A156871
-	for <iwd@lists.linux.dev>; Wed, 24 Jul 2024 12:14:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32C57613D
+	for <iwd@lists.linux.dev>; Wed, 24 Jul 2024 14:14:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721823291; cv=none; b=jh1GLWkjMyDHOJgN+fH4I0N/GznQ06+q7i2+a6fQNGwl2o6ooBgopkyBpHgPFVFSI/5ISHI29PekZEl1fKmEIAHwVQfzGZPvVncG8kTKIeA46m0R1sz/wnwP0inaQIqbRwxTBkpsrVQFG1ULH5I/U+f1UTV2cY8z6EVKRVHZFKw=
+	t=1721830490; cv=none; b=nw83GIo24d3V+kqZE3pUHMzclslfgbId7tdBsrbOzJGXEOm5Og8L1nrtAKtF7O/iETcRncW5YXiRyquGfUYk2WyHAIQd+FZX7bKm66Mm+NKmEVkok2/imwbz2lYAopwRjJnh17foj1M/X+soX0PLx9d8AE/J5gyuEvop+JtpLsc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721823291; c=relaxed/simple;
-	bh=sqfgEz3zIDGjyFyKb74MAymgN8FgL6s8p2L5gY6jrzE=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=g77Ek7iutT3Mgt05lQnFo7k5wu0uuv8+0Vt2li2R+4O37nGT3OvLelzTRlRhMTQB3xrQpVB4o+n+mpU/u+E2eo+19WGoi54ay+YKP1wnqPqG3RJ0CFBYFKTbAOJEFyGuzvuo59L5gxVr+iMetaRnsiDyX7GuOxxLoRkqmLL9gjw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EEsyih9U; arc=none smtp.client-ip=209.85.160.178
+	s=arc-20240116; t=1721830490; c=relaxed/simple;
+	bh=Xz/yfgtVRpMavIsIzW3XIbKxwnCp06avHqOvQriI5qs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=L0wK+0vDKl/5YYh4wyN1BS38f+nQjsz4AI2/q5N69rW/D96bW+VNna/s8WNgjSL/gKI2FOdu0ehcJsRQ8eH2TtCvsbhtxi1PBIc3sJtoVoyv0uj5I07rySCn+bQU9+jlmN6/jCMMYGqfAFDBfee6N2+LdFv99Gan8EHOrXqNEvo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=a6rsEg5F; arc=none smtp.client-ip=209.85.210.53
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EEsyih9U"
-Received: by mail-qt1-f178.google.com with SMTP id d75a77b69052e-44931d9eda6so7802471cf.1
-        for <iwd@lists.linux.dev>; Wed, 24 Jul 2024 05:14:50 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="a6rsEg5F"
+Received: by mail-ot1-f53.google.com with SMTP id 46e09a7af769-7092dd03223so15603a34.1
+        for <iwd@lists.linux.dev>; Wed, 24 Jul 2024 07:14:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1721823289; x=1722428089; darn=lists.linux.dev;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=MAU4dXXXTey9vbb44uY0bmxJruUfpkLZVIukYkG6IHY=;
-        b=EEsyih9U9r4SNoAkE8V0svNLzYvDtnLDnVhhHPUG/X10+zaYIYN4Z8PcRj6GNHC6mx
-         UZJ2V300hV/zTQJg/EPlfobjPy9XgdIHGrY7vR1WYVrCGvEvZxpKd1LpwT+SYjxGP9+A
-         fidD+1Ql8j1XHLLYzEdQZxCq7Ss2mYowc8ODVzbUEVtGoJMav2cUqBwxzgUK2o7pdfrA
-         fKBNrN53raOpU71odVNtI7RsYQXkLkwF7g4XS0iyrgZSRAwNmX3W1KDUi7Lm5IXrZTAi
-         83M5ikSy5nEc1GSijqqa2vfCdDAFBpHtLaPXn8V4+J2qaAgfBMk6uUUA9y3KJwsvPemk
-         uSQg==
+        d=gmail.com; s=20230601; t=1721830488; x=1722435288; darn=lists.linux.dev;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:to:subject:user-agent:mime-version:date:message-id:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=82YVw/D56DtKNCk4J30LN/c9yeasGUrQHTuYCfzlGVs=;
+        b=a6rsEg5FukqwmhHd0owGzPyQtGyOZuXwpmBD5SkTDecfOxOutR5JH2RJeVjN2gLFc4
+         wJEEpS0W+7BZyNbRLYTLA8FZ9sQ31sfVn4vysWrctHRP/tkW6cQ2XqKYfcTnrpcFmEeV
+         zDfMFgZRTLvZzWg5rBUf1Y8A3UmFBYrLxmxUUVCW9go/59zu7+UyHByNeoCDrCCM9Z0O
+         ktAOChNoHc8w9d7ehtzAgeQn3RejqpTilD7xpKUP7/qksFo6RH1W2EXS2HK+xJXLbX6K
+         YxWWyEpf6UdVCAcY6g9r+mAh/jtkto5vm/EjXGyBU2nn0iByxjuxiPvEucABurU1cidY
+         EdiQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721823289; x=1722428089;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=MAU4dXXXTey9vbb44uY0bmxJruUfpkLZVIukYkG6IHY=;
-        b=r2YsxhQck2Clyjl2qR3yHUV7DM5Jus6QIf1pxLV1JtM1ekF1Dvmxp41uQLYXjssbFx
-         VDAmdmHWjKIggu+jzMOP/njssmrlR4c+34DJIapsXNnYvuUQzn2J+r/fylsvlG4NM1tZ
-         4mSjkvlKWDp4Ja09IumSuo5f+quQjyIlobtbNkAv7xLYZdcXD1XUUNZpumN9UqeIJeFn
-         2+CIwRHPFGugJ+Mtxx/iZfsCpvRWH/uQ8tyze9cbYKVa1wtWBRp3UYJ7w3Xy6sSMdslZ
-         58xb1jyM74kHzbMvdF+OBbFcdpgtYaevdxoMx3utmRE8NNHIPj7v2AeUc8HKubcBlBVq
-         YqoA==
-X-Gm-Message-State: AOJu0Yy0N5TiNmbIdjnX3/JihbJOP/ZjYbtwUV1oBrq19vhEkVxhmeEC
-	nWdh22Q3r/TRp/TBhd55n1huW428vXUbOv04FxezZl7CkBI7MVxIjHCHkA==
-X-Google-Smtp-Source: AGHT+IHCqXCUYKLJg9lZS8qrFvZmO1xgdaMZ8sAgmUMmY0qLti3UoSVVJ02HFeXqjE3Ius2Ct6u3DA==
-X-Received: by 2002:ac8:7f08:0:b0:447:e636:9ea4 with SMTP id d75a77b69052e-44fd7b0149fmr23284981cf.8.1721823288902;
-        Wed, 24 Jul 2024 05:14:48 -0700 (PDT)
-Received: from LOCLAP699.locus-rst-dev-locuspark.locus ([152.193.78.90])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-44f9cdbd9b6sm52652171cf.88.2024.07.24.05.14.47
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 24 Jul 2024 05:14:48 -0700 (PDT)
-From: James Prestwood <prestwoj@gmail.com>
-To: iwd@lists.linux.dev
-Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 2/2] auto-t: don't print valgrind log if there was no error
-Date: Wed, 24 Jul 2024 05:14:43 -0700
-Message-Id: <20240724121443.1425256-2-prestwoj@gmail.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240724121443.1425256-1-prestwoj@gmail.com>
-References: <20240724121443.1425256-1-prestwoj@gmail.com>
+        d=1e100.net; s=20230601; t=1721830488; x=1722435288;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=82YVw/D56DtKNCk4J30LN/c9yeasGUrQHTuYCfzlGVs=;
+        b=lZmieGcmjEmE2NGBFGoQJuCvxc+ImXIbwYf4kbVVwa+8deIokBYIm1DCYdyqqRWcqm
+         lnQvb5ClpydnYjuDet1ePNthhFeOEkSstmzdkauJu+aVXC91Ag+mIeB7aTTP51oVEaaU
+         YxffdUxxcdKgrsqg9qsfDTipAKq51L+Az8HE2fsyrGUXuLVogBvJOYxIN7yXFvbDRF0u
+         p+NjZeOSZkKjImlcUn7ur+qunD19iN2zM905tIK75yf6Z6i1RnD+Ckxb+RKtJ8VmqjHF
+         QsZclubqdGs17CohCyiBlgUuyzQwz0g0mhKdslSKWWt0OwA35gcDIEU/H7hRPQNLamVA
+         RAxQ==
+X-Forwarded-Encrypted: i=1; AJvYcCW8cmoIx1Lb9RqnUulAkhwz/sIjjM+1m1H6/CydOiT27eH2RVPMqniqL+TsQoq9tOZ1jlyvmcFVje3S3fyS9pihb0se
+X-Gm-Message-State: AOJu0YyDZPs2IUc19k6dsbuxo8hK7N8vv2q3Hw3bl2KkGUXmYLKMuw6v
+	m9Z1KH4w00M9/d+uJKJQnmEacg2YN+xrjq+MtPW9VoNPqisRbBJe
+X-Google-Smtp-Source: AGHT+IE10D1HyJ5eLJvRkwkr6Wj9/W7EQOejrjxB2hQV/BYbkOW05rL848yZCIWktf3N3CUx8wO4nw==
+X-Received: by 2002:a05:6830:6a8f:b0:703:69b5:1518 with SMTP id 46e09a7af769-709234361e9mr3631927a34.16.1721830488253;
+        Wed, 24 Jul 2024 07:14:48 -0700 (PDT)
+Received: from [192.168.1.22] (syn-070-114-247-242.res.spectrum.com. [70.114.247.242])
+        by smtp.googlemail.com with ESMTPSA id 006d021491bc7-5d59f081072sm335542eaf.45.2024.07.24.07.14.47
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 24 Jul 2024 07:14:47 -0700 (PDT)
+Message-ID: <d6c8a51d-3bf6-4035-94cc-f78f954397cf@gmail.com>
+Date: Wed, 24 Jul 2024 09:14:47 -0500
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/2] scan: fix invalid read when canceling an ongoing scan
+To: James Prestwood <prestwoj@gmail.com>, iwd@lists.linux.dev
+References: <20240724121443.1425256-1-prestwoj@gmail.com>
+Content-Language: en-US
+From: Denis Kenzior <denkenz@gmail.com>
+In-Reply-To: <20240724121443.1425256-1-prestwoj@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-If valgrind didn't report any issues, don't dump the logs. This
-makes the test run a lot easier to look at without having to scroll
-through pages of valgrind logs that provide no value.
----
- tools/run-tests | 16 +++++++++++-----
- 1 file changed, 11 insertions(+), 5 deletions(-)
+Hi James,
 
-diff --git a/tools/run-tests b/tools/run-tests
-index fdd0b989..e043965b 100755
---- a/tools/run-tests
-+++ b/tools/run-tests
-@@ -899,12 +899,18 @@ def post_test(ctx, to_copy):
- 
- 	if ctx.args.valgrind:
- 		for f in os.listdir('/tmp'):
--			if f.startswith("valgrind.log."):
--				dbg(f)
--				with open('/tmp/' + f, 'r') as v:
--					dbg(v.read())
-+			if not f.startswith("valgrind.log."):
-+				continue
-+
-+			with open('/tmp/' + f, 'r') as v:
-+				result = v.read()
-+
-+			# Don't print out the result if there were no issues
-+			if "0 errors from 0 contexts" not in result:
-+				dbg(result)
- 				dbg("\n")
--				os.remove('/tmp/' + f)
-+
-+			os.remove('/tmp/' + f)
- 
- 	# Special case for when logging is enabled
- 	if os.path.isfile('/tmp/iwd-tls-debug-server-cert.pem'):
--- 
-2.34.1
+On 7/24/24 7:14 AM, James Prestwood wrote:
+> When the survey code was added it neglected to add the same
+> cancelation logic that existed for the GET_SCAN call, i.e. if
+> a scan was canceled and there was a pending GET_SURVEY to the
+> kernel that needs to be canceled, and the request cleaned up.
+> 
+> Fixes: 35808debae ("scan: use GET_SURVEY for SNR calculation in ranking")
+> ---
+>   src/scan.c | 10 ++++++++--
+>   1 file changed, 8 insertions(+), 2 deletions(-)
+> 
+
+Both applied, thanks.
+
+Regards,
+-Denis
 
