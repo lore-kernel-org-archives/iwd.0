@@ -1,89 +1,193 @@
-Received: from mail-ot1-f49.google.com (mail-ot1-f49.google.com [209.85.210.49])
+Received: from mail-ot1-f46.google.com (mail-ot1-f46.google.com [209.85.210.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A69BF15D5C4
-	for <iwd@lists.linux.dev>; Wed, 24 Jul 2024 20:27:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43A601741FE
+	for <iwd@lists.linux.dev>; Thu, 25 Jul 2024 16:15:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721852843; cv=none; b=EmfMaoObhXtadW9f7Z26FumEq+/fCD7HPKU5te/cqNRUKhlfwulBW7yvmDBmb+p+/RMXltCEBMqhYSBeu3d795srAN5SdcRUFcohQpuR4+QfDniOyestLttQvm2SjJbRphlb2Fe3HJGyedKCJCsfmo4d9N1UaxBwbvQiaslaaes=
+	t=1721924127; cv=none; b=K1uWlkL0j3K0PzCSCbmwdOllMDy3Vu/mNUb5pOywZLCVqiaHuSlxRAza7rZ0MH4pKqy+VORG2/v6R+FuAVZAfgiRPy473cv0lkDCOMhMRaC1DhZyT58/FQU2dtlxYivmdoNNZDLciWVU7cHvQzn9elEpcD/AulYtmCCzBU6N1xw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721852843; c=relaxed/simple;
-	bh=4I4w4r3+NUYjoq2eqCi2QldI2jRIka2Nkv82m1baxsc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=XcmtNzhRdNdF3nf7j85L4Phsih5NNZZMXhElCDRyY5C0kPr4xQrKc6pkk8N3tLFR9vmJCKqk8ntstGT+XXB3EbEcKRYowD8dEyuvifE1xWy+Y2+hMjfVf4GOsC7AjJQ8noTew38/FfIyd5bdqxYdP8tek210l4t+y0Jfd/NVr/E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=a3MyLSBs; arc=none smtp.client-ip=209.85.210.49
+	s=arc-20240116; t=1721924127; c=relaxed/simple;
+	bh=r+s87XIrs4NJtmXJitDDMjuafNy80iKTwm9lGxmdvIU=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Content-Type; b=pcatgKA4V+UzNY1mfBgss9tF/J21MuMFKHBgUCuEo6digUVJnIWW9YHIdlWANvBnLPlrbq5LGu6eYMCdIgLoV4e7Er9e58FJj1y5SkPHSF0/QniAeWvvWerNe7NI5S7wfniU+YY8eucThoEaUIVSdQKh3eXiO3ogneJ4i6pzCZA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XhkwF0lh; arc=none smtp.client-ip=209.85.210.46
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="a3MyLSBs"
-Received: by mail-ot1-f49.google.com with SMTP id 46e09a7af769-70362cb061aso85928a34.1
-        for <iwd@lists.linux.dev>; Wed, 24 Jul 2024 13:27:21 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XhkwF0lh"
+Received: by mail-ot1-f46.google.com with SMTP id 46e09a7af769-7036e383089so18177a34.2
+        for <iwd@lists.linux.dev>; Thu, 25 Jul 2024 09:15:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1721852840; x=1722457640; darn=lists.linux.dev;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=xg4LMazAUOdTKg/385K37/cTX2xL0E68UHkBcK1Jk70=;
-        b=a3MyLSBszTwdUtsOa3l0v13b0pkCl1DSzu+3IkEnkubMQ1lYVUPvUekInKbp26hT2J
-         CU41RF3+bSju3GvPvwK04FXjulM/HMS+oWCKOfjoSfkyFCoG0v5IuuHZ99hVuxG7/EFq
-         INBzHcOT9Ul5Wtj94mDFPUXEwNDURllBjRSCosdadr1JfqiPI8uXkzipBxP7oMdnalsR
-         RycWInZuBx7mK8GY2pSw+S/j9HuUZn9c/6VdsORtjYs7vOt+VN1GmlArYhFvEhrR04Gi
-         sJh/YJwOVNEtpfZwxUcH24+u38lR55dXIGAtpGPpjpkCMG/TTrpcoCQeLsJz9c/2dt1Q
-         IgNw==
+        d=gmail.com; s=20230601; t=1721924124; x=1722528924; darn=lists.linux.dev;
+        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=hLaqKd6tM4ABh3fsHkpSrSeHNdjMypwEllJDhvj4oV4=;
+        b=XhkwF0lhTAzW83NU60neOxOoCFODjsPK+9aAHuS07oyZvj4IGKPpouX5EPMJivThI1
+         nwjR9DgbrPqWYp9K5Ste18gCajgWzbQIRta4SlasnC8LCQp1RwVvLD9uQ6Um1S17SD2A
+         LU1egLKeA0JC2MHpaLnzMTpEfgnwE4mlqxCKGlDuHbIhSy2gbtppT4PuQFVgwJygE/9V
+         bMP7ADwe1RvBZGYmTi71h/7uoB1BxzwngdXLA08gN4sumcvbgUoS0DUbxZgRZNNsNilm
+         EkvJzB7QUL1iSoWowYWLuELkwg21y0roOcQ8ygyMwxLS2rjjoj7WgtmuIoE9R3dlQQhe
+         BzrQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721852840; x=1722457640;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=xg4LMazAUOdTKg/385K37/cTX2xL0E68UHkBcK1Jk70=;
-        b=YlLSgZB1UZA+MAUdlfplJC1+0iHE2EdWcQ8l25ZbCfX4ULjhsYlUfluOJO/kkN6PCJ
-         1MV62d39UmWqXWYoazFTSPyS974OrDm08UFPrXOpRWyXIn6muyrgpR+2owDXfc79HlDR
-         6FkP1cEmwjuGZseKooeqWcYFZWcORSBD3tqZEwt3Ndcmipz2z6GAj+FujuEmDIVvHdY8
-         0XQ1mOGQNS5TsBnX509pRQPgk7azQVC7XE3UL8/+x195FdIVHyr5cIrCE2A76ckPGGq+
-         lEuDi7ToOpsFhv5L/5N5xm/zWk9NSfaatL7EAydux/CmHzyDI2QxDjXGA8U739V+OERL
-         5tfg==
-X-Forwarded-Encrypted: i=1; AJvYcCVSwwhIZsrlaA/PbudQYyocaiJMYb6Naxdc4iFB+4Q6snnl/KmmNlIQAXWMulFeG/HytNNtmZhVaqC9gkbSQr1L/6tD
-X-Gm-Message-State: AOJu0YzWUJjATzoBB0yjqp6SD2swQS2jByV3viSuu0EUThYa0Yl/YtZs
-	MVV6lz14W7PKl1Gi4jA14g5BoOC/c1/jf+XbdzSBUJuYYzXivTM8
-X-Google-Smtp-Source: AGHT+IGFz5Z6aNi5Jv8s89mDWQkHkC2Iuo6xf6ho87F9KWoLCWwVwcbJniy506JGG2OQDLpNkj7JCA==
-X-Received: by 2002:a05:6830:6181:b0:708:7dbe:61f6 with SMTP id 46e09a7af769-7092e77f036mr1315521a34.29.1721852840602;
-        Wed, 24 Jul 2024 13:27:20 -0700 (PDT)
-Received: from [192.168.1.22] (syn-070-114-247-242.res.spectrum.com. [70.114.247.242])
-        by smtp.googlemail.com with ESMTPSA id 46e09a7af769-70930778280sm20611a34.64.2024.07.24.13.27.20
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 24 Jul 2024 13:27:20 -0700 (PDT)
-Message-ID: <e4f4df6d-9b64-4c30-954a-dda07800ad24@gmail.com>
-Date: Wed, 24 Jul 2024 15:27:19 -0500
+        d=1e100.net; s=20230601; t=1721924124; x=1722528924;
+        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=hLaqKd6tM4ABh3fsHkpSrSeHNdjMypwEllJDhvj4oV4=;
+        b=te8hMsLJ0r1dEhU7CGa3l0bh90sEFnhq9sI64Kc/2nZt9j5uNIZ1swBEJ7rLvVy9Lo
+         BIbC3ZNgBhSGrsLsVcOmDgTlzxbbN9amTgCnd02JWLsDxjingXIhwLFMxJLWOyDJ9Di2
+         eL18z70PQePMB8GAF7+pkkRBnyRnCmkUywjfKxPNYCAKcC2yXCQ51Nj+P4/LGLFykcoj
+         6ZZrZoPeVDrfFh9nZKJULi8pom4zbq0n8DgFbZcY4cYlfahZxDFkkSspslxQoW+WS107
+         N5ogKtCrjqEo28tgDqfMxE2BY18YtbwaLbWYpO3iiJ3aLQwv1yQQb19R2G3rdTGtkPDO
+         69ow==
+X-Gm-Message-State: AOJu0Ywyi41Bi1cJ5iGch3Jd3HIAvzOY8ZCFk3aptI8vrnPACjelZ00k
+	r+JS/VEU6w3rMALozr/UGS6Laqwon0kH9dCqBscTB9Y8CqVNCcIjf1Kp05Hc0qieaTeHIeruY/l
+	9+eMB16DJFscuH6f76/NobkigizVYCf7lCWA=
+X-Google-Smtp-Source: AGHT+IGI5E6k4k5dAV+ULZwwFvXsmqLY/+YpdEPHMSmGLT+9GnXhJ1F2f7vf60u0zMh8KcXLJ1ykgkGh/Fo22vPDhnc=
+X-Received: by 2002:a05:6830:2110:b0:703:68ad:315b with SMTP id
+ 46e09a7af769-7092e752b4amr3604024a34.24.1721924124030; Thu, 25 Jul 2024
+ 09:15:24 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 1/5] dpp: factor out PKEX/DPP start prep into function
-To: James Prestwood <prestwoj@gmail.com>, iwd@lists.linux.dev
-References: <20240724154641.1461593-1-prestwoj@gmail.com>
-Content-Language: en-US
-From: Denis Kenzior <denkenz@gmail.com>
-In-Reply-To: <20240724154641.1461593-1-prestwoj@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+From: daniel antoine <univac55@gmail.com>
+Date: Thu, 25 Jul 2024 18:15:13 +0200
+Message-ID: <CA+iibzCB-6wXch6yFu-4V9dKgz0sJRopsd7wXchccptT5hNB-A@mail.gmail.com>
+Subject: IWD CMD_SET_CQM failed: Operation not supported
+To: iwd@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
 
-Hi James,
+Hi
 
-On 7/24/24 10:46 AM, James Prestwood wrote:
-> In order to slightly rework the DPP state machine to handle
-> automatically disconnecting (for enrollees) functions need to be
-> created that isolate everything needed to start DPP/PKEX in case
-> a disconnect needs to be done first.
-> ---
->   src/dpp.c | 64 +++++++++++++++++++++++++++++++------------------------
->   1 file changed, 36 insertions(+), 28 deletions(-)
-> 
+I always have this error when iwd connect. It's not a problem, it
+works perfectly. How to get rid of it.
 
-All applied, thanks.
+juil. 25 17:35:05 grat-os1 iwd[530]: Wireless daemon version 2.19
+juil. 25 17:35:05 grat-os1 iwd[530]: station: Network configuration is disabled.
+juil. 25 17:35:05 grat-os1 iwd[530]: Wiphy: 0, Name: phy0
+juil. 25 17:35:05 grat-os1 iwd[530]:         Permanent Address:
+50:c2:e8:0b:58:bd
+juil. 25 17:35:05 grat-os1 iwd[530]:         2.4GHz Band:
+juil. 25 17:35:05 grat-os1 iwd[530]:                 Bitrates (non-HT):
+juil. 25 17:35:05 grat-os1 iwd[530]:                          1.0 Mbps
+juil. 25 17:35:05 grat-os1 iwd[530]:                          2.0 Mbps
+juil. 25 17:35:05 grat-os1 iwd[530]:                          5.5 Mbps
+juil. 25 17:35:05 grat-os1 iwd[530]:                         11.0 Mbps
+juil. 25 17:35:05 grat-os1 iwd[530]:                          6.0 Mbps
+juil. 25 17:35:05 grat-os1 iwd[530]:                          9.0 Mbps
+juil. 25 17:35:05 grat-os1 iwd[530]:                         12.0 Mbps
+juil. 25 17:35:05 grat-os1 iwd[530]:                         18.0 Mbps
+juil. 25 17:35:05 grat-os1 iwd[530]:                         24.0 Mbps
+juil. 25 17:35:05 grat-os1 iwd[530]:                         36.0 Mbps
+juil. 25 17:35:05 grat-os1 iwd[530]:                         48.0 Mbps
+juil. 25 17:35:05 grat-os1 iwd[530]:                         54.0 Mbps
+juil. 25 17:35:05 grat-os1 iwd[530]:                 HT Capabilities:
+juil. 25 17:35:05 grat-os1 iwd[530]:                         HT40
+juil. 25 17:35:05 grat-os1 iwd[530]:                         Short GI for 20Mhz
+juil. 25 17:35:05 grat-os1 iwd[530]:                         Short GI for 40Mhz
+juil. 25 17:35:05 grat-os1 iwd[530]:                 HT RX MCS indexes:
+juil. 25 17:35:05 grat-os1 iwd[530]:                         0-15
+juil. 25 17:35:05 grat-os1 iwd[530]:                 HE Capabilities
+juil. 25 17:35:05 grat-os1 iwd[530]:                         Interface Types: ap
+juil. 25 17:35:05 grat-os1 iwd[530]:                         Max HE RX
+<= 80MHz MCS: 0-11 for NSS: 2
+juil. 25 17:35:05 grat-os1 iwd[530]:                         Max HE TX
+<= 80MHz MCS: 0-11 for NSS: 2
+juil. 25 17:35:05 grat-os1 iwd[530]:                         Interface
+Types: station
+juil. 25 17:35:05 grat-os1 iwd[530]:                         Max HE RX
+<= 80MHz MCS: 0-11 for NSS: 2
+juil. 25 17:35:05 grat-os1 iwd[530]:                         Max HE TX
+<= 80MHz MCS: 0-11 for NSS: 2
+juil. 25 17:35:05 grat-os1 iwd[530]:         5GHz Band:
+juil. 25 17:35:05 grat-os1 iwd[530]:                 Bitrates (non-HT):
+juil. 25 17:35:05 grat-os1 iwd[530]:                          6.0 Mbps
+juil. 25 17:35:05 grat-os1 iwd[530]:                          9.0 Mbps
+juil. 25 17:35:05 grat-os1 iwd[530]:                         12.0 Mbps
+juil. 25 17:35:05 grat-os1 iwd[530]:                         18.0 Mbps
+juil. 25 17:35:05 grat-os1 iwd[530]:                         24.0 Mbps
+juil. 25 17:35:05 grat-os1 iwd[530]:                         36.0 Mbps
+juil. 25 17:35:05 grat-os1 iwd[530]:                         48.0 Mbps
+juil. 25 17:35:05 grat-os1 iwd[530]:                         54.0 Mbps
+juil. 25 17:35:05 grat-os1 iwd[530]:                 HT Capabilities:
+juil. 25 17:35:05 grat-os1 iwd[530]:                         HT40
+juil. 25 17:35:05 grat-os1 iwd[530]:                         Short GI for 20Mhz
+juil. 25 17:35:05 grat-os1 iwd[530]:                         Short GI for 40Mhz
+juil. 25 17:35:05 grat-os1 iwd[530]:                 HT RX MCS indexes:
+juil. 25 17:35:05 grat-os1 iwd[530]:                         0-15
+juil. 25 17:35:05 grat-os1 iwd[530]:                 VHT Capabilities:
+juil. 25 17:35:05 grat-os1 iwd[530]:                         Short GI for 80Mhz
+juil. 25 17:35:05 grat-os1 iwd[530]:                         Max RX
+MCS: 0-9 for NSS: 2
+juil. 25 17:35:05 grat-os1 iwd[530]:                         Max TX
+MCS: 0-9 for NSS: 2
+juil. 25 17:35:05 grat-os1 iwd[530]:                 HE Capabilities
+juil. 25 17:35:05 grat-os1 iwd[530]:                         Interface Types: ap
+juil. 25 17:35:05 grat-os1 iwd[530]:                         Max HE RX
+<= 80MHz MCS: 0-11 for NSS: 2
+juil. 25 17:35:05 grat-os1 iwd[530]:                         Max HE TX
+<= 80MHz MCS: 0-11 for NSS: 2
+juil. 25 17:35:05 grat-os1 iwd[530]:                         Interface
+Types: station
+juil. 25 17:35:05 grat-os1 iwd[530]:                         Max HE RX
+<= 80MHz MCS: 0-11 for NSS: 2
+juil. 25 17:35:05 grat-os1 iwd[530]:                         Max HE TX
+<= 80MHz MCS: 0-11 for NSS: 2
+juil. 25 17:35:05 grat-os1 iwd[530]:         6GHz Band:
+juil. 25 17:35:05 grat-os1 iwd[530]:                 Bitrates (non-HT):
+juil. 25 17:35:05 grat-os1 iwd[530]:                          6.0 Mbps
+juil. 25 17:35:05 grat-os1 iwd[530]:                          9.0 Mbps
+juil. 25 17:35:05 grat-os1 iwd[530]:                         12.0 Mbps
+juil. 25 17:35:05 grat-os1 iwd[530]:                         18.0 Mbps
+juil. 25 17:35:05 grat-os1 iwd[530]:                         24.0 Mbps
+juil. 25 17:35:05 grat-os1 iwd[530]:                         36.0 Mbps
+juil. 25 17:35:05 grat-os1 iwd[530]:                         48.0 Mbps
+juil. 25 17:35:05 grat-os1 iwd[530]:                         54.0 Mbps
+juil. 25 17:35:05 grat-os1 iwd[530]:                 HE Capabilities
+juil. 25 17:35:05 grat-os1 iwd[530]:                         Interface Types: ap
+juil. 25 17:35:05 grat-os1 iwd[530]:                         Max HE RX
+<= 80MHz MCS: 0-11 for NSS: 2
+juil. 25 17:35:05 grat-os1 iwd[530]:                         Max HE TX
+<= 80MHz MCS: 0-11 for NSS: 2
+juil. 25 17:35:05 grat-os1 iwd[530]:                         Interface
+Types: station
+juil. 25 17:35:05 grat-os1 iwd[530]:                         Max HE RX
+<= 80MHz MCS: 0-11 for NSS: 2
+juil. 25 17:35:05 grat-os1 iwd[530]:                         Max HE TX
+<= 80MHz MCS: 0-11 for NSS: 2
+juil. 25 17:35:05 grat-os1 iwd[530]:         Ciphers: BIP-CMAC-256
+BIP-GMAC-256 BIP-GMAC-128 CCMP-256
+juil. 25 17:35:05 grat-os1 iwd[530]:                  GCMP-256
+GCMP-128 BIP-CMAC-128 CCMP-128
+juil. 25 17:35:05 grat-os1 iwd[530]:                  TKIP
+juil. 25 17:35:05 grat-os1 iwd[530]:         Supported iftypes: station ap
+juil. 25 17:35:05 grat-os1 iwd[530]: udev interface=wlan0 ifindex=3
+juil. 25 17:35:05 grat-os1 iwd[530]: udev interface=virbr0 ifindex=4
+juil. 25 17:35:06 grat-os1 iwd[530]: event: state, old: disconnected,
+new: autoconnect_quick
+juil. 25 17:35:06 grat-os1 iwd[530]: udev interface=wlan0 ifindex=5
+juil. 25 17:35:06 grat-os1 iwd[530]: event: state, old:
+autoconnect_quick, new: autoconnect_full
+juil. 25 17:35:06 grat-os1 iwd[530]: event: connect-info, ssid:
+Livebox-XXXX xx.xx.xx.xx.xx.xx, signal: -45, load: 6/255
+juil. 25 17:35:06 grat-os1 iwd[530]: event: state, old:
+autoconnect_full, new: connecting
+juil. 25 17:35:06 grat-os1 iwd[530]: CMD_SET_CQM failed: Operation not supported
+juil. 25 17:35:10 grat-os1 iwd[530]: event: state, old: connecting,
+new: connected
+juil. 25 17:35:10 grat-os1 iwd[530]: event: roam-scan,
+juil. 25 17:35:12 grat-os1 iwd[530]: event: roam-info, bss:
+yy:yy:yy:yy:yy:yy, signal: -49, load: 1/255
+juil. 25 17:35:12 grat-os1 iwd[530]: event: state, old: connected, new: roaming
+juil. 25 17:35:12 grat-os1 iwd[530]: CMD_SET_CQM failed: Operation not supported
+juil. 25 17:35:13 grat-os1 iwd[530]: event: state, old: roaming, new: connected
 
-Regards,
--Denis
+I have found one commit referring to CMD_SET_CQM it's the commit
+2dc785982d29ebd72b7cc6ed5548454f386ce222  netdev: Check
+EXT_FEATURE_CQM_RSSI_LIST before sending CMD_SET_CQM
 
+Best regards
+
+Daniel
