@@ -1,108 +1,87 @@
-Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
+Received: from mail-ot1-f44.google.com (mail-ot1-f44.google.com [209.85.210.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 840D1143889
-	for <iwd@lists.linux.dev>; Fri, 26 Jul 2024 12:18:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7047182DF
+	for <iwd@lists.linux.dev>; Fri, 26 Jul 2024 14:53:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721996293; cv=none; b=PKOlMYl818fqquUY0AcQl8UwlJ1DzrUBwKjYB6Tzha/EreZ0MJmJZT4/MmaV69fM6Y2VUE2xvNJ6vYWIzoWi1e5qQZzGzzHq83TIip4hzKLUqaM4Ig3fZ4EuN0fAVQAdLV2DJRasgjxSd8Sbr0U6vgk6Nd0UYqlBlAo89wqi4vw=
+	t=1722005585; cv=none; b=o6HkbGeD4qwcWGB7rekFzwnw2EU1XMw7R4z+XWyD/CF7V6R0syrl+9ixJSrURHE6isfkBbuB2DE1h4Li91KG7nBAHXJw7eXeT6nj6l8D1FIc4VB22UcRSCVT5fVVAKMt5SOf0oTz3XAaV3SCeVVgwGsAXTj6z8HSu82zQ+1TL1s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721996293; c=relaxed/simple;
-	bh=Kgp4m617AaTZemEfEgRZpzlYRv5H8qqGpgatMr5/yeM=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=EM+ktyyQcVQ84huIEh6rmEyTc5xrr8Lrs4kNPTzrfio+n42rtkh6La6zlNa8mHqHQUJwHbQQLt1+MiGJ7X1k0fhkh5pkbDsSkt0gBoANOxICGawsmX6X0b1F1HeS3CpyQ53I/Ssvd5BHNfwYs37/KNwX5kQrOm8C2Rt91Q5A+Nk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Yvrds+LA; arc=none smtp.client-ip=209.85.214.176
+	s=arc-20240116; t=1722005585; c=relaxed/simple;
+	bh=y54IjE7mOLsbMriFf1XBhL9JgAVkjuIQw0YDzxdl/V0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=I48yF9nJ67laYKfcWewda37vS7JRMecDI/1S8ztl2P6thA6jmhppD7ZG+hcIWakLYoKyvcEWQVAy6pBqfrbWLy4SsEjaNnviVr92L/4XW7djc8gdhdB4u6ojmsP/OLYE1XI+r9pbW+fKyaJndwV2jljErm+omwWjkm+LChVfwaE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VoYU27Ui; arc=none smtp.client-ip=209.85.210.44
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Yvrds+LA"
-Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-1fd66cddd4dso5671635ad.2
-        for <iwd@lists.linux.dev>; Fri, 26 Jul 2024 05:18:12 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VoYU27Ui"
+Received: by mail-ot1-f44.google.com with SMTP id 46e09a7af769-704494efa7cso630290a34.3
+        for <iwd@lists.linux.dev>; Fri, 26 Jul 2024 07:53:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1721996291; x=1722601091; darn=lists.linux.dev;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=oH3jG5Ke1c9qd9z/HPd0gPHI2VHuSBfrlIuWmERfCTk=;
-        b=Yvrds+LACXBMRGMAyD1uYwP+8z6xoU6dpdgEf0i73kU9iFgynNfAjFclIN/nWUbYMj
-         lpAzA0CLSy5DrUhHMrz4zUqbx3CtIVtaR40lOR1NVXzKDQlXyzDGvDOsfYcUw1Ux/WIM
-         dfRwVrEa8A2ePcYPPBvqfwwaf1u86VdhWNw/l/JAOm82qCJTogtjtV3P82H3nL/avKi+
-         Gx4fgCYKlueR7Mhn/Ej5paR0TWxKp/MCo56BYwWr5qlpxo4K8zt6n7EUDX42x5sjhlxo
-         oq/jNhALoAqs1+OU3PA8ZcT49waUcL+3yDsuSWu3MHoS2lFOMZm6EYWOvx6H7AQWfl/c
-         ox7Q==
+        d=gmail.com; s=20230601; t=1722005583; x=1722610383; darn=lists.linux.dev;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:to:subject:user-agent:mime-version:date:message-id:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=r11Klw5GqcqWtNxpghSzIP0DXWuGuF36HxQZPShbmDY=;
+        b=VoYU27Ui/pWfu7RuFqluELNsyUq+gEBcpqMuWY15+G5JNKcLv9crKJfFXhjQqQRiM8
+         MSNvfQBLaMH5UX2ZvQhw1fmtC2FDV+6F5MW2dQ8+oByWY+aYIG2Ic1voKzPoXf5YR1qW
+         clUwI/KvQ8kkC1vg4yLhykAoniP1MQ6H93UDv7iIyxWRQReEwoEXMilXckuABTO4PNiD
+         ZmEwbRbD3tIgpzmxnylsiygVjwVKNjlhYoTBbJV1GsjWfHhMowzMiPlDahZyGJfYie3F
+         W4VOqXFYuadZ933+FYH3mZsjjKNCIIhCkG8Jyq8xKMwGC6WH8rDpYOoZ7glWFptCgYC0
+         TqVg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721996291; x=1722601091;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=oH3jG5Ke1c9qd9z/HPd0gPHI2VHuSBfrlIuWmERfCTk=;
-        b=BuDbrECAgpI4x2h39Ue6ysNe2+S2ZJIdRR7LfDBWye5iG/b43xzTo8tupLbgQK94gS
-         Q6+RIVC2RdScpR+cYDDUt4g5mgdWimZ1xCjOIIiTPZ4D2dEkS4dy/m0+BMawUr8S2chj
-         0sgBeA9EYUxHDAoKh5Wf/MHmSOJEzXy3QjoYV7GqMN1cQb5xzXWSso7q1xcd8Xluc1Gp
-         XGcVRxK0zBojgDfTPblJyr+02AnNBPXudGx59e1i85gNpl4l/cN2IRLfp8lIyJDytvxc
-         PtMjCZzL0VKC9k0FoQlqPs81NLdd9s0/j7eurL/d7yxYpk1OdiLw2I8ReJlf6bDMQhVW
-         km7A==
-X-Gm-Message-State: AOJu0YwWeVzFYRtOfDaXHqOxTXNhsIjneTXt1ZHglDfc1+LuH3VloGQB
-	5yC8wMYoqRqZlA4fsd2V2Ya5uOolrMlaiTaBWXg+Rp5OPDjoG6BwN6geuQ==
-X-Google-Smtp-Source: AGHT+IGlWwW4cD28tq7Gi6g2FVz8WEr6/OwMPAzQE7TfIRTJRUDKgjZ6wjv1QT5B93ztjhB5t0zoFQ==
-X-Received: by 2002:a17:902:d481:b0:1fd:8e8b:b2d1 with SMTP id d9443c01a7336-1fed38c2e95mr82406065ad.33.1721996291418;
-        Fri, 26 Jul 2024 05:18:11 -0700 (PDT)
-Received: from LOCLAP699.localdomain (h69-130-12-20.bendor.broadband.dynamic.tds.net. [69.130.12.20])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1fed7ee134esm30823725ad.129.2024.07.26.05.18.10
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 26 Jul 2024 05:18:11 -0700 (PDT)
-From: James Prestwood <prestwoj@gmail.com>
-To: iwd@lists.linux.dev
-Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH] monitor: fix the CQM RSSI threshold attribute
-Date: Fri, 26 Jul 2024 05:18:08 -0700
-Message-Id: <20240726121808.1629079-1-prestwoj@gmail.com>
-X-Mailer: git-send-email 2.34.1
+        d=1e100.net; s=20230601; t=1722005583; x=1722610383;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=r11Klw5GqcqWtNxpghSzIP0DXWuGuF36HxQZPShbmDY=;
+        b=mFNP3EtdUdHTuEmnmvZZbe6WVsgf5ok+TLqlcmhxuH2JBCsUPjcJNCiikx34v3Hvch
+         3SQGtcXxy5NlYXrJ9uoLZqb+O6glfM8pp5th9o5hw+7RkGIQDXNDwVaBwtgAY4W1liEV
+         wBrfXk9HjSumvu0zUl+EIT5jbpm8t/v/+eSJ4lf3857GH3BGWJL82q87gEoraq9Zl1Pt
+         GAXPBUhXewr7nvJqQ0EZhMHQWhghAtwrzrXSLOi6rhRgJnxi+mr2raxctuTQ6zGyqbSe
+         +3nQyhYvbMWtWufkaD8m85BIt4tgYD0w5Od05vKeXoatnujsRVyCNAhHWfHE7ndBAS04
+         aRrg==
+X-Forwarded-Encrypted: i=1; AJvYcCVaB6RY41yRSXCgZ+54cm3yzWYjLbEZs3/J27XVFG34UKH7W6dtAzC79X4ah6AhSpG0yybKesXyX2Ph2kKde0Vixo3O
+X-Gm-Message-State: AOJu0Yx7EXjhx45PX5F9luFQoPM3HUo79/LthQ66Y0putswHMA6nJRJr
+	pcsAzRbR7ccAT7PLceQdQ+BZYsq1+tt/Z+GMt4mdDX3zjpXA62H5
+X-Google-Smtp-Source: AGHT+IGDHNtg1Q2PEhuNx+TUb7Kg5DTAorwGGatH6LFOpJCQCamFUs4oEliUmZ/rOi0pMrc7HE4J9g==
+X-Received: by 2002:a05:6830:7303:b0:709:185d:48b7 with SMTP id 46e09a7af769-7093222b7cbmr5772423a34.9.1722005582871;
+        Fri, 26 Jul 2024 07:53:02 -0700 (PDT)
+Received: from [192.168.1.22] (syn-070-114-247-242.res.spectrum.com. [70.114.247.242])
+        by smtp.googlemail.com with ESMTPSA id 46e09a7af769-70930785d23sm766375a34.72.2024.07.26.07.53.02
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 26 Jul 2024 07:53:02 -0700 (PDT)
+Message-ID: <e57951fe-9729-4e74-bb59-5467db4ae71e@gmail.com>
+Date: Fri, 26 Jul 2024 09:53:01 -0500
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] monitor: fix the CQM RSSI threshold attribute
+To: James Prestwood <prestwoj@gmail.com>, iwd@lists.linux.dev
+References: <20240726121808.1629079-1-prestwoj@gmail.com>
+Content-Language: en-US
+From: Denis Kenzior <denkenz@gmail.com>
+In-Reply-To: <20240726121808.1629079-1-prestwoj@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-This attribute is actually an array of signed 32 bit integers and it
-was being treated as a single integer. This would work until more
-than one threshold was set, then it would fail to parse it.
----
- monitor/nlmon.c | 20 +++++++++++++++++++-
- 1 file changed, 19 insertions(+), 1 deletion(-)
+Hi James,
 
-diff --git a/monitor/nlmon.c b/monitor/nlmon.c
-index a900f7cc..e5cd5451 100644
---- a/monitor/nlmon.c
-+++ b/monitor/nlmon.c
-@@ -5618,8 +5618,26 @@ static void print_cqm_event(unsigned int level, const char *label,
- 	}
- }
- 
-+static void print_cqm_thresholds(unsigned int level, const char *label,
-+					const void *data, uint16_t size)
-+{
-+	const int32_t *thresholds = data;
-+	unsigned int i;
-+
-+	if (size % 4) {
-+		printf("malformed packet");
-+		return;
-+	}
-+
-+	print_attr(level, "%s:", label);
-+
-+	for (i = 0; i < size / 4; i++)
-+		print_attr(level + 1, "Threshold: %d", thresholds[i]);
-+
-+}
- static const struct attr_entry cqm_table[] = {
--	{ NL80211_ATTR_CQM_RSSI_THOLD,	"RSSI threshold",	ATTR_U32 },
-+	{ NL80211_ATTR_CQM_RSSI_THOLD,	"RSSI thresholds",	ATTR_CUSTOM,
-+					{ .function = print_cqm_thresholds } },
- 	{ NL80211_ATTR_CQM_RSSI_HYST,	"RSSI hysteresis",	ATTR_U32 },
- 	{ NL80211_ATTR_CQM_RSSI_THRESHOLD_EVENT,
- 					"RSSI threshold event",	ATTR_CUSTOM,
--- 
-2.34.1
+On 7/26/24 7:18 AM, James Prestwood wrote:
+> This attribute is actually an array of signed 32 bit integers and it
+> was being treated as a single integer. This would work until more
+> than one threshold was set, then it would fail to parse it.
+> ---
+>   monitor/nlmon.c | 20 +++++++++++++++++++-
+>   1 file changed, 19 insertions(+), 1 deletion(-)
+
+Applied, thanks.
+
+Regards,
+-Denis
 
