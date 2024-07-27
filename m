@@ -1,204 +1,265 @@
-Received: from mail-oi1-f176.google.com (mail-oi1-f176.google.com [209.85.167.176])
+Received: from mail-vk1-f171.google.com (mail-vk1-f171.google.com [209.85.221.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3BB0A149E1D
-	for <iwd@lists.linux.dev>; Fri, 26 Jul 2024 22:37:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 816F353373
+	for <iwd@lists.linux.dev>; Sat, 27 Jul 2024 12:25:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722033480; cv=none; b=P9YoiiRsnoE+L1VMCmcKUhwCcBHbGGod+gfTzeVeAK6Mw1o1n2RW1+wiOy0QfyNYqy6Mlo3u4Dn2BHuqjWyRUwsLQlNNXvlrMOXKhC/YFnpRdxBtii4UTObxCs6YbAfLl7a3NySQi5gPabXuP1EypmzXXQ1U9vBqTd8H1h7SVl0=
+	t=1722083127; cv=none; b=RyFTIeX46qz85juaMMLoW3OnRfOWqJXsOAnn4Vh3lIhfMa3loYdVrYjK9avbApq/lquj5kh6FSDzXj+Nm5hBvZAFbX2dQukMRWyrWS8OM6Nm8VlGRcGdf9SqdcTorx2pNS20i5M9JoXEihDT0+cI962v+i4UwOaJAUIi3DoAh4Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722033480; c=relaxed/simple;
-	bh=yMdtlX3sjcnkj9bZoG6+Hcx6Q8ZkAtaWiuOoHPgcRCA=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=T+zmjlvQj7vop8ANqy10TuTQvfje8dKywy0dCVhr8i9YBI/YzS/4tdcbr47OjnbHjfQA8cMf5mNmqbaTCAu9WFjgzoeJ5Bhr/J4SEwD8yjPmLME7DkiGL8RX2RZfaFoY7924j1LKkqrNrsxnCjxv1GpjHQQ4NykkGS/x37fWELE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fmgyPprv; arc=none smtp.client-ip=209.85.167.176
+	s=arc-20240116; t=1722083127; c=relaxed/simple;
+	bh=U/lJD4k7xQj9ZMc6F/eiW5W1mbt44YYaHzbQZ35qO/E=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Content-Type; b=rNYYVrOZMNa4D+be+Vb30LVmmZWrHDxyZQY60dPOOsyD5uYawj+AwRvEISMknuOvupo6R1juBvM45wInLp49xKetVlAAIOClh9alBpd/EytpAeOS/ohjWZpBr3vkCd1ZcB/TmblpJEFspnLnM0f2vSKUzd1gRrSX3VmItW0bbxE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZYfCUymD; arc=none smtp.client-ip=209.85.221.171
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fmgyPprv"
-Received: by mail-oi1-f176.google.com with SMTP id 5614622812f47-3db1646da25so687205b6e.1
-        for <iwd@lists.linux.dev>; Fri, 26 Jul 2024 15:37:58 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZYfCUymD"
+Received: by mail-vk1-f171.google.com with SMTP id 71dfb90a1353d-4f52cc4d3beso611500e0c.3
+        for <iwd@lists.linux.dev>; Sat, 27 Jul 2024 05:25:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1722033478; x=1722638278; darn=lists.linux.dev;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=a5aAKMYPoJ5T2PE2UIZ8SxR5MEJeKgUYFDtgCXOQHmQ=;
-        b=fmgyPprvlPgG4FqjkAphq/LyEr7PDLaYbLdFE2J3KvtheYxOEMGdHl7ezn8BE2mAc+
-         zpzmo9lii9YsiTuHqEeZqUdZ/QAD4j9M0dDXvcAWWmeidkfrp7eHtOav7GfupEryjC4s
-         2EWBjEzN6eXtU9Y1QT9fnoKZtQ9KIg6MuI+PoU3nqeJJPvaxwLz7TZ0KbnI4zoTkSpyN
-         +FxKUe0+viTRo26HXd3m07ylQ49EIGPvFjmkSp7R+S1JVXSCTHmSmjGxts8titjA5mMw
-         sThaNmWrarYMpXCENFpybKzaG4pGXcNQSjsP+BcdsFOlkSSemP78SLlnnlLZJOoZK07N
-         y9xg==
+        d=gmail.com; s=20230601; t=1722083124; x=1722687924; darn=lists.linux.dev;
+        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=h8COG6gHUY/Aj2v9ZfcwJowkZJCnEWg6RMupc6gCZDw=;
+        b=ZYfCUymDOIKueSOQPYavst4YdFyZRxgIVLrAgaajHVYFow3XK/z4A1BUlNvML0XGdB
+         wzcvvwgSYvyDDUR1b8oLT5xG/0FUmZmIGJ8qdDVFlVjzK/Ba28ejMuo9cweSf8EutrsS
+         juv4d3GpTz7ek7fdvX1tsOWh+2gmNYYRxeM8IQQCWuv3KDpXKg0GLRLIwSE1LTuv9PT8
+         ZqGjhvJUPzEplSFbbFXWx4OzTC8bWX/Qg1XzbUrPDoZNxaCjQj7ygpwsp2ZIXQfods7e
+         tsukZLMetzerHCOXkaa4lWLB9RycDKdrFjZXcy6RSqE6hPowm5/1A0vxWz3sQv6xujdn
+         dM2A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722033478; x=1722638278;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=a5aAKMYPoJ5T2PE2UIZ8SxR5MEJeKgUYFDtgCXOQHmQ=;
-        b=Qmh/IRE9Hx93fNBV0Nt9qBUFiIDsnvNaIjjym/w+7/u0IhglPcI+VMgyt4OcTT1ywR
-         37YE2k5h1wNKNwhikqkvZKPyB3hTOC4DQURJc4bVC+ojDIyu5F7Uw1RkqlYl/dLb6021
-         qlkbP8Hk8rYnzQXp2go6c56fIoz7+LZ+p1KMcaLE0WIP0c/mAYKPXk35btXmJOFWJTra
-         0flQ8gr+ch4qP2wl4FdCA2enPTsr0Mv4BEggd5R1H+MZA6HdoAW1LQCsw71z3NMjn03L
-         y5IBpY9bt7xaCrsc9eEJ4N+vYMWif4eAf0Zplrtep42shgqRrurQi2FK0/icKapEsX23
-         ia3A==
-X-Gm-Message-State: AOJu0YwzCC7iSqWfMEsOBQKMy7ItvcndDBFJFXUUSdkOkMjwXfaJiIAt
-	Z9beWc+cJUc0fDRfLOgbRc+wJ21mskKYigXXz+eYJllmajux/QRxeEYD2w==
-X-Google-Smtp-Source: AGHT+IEhm2SxPYq7EnFZH03PyNITloCEvGg3/fwvkgqIA570wPBuWJOY+81bjRqJHXp+m8fEn3vU8A==
-X-Received: by 2002:a05:6808:17a7:b0:3d5:1bc8:e979 with SMTP id 5614622812f47-3db23e7ab53mr505479b6e.1.1722033478019;
-        Fri, 26 Jul 2024 15:37:58 -0700 (PDT)
-Received: from localhost.localdomain (syn-070-114-247-242.res.spectrum.com. [70.114.247.242])
-        by smtp.gmail.com with ESMTPSA id 5614622812f47-3db13521040sm892574b6e.46.2024.07.26.15.37.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 26 Jul 2024 15:37:57 -0700 (PDT)
-From: Denis Kenzior <denkenz@gmail.com>
-To: iwd@lists.linux.dev
-Cc: Denis Kenzior <denkenz@gmail.com>
-Subject: [PATCH 3/3] monitor: Update to the new ell l_netlink_send API
-Date: Fri, 26 Jul 2024 17:37:45 -0500
-Message-ID: <20240726223754.159303-3-denkenz@gmail.com>
-X-Mailer: git-send-email 2.45.2
-In-Reply-To: <20240726223754.159303-1-denkenz@gmail.com>
-References: <20240726223754.159303-1-denkenz@gmail.com>
+        d=1e100.net; s=20230601; t=1722083124; x=1722687924;
+        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=h8COG6gHUY/Aj2v9ZfcwJowkZJCnEWg6RMupc6gCZDw=;
+        b=K241JycW6DsWNCaTUHxg6l0rkesa3CrsSG9ba2oZbbY41L5buYaOXtOGDrtowMJ7Om
+         54nJGKkLrrMqJ+Hy+BJHfdHYxmjEPSyKcgV2bdYQSuNS/0M7hFUJaUYAn+qUbOwo60ej
+         N88E4THT7GcUjojnwF1IwSOOoueqhCp2ff8kakmg25cNuBE/Wq8/JKaNZ0+jOcOZcTHs
+         5OP/dcf/z4KZCBVI9gQDIoOE0HYZ92N4b8C5593zNl4k3V4AffNPO1yE/Jp+C0oOjESX
+         3z58nZG93hMNdU3mLJViQpde1YU6PmZ7Fv5kDL+ewcQunXNRYAAumIRnRltfNkDsIiW+
+         ASCQ==
+X-Gm-Message-State: AOJu0Yyx6WNRkUxmpBfpMlPjF7KViLkqfB56Z49ClaOZaJZApaXT9BG2
+	dhXMI4b625ypa0uf4gBBtI92UbGxHSHjD5INhgM6JuhSUe09jpHDD2WWppZ/OVU4WdRq7AaPzn5
+	RMGzQm81pmdv2noH45UzR9HI9c+VSYk+yz5U=
+X-Google-Smtp-Source: AGHT+IECsI1868uk04X9K3wRA2MmxVNgDLchyd2faHXsl6P02Rysl5rsXUSZuw7TkqxBIfzjgYDYeDL5zgCuNN5+gt0=
+X-Received: by 2002:a05:6122:4105:b0:4f5:c90:2556 with SMTP id
+ 71dfb90a1353d-4f6e68c93d4mr2715719e0c.4.1722083124149; Sat, 27 Jul 2024
+ 05:25:24 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: daniel antoine <univac55@gmail.com>
+Date: Sat, 27 Jul 2024 14:25:13 +0200
+Message-ID: <CA+iibzC0yNsPu3chJj-aRA6=7Yyur_sspoKtO_SpjqA4xPsgGQ@mail.gmail.com>
+Subject: compilation error in iwd with ell commint 883bc6a90b4a9c654fdf2540f02447a7ca567e04
+To: iwd@lists.linux.dev, James Prestwood <prestwoj@gmail.com>, 
+	Denis Kenzior <denkenz@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 
----
- monitor/main.c | 88 ++++++++++++++------------------------------------
- 1 file changed, 24 insertions(+), 64 deletions(-)
+Hi James Hi Denis
 
-diff --git a/monitor/main.c b/monitor/main.c
-index 32f5ec4fc7f3..c560db775caa 100644
---- a/monitor/main.c
-+++ b/monitor/main.c
-@@ -260,22 +260,6 @@ static struct l_genl *genl_lookup(const char *ifname)
- 	return genl;
- }
- 
--static size_t rta_add(void *rta_buf, unsigned short type, uint16_t len,
--			const void *data)
--{
--	unsigned short rta_len = RTA_LENGTH(len);
--	struct rtattr *rta = rta_buf;
--
--	memset(RTA_DATA(rta), 0, RTA_SPACE(len));
--
--	rta->rta_len = rta_len;
--	rta->rta_type = type;
--	if (len)
--		memcpy(RTA_DATA(rta), data, len);
--
--	return RTA_SPACE(len);
--}
--
- static bool rta_linkinfo_kind(struct rtattr *rta, unsigned short len,
- 			const char* kind)
- {
-@@ -304,10 +288,9 @@ static struct l_netlink *rtm_interface_send_message(struct l_netlink *rtnl,
- {
- 	size_t nlmon_type_len = strlen(NLMON_TYPE);
- 	unsigned short ifname_len = 0;
--	size_t bufsize;
--	struct ifinfomsg *rtmmsg;
--	void *rta_buf;
--	struct rtattr *linkinfo_rta;
-+	struct l_netlink_message *nlm;
-+	struct ifinfomsg ifi;
-+	uint16_t flags = 0;
- 
- 	if (ifname) {
- 		ifname_len = strlen(ifname) + 1;
-@@ -316,64 +299,41 @@ static struct l_netlink *rtm_interface_send_message(struct l_netlink *rtnl,
- 			return NULL;
- 	}
- 
-+	if (!L_IN_SET(rtm_msg_type, RTM_NEWLINK, RTM_DELLINK, RTM_GETLINK))
-+		return NULL;
-+
- 	if (!rtnl)
- 		rtnl = l_netlink_new(NETLINK_ROUTE);
- 
- 	if (!rtnl)
- 		return NULL;
- 
--	bufsize = NLMSG_LENGTH(sizeof(struct ifinfomsg)) +
--		RTA_SPACE(ifname_len) + RTA_SPACE(0) +
--		RTA_SPACE(nlmon_type_len);
--
--	rtmmsg = l_malloc(bufsize);
--	memset(rtmmsg, 0, bufsize);
--
--	rtmmsg->ifi_family = AF_UNSPEC;
--	rtmmsg->ifi_change = ~0;
--
--	rta_buf = rtmmsg + 1;
--
--	if (ifname)
--		rta_buf += rta_add(rta_buf, IFLA_IFNAME, ifname_len, ifname);
--
--	linkinfo_rta = rta_buf;
--
--	rta_buf += rta_add(rta_buf, IFLA_LINKINFO, 0, NULL);
--	rta_buf += rta_add(rta_buf, IFLA_INFO_KIND, nlmon_type_len, NLMON_TYPE);
--
--	linkinfo_rta->rta_len = rta_buf - (void *) linkinfo_rta;
-+	memset(&ifi, 0, sizeof(ifi));
-+	ifi.ifi_family = AF_UNSPEC;
-+	ifi.ifi_change = ~0;
- 
- 	switch (rtm_msg_type) {
- 	case RTM_NEWLINK:
--		rtmmsg->ifi_flags = IFF_UP | IFF_ALLMULTI | IFF_NOARP;
--
--		l_netlink_send(rtnl, RTM_NEWLINK, NLM_F_CREATE|NLM_F_EXCL,
--				rtmmsg, rta_buf - (void *) rtmmsg, callback,
--				user_data, destroy);
-+		ifi.ifi_flags = IFF_UP | IFF_ALLMULTI | IFF_NOARP;
-+		flags = NLM_F_CREATE | NLM_F_EXCL;
- 		break;
--
--	case RTM_DELLINK:
--		rta_buf += rta_add(rta_buf, IFLA_IFNAME, ifname_len, ifname);
--
--		l_netlink_send(rtnl, RTM_DELLINK, 0, rtmmsg,
--				rta_buf - (void *)rtmmsg, callback, user_data,
--				destroy);
--		break;
--
- 	case RTM_GETLINK:
--		l_netlink_send(rtnl, RTM_GETLINK, NLM_F_DUMP, rtmmsg,
--				rta_buf - (void *)rtmmsg, callback, user_data,
--				destroy);
--		break;
--
--	default:
--		l_netlink_destroy(rtnl);
--		rtnl = NULL;
-+		flags = NLM_F_DUMP;
- 		break;
- 	}
- 
--	l_free(rtmmsg);
-+	nlm = l_netlink_message_new(rtm_msg_type, flags);;
-+	l_netlink_message_add_header(nlm, &ifi, sizeof(ifi));
-+
-+	if (ifname)
-+		l_netlink_message_append(nlm, IFLA_IFNAME, ifname, ifname_len);
-+
-+	l_netlink_message_enter_nested(nlm, IFLA_LINKINFO);
-+	l_netlink_message_append(nlm, IFLA_INFO_KIND,
-+						NLMON_TYPE, nlmon_type_len);
-+	l_netlink_message_leave_nested(nlm);
-+
-+	l_netlink_send(rtnl, nlm, callback, user_data, destroy);
- 
- 	return rtnl;
- }
--- 
-2.45.2
+I compile iwd with ell include in the same Pkgfile
 
+makedepends=(dbus git python-docutils readline)
+
+description="Internet Wireless Daemon"
+url="https://git.kernel.org/cgit/network/wireless/iwd.git/"
+
+packager="Yaolinux Team"
+maintainer="Dania"
+
+name=iwd
+version=2.19
+release=10
+
+#source=(patch1.patch patch2.patch patch3.patch)
+
+#Last commit on iwd repo
+_commit1=993e48cab240b7fd1b3f508222eaa4ecde83aa8c
+
+#Last commit on ell repo
+_commit2=883bc6a90b4a9c654fdf2540f02447a7ca567e04
+
+prepare() {
+  git clone yyyyyy ell
+
+  cd ell
+  git checkout ${_commit2}
+
+  cd ..
+
+  git clone xxxxxx iwd
+
+  cd iwd
+  git checkout ${_commit1}
+
+ #patch -Np1 -i $SRC/patch1.patch
+ #patch -Np1 -i $SRC/patch2.patch
+ #patch -Np1 -i $SRC/patch3.patch
+
+  autoreconf -fiv
+}
+
+build() {
+  cd iwd
+
+  ./configure --prefix=/usr \
+              --sysconfdir=/etc \
+              --localstatedir=/var \
+              --libexecdir=/usr/lib/iwd \
+              --enable-wired \
+              --enable-ofono \
+              --enable-hwsim \
+              --disable-tools
+
+  make
+  make install DESTDIR=$PKG
+
+  install -dm700 $PKG/var/lib/ead/
+  install -dm700 $PKG/var/lib/iwd/
+}
+
+withe the last commit of ell 83bc6a90b4a9c654fdf2540f02447a7ca567e04
+the compilation fails
+
+  CC       ell/dhcp-lease.lo
+  CC       ell/dhcp-util.lo
+  CC       ell/dhcp-server.lo
+  CC       ell/cert-crypto.lo
+  CC       ell/cert.lo
+  CC       ell/ecc-external.lo
+  CC       ell/ecc.lo
+  CC       ell/ecdh.lo
+  CC       ell/time.lo
+  CC       ell/path.lo
+  CC       ell/dhcp6.lo
+  CC       ell/icmp6.lo
+  CC       ell/dhcp6-lease.lo
+  CC       ell/dhcp6-transport.lo
+  CC       ell/acd.lo
+  CC       ell/netconfig.lo
+  CC       ell/sysctl.lo
+  CC       ell/notifylist.lo
+  CC       monitor/nlmon.o
+  CC       monitor/main.o
+monitor/main.c: In function 'rtm_interface_send_message':
+monitor/main.c:351:38: error: passing argument 2 of 'l_netlink_send'
+makes pointer from integer without a cast [-Wint-conversion]
+  351 |                 l_netlink_send(rtnl, RTM_NEWLINK,
+NLM_F_CREATE|NLM_F_EXCL,
+      |                                      ^~~~~~~~~~~
+      |                                      |
+      |                                      int
+In file included from ./ell/ell.h:17,
+                 from monitor/main.c:43:
+./ell/netlink.h:34:59: note: expected 'struct l_netlink_message *' but
+argument is of type 'int'
+   34 |                                 struct l_netlink_message *message,
+      |                                 ~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~
+monitor/main.c:351:51: error: passing argument 3 of 'l_netlink_send'
+makes pointer from integer without a cast [-Wint-conversion]
+  351 |                 l_netlink_send(rtnl, RTM_NEWLINK,
+NLM_F_CREATE|NLM_F_EXCL,
+      |                                                   ^~~~~~~~~~~~
+      |                                                   |
+      |                                                   int
+./ell/netlink.h:35:58: note: expected 'l_netlink_command_func_t' {aka
+'void (*)(int,  short unsigned int,  const void *, unsigned int,  void
+*)'} but argument is of type 'int'
+   35 |                                 l_netlink_command_func_t function,
+      |                                 ~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~
+monitor/main.c:352:49: error: passing argument 5 of 'l_netlink_send'
+makes pointer from integer without a cast [-Wint-conversion]
+  352 |                                 rtmmsg, rta_buf - (void *)
+rtmmsg, callback,
+      |                                         ~~~~~~~~^~~~~~~~~~~~~~~~~
+      |                                                 |
+      |                                                 long int
+./ell/netlink.h:37:58: note: expected 'l_netlink_destroy_func_t' {aka
+'void (*)(void *)'} but argument is of type 'long int'
+   37 |                                 l_netlink_destroy_func_t destroy);
+      |                                 ~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~
+monitor/main.c:351:17: error: too many arguments to function 'l_netlink_send'
+  351 |                 l_netlink_send(rtnl, RTM_NEWLINK,
+NLM_F_CREATE|NLM_F_EXCL,
+      |                 ^~~~~~~~~~~~~~
+./ell/netlink.h:33:14: note: declared here
+   33 | unsigned int l_netlink_send(struct l_netlink *netlink,
+      |              ^~~~~~~~~~~~~~
+monitor/main.c:359:38: error: passing argument 2 of 'l_netlink_send'
+makes pointer from integer without a cast [-Wint-conversion]
+  359 |                 l_netlink_send(rtnl, RTM_DELLINK, 0, rtmmsg,
+      |                                      ^~~~~~~~~~~
+      |                                      |
+      |                                      int
+./ell/netlink.h:34:59: note: expected 'struct l_netlink_message *' but
+argument is of type 'int'
+   34 |                                 struct l_netlink_message *message,
+      |                                 ~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~
+monitor/main.c:360:41: error: passing argument 5 of 'l_netlink_send'
+makes pointer from integer without a cast [-Wint-conversion]
+  360 |                                 rta_buf - (void *)rtmmsg,
+callback, user_data,
+      |                                 ~~~~~~~~^~~~~~~~~~~~~~~~
+      |                                         |
+      |                                         long int
+./ell/netlink.h:37:58: note: expected 'l_netlink_destroy_func_t' {aka
+'void (*)(void *)'} but argument is of type 'long int'
+   37 |                                 l_netlink_destroy_func_t destroy);
+      |                                 ~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~
+monitor/main.c:359:17: error: too many arguments to function 'l_netlink_send'
+  359 |                 l_netlink_send(rtnl, RTM_DELLINK, 0, rtmmsg,
+      |                 ^~~~~~~~~~~~~~
+./ell/netlink.h:33:14: note: declared here
+   33 | unsigned int l_netlink_send(struct l_netlink *netlink,
+      |              ^~~~~~~~~~~~~~
+monitor/main.c:365:38: error: passing argument 2 of 'l_netlink_send'
+makes pointer from integer without a cast [-Wint-conversion]
+  365 |                 l_netlink_send(rtnl, RTM_GETLINK, NLM_F_DUMP, rtmmsg,
+      |                                      ^~~~~~~~~~~
+      |                                      |
+      |                                      int
+./ell/netlink.h:34:59: note: expected 'struct l_netlink_message *' but
+argument is of type 'int'
+   34 |                                 struct l_netlink_message *message,
+      |                                 ~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~
+monitor/main.c:365:51: error: passing argument 3 of 'l_netlink_send'
+makes pointer from integer without a cast [-Wint-conversion]
+  365 |                 l_netlink_send(rtnl, RTM_GETLINK, NLM_F_DUMP, rtmmsg,
+      |                                                   ^~~~~~~~~~
+      |                                                   |
+      |                                                   int
+./ell/netlink.h:35:58: note: expected 'l_netlink_command_func_t' {aka
+'void (*)(int,  short unsigned int,  const void *, unsigned int,  void
+*)'} but argument is of type 'int'
+   35 |                                 l_netlink_command_func_t function,
+      |                                 ~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~
+monitor/main.c:366:41: error: passing argument 5 of 'l_netlink_send'
+makes pointer from integer without a cast [-Wint-conversion]
+  366 |                                 rta_buf - (void *)rtmmsg,
+callback, user_data,
+      |                                 ~~~~~~~~^~~~~~~~~~~~~~~~
+      |                                         |
+      |                                         long int
+./ell/netlink.h:37:58: note: expected 'l_netlink_destroy_func_t' {aka
+'void (*)(void *)'} but argument is of type 'long int'
+   37 |                                 l_netlink_destroy_func_t destroy);
+      |                                 ~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~
+monitor/main.c:365:17: error: too many arguments to function 'l_netlink_send'
+  365 |                 l_netlink_send(rtnl, RTM_GETLINK, NLM_F_DUMP, rtmmsg,
+      |                 ^~~~~~~~~~~~~~
+./ell/netlink.h:33:14: note: declared here
+   33 | unsigned int l_netlink_send(struct l_netlink *netlink,
+      |              ^~~~~~~~~~~~~~
+make[1]: *** [Makefile:2579: monitor/main.o] Error 1
+make[1]: *** Waiting for unfinished jobs....
+make: *** [Makefile:1742: all] Error 2
+=======> ERROR: Building 'iwd.man1722081992any.cards.tar.xz' failed.
+
+Best regards
+
+Daniel
