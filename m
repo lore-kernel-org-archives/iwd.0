@@ -1,180 +1,145 @@
-Received: from mail-qv1-f46.google.com (mail-qv1-f46.google.com [209.85.219.46])
+Received: from mail-qv1-f53.google.com (mail-qv1-f53.google.com [209.85.219.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45512145FE1
-	for <iwd@lists.linux.dev>; Mon, 29 Jul 2024 12:38:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F82D1487C1
+	for <iwd@lists.linux.dev>; Mon, 29 Jul 2024 12:44:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722256736; cv=none; b=s1bLxxZNsR3kbdfRiLkOP+koEKTZ1um5QOvhcgqJ7NfI036mfnjt2cegg0pIRNcuvSC5DqIJMhswADsdcrghkclS7IXO0AcePWB91N0QO1mdTXFaYzey+OKs3nJgrDz3665OkYkIA/ZZo8mGKJbbmRc886VplybYL+m2aRg1w+E=
+	t=1722257061; cv=none; b=urXvzaEk/68elFU8DBCOVaJQ91xY1UgG6HBmTIshtcPHm1W9EQEHfQl9SynfUcBeTjBfLk6GCwmaUmhpxxWPN1+BSSFv8dOnDgAa72n+YUgyjDX6TUfe10Yh0pu2pqGRQxxPcSeCBJgXi9XDcWck9JK30mpJ03y6CYJE4Hx2M9c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722256736; c=relaxed/simple;
-	bh=x8SNYoPXzDoqsaKvwdysQIfWV7k/FMvAgrpMBWOdDI4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=aQDqWdDS996qvHm0dSQF6wEurDziUwDgeSAnwpEmk90pU2vhD4ntvvPuagHSLU3DvPvyHNLB8T6f7pEsxzYxub4KrwnU6IyGWeK1SemfYS9xZhGYFQ7PX9w+zNCh/ygkakm0+jU03p5Fn0SQIfRIp7Z74BhsHWXRHnoQKQb95vM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RQ/RRr1n; arc=none smtp.client-ip=209.85.219.46
+	s=arc-20240116; t=1722257061; c=relaxed/simple;
+	bh=G/Y/HSk96c9KUFcvJUJi4rWgvQ1ijUr/fOHBtIyaX9M=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=JOkUdr8GKHl3sWYYD8fyU+yhdiURNiwpUR2JRQfn/JtQbSlmVZtVQxJ8mebwosml0m5jTBo2jekOzzunrgXxyYIFa4k4OZUEKaxl5QFbjqyVRHwTXVRNvy5Eg6jnLnUHBOM1Vh2vIheysS3mGgIswnPZaLRPPQc9S8Rmawa+SvA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aEqJK4TW; arc=none smtp.client-ip=209.85.219.53
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RQ/RRr1n"
-Received: by mail-qv1-f46.google.com with SMTP id 6a1803df08f44-6b79c27dd01so18641086d6.3
-        for <iwd@lists.linux.dev>; Mon, 29 Jul 2024 05:38:55 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aEqJK4TW"
+Received: by mail-qv1-f53.google.com with SMTP id 6a1803df08f44-6b5dfcfb165so18829076d6.0
+        for <iwd@lists.linux.dev>; Mon, 29 Jul 2024 05:44:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1722256734; x=1722861534; darn=lists.linux.dev;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=UTFiaFiQBwnM9n+HSNaMIpGnCc9L5h1ptTe1cLdckJg=;
-        b=RQ/RRr1nj0Osl1UERmo6T+XfV+TsgRFBq+6PVVHHVC3acn1HHD13ciEslJgNn2uqBv
-         6/82G8qmKY2wNCd0NnI5iikKKAwy+q7mvUN6b0soaR+4S3cALFaGx1mPbMVr70Vq6rqE
-         +z2lgkFHvWqq+T8MNjLEJW36iXqSaIBDlLxsXUzMpccnhyFHETdxCFOJVBBSRy/dqPGj
-         CxlQ/aywygILC9JbdRRw6A0tN8ymAl8XRzXADoWa+yWSTJP9qBplDdIMHC8SUkmMPOoD
-         Z/NhKED/VglbpSp43DkESlncTZPbJ1wZ4ez3LuywbU1Lv8XpVX9646dfQ6OGfHHjOogP
-         xTZA==
+        d=gmail.com; s=20230601; t=1722257059; x=1722861859; darn=lists.linux.dev;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=cpwtonmqs8Ssr/b2jzuLXc+ajd8QJ2pra28el9tmM2g=;
+        b=aEqJK4TWnUFuA2Bhmf/2ZtNlVwCdOLWLlfYQfPUrwTlUPlAJ5t967RiD6zsJO+8V61
+         Id0ppqHzKb6D7KJ2IRamJmiy2iWh0dfJ9LxKZ8J77wum9S/UsgkbGk7HcBLOoQfTG9yM
+         yB3dm5EdB7WR27JJpUqIxGDUhRJBORBhTP8qNkTBfVpAv67iXv6W5bJY1sJk1CYfIDRy
+         g+FcExJCZMjuE/Q1sP5GjZauDvdKGtAPEF/SOu0OkeuULDDWLDKq/DVWBvT7DQVgCBvO
+         MEylSxwP8qNniZjhg/JuEBx2IfPcMEOYxrhedfV36qpKfJY7uyEVzd0XJS9v58bV4g8S
+         m9Dw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722256734; x=1722861534;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=UTFiaFiQBwnM9n+HSNaMIpGnCc9L5h1ptTe1cLdckJg=;
-        b=jfrGnXbuAlBVsIGZLW7M+lssHlzB8w7ow54/4A38uzLLPGpZq9h3v62To5a8ufBl6+
-         2nQ0euonSNXxxaecb8ZGYOD17oSQOyVKXR8txrPJGqTQ3B4qxxLA0lqAIH8cXpf9s0jn
-         yl6FREjrLxS+8e47KzgO+YTJNMbnlV+gewJuwhg7Fev5d9BfWMGb6ByFRAghstj1gl7F
-         IdkjYgtI80tGoEA6tHH2NJvMMZSrj1s6xO0LVj9oJmxtQ5exG2AaXU1ciVdEbWk3WMXp
-         wHqf/LmImSwatcSt6JeZdpbOGMnFKtnuovVnXTmNBrf/UhoWb57wY/WQbU/qu69HLQGm
-         p6FQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWm8oMBGRnKIUkl0j9tbUxS85mEzTCdotpvbpzOEFuLOrqLLye5PW9clsPNRGoV4zh0MRnoez1ctch/Gxjy0GRu9Pp7
-X-Gm-Message-State: AOJu0YzDG24B6lsjQln09VR2rYUJIJ+GqdAnevHODxJtQVyi+vQpYBIT
-	zmrfo9vxmxVr3w0PMidBSubncZ3VQWNUygOxXqw053iYZE8Kto1P
-X-Google-Smtp-Source: AGHT+IH+SycnpdfGRwOS1B5wJM02dozo8K0IkglD3s62z9+wt5eKWKe3bBM6qy0Dk4spZxAfFeyF3Q==
-X-Received: by 2002:a05:6214:2401:b0:6b0:76f1:8639 with SMTP id 6a1803df08f44-6bb55aba950mr122986526d6.42.1722256734165;
-        Mon, 29 Jul 2024 05:38:54 -0700 (PDT)
-Received: from [10.100.121.195] ([152.193.78.90])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6bb3f8d82b7sm50811316d6.28.2024.07.29.05.38.53
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 29 Jul 2024 05:38:53 -0700 (PDT)
-Message-ID: <e0b71ad0-0fcf-479e-b976-0f84d36a88c2@gmail.com>
-Date: Mon, 29 Jul 2024 05:38:51 -0700
+        d=1e100.net; s=20230601; t=1722257059; x=1722861859;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=cpwtonmqs8Ssr/b2jzuLXc+ajd8QJ2pra28el9tmM2g=;
+        b=Zk1pu6J6BCNrH8mC7KiXg8bU2J119Cx78cnKWcTZt0s5wYwT1lYCDlcol6RGSJVvmQ
+         KNXGxIiJrsgPPkA+wCW7roLWLMV52qw3EQ6qf01u/q+iPYepr21GJaYRpjDpRFX9/Hj5
+         PQr4Lm/pc83kk5498OwfyR1PdJU51dW4cACttpTgptRQfSz/DXSZY1+KsdHH//P/U3TM
+         tCnOhb47nQGAPRw+yL0O08E/KdC+jRBMZ4O/6Es03gSGQpjIG937P/wi0wl+L42sc9Bv
+         wQ83QJkz9ZQNp4vxQtm2rKENuCm96+LEgehqIppoYpRIAj6DbDIgE7e+fX3lQF86RPV3
+         VZ9g==
+X-Gm-Message-State: AOJu0YwH/PkdmpzBOulyxAjaPs6hzkAqdCnrWkf1imHoT9iDXa8FsTQ4
+	ESuB8WFEYO7mbDLuZdJqxOOIz3gz8B0wZagEqTKjMQhWkKLkeaDPkiMtCw==
+X-Google-Smtp-Source: AGHT+IGwi6PLyyX+M/IczzB9+eOq+gUgX1ws0JgJbJgMbbER1UayBKuUKz0SUx4ncI+Z5DcqDJk98A==
+X-Received: by 2002:a05:6214:29e8:b0:6b5:e51d:441d with SMTP id 6a1803df08f44-6bb55b154f5mr92553676d6.41.1722257058766;
+        Mon, 29 Jul 2024 05:44:18 -0700 (PDT)
+Received: from LOCLAP699.locus-rst-dev-locuspark.locus ([152.193.78.90])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6bb3f8d84edsm51171266d6.14.2024.07.29.05.44.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 29 Jul 2024 05:44:18 -0700 (PDT)
+From: James Prestwood <prestwoj@gmail.com>
+To: iwd@lists.linux.dev
+Cc: James Prestwood <prestwoj@gmail.com>
+Subject: [PATCH 1/6] doc: Document new BSS affinity method calls
+Date: Mon, 29 Jul 2024 05:44:05 -0700
+Message-Id: <20240729124410.1763549-1-prestwoj@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: Frequent Disconnects / Roaming Issue with IWD + systemd-networkd
-To: Martin Petzold <martin.petzold@tavla.de>,
- "iwd@lists.linux.dev" <iwd@lists.linux.dev>
-Cc: Denis Kenzior <denkenz@gmail.com>
-References: <85ef594d-d928-4d12-8741-b3d897c008fa@tavla.de>
-Content-Language: en-US
-From: James Prestwood <prestwoj@gmail.com>
-In-Reply-To: <85ef594d-d928-4d12-8741-b3d897c008fa@tavla.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-Hi Martin,
+This documents new DBus methods that expose a bit more control to how
+IWD roams. The new methods are:
 
-On 7/28/24 11:53 AM, Martin Petzold wrote:
-> Hi all,
->
-> this issue is related to my previous issue, see [1]. It seems quite 
-> sure that BSSes are blacklisted and, therefore, do not re-connect or 
-> re-connect after a long period of time and then lose the connection 
-> again. I cannot tell the exact reason, still working on getting some 
-> logs from these devices.
-Yeah I don't think there is much that can be done without debug logs to 
-see exactly why.
-> Changing the blacklist configurations helps in terms of the devices 
-> coming back, also adding "IgnoreCarrierLoss" in systemd-networkd 
-> configuration seems to make the situation better. However, still 
-> really bad!
+SetConnectedBssAffinity()
+UnsetConnectedBssAffinity()
 
-So fwiw if you suspect blacklisting is the issue you can always lower 
-the blacklist timeout very low. For our use case we have it set to 2s, 
-only to ensure the BSS gets blacklisted for the remainder of that 
-connection attempt. All our clients run on a known network 
-infrastructure though, which may not be true for you, but disabling the 
-blacklist (by setting a low maximum timeout) will only cause IWD to try 
-connecting again after certain failures.
+Setting the affinity on the connected BSS effectively "locks" IWD to
+that BSS (except at critical RSSI levels, explained below). This can
+be useful for clients that have access to more information about the
+environment than IWD. For example, if a client is stationary there
+is likely no point in trying to roam until it has moved elsewhere.
 
->
-> I have now updated to most recent Laird firmware (11.x), IWD 1.27 and 
-> systemd 252. The problem still exists without any difference. Of 
-> course our customer now also investigates his AP infrastructure, which 
-> also could be miss-configured.
->
-> This issue is especially present with multiple AP with same SSID 
-> (typical roaming setup). But also present with single router. The 
-> signal strength of the APs is usually low between -60 and -80 (and may 
-> change also over time - closed doors etc.). We still have a stationary 
-> device. Maybe it is jumping between AP and then blacklisting these AP.
->
-> 1. I wonder if the problem could be related to systemd-networkd 
-> managing the network interface and DHCP?
-Hard to say without debug logs.
->
-> 2. What is actually your recommended management configuration with IWD 
-> + systemd-networkd (1.27 and 2.x)?
-This really comes down to personal preference. I prefer using IWD 
-because it removes one more dependency but there isn't any problem with 
-using systemd-networkd either.
->
-> -> Like everything should work, especially Wi-Fi and also roaming 
-> scenarios.
->
-> 3. What does IWD do using the "RoamThreshold5G" value of "-76" and 
-> with two APs and same SSID (roaming) with slightly lower or changing 
-> values?
-If the current connection drops below the threshold IWD issues a roam 
-scan, and if there is a better AP out there it will attempt a roam. If 
-no better AP exists it remains on the current, even if the threshold is 
-below that value. As long as the current RSSI is below that value IWD 
-will continue to scan looking for a roam target.
->
-> 4. Is the following configuration correct, if I want IWD to manage the 
-> network interface and DHCP, and still let systemd-networkd knowing the 
-> interface?
->
-> -> I need the *.network for wait-for-online triggers and also because 
-> I am reading out the network topology using networkctl and there is 
-> also an Ethernet interface.
->
-> ##### /etc/iwd/main.conf
->
-> [General]
-> EnableNetworkConfiguration=true
->
-> [Network]
-> NameResolvingService=systemd
->
-> [Scan]
-> InitialPeriodicScanInterval=10
-> MaximumPeriodicScanInterval=60
->
-> [Blacklist]
-> InitialTimeout=60
-> MaximumTimeout=3600
-I would suggest setting MaximumTimeout to something low, at least to 
-debug if this is indeed the issue you are seeing. If APs are routinely 
-failing to allow clients to connect they will be blacklisted.
->
-> ##### /etc/systemd/network/20-wlan0.network
->
-> [Match]
-> Name=wlan0
->
-> [Link]
-> RequiredForOnline=no
->
-> #####
-I'm no systemd expert, but this seems fine. I think as long as you don't 
-set any DHCP settings in systemd it should work with IWD managing the IP.
->
-> [1] 
-> https://lore.kernel.org/iwd/8c7ff992-2f03-4e4f-97bc-36eab3727d44@tavla.de/T/
->
-> Thanks,
->
-> Martin
->
->
+A new main.conf option would also be added:
+
+[General].CriticalRoamThreshold
+
+This would be the new roam threshold set after
+SetConnectedBssAffinity() is called. If the RSSI continues to drop
+below this level IWD would (attempt to) roam.
+---
+ doc/station-api.txt | 22 ++++++++++++++++++++++
+ src/iwd.config.rst  |  8 ++++++++
+ 2 files changed, 30 insertions(+)
+
+diff --git a/doc/station-api.txt b/doc/station-api.txt
+index 05dd137e..3dc2376b 100644
+--- a/doc/station-api.txt
++++ b/doc/station-api.txt
+@@ -135,6 +135,28 @@ Methods		void Scan()
+ 			Possible Errors: [service].Error.InvalidArguments
+ 					 [service].Error.NotFound
+ 
++		void SetConnectedBssAffinity()
++
++			Sets a high affinity/preference to the currently
++			connected BSS. Specifically, calling this will reduce
++			the roam threshold down to a critical level set by
++			[General].CriticalRoamThreshold. This effectively locks
++			the client onto the current BSS unless the signal
++			quality becomes extremely poor.
++
++			If IWD roams or disconnects the affinity will be reset.
++
++			Possible Errors: net.connman.iwd.NotConnected
++
++		void UnsetConnectedBssAffinity()
++
++			Unset a prior call to SetConnectedBssAffinity(). This
++			moves the roaming threshold back up to the default level
++			(RoamThreshold/RoamThreshold5GHz).
++
++			Possible Errors: net.connman.iwd.NotConnected
++					 net.connman.iwd.NotConfigured
++
+ Properties	string State [readonly]
+ 
+ 			Reflects the general network connection state.  One of:
+diff --git a/src/iwd.config.rst b/src/iwd.config.rst
+index d9c94e01..31f43bc6 100644
+--- a/src/iwd.config.rst
++++ b/src/iwd.config.rst
+@@ -130,6 +130,14 @@ The group ``[General]`` contains general settings.
+        This value can be used to control how aggressively **iwd** roams when
+        connected to a 5GHz access point.
+ 
++   * - CriticalRoamThreshold
++     - Value: rssi dBm value, from -100 to 1, default: **-82**
++
++       The threshold at which IWD will roam regardless of the affinity set to
++       the current BSS. This is only used if the SetConnectedBssAffinity() DBus
++       method is called, at which point this value becomes the new roam
++       threshold.
++
+    * - RoamRetryInterval
+      - Value: unsigned int value in seconds (default: **60**)
+ 
+-- 
+2.34.1
+
