@@ -1,62 +1,62 @@
-Received: from mail-oi1-f181.google.com (mail-oi1-f181.google.com [209.85.167.181])
+Received: from mail-oi1-f175.google.com (mail-oi1-f175.google.com [209.85.167.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A8CF55894
-	for <iwd@lists.linux.dev>; Mon,  5 Aug 2024 14:07:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E8D717C64
+	for <iwd@lists.linux.dev>; Mon,  5 Aug 2024 14:07:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722866846; cv=none; b=V/NqaE3Pxxt77PghfysgjVYWdfuolMsDZjQaDjxpvNPwDfknXsUBo17xMxEK6rBqm4QMOoUWPfhzLdf5Rt8tIRPrdoIi2JKjGoa59NCITmj+3ck7MzYsGV6i9gTZKowGZfQJf6TDQGJ8K9PUWbNrt0sTlbyt/csrbRTqBUN81mM=
+	t=1722866847; cv=none; b=DS9FFh/BrhjNpRMu7ix5QjoUvInX/jknDlPvxR2B/azrbX/CW38OGdKnGkFY/NXDteG9Xv7wIW2BOkEcB4dLXmTsCel0Ty3xnY3bQQ/T2W2wZMawcAtgmFCGdZQW0QE3yBdGxyN756cyE9n5L69JeKZ5QMgPmT8Y60CGbJHrYYk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722866846; c=relaxed/simple;
-	bh=JLQ+Pb/EmccRoKEoC56+wI4QY9Ds8GnYO9r6iLs9cB4=;
+	s=arc-20240116; t=1722866847; c=relaxed/simple;
+	bh=+yMGTPCSkOLc2FFzZmsCUHxyrmiaeuco4Ghi72cG+s4=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=kuBwK+XRlnoET9xx+R7nw6cVn6oJtUiF8y2jI65WySzvKX9CRrwmQoUQqjKKUfurpdiJm52HYcSiTkBkyg545Thqn/1zG+fhWROkvI/abFL4VSoY1oJCkFec7HsmSdhGJuyJ0PlZNPK+IJYkUvB/5moWpob2kKXjI9bq4Ta17fE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hnl63DSL; arc=none smtp.client-ip=209.85.167.181
+	 MIME-Version; b=PCDL3YZ9yEd1nlaQ+3W5nBp7D7EtOfT14OnFUJXzAQaxQPysemA/R4j9dhF0JE7TGyTuU+EojnHfvm2db/GR30d7TzO5PI+lhOYwZQjgy5H80KGaNaz1sLHsh9rfA+F9OoVv1QQBToC8HLoDetOeBmRliUvrMI2heCrGwGoc8dk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GIecTKZp; arc=none smtp.client-ip=209.85.167.175
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hnl63DSL"
-Received: by mail-oi1-f181.google.com with SMTP id 5614622812f47-3db2315d7ceso6207404b6e.1
-        for <iwd@lists.linux.dev>; Mon, 05 Aug 2024 07:07:25 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GIecTKZp"
+Received: by mail-oi1-f175.google.com with SMTP id 5614622812f47-3db504ab5f3so2922859b6e.0
+        for <iwd@lists.linux.dev>; Mon, 05 Aug 2024 07:07:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1722866844; x=1723471644; darn=lists.linux.dev;
+        d=gmail.com; s=20230601; t=1722866845; x=1723471645; darn=lists.linux.dev;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Xx+XprITqFGTjtQ4SmUv/xE3MhlLmwzNRrABoCGND4k=;
-        b=hnl63DSLv0cNtqKZKKXbRr1hRJFn4HvG4tl2nekAcS5b2vG/h9kX4W2j9dRGFpAdFn
-         4bsYrb8bFKgasQETxkZ/17hJFmuQS4pjz0ITMdb4tpXvkBX6YT2O5wyZNItvvovjph3R
-         6BIzE/eu8pwBmksHiN2cyO7Ss5iRULYlMRxhlt6yH5wT+ljPw0qG9QEPdhYeWi9VkIG4
-         Iso5ozxIFXVIKhv+s1lcpMW65ccpR5rCyg/96k2U/zyBZPdd1vW2NnnTjICOAniZrKSE
-         UudRvH2OtuJ0Ky7coj3Qcg50MYN6q+yQfrS6fq8Tst+IHfGKgD4SKNa+aN7fjAECoBpF
-         zTUQ==
+        bh=idHjvPbdJCUT1qRDAOnY/1uva9G15W/NbgoaUGRZRng=;
+        b=GIecTKZpKgYSBsZ4crgvi0F/cx4Y8VXyUA+b9x1f4B4oG4jUXEDMFngRabizleQxyv
+         Fht0eagnNS8iLa0qlnUp5bEfAvDd5G4QwXMy+fv2UOEz8o9ng5JBEYV95LQBnghXzjnB
+         h/1Jzw6ymvSgidhm2Rri8XnwFMaCAQWZ+cqPDzEaWhpDh+R+ddCKvqoHV83nqIOLEEGy
+         6E7zrcWj/RFhrrd2Ujfw+/D6PWo1mtdK3H0lsc9vT/8E6BTgNnSRyOoZCUdUYFWkwBTE
+         /fjjZXdD9FeRsTYbV8iho/SHxAKmXQ02IntgQvJCi1nDvXRZFU2Hn6sertFgOM7r/h/l
+         m9bw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722866844; x=1723471644;
+        d=1e100.net; s=20230601; t=1722866845; x=1723471645;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=Xx+XprITqFGTjtQ4SmUv/xE3MhlLmwzNRrABoCGND4k=;
-        b=vZpu73Sv+QWRYQ7HV+VRwZaanqHxYe+mHFbLrsslOp4jmEuVhBsZwEvhI/0slTrFzW
-         jsFIxLpCxIL//nNwJpAX0Sh4IYQQCF5T4oroRpjnS+las5UbTFSsR+6jjn4wWq6FLXKz
-         6WfWQr4zSxzBWzEUYw/7nJ8S+lW2311Z4GbGs9KJH773K/3tGr0PWhrN4EPkAKMNeBZP
-         qi7+xluTuCrfvjai8Oi2CS5v/l7lpJ1v/y3XOos7E2D9Wx9rniCfnXJm3zawcizOVdvS
-         HEu5iHQ2XJa9FkQvkD2U0VJyocXbcQZ1utrOKAnKkZINuWaCbPi+ImQRuSY5HIb2Qxqo
-         WELA==
-X-Gm-Message-State: AOJu0YyurO/XTLhCIWtru9mHq9QdksQd7SlWQt6dp58uoTeyqOrrAwVl
-	FlNhDXoF+c/YLZuOtlFsNLXTs44C//M+Zi9mriGBa9n3WjQmwmS9LSYo/w==
-X-Google-Smtp-Source: AGHT+IHUtwk6vcgM4Jy/5QSt2kspsLsO43Zp06KoGwL3jjvJow6S5bNtM8me4UmyqTOr4zJhCrFm1A==
-X-Received: by 2002:a05:6808:1206:b0:3da:4c28:6697 with SMTP id 5614622812f47-3db5582e23dmr14935889b6e.38.1722866844389;
-        Mon, 05 Aug 2024 07:07:24 -0700 (PDT)
+        bh=idHjvPbdJCUT1qRDAOnY/1uva9G15W/NbgoaUGRZRng=;
+        b=qGOTcFAavBa+g7hSMz6jfZmeyVESamXVONDI0+20U2dvdolRPuogU08oQMqyVhRtBo
+         XPwCqmb9AX8dveETuMpmInZaHglqRjtG5oSpQISsyy+NsfWAv53kdZsNEqylnL8gMHJC
+         l658tWpFymJg6cqjWEnPeXP0KoL9jkCsAJXhpGcpp4UMDSnlCHqH8aAZ6/4BV2ZhWtOl
+         Qqppbmjuprbz8tgtznkL9zu8Tp5uW3tuwPyCGsKgKDibR39AH5QdDC+B+vr/iNrVLLZm
+         WY4PyIiSn/B344NsKlpqapwOAiLbeZ7P4cE2mtkSiGn/Y2XSGj6/g82QRJroXYcMvGxm
+         nWvw==
+X-Gm-Message-State: AOJu0YxZWR8zC2N0PsliygoQ+4gMgzR5W1pmb2C/ctyWpDryAsnR0M4H
+	WCq0R4Gt3JVQf1qQVPyTyEo2+oCQs0a98ncX76of9gevpcVrXJ7zrjVVRQ==
+X-Google-Smtp-Source: AGHT+IFwo330Y19anfNnLhk1qEZH+BJalgb3Youd630qMmHXytF4OCrEZ6EXj3zn96y8afKY2IOYnQ==
+X-Received: by 2002:a05:6808:2387:b0:3d9:e1d1:155c with SMTP id 5614622812f47-3db55832f34mr10165314b6e.35.1722866845585;
+        Mon, 05 Aug 2024 07:07:25 -0700 (PDT)
 Received: from archdev.attlocal.net (syn-070-114-247-242.res.spectrum.com. [70.114.247.242])
-        by smtp.gmail.com with ESMTPSA id 5614622812f47-3db56361a88sm2654172b6e.4.2024.08.05.07.07.23
+        by smtp.gmail.com with ESMTPSA id 5614622812f47-3db56361a88sm2654172b6e.4.2024.08.05.07.07.24
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 05 Aug 2024 07:07:23 -0700 (PDT)
+        Mon, 05 Aug 2024 07:07:25 -0700 (PDT)
 From: Denis Kenzior <denkenz@gmail.com>
 To: iwd@lists.linux.dev
 Cc: Denis Kenzior <denkenz@gmail.com>
-Subject: [PATCH 2/7] monitor: Mask flags from attribute identifier
-Date: Mon,  5 Aug 2024 09:07:09 -0500
-Message-ID: <20240805140721.57518-2-denkenz@gmail.com>
+Subject: [PATCH 3/7] wiphy: Fix use of wiphy_has_feature
+Date: Mon,  5 Aug 2024 09:07:10 -0500
+Message-ID: <20240805140721.57518-3-denkenz@gmail.com>
 X-Mailer: git-send-email 2.45.2
 In-Reply-To: <20240805140721.57518-1-denkenz@gmail.com>
 References: <20240805140721.57518-1-denkenz@gmail.com>
@@ -68,27 +68,27 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Certain flags (for example, NLA_F_NESTED) are ORed with the netlink
-attribute type identifier prior to being sent on the wire.  Such flags
-need to be masked off and not taken into consideration when attribute
-type is being compared against known values.
+Features with the _EXT_ in the name must be queried using the
+wiphy_has_ext_feature method.
+
+Fixes: bc7b12d1a4a7 ("wiphy: handle FILS AKMs")
 ---
- monitor/nlmon.c | 2 +-
+ src/wiphy.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/monitor/nlmon.c b/monitor/nlmon.c
-index 941992595412..214246ea72c2 100644
---- a/monitor/nlmon.c
-+++ b/monitor/nlmon.c
-@@ -7762,7 +7762,7 @@ static void print_rtnl_attributes(int indent, const struct attr_entry *table,
- 		return;
- 
- 	for (attr = rt_attr; RTA_OK(attr, len); attr = RTA_NEXT(attr, len)) {
--		uint16_t rta_type = attr->rta_type;
-+		uint16_t rta_type = attr->rta_type & NLA_TYPE_MASK;
- 		enum attr_type type = ATTR_UNSPEC;
- 		attr_func_t function;
- 		const struct attr_entry *nested;
+diff --git a/src/wiphy.c b/src/wiphy.c
+index fb36ebb2b3c6..6b755ff8201d 100644
+--- a/src/wiphy.c
++++ b/src/wiphy.c
+@@ -276,7 +276,7 @@ enum ie_rsn_akm_suite wiphy_select_akm(struct wiphy *wiphy,
+ 	 * for fast transitions.  Otherwise use SHA256 version if present.
+ 	 */
+ 	if (security == SECURITY_8021X) {
+-		if (wiphy_has_feature(wiphy, NL80211_EXT_FEATURE_FILS_STA) &&
++		if (wiphy_has_ext_feature(wiphy, NL80211_EXT_FEATURE_FILS_STA) &&
+ 				fils_capable_hint) {
+ 			if ((info->akm_suites &
+ 					IE_RSN_AKM_SUITE_FT_OVER_FILS_SHA384) &&
 -- 
 2.45.2
 
