@@ -1,96 +1,143 @@
-Received: from mout-p-102.mailbox.org (mout-p-102.mailbox.org [80.241.56.152])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f180.google.com (mail-qk1-f180.google.com [209.85.222.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1701AD59
-	for <iwd@lists.linux.dev>; Sun,  4 Aug 2024 21:01:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.241.56.152
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 427BC18026
+	for <iwd@lists.linux.dev>; Mon,  5 Aug 2024 12:34:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722805281; cv=none; b=PXybKA2+Pu+qFdnRp49CMiikq9ddWIgiTsyTbYCJAh212YJfRHdlDjz23gr/Y8NIB+68VloeXEke0IaHU4matDw7cZRAqrBmoJbwxMhNVKZQICTEkdr1MVtTPsIo9XgzhW57SOFEXshnyr0Elq30x6cfG3t9IMscS7hGkepyp+k=
+	t=1722861299; cv=none; b=kPTpc5brGNoCzlMJCXrFrRwxBammPMvWrEKXDA2QOO41C9lYnNVxOOJ5te2teaM22tn7+dNYTMSBOAp7Fbj9/a9FvtLn1HplQSqo65BENrsVHDVJIPvvJtaCRh5fE2bm8ynXY6bXDdjYmSF6h7Q85IyUSGIJfARgUwN45akuhkA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722805281; c=relaxed/simple;
-	bh=Qairf18vKmvDrPYdGYajIEiHn77Qi0T/9ScGJkr4P6Y=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=prfVhrZUuRlXB4Wao4Wc68ZHXuUDCzPTSVtQiN0NzrSVpSse6UV3mf3IMyNYPd6TqpxoApbkHmHv2iZ/3GAU7fIBQTjMitZJ3rUDFAZWVKP1RRcB4umIBpA2JBpV+VVcJAkX89doEMBMwmdjgfDqx0TgMAOBPqjgZWLfpMTDpFo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=vonhaugwitz.com; spf=pass smtp.mailfrom=vonhaugwitz.com; dkim=pass (2048-bit key) header.d=vonhaugwitz.com header.i=@vonhaugwitz.com header.b=IK3mNEmn; arc=none smtp.client-ip=80.241.56.152
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=vonhaugwitz.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=vonhaugwitz.com
+	s=arc-20240116; t=1722861299; c=relaxed/simple;
+	bh=gQfQxx36UCliAHfrmIH9clF1VmH8PeIbJoax+myJRrw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=UBnlEuPRv5LQ/Z3IkXwu0Q2+RqFqgIQLbROokFN9r9V5cCPyikVMrIjcu+IIDCQiogkn8adw7BSyJRqBUj5zqyFhzEK2pEXPPsLlKJM4eIGFbN4N9ni4vnkQRbC5zFmYluaqOWz865Fkr6liwNBhLNkZbwpwAMjF3y+7kvpKWWw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=i4+nMjgq; arc=none smtp.client-ip=209.85.222.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=vonhaugwitz.com header.i=@vonhaugwitz.com header.b="IK3mNEmn"
-Received: from smtp1.mailbox.org (smtp1.mailbox.org [IPv6:2001:67c:2050:b231:465::1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mout-p-102.mailbox.org (Postfix) with ESMTPS id 4WcX6V1V8wz9slg;
-	Sun,  4 Aug 2024 23:01:06 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=vonhaugwitz.com;
-	s=MBO0001; t=1722805266;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=bUhBzSvPnVMlzCRJCKRGj5O9E1ul4XLs+kCn4RmSZ/M=;
-	b=IK3mNEmnBgpBjXEPx3qcP/SwbrgHE11a9l72ws0tLLv4VUZJEz1TN9G/bTQLQqECR3g+T7
-	KNB/7Jp6Nw/HVt9F+aWUMIx4G/SWU1ohg+3aaF0qPHAWj13QPfsCcCFexo6sZ3j35iEYLH
-	m8osxd3rXCWZXh7aUZDpiB0C4Tg5B+Ptbz4mgXEY0D1VkDAvuUfwR77HlyB6IQbYm9KUqp
-	Qh01xkCIQ9qM1fV7JPOS7rqPM4DtEHc7eL9VGzx/+7aFAE+bhDnqt0URA8+7O3V+/jSl5N
-	W7RDi7TsQb2dUXt/uKyAC3121wpp4xDBpMsBbHj7LnADjihibVSiXXNB7yL0HQ==
-Date: Sun, 4 Aug 2024 23:01:03 +0200
-From: Hannes von Haugwitz <hannes@vonhaugwitz.com>
-To: James Prestwood <prestwoj@gmail.com>
-Cc: Grant Erickson <gerickson@nuovations.com>, iwd@lists.linux.dev
-Subject: Re: IPv6 Privacy Extension support?
-Message-ID: <20240804210103.GA25@magnesium.vonhaugwitz.com>
-References: <20240301144608.GA25@magnesium.vonhaugwitz.com>
- <629785cf-77c3-4b14-ab58-d4b2c75f254a@gmail.com>
- <20240304193253.GA25@magnesium.vonhaugwitz.com>
- <BBC776B8-57F8-460D-A1CC-FD3B5A522311@nuovations.com>
- <047c2dfc-ca69-4117-a3a6-66790b9814db@gmail.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="i4+nMjgq"
+Received: by mail-qk1-f180.google.com with SMTP id af79cd13be357-7a1d3959ad5so497983685a.0
+        for <iwd@lists.linux.dev>; Mon, 05 Aug 2024 05:34:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1722861297; x=1723466097; darn=lists.linux.dev;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:to:subject:user-agent:mime-version:date:message-id:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=U+1Y8BX2Wh3Of+CEEzHaFWMTWY1h038N4LZMQDfQ82g=;
+        b=i4+nMjgq3WgVSq5gqoNF2qo0OX9/T81VIfpdyqGSD1CoRagtv487Std23rKt+SmK5L
+         pYV9ZP8ukKdh0WwO9A6HDogM4dGRWnaiZ+WOvX61LSaBUCOwYl6hpMWNuOXpSyvg1JAm
+         NqvhD1xLQXQL4cem2nNlfS4Lxglha4YFRv7GbydLB3QYzyP7wMNpsRGyrhT6HNCVPn9j
+         JcCOGeSa/bXXU1S3bE2f8PMw0k8N+omPqHmmW/HAklNiGAiha5l/g7BWqOoAZzIbjQ3h
+         f5kAnmKWTt2SjbTNXvp4ZelWHGmoag9+0K1u0LTbE/G6X8TfrVJz1kNKXbYP4NTgX3L7
+         Issw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1722861297; x=1723466097;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=U+1Y8BX2Wh3Of+CEEzHaFWMTWY1h038N4LZMQDfQ82g=;
+        b=L7iHbsTV2IoHuzqPAvvTD6v0mkIZujUgTxTAhGYOjenm0KqfhvQfTcHabu8B/FEDqM
+         jBpfDeLZKNb0ZTNXlGv/S8eaL/NLudcgffvFLvufAog8RwO1mIaYMrLX8YiUDXaE/Fd1
+         B2iLgtgBKP/jB4Kh2wYXvvV1ARYtdNkjvHou21GV5wHhWdhIcKPxTSszY5Jw+ALFRFpm
+         XUliRsf0srJ0rjobo3ZOXx+vHHZpskQXdrdip3eKFD9WRS3DywcFtxRimEO5iiSiKBUn
+         lvdbWkktUlP9Ls8lozjy4UsOo+wVpZSe9ZyLVVtVzsOH66Txn7ngY/jQ/yTXbuqK/h8r
+         zAdw==
+X-Forwarded-Encrypted: i=1; AJvYcCXBEybG0TX7K95fzx6d47431zZkDLsycL6wWrRPQ1snl1s7TyvKy7uQ9HcF6KFVdoGIfRBZNO8dPeFk6W1jncDZbmwv
+X-Gm-Message-State: AOJu0YxLa9H7fBUaY7dAgVXKZKec4t5oITrJoxWYbhZf4XAm7ktzfl4z
+	GAZwdEvrMP7+kdvF7J0Stkxpf5wUHDncrSQRtxW7PpYFa/nH2sQO
+X-Google-Smtp-Source: AGHT+IHku7NLRw3AcAFMbYDuBJd5tZCjZnkH4eEid9g9wjN7XE9aIvfihn7WQ+/byglI3xlNON1D+Q==
+X-Received: by 2002:a05:620a:4306:b0:79f:735:4d08 with SMTP id af79cd13be357-7a34c0a639amr2455183885a.25.1722861297049;
+        Mon, 05 Aug 2024 05:34:57 -0700 (PDT)
+Received: from [10.100.121.195] ([152.193.78.90])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7a34f6ff716sm345359985a.64.2024.08.05.05.34.56
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 05 Aug 2024 05:34:56 -0700 (PDT)
+Message-ID: <ef38aa12-634e-4870-888c-219c961f301c@gmail.com>
+Date: Mon, 5 Aug 2024 05:34:54 -0700
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <047c2dfc-ca69-4117-a3a6-66790b9814db@gmail.com>
-X-Rspamd-Queue-Id: 4WcX6V1V8wz9slg
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Request] iwd to support brcmfmac 'SAE with AUTHENTICATE'
+To: KeithG <ys3al35l@gmail.com>, iwd@lists.linux.dev
+References: <CAG17S_N+Hjt2c8t8hN4VMx79QsQ3hiiE_cwOErg6fKoyHkr67A@mail.gmail.com>
+Content-Language: en-US
+From: James Prestwood <prestwoj@gmail.com>
+In-Reply-To: <CAG17S_N+Hjt2c8t8hN4VMx79QsQ3hiiE_cwOErg6fKoyHkr67A@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Wed, Mar 06, 2024 at 04:19:41AM -0800, James Prestwood wrote:
-> On 3/4/24 1:40 PM, Grant Erickson wrote:
-> > On Mar 4, 2024, at 11:32 AM, Hannes von Haugwitz <hannes@vonhaugwitz.com> wrote:
-> > > On Mon, Mar 04, 2024 at 04:30:27AM -0800, James Prestwood wrote:
-> > > > I'm not familiar with the privacy extensions specifically, but you can
-> > > > enable MAC address randomization which should hide the MAC for you. You can
-> > > > check the man pages for more details but in main.conf something like:
-> > > >
-> > > > [Settings]
-> > > > AddressRandomization=network
-> > > MAC address randomization hides the physical MAC address but does not
-> > > prevent device tracking (within the same network). With privacy extension
-> > > enabled, the IPv6 address is randomly regenerated every few hours.
-> > >
-> > > For more details see [RFC_4941].
-> > >
-> > > Best regards
-> > >
-> > > Hannes
-> > James:
-> >
-> > I believe it’s handled in connman with these APIs:
-> >
-> >      https://git.kernel.org/pub/scm/network/connman/connman.git/tree/src/ipconfig.c#n528
-> >
-> > with the Linux kernel “use_tempaddr” sysctl setting. I assume iwd would have to replicate this infrastructure, or pull it into ELL and share it that way.
+Hi Keith,
+
+On 8/4/24 10:08 AM, KeithG wrote:
+> I know brcmfmac is a pain to deal with on many fronts. The current
+> firmware installed by RPiOS in bookworm as of:
 >
-> Hmm, if this is all that's required then shouldn't this already work if
-> Hannes is setting "use_tempaddr" externally to IWD? Of course having this
-> within an IWD profile setting would be nice, but I think there must be more
-> too it than this right?
+> Linux 6.6.31+rpt-rpi-v8 RPiOS-bookworm aarch64 (64bit)
+>
+> is:
+> [   65.894288] brcmfmac: brcmf_c_preinit_dcmds: Firmware: BCM4345/6
+> wl0: Apr 15 2021 03:03:20 version 7.45.234 (4ca95bb CY) FWID
+> 01-996384e2
+> iwlist shows:
+>          Supported extended features:
+>                  * [ CQM_RSSI_LIST ]: multiple CQM_RSSI_THOLD records
+>                  * [ 4WAY_HANDSHAKE_STA_PSK ]: 4-way handshake with PSK
+> in station mode
+>                  * [ 4WAY_HANDSHAKE_STA_1X ]: 4-way handshake with
+> 802.1X in station mode
+>                  * [ DFS_OFFLOAD ]: DFS offload
+>                  * [ SAE_OFFLOAD ]: SAE offload support
+>                  * [ 4WAY_HANDSHAKE_AP_PSK ]: AP mode PSK offload support
+>                  * [ SAE_OFFLOAD_AP ]: AP mode SAE authentication offload support
+>
+> This driver does not seem to work with iwd nor wpa_supplicant to
+> connect to an SAE3-Personal network. To get it to work with
+> wpa_supplicant, I had to follow the instructions in this link:
+> https://github.com/raspberrypi/linux/pull/5945
+> It shows that it has been merged into the kernel. The new firmware
+> forces SAE authentication to the AUTHENTICATE command, apparently.
+>
+> [   65.764656] brcmfmac: brcmf_c_preinit_dcmds: Firmware: BCM4345/6
+> wl0: Aug 29 2023 01:47:08 version 7.45.265 (28bca26 CY) FWID
+> 01-b677b91b
+> iwlist shows:
+> ...
+>   Device supports SAE with AUTHENTICATE command
 
-Is there any news about this feature request?
+So this is interesting... IWD does not expect a fullmac card to support 
+AUTHENTICATE but if this is the direction brcmfmac is going I guess we 
+can support it. This is such a mess though and brcmfmac just needs to 
+decide what they are doing. This just makes things even more complicated 
+as we now have 3 (?) ways to do SAE just on brcmfmac.
 
-Best regards
+I think IWD is getting very confused with this newly added support. 
+Could you get a wiphy dump with iwmon with this new kernel/firmware so I 
+can see what exactly its saying it supports and what it doesn't. You can 
+do this by running iwmon:
 
-Hannes
+iwmon --nortnl --noscan -w iwmon.pcap
+
+Then starting IWD.
+
+> ...
+>          Supported extended features:
+>                  * [ CQM_RSSI_LIST ]: multiple CQM_RSSI_THOLD records
+>                  * [ DFS_OFFLOAD ]: DFS offload
+>
+> With this driver and the latest wpa_supplicant (built from git), I can
+> connect to an SAE3/Personal AP.
+>
+> I am not a dev but can build and test stuff on my setup. As I
+> understand it, since the new brcmfmac firmware requires the SAE
+> authentication to be done outside of the kernel and that iwd does not
+> yet support this functionality.
+> Is there anything I can do to support the addition of this
+> functionality to iwd? We develop on the RPi and we are stuck with the
+> brcmfmac cards and use connman/iwd for our connectivity.
+>
+> Keith
+>
