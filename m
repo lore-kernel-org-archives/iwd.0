@@ -1,120 +1,135 @@
-Received: from mail-oi1-f170.google.com (mail-oi1-f170.google.com [209.85.167.170])
+Received: from mail-yw1-f170.google.com (mail-yw1-f170.google.com [209.85.128.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E0AF17C64
-	for <iwd@lists.linux.dev>; Mon,  5 Aug 2024 14:07:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE5A15339D
+	for <iwd@lists.linux.dev>; Mon,  5 Aug 2024 14:21:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722866851; cv=none; b=Y+tBeU5y82SxfZ8ScGSdgGx4fTnTS6CNB1cU+eJXvJ60WBERZ/7NV1vDFrQl1PxNV4yCJZJg4Ju/2AeRDqrr6YEFZe/f66261C9YrBmpobP8RJ2puZ+lqCCQ6XBAOjR6KA4l2hCMnR/p6KMMvPXL8k5QWD96AGEQLswEi70KYKs=
+	t=1722867666; cv=none; b=ULubbEzbppXpsNQAYapEhm58t2abt8idmkv3LH3PO1VlLY78Ns3eHI7KDFmvB8shN4O3L1GY5AAbhMFbC02EuJGIEvpGam0bBL2adrivyGRfV3OixkF/lZ3aR/FuSighTf1/seaqM8OfEGikifMWFV2gEdTjipfo9K0+BrVndZY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722866851; c=relaxed/simple;
-	bh=W/rohdQsP4mnfhtpZXf+x07LZ5SCvwFToxTbKpiTwAc=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=PDF6i9cDGdf7vVDsyZm7zj2l9nWD3HrWKzLSm5NmBaADGHWRVezI2driCbI4XAZgNG9CyGeE6xbpvR3cW1ZFKhVOuDA3ulMO/A2gFPPfCm9fYhBxaKcknerV4NjG6ZZFtvQ7+yVARvdvFTaTgHfBo7pRPVra2SazjdSeCHxqGJk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kYWDBC8r; arc=none smtp.client-ip=209.85.167.170
+	s=arc-20240116; t=1722867666; c=relaxed/simple;
+	bh=nXoMqrMNsnD1Omyw34+lg717mmCBilo97c44Gho1QMk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=oWC8+ubVEdesEEeNwfRooScqJ8RTcG4n473qu10bpFmLIgwcPVpN8YmtGsej2Ci+RG2hm6mp/75zAWtZvDWv0+y3XTSMbgHURG/cgkDR6qSeHDGeuhyRHpEYrhwZZ0beRO0P6lWjUG6KWN2CT6+m6oR226IeeyLi3WI+5TMesHA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GDPsJpS1; arc=none smtp.client-ip=209.85.128.170
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kYWDBC8r"
-Received: by mail-oi1-f170.google.com with SMTP id 5614622812f47-3db1270da60so7436756b6e.2
-        for <iwd@lists.linux.dev>; Mon, 05 Aug 2024 07:07:30 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GDPsJpS1"
+Received: by mail-yw1-f170.google.com with SMTP id 00721157ae682-66ca5e8cc51so95727647b3.1
+        for <iwd@lists.linux.dev>; Mon, 05 Aug 2024 07:21:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1722866849; x=1723471649; darn=lists.linux.dev;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=KDGPEknDCSEMiAEXT3w71++JkOVTA745cTtkDfXqG0Y=;
-        b=kYWDBC8rZRGwugXnEwXmIJuk4gafFwK5IRjR2FBFtQy+BNy/oi/wfzkAt1h7QOhNp2
-         BZRaAF9M1K4Vu0D6D0unxSjBO4P7krm87R67NmtHND3sS9PFLUHG+DPMsRiDxRHImSHq
-         cZ7JFjTDpmaPceGS5LYrR7+Kqhe/Z6iTffkfOT9hKc+jxUYMMjPp29IqD6CbX869e/fV
-         m3ummUU6ara51CltR4QMIUtpTAK5F2oLS18ma/2cgkVd3HGnmqtUzm1YsLZeKYZbF7Of
-         rvY5dLuaZd1IahF9HjQM+uFIMinCvIpT5Xbz8VtQLnr6Mti8Riz7DxKQYiEhKRZ+vmja
-         OCjA==
+        d=gmail.com; s=20230601; t=1722867663; x=1723472463; darn=lists.linux.dev;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:to:subject:user-agent:mime-version:date:message-id:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=ks7ugHydiLoArN4W8KVvhEI/jMuY2Q9duNT1UF24pnQ=;
+        b=GDPsJpS1Rj8Zq2QVb6dAmoGeu9HWAE6s04mNTHcMVUcy3x7BzJ30QA1d61EH5DrxcB
+         kZSKYMS5X3UHJdW5r7GfOa0njK/eO47fEZ/DfNFatAxGfEozJdeb70NwnZBCAD4QLmRw
+         Tb6bOaKFv49x+CdUuQ9pDGBPYazYL0Co6iOHe5EqlqM0Ip0msuH3R+8+Zgio/6Q0E69O
+         f0Qi4J15gzz5Nsu46xMDmxkHBKvE0Vw5o2JvfK3zE5mRSbB3M6EtGIeapvc09e/uDbp4
+         oJYm+YQBz4GsXtvHmwZ+BaM+EK1q0qo53yRTwj6naGBr1veGyLzh/INIDM0kTqlumtdl
+         ZLUw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722866849; x=1723471649;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=KDGPEknDCSEMiAEXT3w71++JkOVTA745cTtkDfXqG0Y=;
-        b=FtnhV9Qd/3YnHTcxH82MqFpKqBp8+vpUzm/v/AAtfRvlgCWFxl86Wl9vZCKy5GdWJt
-         b+zV2e3DSzOmYOLdzwwfKxW0VXU7tyKmMooBjTlKChsys4QMjfITu/QxyAvUOHk9LNgs
-         UkQ4MO13IFgSArW88NzzOIomJMhvma1MJ70MylNX+1Jf64+gKIbIvbY05OS7mNscWstm
-         LDrb0D1Qy6aCvcFE3y81H/PUJ3XViiqVpqVB9HmGDj9dO6A3geWcifrr7sZJt9f2ITbb
-         gIL1NK/DODSnjWB6fjt7KZ2LslJlUnJrglmXotWu8xYfN+RkueYP0olx1AKdoIEmHA85
-         uWfg==
-X-Gm-Message-State: AOJu0YyqM81ysDQ6wsuLglrkz2wevb2xyMJYSLkjC40rMWj/YrCqIutj
-	h+iuXvD5GHS6fjR/F1Dmr+rUwp0xXA+AaZqUJRR5TmxgmXCWnAf/AoKtBQ==
-X-Google-Smtp-Source: AGHT+IFehnW90Tc/7AWbP5P6Eym9bypuFBPtW7s2dIx8a0P3PyYGD2ljNlR9A6i7lH7rbrSyfSH1Sw==
-X-Received: by 2002:a05:6808:1384:b0:3d9:3b17:f752 with SMTP id 5614622812f47-3db5581636emr16749201b6e.26.1722866849278;
-        Mon, 05 Aug 2024 07:07:29 -0700 (PDT)
-Received: from archdev.attlocal.net (syn-070-114-247-242.res.spectrum.com. [70.114.247.242])
-        by smtp.gmail.com with ESMTPSA id 5614622812f47-3db56361a88sm2654172b6e.4.2024.08.05.07.07.28
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 05 Aug 2024 07:07:28 -0700 (PDT)
-From: Denis Kenzior <denkenz@gmail.com>
-To: iwd@lists.linux.dev
-Cc: Denis Kenzior <denkenz@gmail.com>
-Subject: [PATCH 7/7] netdev: Simplify FILS handling in netdev_connect_common
-Date: Mon,  5 Aug 2024 09:07:14 -0500
-Message-ID: <20240805140721.57518-7-denkenz@gmail.com>
-X-Mailer: git-send-email 2.45.2
-In-Reply-To: <20240805140721.57518-1-denkenz@gmail.com>
-References: <20240805140721.57518-1-denkenz@gmail.com>
+        d=1e100.net; s=20230601; t=1722867663; x=1723472463;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ks7ugHydiLoArN4W8KVvhEI/jMuY2Q9duNT1UF24pnQ=;
+        b=tjTy1r/TsnYqN3ziR4uQVcJc8rBlQRCneC2Pg6HAKkhQoGT3NBFol5mgaJbwkhS+s2
+         ctsEh4h8OWuvAtTUBMVToeo1H5t61ZaG56DORNkPJKuIrEwITxFh6mXvPkk/n0WeWXyH
+         dvNBUAFY0OjvAV2lHFrgkY7f9h1ir6d0fkv2exl8aOw7meRF7LCanqxpWzqW/9ZLsVS/
+         L4B0LNgq0vcgvyKsOcqIzeNrItWbwBBy/h+Poazwn7kVvNRbwV4w/DLuEtyZupNiZkp0
+         gbSW9Cmp4duAM8LUAUhZ2+/rX7cxZA9o9fQwjqG6mWlrj4mBuIMSJzvD5sHWggh8P+Wt
+         /6Bg==
+X-Forwarded-Encrypted: i=1; AJvYcCWFO+40ZRiBheLBdNIkE+yF0740TF94kSrnELTjVAqX61tMBD6NMW+aBx3edPjcvk/8Omn5O0by5j+wxPR1rALqQ0Zt
+X-Gm-Message-State: AOJu0YxKjgSELK0Kn3IrGi39fP4Vi3dIKinLagzJ+bOsqIg6p3M7IQ4H
+	1Sq+iLLvBEc+u+AUprzroppSvd0WUaM6aEv/jzHGilNfiJR9toxR
+X-Google-Smtp-Source: AGHT+IG/SqOru3ct+MmEJBVJW9C0uwJbPD6/FUYY1yIibHZAfghAgEeQmp17bQta1+G8SejUboDY/w==
+X-Received: by 2002:a0d:f046:0:b0:64a:78ed:5cb1 with SMTP id 00721157ae682-68963707bf1mr130211267b3.28.1722867663617;
+        Mon, 05 Aug 2024 07:21:03 -0700 (PDT)
+Received: from [10.100.121.195] ([152.193.78.90])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6bb9c864987sm35986376d6.110.2024.08.05.07.21.02
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 05 Aug 2024 07:21:03 -0700 (PDT)
+Message-ID: <4bb34106-49e9-45f1-a3d2-cab6329f2029@gmail.com>
+Date: Mon, 5 Aug 2024 07:21:01 -0700
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 7/7] netdev: Simplify FILS handling in
+ netdev_connect_common
+To: Denis Kenzior <denkenz@gmail.com>, iwd@lists.linux.dev
+References: <20240805140721.57518-1-denkenz@gmail.com>
+ <20240805140721.57518-7-denkenz@gmail.com>
+Content-Language: en-US
+From: James Prestwood <prestwoj@gmail.com>
+In-Reply-To: <20240805140721.57518-7-denkenz@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
----
- src/netdev.c | 18 +++++++++---------
- 1 file changed, 9 insertions(+), 9 deletions(-)
+Hi Denis,
 
-diff --git a/src/netdev.c b/src/netdev.c
-index fb095fdca561..494e46a59de2 100644
---- a/src/netdev.c
-+++ b/src/netdev.c
-@@ -3833,6 +3833,14 @@ static void netdev_connect_common(struct netdev *netdev,
- 		goto build_cmd_connect;
- 	}
- 
-+	if (IE_AKM_IS_FILS(hs->akm_suite)) {
-+		netdev->ap = fils_sm_new(hs, netdev_fils_tx_authenticate,
-+						netdev_fils_tx_associate,
-+						netdev_get_oci,
-+						netdev);
-+		goto done;
-+	}
-+
- 	if (nhs->type != CONNECTION_TYPE_SOFTMAC)
- 		goto build_cmd_connect;
- 
-@@ -3855,15 +3863,6 @@ static void netdev_connect_common(struct netdev *netdev,
- 		}
- 
- 		break;
--	case IE_RSN_AKM_SUITE_FILS_SHA256:
--	case IE_RSN_AKM_SUITE_FILS_SHA384:
--	case IE_RSN_AKM_SUITE_FT_OVER_FILS_SHA256:
--	case IE_RSN_AKM_SUITE_FT_OVER_FILS_SHA384:
--		netdev->ap = fils_sm_new(hs, netdev_fils_tx_authenticate,
--						netdev_fils_tx_associate,
--						netdev_get_oci,
--						netdev);
--		break;
- 	default:
- build_cmd_connect:
- 		cmd_connect = netdev_build_cmd_connect(netdev, hs, prev_bssid);
-@@ -3876,6 +3875,7 @@ build_cmd_connect:
- 		}
- 	}
- 
-+done:
- 	netdev->connect_cmd = cmd_connect;
- 	netdev->event_filter = event_filter;
- 	netdev->connect_cb = cb;
--- 
-2.45.2
+On 8/5/24 7:07 AM, Denis Kenzior wrote:
+> ---
+>   src/netdev.c | 18 +++++++++---------
+>   1 file changed, 9 insertions(+), 9 deletions(-)
+>
+> diff --git a/src/netdev.c b/src/netdev.c
+> index fb095fdca561..494e46a59de2 100644
+> --- a/src/netdev.c
+> +++ b/src/netdev.c
+> @@ -3833,6 +3833,14 @@ static void netdev_connect_common(struct netdev *netdev,
+>   		goto build_cmd_connect;
+>   	}
+>   
+> +	if (IE_AKM_IS_FILS(hs->akm_suite)) {
+> +		netdev->ap = fils_sm_new(hs, netdev_fils_tx_authenticate,
+> +						netdev_fils_tx_associate,
+> +						netdev_get_oci,
+> +						netdev);
+> +		goto done;
+> +	}
+> +
+>   	if (nhs->type != CONNECTION_TYPE_SOFTMAC)
+>   		goto build_cmd_connect;
+>   
+> @@ -3855,15 +3863,6 @@ static void netdev_connect_common(struct netdev *netdev,
+>   		}
+>   
+>   		break;
+> -	case IE_RSN_AKM_SUITE_FILS_SHA256:
+> -	case IE_RSN_AKM_SUITE_FILS_SHA384:
+> -	case IE_RSN_AKM_SUITE_FT_OVER_FILS_SHA256:
+> -	case IE_RSN_AKM_SUITE_FT_OVER_FILS_SHA384:
+> -		netdev->ap = fils_sm_new(hs, netdev_fils_tx_authenticate,
+> -						netdev_fils_tx_associate,
+> -						netdev_get_oci,
+> -						netdev);
+> -		break;
+>   	default:
+>   build_cmd_connect:
+>   		cmd_connect = netdev_build_cmd_connect(netdev, hs, prev_bssid);
+> @@ -3876,6 +3875,7 @@ build_cmd_connect:
+>   		}
+>   	}
+>   
+> +done:
+>   	netdev->connect_cmd = cmd_connect;
+>   	netdev->event_filter = event_filter;
+>   	netdev->connect_cb = cb;
+
+Mostly just an observation, but the switch block is pretty much just 
+checks for SAE now, and the default build_cmd_connect case. It may look 
+nicer to just have if/else if's for:
+
+IE_AKM_IS_FILS()
+IE_AKM_IS_OWE()
+IE_AKM_IS_SAE()
+
+But I'm also fine leaving it how you have it.
 
