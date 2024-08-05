@@ -1,97 +1,93 @@
-Received: from mail-oi1-f172.google.com (mail-oi1-f172.google.com [209.85.167.172])
+Received: from mail-oi1-f171.google.com (mail-oi1-f171.google.com [209.85.167.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22A5717C64
-	for <iwd@lists.linux.dev>; Mon,  5 Aug 2024 14:06:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C628917C64
+	for <iwd@lists.linux.dev>; Mon,  5 Aug 2024 14:07:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722866772; cv=none; b=ERMwLMIzSRaNVVklDM1qlpBwdVKRjBpFE0tAENveHqd+fcy1dRPiV4+cw1AQ0Jx6klz3S0oRWF6vut/dtewgW11Jfvoa0icg1fUdQOT8Di3tjCoAl8kYZ7P5Xhmk+wFryM6DKFYGyF53mQ9xGlZqUu0uu/4UhNqdtbPtOJ1mF+o=
+	t=1722866846; cv=none; b=cra6VPJWLDQ4BvXJ62NoE1HVbnqQubTZ1wSWDE75SIT/zjIjGT5DxI/4MLNZtNFFjFVZeQXapXmnCdDnqLxdUrQN7v3bOOgBFjoq+D7X3pql53oeldEkPR8IbXV7ZoUfFtcIL73v5pNuoaPQTIUjFGoE4jHcH8/91BwQ96T+Hs8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722866772; c=relaxed/simple;
-	bh=5Kh7239kURpGD3qNBNRZRfX8uNGWu7mX7K8jaMpPalA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=b+yKHRuOgwrJDu84iGph6C/Tuy9T9/nyu3g0pOpp/7LhwknAxctLi3Fco9w87iCUypeoOp35xu834oo3uF7ZMIztn35AmZRlmPUDZS5edUJTg00ULmpjePCHzFjXTsOUFrQtgFDa+nm9e1xPEOnjT8/qnEDGwtZOcCRuqjgMnyE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kMaVwWuC; arc=none smtp.client-ip=209.85.167.172
+	s=arc-20240116; t=1722866846; c=relaxed/simple;
+	bh=TnJhlZSQZlCY+Nb7XxT0I3c6X9S6tgop07v2aJ5bqcY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=rZe87HaISCf2sAlheNvplRB0AQJ/TJ3O0pW3mOlaon5/MtXMJ9HAxE7YnHQ0nYIBTvBTlY/PnDz55HKeLQtspEFZpYNO2U7vOZ0RZJEarhUlwTUWGLUd8sA/j6xO3ltCpcsI6t3aSB3dWkyGL2BjKL56OnCUTLpKrlyY2DSsDHw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=a3/VXJh8; arc=none smtp.client-ip=209.85.167.171
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kMaVwWuC"
-Received: by mail-oi1-f172.google.com with SMTP id 5614622812f47-3db22c02a42so6616382b6e.3
-        for <iwd@lists.linux.dev>; Mon, 05 Aug 2024 07:06:10 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="a3/VXJh8"
+Received: by mail-oi1-f171.google.com with SMTP id 5614622812f47-3db22c02a42so6617804b6e.3
+        for <iwd@lists.linux.dev>; Mon, 05 Aug 2024 07:07:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1722866770; x=1723471570; darn=lists.linux.dev;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=/6bY3mrqNIzuITrSIWRyTKXc88J/5bK+D4ESUTTV4UQ=;
-        b=kMaVwWuCk+mP9fraYqzPxx2AL+cw8aIfygRGPed2b4s/mjSQr4+yh8onO3cdcrnnHr
-         H+kWcKiGbV79nzqXHB4jsv5VPMg9bp/Nq44oCJ80yOeNCbj+VRfMpYEiT68Y9anlj42v
-         l4qHv4Z0PKWoEKNslB3SxN20uxC5dKm8GFtg2hg2O2vRXLoC6pD0zgBROgNeDCi+k6p4
-         Zg6pYe6iqpNkFYM5Y5z1BumR9MJxpWcUvgXMR4EYZj2YZ4H2T/AbATt75SuwkVYKKHoa
-         NRY8cUBIvGR9iBsMlvbYTUl1GLymZ3n7cKsO14eqC9hu8+wSW5rP6mi/Eqhk+uXHIc6p
-         hJSw==
+        d=gmail.com; s=20230601; t=1722866843; x=1723471643; darn=lists.linux.dev;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=rfFQn81mZNNz2E0CwmNrnW9XEkdWldOBKCwP10Xe/Ac=;
+        b=a3/VXJh8TKH0HcPfOX6ZZlbP3frevJJgO4DaMAJO9MUwHOhb6p8nOeBTvTNAVDRVgk
+         sgyWnfIH4/beT0JwEgJHtsmOIBhBG0G2GQ/+cDfoJ1wBwRhayDgegpXg7tuNkCKxDyeb
+         KFmmEHJmVVd6+P+aH8Fo6bodO6a+vSHSQckwcyb+Ep/ebHwR/FcurkeDZLycHulItc4D
+         ynLqcScWmQO2U5znTlvrsmKErqYQmT42h9MVeAXmfbaYuI8kCT9t2YfCChKAuwjnuY0L
+         TUjV7DxZjOFHXgAObwxd3fg5zY5MpkUCQSLWpd19BTG0GR/zOwAjSHDznKXkRmiWHpka
+         OGng==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722866770; x=1723471570;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=/6bY3mrqNIzuITrSIWRyTKXc88J/5bK+D4ESUTTV4UQ=;
-        b=ORH/3tn1O9hFwQK+wKj4+b0f6AxHxRmM//dAyPZouUFdWi154gc1L2qMt9B4LlAN1U
-         uHibJuWpGT+a8iqjP3ONev1OmGowtp9KGvsIjD8woemk+Rdn1J1Jv85m1sj/NhkpnF88
-         h0ALogLAVWew1r6EGdThPJq9ZLaasS6priVbMYhfwKOeFSIfRxSlKKt1ASSVZP548vBS
-         Uv5Igt2uBnXHFn0vZ1qfB4QFUHn1EDfSq4tUCSbC3dLpJFb96RrW+oBYtNTHb2mxOP1y
-         ZtkvkHz7y/dhoXGTemwmxo5TX4KuDvZXsgOwcuH06syk67AcmFfs2M+DaUbh5bnodilq
-         aBjA==
-X-Forwarded-Encrypted: i=1; AJvYcCXiM8HqVRnY+nceOXHva1Xhn1iny7PvS2Cex5Z26ZRVSN62TFdFv8O5NuzEreoDsfITZw3hV/PO61Qq0lw0Miaf2ehc
-X-Gm-Message-State: AOJu0Yxae9+37HPqzH6Hi7yiBG9XU776SQJK0sjX7zeDOI9lCvZaRE7n
-	qcd9TGAaG1NBhQTOWNse78fiZyODhfW41uFjSyzUvDgk2ItcBzrkNhH8Wg==
-X-Google-Smtp-Source: AGHT+IHEggEP9/Xk/HR0G7p6D5QBKgJAboHU3yBpC1gzvZW4BiSx6Et8VKokhVKM8owkfc9j703YFA==
-X-Received: by 2002:a05:6808:f8a:b0:3d9:dfef:d7c8 with SMTP id 5614622812f47-3db55817bf8mr16198380b6e.27.1722866770127;
-        Mon, 05 Aug 2024 07:06:10 -0700 (PDT)
-Received: from [192.168.1.22] (syn-070-114-247-242.res.spectrum.com. [70.114.247.242])
-        by smtp.googlemail.com with ESMTPSA id 5614622812f47-3db563c76b6sm2658016b6e.55.2024.08.05.07.06.09
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 05 Aug 2024 07:06:09 -0700 (PDT)
-Message-ID: <6c55f881-d677-42a9-8bab-9be889e02978@gmail.com>
-Date: Mon, 5 Aug 2024 09:06:08 -0500
+        d=1e100.net; s=20230601; t=1722866843; x=1723471643;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=rfFQn81mZNNz2E0CwmNrnW9XEkdWldOBKCwP10Xe/Ac=;
+        b=XIOr+6xFP20u6X3Yg9cMF9CzseULkIxzSgG65TNxsa+g85Xt6d5+AU30OWBjfC86QM
+         DJvGSFXi1cj9uUj7yIZK8jpct4p2OKq8yOE/Ir0OGbeAOS/ZZerui9+57eHa7QEYWce7
+         USb5XIMSu/lPbPP4WjxVDPqWXEwlUd2dAfjMGUf/JoelXuAGK6IP0sBelLn8tbiSiJVe
+         xeRRSA8fAKyrKuRKcZMXsP/g221DTOFiVshjUypKIbYRbEqjeERk0Xn1AWpgtnomi+FG
+         W16nOEgTTtPgwE7ST0s0EQhig2REz0H6MBj+cdMHp58a7lWUaSE9ufCKB8fBeQWQv8ct
+         wVDA==
+X-Gm-Message-State: AOJu0YwAcOGRINJtMhzZAvS6qAX7HlBvzli/LC7UT6BEd7/S2FiNlADc
+	K8brNVEavWgfD4cVR7Od6knDTwL6+a59B+iBajLTLrBrW5Ex+OQXfGu2xw==
+X-Google-Smtp-Source: AGHT+IEvFjRXPABHmBjBKNS+fzPaWjAjTh1hMpJ2Lb3thjfUwrcoCSxd0sGcMbU/DP61LJax0la/XA==
+X-Received: by 2002:a05:6808:1308:b0:3db:19b9:1e39 with SMTP id 5614622812f47-3db5583fd74mr12488891b6e.50.1722866843632;
+        Mon, 05 Aug 2024 07:07:23 -0700 (PDT)
+Received: from archdev.attlocal.net (syn-070-114-247-242.res.spectrum.com. [70.114.247.242])
+        by smtp.gmail.com with ESMTPSA id 5614622812f47-3db56361a88sm2654172b6e.4.2024.08.05.07.07.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 05 Aug 2024 07:07:23 -0700 (PDT)
+From: Denis Kenzior <denkenz@gmail.com>
+To: iwd@lists.linux.dev
+Cc: Denis Kenzior <denkenz@gmail.com>
+Subject: [PATCH 1/7] monitor: Decode RMNet Mux Identifier
+Date: Mon,  5 Aug 2024 09:07:08 -0500
+Message-ID: <20240805140721.57518-1-denkenz@gmail.com>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] station: improve zero oper class neighbor report
- workaround
-To: James Prestwood <prestwoj@gmail.com>, iwd@lists.linux.dev
-References: <20240731144717.473941-1-prestwoj@gmail.com>
-Content-Language: en-US
-From: Denis Kenzior <denkenz@gmail.com>
-In-Reply-To: <20240731144717.473941-1-prestwoj@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-Hi James,
+---
+ monitor/nlmon.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-On 7/31/24 9:47 AM, James Prestwood wrote:
-> The workaround for Cisco APs reporting an operating class of zero
-> is still a bug that remains in Cisco equipment. This is made even
-> worse with the introduction of 6GHz where the channel numbers
-> overlap with both 2.4 and 5GHz bands. This makes it impossible to
-> definitively choose a frequency given only a channel number.
-> 
-> To improve this workaround and cover the 6GHz band we can calculate
-> a frequency for each band and see what is successful. Then append
-> each frequency we get to the list. This will result in more
-> frequencies scanned, but this tradeoff is better than potentially
-> avoiding a roam to 6GHz or high order 5ghz channel numbers.
-> ---
->   src/station.c | 145 ++++++++++++++++++++++++++++----------------------
->   1 file changed, 82 insertions(+), 63 deletions(-)
-> 
-
-Applied, thanks.
-
-Regards,
--Denis
+diff --git a/monitor/nlmon.c b/monitor/nlmon.c
+index e5cd545173ce..941992595412 100644
+--- a/monitor/nlmon.c
++++ b/monitor/nlmon.c
+@@ -7597,8 +7597,15 @@ static void flags_str(const struct flag_names *table,
+ 	pos += sprintf(str + pos, "]");
+ }
+ 
++static struct attr_entry link_info_data_entry[] = {
++	{ IFLA_RMNET_MUX_ID,	"RMNet Mux Id",		ATTR_U16 },
++	{ },
++};
++
+ static struct attr_entry link_info_entry[] = {
+ 	{ IFLA_INFO_KIND,	"Kind",		ATTR_STRING },
++	{ IFLA_INFO_DATA,	"Info Data",
++				ATTR_NESTED, { link_info_data_entry } },
+ 	{ },
+ };
+ 
+-- 
+2.45.2
 
