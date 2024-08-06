@@ -1,80 +1,81 @@
-Received: from mail-ot1-f43.google.com (mail-ot1-f43.google.com [209.85.210.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mout-p-201.mailbox.org (mout-p-201.mailbox.org [80.241.56.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D57F18D644
-	for <iwd@lists.linux.dev>; Tue,  6 Aug 2024 14:33:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDD7822066
+	for <iwd@lists.linux.dev>; Tue,  6 Aug 2024 17:38:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.241.56.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722954787; cv=none; b=r/yVNzlUM6hFJcaJVLe6YG2e7XOF+vlnwYWUT7ohxWV9yBR1ZzrCiK/u3BMqVspIkYStetAawcP9czhaFw4SOovIb0y7s/dwH/Q/SKsOgstFZhEAzvvLG6zHEeqxEnfJfbyKBrOWNuMHdTfriMkMkFIKEkXcKBrbS6MoFr5PLF0=
+	t=1722965926; cv=none; b=blnhHYf6CR020l7Z6cmqodCcRhswNgC9P0Y4w7SMaSTAJoKVcXs3LM6DPwjDk43ORfYzEzsSHPn5jKjhyzzSxS4Q+unMT2cTr0BTHxQ5Np9mA6IJUE+5iRqBp52Efgg9jVRB6ZZTUq1O8BheGHqd9nSrfCLK/NSjyxlJ+zbbwGg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722954787; c=relaxed/simple;
-	bh=9XhUj1UFHqx4olmYVzgahC5p+KckVU1IMLzu7GLdPHE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=Fd5LvpWk3Gj/nG14wv9KI3Rk8XPMEP7zC2G6ByTFFbldeGDTS2dWgQvu52IPoUwks1g1gALXWet181+z7j6TBaLmHYtJINwvbeBH/4jT9AG6mQ8h5GHzGP85yOJ+oa+ZsCTKw8tCUFO5ZMivz2XlsOV003I8Hjbl4NVyuXkD/u4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=V5Qsb36A; arc=none smtp.client-ip=209.85.210.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1722965926; c=relaxed/simple;
+	bh=EBT4hiFUATcqOgbWRqrTFuz3weGQikglP+H+epxOzJY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=JRoXQFqGzJosYtDwXGaEQTND58CPDR0+MaQDSY+TH1NVIKbZT9dqPjVxpXD8E9mrT8u4tGJPv0qVoignc+c+YE4439wLHMRb18DzqRZYHqtKQ1oWKqrv87svZS4hRef7SDp3d6AaE0EVq35j2ZWaBgoTyg9J4kWIwdTpGtnbb/M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=vonhaugwitz.com; spf=pass smtp.mailfrom=vonhaugwitz.com; dkim=pass (2048-bit key) header.d=vonhaugwitz.com header.i=@vonhaugwitz.com header.b=TXqxFdF2; arc=none smtp.client-ip=80.241.56.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=vonhaugwitz.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=vonhaugwitz.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="V5Qsb36A"
-Received: by mail-ot1-f43.google.com with SMTP id 46e09a7af769-70943b07c2cso410951a34.1
-        for <iwd@lists.linux.dev>; Tue, 06 Aug 2024 07:33:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1722954785; x=1723559585; darn=lists.linux.dev;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=gKHnoDZ/vkRjlipyh1da2VcfX0/5Hlk/P6E3Tf18CWU=;
-        b=V5Qsb36A09jVJNdvhsSOMlsnvoEHcSq5BwTsL0eFJGAy0HTM41GxEAUN0wB5oAQNVx
-         PA/xwgejqUHIr/+XZ3fsJrfMF0TLGSaQ3sNhC+shD929zNe9/PNSjAuTGufTv96hftEs
-         6xV5f9eqrlxavjutuwbzSveny60oVuKW0UvLGB6ZbZ6BFjNDKRixSft+Rxt55/WRUtCi
-         XZA4vsksc7rBZwI4YVz+8GjE+vivkfO1+KN2BnsVHPAXKsNtOJapbDtPBtCdBTuMV1TL
-         n/ATTkFXhyJ0y67XwOA9HNZbEr9rx/RKX1E0tSYA5MWd3hvs8KTyPczJsvREBOWw8G/G
-         h3Ag==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722954785; x=1723559585;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=gKHnoDZ/vkRjlipyh1da2VcfX0/5Hlk/P6E3Tf18CWU=;
-        b=e0/O9yQZrLDOx7hT06LUq8qU14YIR4pOciniXZriLdvcri76i7HoLhlHoVXwyZ77Iw
-         n6qNbbcoxuvKVfLiiNk660Ja1FuJJ/yHvBtr1+AuxAQX9eN4OCxIrllVw+T0Ti6cR3sA
-         7NjTCCzv8eb+kH0nNntMmMB2H7vuttPgAqs7hrNfvaiwUykg1FO26O5dGTXuo3CnCMfS
-         apA2JZ3uLh/y4GQ7Qv49X41p8IhhjRWF67otyeZT0vXWK+Cc8VWl6YnUQsKUaa/TBmBa
-         kY7rAf1lFEevTVXRPLXdVo9pOkVm0G41BuuwARS1HmwZdB3Jq4iehMq1PJG+ipX0EJfh
-         029A==
-X-Gm-Message-State: AOJu0YwWo9eT9WmGWpFRN08gk2yofrq1JnSka6kNHR8rcFl3XeaSWxBH
-	HV69DBYyuhk6zuuSMoPsvEJqsewC+VJNeNdtEW7j7e6wtC17GbQtqT72gA==
-X-Google-Smtp-Source: AGHT+IE1dXLJYrq8GhNIbyGG9nL7JJ/xNZJo57K3D0ElLIV+O2ODQP0ZQIXv0/qCsJy4N8QWzkUBBw==
-X-Received: by 2002:a05:6830:698f:b0:704:4abf:c0d6 with SMTP id 46e09a7af769-709b33436b7mr20048149a34.20.1722954785246;
-        Tue, 06 Aug 2024 07:33:05 -0700 (PDT)
-Received: from [192.168.1.22] (syn-070-114-247-242.res.spectrum.com. [70.114.247.242])
-        by smtp.googlemail.com with ESMTPSA id 46e09a7af769-70a3a7501d4sm3850616a34.59.2024.08.06.07.33.04
-        for <iwd@lists.linux.dev>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 06 Aug 2024 07:33:04 -0700 (PDT)
-Message-ID: <e6854941-2c81-4f7d-a69b-ab89f49bb3d8@gmail.com>
-Date: Tue, 6 Aug 2024 09:33:03 -0500
+	dkim=pass (2048-bit key) header.d=vonhaugwitz.com header.i=@vonhaugwitz.com header.b="TXqxFdF2"
+Received: from smtp1.mailbox.org (smtp1.mailbox.org [IPv6:2001:67c:2050:b231:465::1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mout-p-201.mailbox.org (Postfix) with ESMTPS id 4WdgWs2fjQz9svS;
+	Tue,  6 Aug 2024 19:38:33 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=vonhaugwitz.com;
+	s=MBO0001; t=1722965913;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=gCo3sGaoyeiSWZqCw18jgE/Ao2bZ4vtOm9R2T8fGbwA=;
+	b=TXqxFdF2ffdDkirPLycqIPn8sYWqj6CQeAxdd1+YlQ1dIWdwBjvy58RiD3giZA+lSfl0LI
+	wukYEbQzJwtjlah+F1vWm/iXn39B20DJ5dP8JI05Nf4zPnixuOtKkEbJBqE3hLl7MnQ2RD
+	j77d0vFI2ogUUZfy2lDys4mcnWNAiuGH9/vPOF4FsM/TIIKZUZ5WfVS+UlnWumB4OjZ6cD
+	Qkj9rHR6eJdA+rhTm95cgc/Z/dK/s+e0f7O9ClOgtAHI6yjlqk/zIno5A+6My/iZ31Wl1T
+	xolOCPt0wluLnMVMKYC3jQ0ZghFI/Fvd4xq15nI/BPjgh+4VcIfNYkcEFHD4mg==
+Date: Tue, 6 Aug 2024 19:38:30 +0200
+From: Hannes von Haugwitz <hannes@vonhaugwitz.com>
+To: James Prestwood <prestwoj@gmail.com>
+Cc: Grant Erickson <gerickson@nuovations.com>, iwd@lists.linux.dev
+Subject: Re: IPv6 Privacy Extension support?
+Message-ID: <20240806173830.GA25@magnesium.vonhaugwitz.com>
+References: <20240301144608.GA25@magnesium.vonhaugwitz.com>
+ <629785cf-77c3-4b14-ab58-d4b2c75f254a@gmail.com>
+ <20240304193253.GA25@magnesium.vonhaugwitz.com>
+ <BBC776B8-57F8-460D-A1CC-FD3B5A522311@nuovations.com>
+ <047c2dfc-ca69-4117-a3a6-66790b9814db@gmail.com>
+ <20240804210103.GA25@magnesium.vonhaugwitz.com>
+ <70e5936f-c789-4f56-a275-e1b559ea27fe@gmail.com>
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/7] monitor: Decode RMNet Mux Identifier
-To: iwd@lists.linux.dev
-References: <20240805140721.57518-1-denkenz@gmail.com>
-Content-Language: en-US
-From: Denis Kenzior <denkenz@gmail.com>
-In-Reply-To: <20240805140721.57518-1-denkenz@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <70e5936f-c789-4f56-a275-e1b559ea27fe@gmail.com>
+X-Rspamd-Queue-Id: 4WdgWs2fjQz9svS
 
-On 8/5/24 9:07 AM, Denis Kenzior wrote:
-> ---
->   monitor/nlmon.c | 7 +++++++
->   1 file changed, 7 insertions(+)
+On Mon, Aug 05, 2024 at 05:44:39AM -0700, James Prestwood wrote:
+> I was still not sure exactly what needs to be done. If the sysctl setting is
+> all thats needed, this is an easy feature, but you had said setting that
+> manually still doesn't enable the privacy extensions? Is the issue maybe
+> that IWD removes the wlan0 interface on startup? So setting that sysctl
+> setting manually, then starting IWD, is clearing it?
 > 
+> Is use_tempaddr still set as expected after IWD start?
 
-Applied
+I set the following kernel parameters via sysctl.d/60-ipv6_privacy.conf:
 
+net.ipv6.conf.all.use_tempaddr = 2
+net.ipv6.conf.default.use_tempaddr = 2
+
+After restarting IWD use_tempaddr for wlan0 is set as expected:
+
+# sysctl net.ipv6.conf.wlan0.use_tempaddr
+net.ipv6.conf.wlan0.use_tempaddr = 2
+
+Best regards
+
+Hannes
