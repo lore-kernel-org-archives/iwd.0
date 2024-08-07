@@ -1,81 +1,163 @@
-Received: from mout-p-201.mailbox.org (mout-p-201.mailbox.org [80.241.56.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f179.google.com (mail-qk1-f179.google.com [209.85.222.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDD7822066
-	for <iwd@lists.linux.dev>; Tue,  6 Aug 2024 17:38:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.241.56.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CFD18286A
+	for <iwd@lists.linux.dev>; Wed,  7 Aug 2024 18:14:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722965926; cv=none; b=blnhHYf6CR020l7Z6cmqodCcRhswNgC9P0Y4w7SMaSTAJoKVcXs3LM6DPwjDk43ORfYzEzsSHPn5jKjhyzzSxS4Q+unMT2cTr0BTHxQ5Np9mA6IJUE+5iRqBp52Efgg9jVRB6ZZTUq1O8BheGHqd9nSrfCLK/NSjyxlJ+zbbwGg=
+	t=1723054477; cv=none; b=AoCXZKqx5ExN7QtAzWqu4nSx/xtB6V+SQ3e8zmZWqYVJa0AWZ6wFWpmPdp4fv0jOQ8upKZBygc9OqtfOK5prg43lyBVRiuujbXTyZE0/ia/wQm9PG4baAVvS40ORD2CxYvMmzHMQiXMYSGjo7I764R8V/djB9pTFcA8NHzw40/4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722965926; c=relaxed/simple;
-	bh=EBT4hiFUATcqOgbWRqrTFuz3weGQikglP+H+epxOzJY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JRoXQFqGzJosYtDwXGaEQTND58CPDR0+MaQDSY+TH1NVIKbZT9dqPjVxpXD8E9mrT8u4tGJPv0qVoignc+c+YE4439wLHMRb18DzqRZYHqtKQ1oWKqrv87svZS4hRef7SDp3d6AaE0EVq35j2ZWaBgoTyg9J4kWIwdTpGtnbb/M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=vonhaugwitz.com; spf=pass smtp.mailfrom=vonhaugwitz.com; dkim=pass (2048-bit key) header.d=vonhaugwitz.com header.i=@vonhaugwitz.com header.b=TXqxFdF2; arc=none smtp.client-ip=80.241.56.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=vonhaugwitz.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=vonhaugwitz.com
+	s=arc-20240116; t=1723054477; c=relaxed/simple;
+	bh=FMJZ4MVV3MeRyAGLLPl3fbhEdU3KPFl4ckpiqCNdzjo=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=tlhkojgHHe7WnqBlkpepZT2x3NbBi0iVcInqbfJsSHb9qD3djvy/DmRQEr+tIhBtvHAE2F6TlyFvde2tlSmA6QPYcvJxyBwZaqrrT/uA6wY5C14pkeSg6tZIpyRhKOVYL0wCfO8qdFn0gnonO0S5kww70Jf8cZtDTNj8kP0ukwM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aPJdxoAf; arc=none smtp.client-ip=209.85.222.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=vonhaugwitz.com header.i=@vonhaugwitz.com header.b="TXqxFdF2"
-Received: from smtp1.mailbox.org (smtp1.mailbox.org [IPv6:2001:67c:2050:b231:465::1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mout-p-201.mailbox.org (Postfix) with ESMTPS id 4WdgWs2fjQz9svS;
-	Tue,  6 Aug 2024 19:38:33 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=vonhaugwitz.com;
-	s=MBO0001; t=1722965913;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=gCo3sGaoyeiSWZqCw18jgE/Ao2bZ4vtOm9R2T8fGbwA=;
-	b=TXqxFdF2ffdDkirPLycqIPn8sYWqj6CQeAxdd1+YlQ1dIWdwBjvy58RiD3giZA+lSfl0LI
-	wukYEbQzJwtjlah+F1vWm/iXn39B20DJ5dP8JI05Nf4zPnixuOtKkEbJBqE3hLl7MnQ2RD
-	j77d0vFI2ogUUZfy2lDys4mcnWNAiuGH9/vPOF4FsM/TIIKZUZ5WfVS+UlnWumB4OjZ6cD
-	Qkj9rHR6eJdA+rhTm95cgc/Z/dK/s+e0f7O9ClOgtAHI6yjlqk/zIno5A+6My/iZ31Wl1T
-	xolOCPt0wluLnMVMKYC3jQ0ZghFI/Fvd4xq15nI/BPjgh+4VcIfNYkcEFHD4mg==
-Date: Tue, 6 Aug 2024 19:38:30 +0200
-From: Hannes von Haugwitz <hannes@vonhaugwitz.com>
-To: James Prestwood <prestwoj@gmail.com>
-Cc: Grant Erickson <gerickson@nuovations.com>, iwd@lists.linux.dev
-Subject: Re: IPv6 Privacy Extension support?
-Message-ID: <20240806173830.GA25@magnesium.vonhaugwitz.com>
-References: <20240301144608.GA25@magnesium.vonhaugwitz.com>
- <629785cf-77c3-4b14-ab58-d4b2c75f254a@gmail.com>
- <20240304193253.GA25@magnesium.vonhaugwitz.com>
- <BBC776B8-57F8-460D-A1CC-FD3B5A522311@nuovations.com>
- <047c2dfc-ca69-4117-a3a6-66790b9814db@gmail.com>
- <20240804210103.GA25@magnesium.vonhaugwitz.com>
- <70e5936f-c789-4f56-a275-e1b559ea27fe@gmail.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aPJdxoAf"
+Received: by mail-qk1-f179.google.com with SMTP id af79cd13be357-7a1d6f4714bso11753385a.1
+        for <iwd@lists.linux.dev>; Wed, 07 Aug 2024 11:14:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1723054474; x=1723659274; darn=lists.linux.dev;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=5WfHtyfFvWdBzXQxfvCPRPK4dSsTpYb/cz+sdUWNRlM=;
+        b=aPJdxoAf245YqMynXmdlSxxo2npYaP/3NDI9KKs89uRhaRDfn+f10jSZYNXM34V+5P
+         c+Egm6GvpSU2O+2J4QIZlae40fQ08l8IckK3bQmziD2olkri9Q3c0ukLUf3JZkvdqxex
+         xMD9KVcdX56qh8v2vsvs4nC6BZSloeyR8nnBPvqlpjkfDaBQ9n+dxvcOYH0kcVX+rrsD
+         q3vWWs3Liz4KpbzEJhPottSL9f9VZ/MbRxQ1wcsrbg8fZ9BwBSPmLEGiR3+03EX8z1s9
+         BNwOJ6exHORrxZ5HpUXh9wsuG+hNBfi8SzciKaQ0mwYhaJcVrfTb4SDd/bqaiyOtHiPw
+         h19Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1723054474; x=1723659274;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=5WfHtyfFvWdBzXQxfvCPRPK4dSsTpYb/cz+sdUWNRlM=;
+        b=Ykc4ZPKkmAi+XaNHwUWnQ27K/+lOtlFqH4t+UY3csXYk34rymPHzUgEZNpnGDYOu0C
+         1FGdgd20GpMayNmyMyeOdtCpZrKshjVwVdxyEu9hu8d8BUGnFSRpmDIqrGJ5lWFNrTkx
+         01eow/wreiHpkhnBarQ2fLq3q2s6yNukqHON/J5kdgylG+dtZ/n8s9kzrGunNIy1acTZ
+         s9qJ+THdas/Pg3uegYOqVWkop19j7CgrmfPQpmJBhlqI9T9Dt90dpD67PxSkH+3+RQPO
+         0uaR7GqrlAVEE2ocD8p9fDiuXebw/Qo1UwUqQgGRS5B655N89GwRgFrSIcREX5dad/w+
+         HNJQ==
+X-Gm-Message-State: AOJu0YyDi8zOH74ljZyMd0RgFC7Y8uA5HUl3B/hARE7Z5mujoHbNaB/F
+	L07mxbb/Cx1zWns2gdRtpKQIZ3G2iZl+iAp22ksP6xjXUWsCohdiSSvFrg==
+X-Google-Smtp-Source: AGHT+IEhIHTsRp0Q4R+o5ZhYAl0Fg3JQYEU6sJYJZlTSWc2RjTgptO2m9/iax4r48EDDMO0aI9egdQ==
+X-Received: by 2002:a05:620a:410e:b0:79f:e0d:e052 with SMTP id af79cd13be357-7a377ba35b6mr627661385a.9.1723054474025;
+        Wed, 07 Aug 2024 11:14:34 -0700 (PDT)
+Received: from LOCLAP699.localdomain ([152.193.78.90])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7a3785d0db4sm82194685a.7.2024.08.07.11.14.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 07 Aug 2024 11:14:33 -0700 (PDT)
+From: James Prestwood <prestwoj@gmail.com>
+To: iwd@lists.linux.dev
+Cc: James Prestwood <prestwoj@gmail.com>
+Subject: [PATCH 01/14] network: add network_bss_list_prune
+Date: Wed,  7 Aug 2024 11:14:14 -0700
+Message-Id: <20240807181427.170515-1-prestwoj@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <70e5936f-c789-4f56-a275-e1b559ea27fe@gmail.com>
-X-Rspamd-Queue-Id: 4WdgWs2fjQz9svS
+Content-Transfer-Encoding: 8bit
 
-On Mon, Aug 05, 2024 at 05:44:39AM -0700, James Prestwood wrote:
-> I was still not sure exactly what needs to be done. If the sysctl setting is
-> all thats needed, this is an easy feature, but you had said setting that
-> manually still doesn't enable the privacy extensions? Is the issue maybe
-> that IWD removes the wlan0 interface on startup? So setting that sysctl
-> setting manually, then starting IWD, is clearing it?
-> 
-> Is use_tempaddr still set as expected after IWD start?
+This adds a new API meant to replace network_bss_list_clear. Instead
+of clearing the entirely network->bss_list on each scan we can
+instead just prune out entries that didn't show up in the scan.
+The network_bss_add API was also updated to prepare for
+network_bss_list_prune by removing existing entries, as now even
+"new" entries may exist in the list still and need to be removed.
+---
+ src/network.c | 43 ++++++++++++++++++++++++++++++++++++-------
+ src/network.h |  2 ++
+ 2 files changed, 38 insertions(+), 7 deletions(-)
 
-I set the following kernel parameters via sysctl.d/60-ipv6_privacy.conf:
+diff --git a/src/network.c b/src/network.c
+index 09099fac..6d7e5ec4 100644
+--- a/src/network.c
++++ b/src/network.c
+@@ -1129,8 +1129,17 @@ bool network_update_known_frequencies(struct network *network)
+ 	return true;
+ }
+ 
++static bool match_addr(const void *a, const void *b)
++{
++	const struct scan_bss *bss = a;
++
++	return memcmp(bss->addr, b, 6) == 0;
++}
++
+ bool network_bss_add(struct network *network, struct scan_bss *bss)
+ {
++	l_queue_remove_if(network->bss_list, match_addr, bss->addr);
++
+ 	if (!l_queue_insert(network->bss_list, bss, scan_bss_rank_compare,
+ 									NULL))
+ 		return false;
+@@ -1150,13 +1159,6 @@ bool network_bss_add(struct network *network, struct scan_bss *bss)
+ 	return true;
+ }
+ 
+-static bool match_addr(const void *a, const void *b)
+-{
+-	const struct scan_bss *bss = a;
+-
+-	return memcmp(bss->addr, b, 6) == 0;
+-}
+-
+ /*
+  * Replaces an old scan_bss (if exists) in the bss list with a new bss object.
+  * Note this BSS is *not* freed and must be by the caller. scan_bss objects are
+@@ -1188,6 +1190,33 @@ void network_bss_list_clear(struct network *network)
+ 	network->bss_list = l_queue_new();
+ }
+ 
++struct network_prune_data {
++	struct network *network;
++	struct l_queue *new_list;
++};
++
++static bool scan_bss_prune_missing(void *a, void *user_data)
++{
++	struct scan_bss *bss = a;
++	struct network_prune_data *data = user_data;
++
++	if (!l_queue_find(data->new_list, match_addr, bss->addr))
++		return true;
++
++	return false;
++}
++
++void network_bss_list_prune(struct network *network, struct l_queue *new_list)
++{
++	struct network_prune_data data;
++
++	data.network = network;
++	data.new_list = new_list;
++
++	l_queue_foreach_remove(network->bss_list,
++				scan_bss_prune_missing, &data);
++}
++
+ struct scan_bss *network_bss_list_pop(struct network *network)
+ {
+ 	return l_queue_pop_head(network->bss_list);
+diff --git a/src/network.h b/src/network.h
+index 17dfcca8..be81c150 100644
+--- a/src/network.h
++++ b/src/network.h
+@@ -71,6 +71,8 @@ bool network_bss_add(struct network *network, struct scan_bss *bss);
+ bool network_bss_update(struct network *network, struct scan_bss *bss);
+ bool network_bss_list_isempty(struct network *network);
+ void network_bss_list_clear(struct network *network);
++void network_bss_list_prune(struct network *network, struct l_queue *new_list);
++
+ struct scan_bss *network_bss_list_pop(struct network *network);
+ struct scan_bss *network_bss_find_by_addr(struct network *network,
+ 							const uint8_t *addr);
+-- 
+2.34.1
 
-net.ipv6.conf.all.use_tempaddr = 2
-net.ipv6.conf.default.use_tempaddr = 2
-
-After restarting IWD use_tempaddr for wlan0 is set as expected:
-
-# sysctl net.ipv6.conf.wlan0.use_tempaddr
-net.ipv6.conf.wlan0.use_tempaddr = 2
-
-Best regards
-
-Hannes
