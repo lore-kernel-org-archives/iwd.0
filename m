@@ -1,62 +1,62 @@
-Received: from mail-qk1-f169.google.com (mail-qk1-f169.google.com [209.85.222.169])
+Received: from mail-qk1-f179.google.com (mail-qk1-f179.google.com [209.85.222.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB08613E04B
-	for <iwd@lists.linux.dev>; Wed,  7 Aug 2024 18:14:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B63FA13E3F6
+	for <iwd@lists.linux.dev>; Wed,  7 Aug 2024 18:14:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723054485; cv=none; b=EsTIwgTBFG9rX9hhrsquJnzE7cCLq7oWGpCeBhY57RjDccct0irVInfswTvRkQoouy/wtK+shu9zlpb1OYal5a9p4Yf8tc0khAcBG8XYldIQlhHGCaq1XFZ61EBxTjS6IPWHNwC1U8imNT+kkS5pN+Fv4V8cxoS6SWcZksANaGI=
+	t=1723054486; cv=none; b=W3y92d+mTsTF4mxj7kEQEcPXICqb7Aj/zLlsIVl0NPQPKRZT7eeADlFJlL53fppdirqidyrKTNztsqtNcFFlhxiAz05cEiigohoVAMX6jR3UEuVR7n/J5MSXPVC8Y6jMLfySsvzGk5bBKbk6fJWU+1r3IopTWQHEC50AWZp9rhY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723054485; c=relaxed/simple;
-	bh=4YFB5h8zKkmMyRzSrqpkAovpdCwEtyubNe5Bd94jGSs=;
+	s=arc-20240116; t=1723054486; c=relaxed/simple;
+	bh=0JXQUsU+CeZbduEPiJJveo0hTbm5nD6K/zdc+wnogXU=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=iSFgxTDCo3J05Es+z5RWSZTEzGdXZRse4NdioukA4+xWtI+vObE7tV5SraApZEZCFhBE+S0dpjLqpUwg4TDs3ZRRmflbnqv1j/dUbYVkPePzi4nAoBQ1uV7qmIsYlRxgEDA++1Vl9+AEyub69b8dNHJJ8UacMtAHPvg0ZqbpyTc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RpJ2w2Qr; arc=none smtp.client-ip=209.85.222.169
+	 MIME-Version; b=L22IXiKNVHf2/kTLubf7HuJykE74R9Rhak0qDRAHbG6XcmjuFOBjpJjduiLt2+foachwvjzYc7Dt0s56VRofygNaZwVMA5W70X9G0r080YVaYIZaAWfzepNfNf73ZM7V4UapMTc6teB7sU+7eSIgmJlFDk+K81mr7zcOJQdS3FY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=X8ydoxV8; arc=none smtp.client-ip=209.85.222.179
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RpJ2w2Qr"
-Received: by mail-qk1-f169.google.com with SMTP id af79cd13be357-7a1d3e93cceso114270785a.1
-        for <iwd@lists.linux.dev>; Wed, 07 Aug 2024 11:14:43 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="X8ydoxV8"
+Received: by mail-qk1-f179.google.com with SMTP id af79cd13be357-7a1dcba8142so88904085a.0
+        for <iwd@lists.linux.dev>; Wed, 07 Aug 2024 11:14:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1723054482; x=1723659282; darn=lists.linux.dev;
+        d=gmail.com; s=20230601; t=1723054483; x=1723659283; darn=lists.linux.dev;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Ci5+tjb70kTDD0CyGyfEAkcddsN33FelYMkFVd1mz+8=;
-        b=RpJ2w2QrgL76dma32x+U9sWMKzW5q4FyF6m5iwa5Y0aje3Sj9TQ5LdELyt8tHU0Zph
-         QqOxPCj5ORmx6rTupgTCX8KNAgbrePpp6x3ewQzyG6iPpc8HohHeEdEvY2LERjWbSG7a
-         2SIgsx4j8oaXDMAvHZrpPK7K4w3vR4DhTMnEXbO6RhPYSN7nTxFGeEifbluENMx5fzqX
-         NpFZazfOrYXCWfM4CYnLTEwyC2YSa4yBuCojY6VPGP/sKl9bfIyfFInDHJc0GBDiZGnX
-         QTIOwHvZt1p4uIvK+lkX4AE1GI3GmqlLj1zUs/A226+KwKXK99i+6TI4hQnEp98gDbXS
-         GbIQ==
+        bh=bkZzKtxYPZkT6hUlkqBEznSewHrv3kJaBT71xggLwjM=;
+        b=X8ydoxV8T8sCNnR8jiflZZPMxwUw+ZPFnIxX8IxgqmSmuVsPSXd2sgEPxZFS5NwEBU
+         G7RNh97Uwp6KWLv7ps11DllFrAbxB/VibWkRnCmVyfjWH12FYaOLG8/4Ife7PdNwzs0M
+         XU6ABSUWvArqYybOrFixDy02tGoPhDkVUVDJIfbj9VSV2kpGP7DLSGvC4Udn3G0czIlc
+         DgyGlg6oIhCgKF0UKGS2oyXucdc93EsQPpo7HIcs/ALd+LyTK1vuuL3JdJZ06vHE+QEV
+         uypSYEtD26Gg3FtieBqe4xu/BuQ030wRigRYxE57gfI7CUe2uVXEvJlujszp/8IiYC3w
+         9Otg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723054482; x=1723659282;
+        d=1e100.net; s=20230601; t=1723054483; x=1723659283;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=Ci5+tjb70kTDD0CyGyfEAkcddsN33FelYMkFVd1mz+8=;
-        b=JZ4ZPKMPV+4s7sv7WT8DIQ49+aNFd/VZEUWkhuIivuiY2wrElIdhH1uaf5fu4bPInU
-         uC7wtTZ0jwoDl27zcm4XJGwMy5yPvsbkgP92Xbl4FLadnt0+hHcC7tcHyyFN6iJsuF10
-         BHns45D79eKiRNB0Nl0wj0OtR2jsm6wI4bMjMVosGibQMC4OrxXOaQkZIushnADvyk/b
-         AoOAVVQItX/Vn12ybrIEGGrLV3SbTKFvQhzW7E9meliQ/E0bdY7+kJgNcR+Gm+MnPFxD
-         9pYL2OG0Hk/ivwYkBZLwoaWWrELHwXg+sOK+HV1/+fo9K3fnCMOkZYznHRUutS3tDhuZ
-         EIcw==
-X-Gm-Message-State: AOJu0YxfcEgq7SuqiTwCB2Z0dT2J1DW/hmtAShltlZ5mIrXkZuV1W583
-	/JWprpr9xXT7osh+ToGvYMpgrw4r/j79+jyNYzE6LXJeo3YsKAsfM25r3A==
-X-Google-Smtp-Source: AGHT+IFoX/t+gbtnL8wYGY8/BAjtJ0PMtnz4skmOPjkoE92yPbzlm9k/wuzWo0SvzwSOpC/LNb2jvA==
-X-Received: by 2002:a05:620a:178b:b0:79f:aa9:b3a0 with SMTP id af79cd13be357-7a377ba6598mr574156685a.13.1723054482286;
-        Wed, 07 Aug 2024 11:14:42 -0700 (PDT)
+        bh=bkZzKtxYPZkT6hUlkqBEznSewHrv3kJaBT71xggLwjM=;
+        b=MFwDE50pnAKnVbNqfUJu0eJekIluxZq0szkF6KfRhU8r8iK4E0UDScij4oXYgcyh6Z
+         RO2+o4iZ4splsLO7xd4w9XpE2rxSooDFQqkaP+reqoqOUy1BpPgUSXr2z1VJ/XNNGT5O
+         Ak+zWtcRa7Jg/ZabsDo6yCwTvYXmjxL+8hoAzZGHN/po1NA8Tvlh5GOYca35LwQm+ykV
+         AIroy6TYEK/a85b80dl89z17ld6nibj9zpz2mhSmfizHtO1G13kp5QWtSWTcl84vScla
+         1R/m6WYzv6MCIpbMFJenHyaTrmZcR0eubu66t/AGcqCAZKPquBPp6tdPipDhn6JBuHGX
+         F8lA==
+X-Gm-Message-State: AOJu0YwgUgNBU5Ybjng7yTEdfey2LeY6C98r/TK7ygR2NvFj9nvHmosp
+	pMeMufsD/zbFTv371QT34DVPGrvibKYaUoLpceEVeTqoliF1gj/BOzfiAA==
+X-Google-Smtp-Source: AGHT+IF/TpqGpCNlpJaemJ3pfO/08MILSQYwqOUE3nUERqe79Fx+GMIInqLCNxsuM5MFRCzAmK10Iw==
+X-Received: by 2002:a05:620a:4113:b0:79e:f878:7ffb with SMTP id af79cd13be357-7a377c0dbc5mr597787585a.9.1723054483442;
+        Wed, 07 Aug 2024 11:14:43 -0700 (PDT)
 Received: from LOCLAP699.localdomain ([152.193.78.90])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7a3785d0db4sm82194685a.7.2024.08.07.11.14.41
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7a3785d0db4sm82194685a.7.2024.08.07.11.14.42
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 07 Aug 2024 11:14:42 -0700 (PDT)
+        Wed, 07 Aug 2024 11:14:43 -0700 (PDT)
 From: James Prestwood <prestwoj@gmail.com>
 To: iwd@lists.linux.dev
 Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 08/14] doc: document BasicServiceSet API
-Date: Wed,  7 Aug 2024 11:14:21 -0700
-Message-Id: <20240807181427.170515-8-prestwoj@gmail.com>
+Subject: [PATCH 09/14] client: separate property header and values into two functions
+Date: Wed,  7 Aug 2024 11:14:22 -0700
+Message-Id: <20240807181427.170515-9-prestwoj@gmail.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240807181427.170515-1-prestwoj@gmail.com>
 References: <20240807181427.170515-1-prestwoj@gmail.com>
@@ -68,59 +68,96 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
+There are certain cases where we may not want to display the entire
+header for a given set of properties. For example displaying a list
+of proxy interfaces. Add finer control by separating out the header
+and the prop/value display into two functions.
 ---
- doc/basic-service-set.txt | 10 ++++++++++
- doc/network-api.txt       |  5 +++++
- doc/station-api.txt       |  6 ++++++
- 3 files changed, 21 insertions(+)
- create mode 100644 doc/basic-service-set.txt
+ client/dbus-proxy.c | 38 +++++++++++++++++++++++++++++---------
+ client/dbus-proxy.h |  7 +++++++
+ 2 files changed, 36 insertions(+), 9 deletions(-)
 
-diff --git a/doc/basic-service-set.txt b/doc/basic-service-set.txt
-new file mode 100644
-index 00000000..2ebb63be
---- /dev/null
-+++ b/doc/basic-service-set.txt
-@@ -0,0 +1,10 @@
-+Basic service set hierarchy
-+=================
-+
-+Service		net.connman.iwd
-+Interface	net.connman.iwd.BasicServiceSet
-+Object path	/net/connman/iwd/{phy0,phy1,...}/{1,2,...}/Xxx
-+
-+Properties	string Bssid [readonly]
-+
-+			MAC address of BSS
-diff --git a/doc/network-api.txt b/doc/network-api.txt
-index e4a34411..3aa68382 100644
---- a/doc/network-api.txt
-+++ b/doc/network-api.txt
-@@ -50,3 +50,8 @@ Properties	string Name [readonly]
- 			corresponding to this Network.  If the network
- 			is not provisioned or has not been connected to
- 			before, the property is omitted.
-+
-+		a(o) BasicServiceSets [readonly]
-+
-+			Contains a list of paths of each individual
-+			BasicServiceSet object.
-diff --git a/doc/station-api.txt b/doc/station-api.txt
-index 05dd137e..7b067620 100644
---- a/doc/station-api.txt
-+++ b/doc/station-api.txt
-@@ -164,6 +164,12 @@ Properties	string State [readonly]
- 			for networks.  net.connman.iwd.Network objects are
- 			updated when this property goes from true to false.
+diff --git a/client/dbus-proxy.c b/client/dbus-proxy.c
+index 42b8427f..1e50d902 100644
+--- a/client/dbus-proxy.c
++++ b/client/dbus-proxy.c
+@@ -47,10 +47,10 @@ static struct l_dbus *dbus;
+ static struct l_queue *proxy_interfaces;
+ static struct l_queue *proxy_interface_types;
  
-+		object ConnectedBss [readonly, optional]
-+
-+			net.connman.iwd.BasicServiceSet object represeting the
-+			BSS the device is currently connected to or to which
-+			a connection is in progress.
-+
- SignalLevelAgent hierarchy
- ==========================
+-void proxy_properties_display(const struct proxy_interface *proxy,
+-				const char *caption, const char *margin,
+-				unsigned int name_column_width,
+-				unsigned int value_column_width)
++void proxy_properties_display_inline(const struct proxy_interface *proxy,
++					const char *margin,
++					unsigned int name_column_width,
++					unsigned int value_column_width)
+ {
+ 	const void *data;
+ 	const struct proxy_interface_property *properties;
+@@ -59,11 +59,6 @@ void proxy_properties_display(const struct proxy_interface *proxy,
+ 	if (!proxy->type->properties)
+ 		return;
  
+-	display_table_header(caption, "%s%-*s  %-*s  %-*s", margin,
+-				8, "Settable",
+-				name_column_width, "Property",
+-				value_column_width, "Value");
+-
+ 	data = proxy_interface_get_data(proxy);
+ 	properties = proxy->type->properties;
+ 
+@@ -82,6 +77,31 @@ void proxy_properties_display(const struct proxy_interface *proxy,
+ 	}
+ }
+ 
++void proxy_properties_display_header(const char *caption, const char *margin,
++					unsigned int name_column_width,
++					unsigned int value_column_width)
++{
++	display_table_header(caption, "%s%-*s  %-*s  %-*s", margin,
++				8, "Settable",
++				name_column_width, "Property",
++				value_column_width, "Value");
++}
++
++void proxy_properties_display(const struct proxy_interface *proxy,
++				const char *caption, const char *margin,
++				unsigned int name_column_width,
++				unsigned int value_column_width)
++{
++	if (!proxy->type->properties)
++		return;
++
++	proxy_properties_display_header(caption, margin, name_column_width,
++					value_column_width);
++
++	proxy_properties_display_inline(proxy, margin, name_column_width,
++					value_column_width);
++}
++
+ static const void *proxy_interface_property_tostr(
+ 					const struct proxy_interface *proxy,
+ 					const char *name)
+diff --git a/client/dbus-proxy.h b/client/dbus-proxy.h
+index 98b0a2a4..f0a5d38a 100644
+--- a/client/dbus-proxy.h
++++ b/client/dbus-proxy.h
+@@ -95,6 +95,13 @@ void proxy_properties_display(const struct proxy_interface *proxy,
+ 				const char *caption, const char *margin,
+ 				unsigned int name_column_width,
+ 				unsigned int value_column_width);
++void proxy_properties_display_inline(const struct proxy_interface *proxy,
++					const char *margin,
++					unsigned int name_column_width,
++					unsigned int value_column_width);
++void proxy_properties_display_header(const char *caption, const char *margin,
++					unsigned int name_column_width,
++					unsigned int value_column_width);
+ 
+ char *proxy_property_str_completion(const struct proxy_interface_type *type,
+ 					proxy_property_match_func_t function,
 -- 
 2.34.1
 
