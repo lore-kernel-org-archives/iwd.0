@@ -1,62 +1,62 @@
-Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
+Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8305513D8A3
-	for <iwd@lists.linux.dev>; Thu,  8 Aug 2024 17:42:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D38013D8A3
+	for <iwd@lists.linux.dev>; Thu,  8 Aug 2024 17:42:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723138965; cv=none; b=LFxUXysKGUp+gtKwPWOQ9O/ypXmrYwvYqCSj+ExlQ8zsH9C/aZu3g7JSthQ4huylNswjr6HfOd7eHPm8vcf+c3Gf5tjLqj+v/k/l+16JUk1iGThT0PdDGYMOtWoQRFGQeXktux+jKDsGPoBsPC35D7/p2IfbB1n7SG3xcVV+hp4=
+	t=1723138968; cv=none; b=cXYI+bWUpLBGnp2gpOBf4l8Z/f993mJ945toMIISSkSAEO0yHUSvoRLzJOqwpO3dlBz9T/AMTfCMXzDzlUOdjjpwTQzpkyfpJXVZSUSmLbxHX/as6AawycXkvFRq5fbmkX0U4NYmLJBrOSSGI+jXRZoclwygfa4UTJIDs6OM2z8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723138965; c=relaxed/simple;
-	bh=zcfmygZEedhUPgLFVHLHlW3UnxphsOK8lGiRwrln21M=;
+	s=arc-20240116; t=1723138968; c=relaxed/simple;
+	bh=je2lKnZk7kH3dmAL7I38N/hHJqcA5JaTsiG8voPPEK8=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=VV04n6CbGScA808cC6WPhaE4/qrA0rZbwHGLTZmWj7ROwrUjNaKCantuZZXWJmR0VF3qSpzogUbxXOm0pCzrA66paJr4pxOlHgAhaXx0cVjE6mW518HxlzYPFLOOoUXpxE0LCWpDqJLAKKuwAccrk9YLCest/ejbUNaGPLMY0eI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fp19hPy7; arc=none smtp.client-ip=209.85.214.180
+	 MIME-Version; b=QcvevyBVLauPpIT/L2H0hPJ3Aj40PGkEVXeSRk+sIxUjo/7P6R9ysG9MwPMNejgQa/9hrx2DDPsY+WKju5i8Y5w03SFzF4YnLEuxT56arIKFTEoKylJeuBlV9e04WWsB5PG5yW+0nvMqDaRGCyKhyWQafAmN78+wmZsPj2FmpqU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=g7zvRfkZ; arc=none smtp.client-ip=209.85.214.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fp19hPy7"
-Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-1fc566ac769so11114765ad.1
-        for <iwd@lists.linux.dev>; Thu, 08 Aug 2024 10:42:44 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="g7zvRfkZ"
+Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-1fc52394c92so12100015ad.1
+        for <iwd@lists.linux.dev>; Thu, 08 Aug 2024 10:42:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1723138964; x=1723743764; darn=lists.linux.dev;
+        d=gmail.com; s=20230601; t=1723138965; x=1723743765; darn=lists.linux.dev;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=4+7LVb5lYo1Qa0arYhAPcN+vLl04SkUC6WEfVoKbenM=;
-        b=fp19hPy736xZ7Nvt+sdSqFRRuirs/xNP0MBjVvfp980uOKrHpSf2D9Mwjy4nob2mdi
-         rDql3WkCjeTv/zCrWA2GjHAIH9LjquPxAlDR8biyXJ3IqAWpgS7RAUpIYdEN7MqMtZgz
-         FAeWt3GwsesREKwYe8btU4e1JZukLyHAxk8fNLTyp6O+W/DTTTHnwMkRSAAjXK+5QUpQ
-         gacW8eRFE8vGtMaHnQC9Od39XfdPhaAiu7vEFiOWp23ZEXB0jin38oih10tQrRi2d6Bt
-         Iy4Y2lzQt42o5KeOlxIhbeM2gN2NLii43WX+iAbi9gxNyMPW4632ggHCvws6Il45iWqy
-         Ts6g==
+        bh=iMW23mZ6oxjsUd082UMfzQK+uh7dCMibsbp6keuPKJ4=;
+        b=g7zvRfkZJrD1UjLOzmNJ0qRbjQqIxy3cPo+68wiI3US1YQcITPwRK9tEYwbEvkqVgb
+         4csPSju6Jlop0nN3T+VEspICCSuZFv8hsIKyT9kYSHpEjmGZmHedluSxN/gsJIWu6Z+c
+         L9TUTLaGGTdDCyvFj0+mlKeIPLgUTW7BE0XHqDw4DiMUBzbGm9bfVmvniNrE4LzDyxhU
+         gUHYReslJsMQKCHGL0maLM2R8FfsGngmFEzxOJ/Wgab5zk/gk+IkjPBElH3EURhBT94S
+         Mot+Aw2kHOeO1/LrUsQHcEbE/E9R3cOHy4letCdvCMHbI4g5kE0C8QqzRHQJqYN5Clyd
+         Up4A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723138964; x=1723743764;
+        d=1e100.net; s=20230601; t=1723138965; x=1723743765;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=4+7LVb5lYo1Qa0arYhAPcN+vLl04SkUC6WEfVoKbenM=;
-        b=d1EXHpgIJOT4rgCGEcEn39AgMaL2r9YyjEwvTveOE2diqvNGxFRPR7Fnog75rDxY5X
-         ojPIS+I0jITF7vwHpcLs2XFHzd5kDcRHKoCseP1cx9Mpq6JaJ5zHw1F7z4M7YJXE92m3
-         SxiRB6kSgaoJyzlNQl3tuP3rHb2hVYAMkZdMYcj49Y8LDk280RanfBftlNzW+KY8T2qQ
-         kzYHSDrEVSQ1RorhZ9UrtnIArmpDOdkKTjSUBXX95PUlm0DyUfEyUpuvgsOwyQ/LXMqC
-         SR6/99t8S8xZvtE8YMwCuvRAlZjxWtItuiPkkWouhLbStxATxCo9sFnzH2UF0M/Sg95e
-         kaWQ==
-X-Gm-Message-State: AOJu0YyvtEbkIV6jyshEpE1ewcLmPheINeTfnFvUvYx/6TjUmVsMfUFt
-	lHBH4Q1yFXdvaBiucK05rhYIchrBdRSLT9RfexDt2XPK26StJmCoAZOzPw==
-X-Google-Smtp-Source: AGHT+IFhmdjFoblJ9ZEC/ypXfde725zNxVXaoOAn3lkCvf5nysJGlym1hoCbRkeMxE9J5gi3YNIygA==
-X-Received: by 2002:a17:903:2310:b0:1fc:62e5:76da with SMTP id d9443c01a7336-200952b71a9mr32982585ad.21.1723138963345;
-        Thu, 08 Aug 2024 10:42:43 -0700 (PDT)
+        bh=iMW23mZ6oxjsUd082UMfzQK+uh7dCMibsbp6keuPKJ4=;
+        b=A7XCW21GKBdNQQbZdyqvub9GjTInpsUXr3KgLaMg3Me7yBy4VgUi8EwFK0e7qgm8VQ
+         SpCG6CrGdokn3zOkkVXnJn+6/od276ODFly0mAzpV5LlFOal4uBqkj5JJaGNqPNKiVl3
+         hOHcK961zddbrUluO6sfDFGRNCPRRHG4y0PavWLNBgqdGIaevmfq+t6P5RBCtFEX7syZ
+         C1/B3JzqY42ARAYdwQyDPPTyDRq5/xlWDV/tGvxITeurIZ6Mi4Ne4W5l6CiPvfFjXVrN
+         GSVRoH4Y3Jh4PMf2T6Ig9sPzIFMl6csyv7/k5SxlPnxUVR6Y7lm9pBOPG2IbYvQYgqHC
+         rRyw==
+X-Gm-Message-State: AOJu0YylB6lQPoIY+sBRA+tjHr9EG9T0wHmdP4xFRkuYodVXPhQ/qLFm
+	YzvnbjQ2dMXaFhvnuLS1X5wqUXpurkyPFk5rE7j7f5W4ZqvFuyTO+ZJK1A==
+X-Google-Smtp-Source: AGHT+IH6an9OKiMWOE7M0SPFadr8K2/KUwp1W++jeH18uuka9PN7xT3LDdGq1mxTtqiQacl5ee08sg==
+X-Received: by 2002:a17:903:120b:b0:1fc:6c23:8a3b with SMTP id d9443c01a7336-2009526b4c4mr28087345ad.17.1723138964724;
+        Thu, 08 Aug 2024 10:42:44 -0700 (PDT)
 Received: from LOCLAP699.localdomain (h69-130-12-20.bendor.broadband.dynamic.tds.net. [69.130.12.20])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1ff58f53435sm127478355ad.64.2024.08.08.10.42.42
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1ff58f53435sm127478355ad.64.2024.08.08.10.42.43
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
         Thu, 08 Aug 2024 10:42:43 -0700 (PDT)
 From: James Prestwood <prestwoj@gmail.com>
 To: iwd@lists.linux.dev
 Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH v2 06/13] station: add ConnectedAccessPoint property
-Date: Thu,  8 Aug 2024 10:42:29 -0700
-Message-Id: <20240808174236.218750-6-prestwoj@gmail.com>
+Subject: [PATCH v2 07/13] doc: document BasicServiceSet API
+Date: Thu,  8 Aug 2024 10:42:30 -0700
+Message-Id: <20240808174236.218750-7-prestwoj@gmail.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240808174236.218750-1-prestwoj@gmail.com>
 References: <20240808174236.218750-1-prestwoj@gmail.com>
@@ -68,53 +68,62 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This property is a path that corresponds to a BasicServiceSet
-object, the one the station is currently connected to.
 ---
- src/station.c | 20 ++++++++++++++++++++
- 1 file changed, 20 insertions(+)
+ doc/basic-service-set.txt | 10 ++++++++++
+ doc/network-api.txt       |  5 +++++
+ doc/station-api.txt       |  6 ++++++
+ 3 files changed, 21 insertions(+)
+ create mode 100644 doc/basic-service-set.txt
 
 v2:
- * Renamed ConnectedBss to ConnectedAccessPoint
+ * Renamed properties after review
 
-diff --git a/src/station.c b/src/station.c
-index 8a76339c..5524943b 100644
---- a/src/station.c
-+++ b/src/station.c
-@@ -4376,6 +4376,23 @@ static bool station_property_get_connected_network(struct l_dbus *dbus,
- 	return true;
- }
+diff --git a/doc/basic-service-set.txt b/doc/basic-service-set.txt
+new file mode 100644
+index 00000000..f827ca02
+--- /dev/null
++++ b/doc/basic-service-set.txt
+@@ -0,0 +1,10 @@
++Basic service set hierarchy
++=================
++
++Service		net.connman.iwd
++Interface	net.connman.iwd.BasicServiceSet
++Object path	/net/connman/iwd/{phy0,phy1,...}/{1,2,...}/Xxx
++
++Properties	string Address [readonly]
++
++			MAC address of BSS
+diff --git a/doc/network-api.txt b/doc/network-api.txt
+index e4a34411..8bc6eea6 100644
+--- a/doc/network-api.txt
++++ b/doc/network-api.txt
+@@ -50,3 +50,8 @@ Properties	string Name [readonly]
+ 			corresponding to this Network.  If the network
+ 			is not provisioned or has not been connected to
+ 			before, the property is omitted.
++
++		array(object) ExtendedServiceSet [readonly]
++
++			Contains a list of paths of each individual
++			BasicServiceSet object.
+diff --git a/doc/station-api.txt b/doc/station-api.txt
+index 05dd137e..84f1b7bf 100644
+--- a/doc/station-api.txt
++++ b/doc/station-api.txt
+@@ -164,6 +164,12 @@ Properties	string State [readonly]
+ 			for networks.  net.connman.iwd.Network objects are
+ 			updated when this property goes from true to false.
  
-+static bool station_property_get_connected_ap(struct l_dbus *dbus,
-+					struct l_dbus_message *message,
-+					struct l_dbus_message_builder *builder,
-+					void *user_data)
-+{
-+	struct station *station = user_data;
++		object ConnectedAccessPoint [readonly, optional]
 +
-+	if (!station->connected_network)
-+		return false;
++			net.connman.iwd.BasicServiceSet object represeting the
++			BSS the device is currently connected to or to which
++			a connection is in progress.
 +
-+	l_dbus_message_builder_append_basic(builder, 'o',
-+			network_bss_get_path(station->connected_network,
-+						station->connected_bss));
-+
-+	return true;
-+}
-+
- static bool station_property_get_scanning(struct l_dbus *dbus,
- 					struct l_dbus_message *message,
- 					struct l_dbus_message_builder *builder,
-@@ -4783,6 +4800,9 @@ static void station_setup_interface(struct l_dbus_interface *interface)
- 	l_dbus_interface_property(interface, "ConnectedNetwork", 0, "o",
- 					station_property_get_connected_network,
- 					NULL);
-+	l_dbus_interface_property(interface, "ConnectedAccessPoint", 0, "o",
-+					station_property_get_connected_ap,
-+					NULL);
- 	l_dbus_interface_property(interface, "Scanning", 0, "b",
- 					station_property_get_scanning, NULL);
- 	l_dbus_interface_property(interface, "State", 0, "s",
+ SignalLevelAgent hierarchy
+ ==========================
+ 
 -- 
 2.34.1
 
