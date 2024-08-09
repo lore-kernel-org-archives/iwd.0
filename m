@@ -1,106 +1,77 @@
-Received: from fout7-smtp.messagingengine.com (fout7-smtp.messagingengine.com [103.168.172.150])
+Received: from mout-p-101.mailbox.org (mout-p-101.mailbox.org [80.241.56.151])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76CCCC8C7
-	for <iwd@lists.linux.dev>; Fri,  9 Aug 2024 02:22:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.150
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 426271CA94
+	for <iwd@lists.linux.dev>; Fri,  9 Aug 2024 17:54:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.241.56.151
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723170144; cv=none; b=uQYMdGFChdSVO+okzpsrUfsq6CkauY+rT2Gt2EfMIUWtNhgyZdIvU2Vhi24suyFy9qhf1J7dJT7GZZpLydAAVbsfN8Tk3z0SG19GfrgBMhqrQChtmyTJfSJW48VvExWZKWUzU/i0QmTtGg8knMReUL/lKnOMvKIlrMXbsN9sgI0=
+	t=1723226101; cv=none; b=emd7K+abWE/Nx7qhcHgM5IFMuhe3VhTOCc5xWa0YCJITiMm09dz8D9au5hluZo6dd4QLJgMyZy4Sxi7+KnuHKbwYHDC44CjMaEWlvm3qLv1gJVuuIgp0WnS3Jci0LFfQZc/WYfnBuqEOqN1YomSBO7zg9aH/lLwk5hKGcpLsjRY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723170144; c=relaxed/simple;
-	bh=ZVR959v8lMZAztQgZAY5Io/htssI/4hzbnPAPovW9DE=;
-	h=MIME-Version:Date:From:To:Message-Id:In-Reply-To:References:
-	 Subject:Content-Type; b=eKDzZr68su0AZ4dPDvB06TMtFDjQAIBit+m2DM+tAGMyvRJWeeLlyPgcj03I1WROTw5kBNkl3jzOdTSXqm+Jz4rW+Ugr//pzf87L83WJp6KOxqLhqrtJFo369bZ3REWc/DD8h1+r6Aj9lt//9jwRFS6mT5gWM46NqLKZFHo7cMk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fastmail.com; spf=pass smtp.mailfrom=fastmail.com; dkim=pass (2048-bit key) header.d=fastmail.com header.i=@fastmail.com header.b=Tkimi3Ao; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=Pman96gv; arc=none smtp.client-ip=103.168.172.150
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fastmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastmail.com
+	s=arc-20240116; t=1723226101; c=relaxed/simple;
+	bh=zmIDfQNVNQnpuIqBGih/A3esYguuxDirW3T+sJD8XtM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=NUtDa4+Jgi7gteHkNJIhP8CbMwysfELDGgeSjgOU3h8qqtxqhDVyWCRt8eCEmi9UMvA4DOWK8NuarnWN3nsaEoG1sSEjKqQYGF0tiDGb9IlSrw3fNKLZTL9PW1N38ZuEpHBWZ8M2xBWSBUcyPg4mEM1lDD6VcvjSR9MmH1571Eo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=vonhaugwitz.com; spf=pass smtp.mailfrom=vonhaugwitz.com; dkim=pass (2048-bit key) header.d=vonhaugwitz.com header.i=@vonhaugwitz.com header.b=L7lD5vSu; arc=none smtp.client-ip=80.241.56.151
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=vonhaugwitz.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=vonhaugwitz.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fastmail.com header.i=@fastmail.com header.b="Tkimi3Ao";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="Pman96gv"
-Received: from compute5.internal (compute5.nyi.internal [10.202.2.45])
-	by mailfout.nyi.internal (Postfix) with ESMTP id 82E33138FCE2;
-	Thu,  8 Aug 2024 22:22:21 -0400 (EDT)
-Received: from imap47 ([10.202.2.97])
-  by compute5.internal (MEProxy); Thu, 08 Aug 2024 22:22:21 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fastmail.com; h=
-	cc:content-transfer-encoding:content-type:content-type:date:date
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm3; t=1723170141;
-	 x=1723256541; bh=45mC0MfpDMf/f6/YEPfO5pFLWl2do5v7H7RAequTXqg=; b=
-	Tkimi3Aogp7Ni5PPadW7jJL2lh2RXzEriZadmKyqcZx3mVMkmOjdAPoUkN6P7lyP
-	IGhuw04XcW2CRnIT0DEhvFOL2cUzqtz8zmT8UAl3Xo1nMzBnHbNgD1mhJjWIYD7h
-	c7GTnb25jDDoeoUFyD0IoVjppqU9uBwgwzsjHZ1PueuUDV6R17uoxr7+S8Z6GMzp
-	l8X23UeBOJTPvssFcFLm/AA0j/1szALXhkDzRFmtHLadYBn4oOALkg3+TKl0Sh+8
-	SKQbLHDVAiFAUvMFpI2qSRoOKOLAzmEsO5Mlmf3PTie6GeHoj59bQCWHlYsdX4+t
-	QLJyig1BHxP19qsng21xHw==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:content-transfer-encoding:content-type
-	:content-type:date:date:feedback-id:feedback-id:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to:x-me-proxy:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1723170141; x=
-	1723256541; bh=45mC0MfpDMf/f6/YEPfO5pFLWl2do5v7H7RAequTXqg=; b=P
-	man96gvxaNWuvjgj1poBUHj1afpxbylqsz/5As6r17FaGpfvE4yiCWrsxqLSq7KG
-	2WhR+aCrqmGj+vwFysR1CcsEcVli3Jo5bCm7fzMASLVnqZduF1S6HHTbtQ7/ftgr
-	xTggrzzZ40PJO0Yju+8nSn2qDGsGkmAWwcI/3LXS7GlfWW0YJTtrSExlzwX40kRQ
-	MGMqZx3/ScoKWuli4jrc7a7ZExSMiPzrse76fPxANqZBSlO3yCJvu8W0A6lloYi+
-	hgtacxQ6NpQARCDiXJ7Z9ls1SuBtZYRUHqkzMyFwX/sHwRbH9ZHH/WHDINl+x9QA
-	sr705P2w7a7Ko/cb5yYSg==
-X-ME-Sender: <xms:XX21ZpKm2H5dda2ebQoGFPJWkIahassMuamUt4Q9HzkN5Anhr01l6w>
-    <xme:XX21ZlI0dBqcDn5p4X5521dA-YqIGHKcYfbitJ1w8eQMXRGYZKR7Fku338T2_Lw9J
-    gaU2nAWB3jtzPx9klY>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeftddrleefgdehiecutefuodetggdotefrodftvf
-    curfhrohhfihhlvgemucfhrghsthforghilhdpggftfghnshhusghstghrihgsvgdpuffr
-    tefokffrpgfnqfghnecuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnth
-    hsucdlqddutddtmdenucfjughrpefoggffhffvkfgjfhfutgfgsehtjeertdertddtnecu
-    hfhrohhmpedfofhoghgvnhhsucflvghnshgvnhdfuceomhhoghhjsehfrghsthhmrghilh
-    drtghomheqnecuggftrfgrthhtvghrnhepkeejveejhffghfdtieegveejgedthffhveek
-    keegkeffudeghefhudfguedvuddunecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrg
-    hmpehmrghilhhfrhhomhepmhhoghhjsehfrghsthhmrghilhdrtghomhdpnhgspghrtghp
-    thhtohepvddpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtohepphhrvghsthifohhjse
-    hgmhgrihhlrdgtohhmpdhrtghpthhtohepihifugeslhhishhtshdrlhhinhhugidruggv
-    vh
-X-ME-Proxy: <xmx:XX21ZhtLdPmAhdaw6Y3sTylZRmx0prvfzsI-aF_Wr3kpG-xkbDIuXg>
-    <xmx:XX21ZqaoxZ3np0Zerb0U4JNLc4LmFV8B_y6v3R3GSqubkG5pnaHduQ>
-    <xmx:XX21Zga3-WtdjFow3R5Mq3lL7A_70ChXCHRiiYXOQNJ-yrw5tJi6HQ>
-    <xmx:XX21ZuDtMMK74iOiXWGA2_ZMrgil59HPQRjy69xHrmADYExM8VsHYA>
-    <xmx:XX21Zrzijq8telFtJkOlI9pSmB7lbWxaJ6U4Mo1GGbayVKQO75IZ_MZb>
-Feedback-ID: i9549465d:Fastmail
-Received: by mailuser.nyi.internal (Postfix, from userid 501)
-	id 529F7A60079; Thu,  8 Aug 2024 22:22:21 -0400 (EDT)
-X-Mailer: MessagingEngine.com Webmail Interface
+	dkim=pass (2048-bit key) header.d=vonhaugwitz.com header.i=@vonhaugwitz.com header.b="L7lD5vSu"
+Received: from smtp202.mailbox.org (smtp202.mailbox.org [IPv6:2001:67c:2050:b231:465::202])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mout-p-101.mailbox.org (Postfix) with ESMTPS id 4WgWlD01gtz9sWC;
+	Fri,  9 Aug 2024 19:54:48 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=vonhaugwitz.com;
+	s=MBO0001; t=1723226088;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=zmIDfQNVNQnpuIqBGih/A3esYguuxDirW3T+sJD8XtM=;
+	b=L7lD5vSugg5+8IBADmob1CDhV71rnNTPuntVCgRERkCUZx8u5pEkS5ED0oGYhrERSlPCAP
+	mdUuqkgF1bev+/xt1nlIjbXuxo1W9e0WnElTSJ+9KmMovM0fKFZDpVcSEmgssui3HwRGce
+	iHy7RRSrKYAPjyG67t9u4wUA/VLgr59d/SFv6JInf5gMD6z3t3VnCig87TQtAFhdfoX2gR
+	/0F7t4i4R0cq5FE/fhBqI9dc3yDevd1ZBodb6WtRgwVOVPBhJlEya2GCkcv6IIuvEJmgAS
+	TLx1nnzZb1cg9QsIWq+sJsPp4PjRo3ZPVML46Pyn7zUuV63AD+ItLQ8RcJBl6A==
+Date: Fri, 9 Aug 2024 19:54:45 +0200
+From: Hannes von Haugwitz <hannes@vonhaugwitz.com>
+To: James Prestwood <prestwoj@gmail.com>
+Cc: Grant Erickson <gerickson@nuovations.com>, iwd@lists.linux.dev
+Subject: Re: IPv6 Privacy Extension support?
+Message-ID: <20240809175445.GA25@magnesium.vonhaugwitz.com>
+References: <20240301144608.GA25@magnesium.vonhaugwitz.com>
+ <629785cf-77c3-4b14-ab58-d4b2c75f254a@gmail.com>
+ <20240304193253.GA25@magnesium.vonhaugwitz.com>
+ <BBC776B8-57F8-460D-A1CC-FD3B5A522311@nuovations.com>
+ <047c2dfc-ca69-4117-a3a6-66790b9814db@gmail.com>
+ <20240804210103.GA25@magnesium.vonhaugwitz.com>
+ <70e5936f-c789-4f56-a275-e1b559ea27fe@gmail.com>
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Date: Fri, 09 Aug 2024 02:21:02 +0000
-From: "Mogens Jensen" <mogj@fastmail.com>
-To: "James Prestwood" <prestwoj@gmail.com>, iwd@lists.linux.dev
-Message-Id: <e0c9ccff-7bbd-41bd-9b54-5495e30cdf89@app.fastmail.com>
-In-Reply-To: <d571910b-77c8-4e47-8741-01867c535398@gmail.com>
-References: <3554030d-7309-459c-8e91-ee34a0fe677b@app.fastmail.com>
- <d571910b-77c8-4e47-8741-01867c535398@gmail.com>
-Subject: Re: iwd 2.19 segfault?
-Content-Type: text/plain
-Content-Transfer-Encoding: 7bit
-
-On Mon, Jul 22, 2024, at 11:25, James Prestwood wrote:
-> Hi Mogens,
->
-> This really isn't much to go on. Are there any IWD logs? A stack trace? 
-> Core dump? etc.
->
-> Thanks,
->
-> James
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <70e5936f-c789-4f56-a275-e1b559ea27fe@gmail.com>
+X-Rspamd-Queue-Id: 4WgWlD01gtz9sWC
 
 Hi James,
 
-Unfortunately not and the error has not occured since, which I find quite strange. That is also why I started this thread, to find out if anyone else have ever seen something like this.
+On Mon, Aug 05, 2024 at 05:44:39AM -0700, James Prestwood wrote:
+> I was still not sure exactly what needs to be done. If the sysctl setting is
+> all thats needed, this is an easy feature, but you had said setting that
+> manually still doesn't enable the privacy extensions? Is the issue maybe
+> that IWD removes the wlan0 interface on startup? So setting that sysctl
+> setting manually, then starting IWD, is clearing it?
 
-However, I now run iwd with debugging enabled and that will hopefully reveal some more information, if the error occurs again.
+I've looked a bit deeper into the source code. It looks like iwd uses
+the ell library for network configuration and ell seems to hard code the
+EUI-64-based Interface Identifier for the IPv6 address[ell/netconfig.c].
 
-Regards,
-Mogens Jensen
+Best regards
+
+Hannes
+
+[ell/netconfig.c] https://git.kernel.org/pub/scm/libs/ell/ell.git/tree/ell/netconfig.c?id=4acbb92c0513644900078c348d972ef5e48fdc4c#n760
