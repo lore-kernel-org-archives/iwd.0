@@ -1,147 +1,101 @@
-Received: from mail-ed1-f49.google.com (mail-ed1-f49.google.com [209.85.208.49])
+Received: from mail-lf1-f53.google.com (mail-lf1-f53.google.com [209.85.167.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2859719047C
-	for <iwd@lists.linux.dev>; Mon, 12 Aug 2024 18:30:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F09313BAFA
+	for <iwd@lists.linux.dev>; Mon, 12 Aug 2024 18:30:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723487408; cv=none; b=nsiUzP8zjgh3SciUufYXiSlKGEI2adsoa0mv20eo7iFeVwU270ZtBmVG0DORnKTccjVR1AvUq4NMrrwT1Ag9EjnhtvEuN3zqiVPJtaHIqE6nl2VkYO5PwbrChG9ZzGgvwsAokAujJL/9b17Lv6uRYWar2kee3vhW6zvG4hxNi/M=
+	t=1723487424; cv=none; b=oS/rIzZzqEzy808V6TTjC6anNGbEXlwlvk4Wif36kQ8F7Qp2s6MUons/FXmkEXQjdjLLPkexNys9MxypUuzyzE3LbVCn7CyGDCfh7Qm0i6OrpGg/t39CwH6BXARjx3uk2/mXuszlUfzvi2COBm1iD+8r69ILs6rXR6IyN/hDIyA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723487408; c=relaxed/simple;
-	bh=zuocVqkrXa+FRcB5mO40cgjp0zhv1dupcmY3i74yXTI=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=f2prXkZkajPxfmfVTwdA9hjaFTBnHhPm4FB2oMTIuekxAn8CFv7gjEsFTqSp3+mYVU7sYpIk5Myn3dwlTY8vuK1/WwO7USwlXTdAC5TGD0UEnRLo7/vKgJnXCFsT7cLn5g0p0nPO/aJncHUsydpJm8PFSF4lRPI2vPPTvCReuW8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aw/+eyp0; arc=none smtp.client-ip=209.85.208.49
+	s=arc-20240116; t=1723487424; c=relaxed/simple;
+	bh=6Qx5jRIYWTZYHhXfy47i3AgbPsXvW/t+C0jg5UzEDE4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=Ff7IZibaGJflwFfY9Aa8TStM8+AL7gkLqHPtOcTCh3TAc1IEi2d8HbEZuETlqhnCP4FdfdqdEZXjsY4Ma0o3mvL/2PwhCDDXR7xrOeq32T/8uyHQmpLcgG4HH1RzR2yyCR9mbQ1wWRRAWQd5KO33/sJKY8qbItTDh9I+FgG9CNk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gGbh1wjJ; arc=none smtp.client-ip=209.85.167.53
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aw/+eyp0"
-Received: by mail-ed1-f49.google.com with SMTP id 4fb4d7f45d1cf-5a309d1a788so4935011a12.3
-        for <iwd@lists.linux.dev>; Mon, 12 Aug 2024 11:30:06 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gGbh1wjJ"
+Received: by mail-lf1-f53.google.com with SMTP id 2adb3069b0e04-52f01ec08d6so6427292e87.2
+        for <iwd@lists.linux.dev>; Mon, 12 Aug 2024 11:30:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1723487405; x=1724092205; darn=lists.linux.dev;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=NB3Eki21XhsNlD3Mfr0DW4smFeZb//ku8IQAOfu1j28=;
-        b=aw/+eyp0Z4xLxxGz1aiDn92Mn+Pui8PvIFureJyvdopj+Kr0Jb5FLXczzVHvCmqNJs
-         bITzN1PRln9Iv2Msf7FKsxxLOEPSwAhvGkSB7/v9pLHFiTYDDAwLF2PXD81JHZl7cAEW
-         BZwTE/McpYOqILOsUUZO0Ag+2wuEBOZpFmCR6CH9w6h+I+3tqajiJq3qeiF3gcitnne0
-         NI+OpMgtXqMySzllqk5CxGs51tVZleERittQpE5Q8xHQ0J7A/IF0ysBcVQLryMdC3cXE
-         FitMHvPnOebf93spWN3gF18RJt9//qrFAlc9QaxqNEi6CAK98hRnyvDIT4PPp1KabIkc
-         Cvdg==
+        d=gmail.com; s=20230601; t=1723487421; x=1724092221; darn=lists.linux.dev;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:to:subject:user-agent:mime-version:date:message-id:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=6Qx5jRIYWTZYHhXfy47i3AgbPsXvW/t+C0jg5UzEDE4=;
+        b=gGbh1wjJdWSlTWAU15eRW2hFHr5pQw5Eh5apCFivbfFaiaPvg6pgX/J7mrWYibRped
+         Bv9tnMgCT+M300VBsANW659nJ66zPxaO1ETOW+IAyxkeJ7b2Xf0X2XO/HXYK+4zkrlHR
+         F7Tlz8a4RWbXbUdqtm4D9SE/F17ZgYpE/PwDR2X5H/rEFGLGmuasM69Fotnw/AahJ5IU
+         kHB2zvbMR/0vE2OEF9Vl9aqOJq9qZInRA3IKsbXtPxfT5kCDeGxUEPMxL5tUITEhlntY
+         fNqEYc74mFtb2hXOv3c+CO2gQxsjBC0vf6w4yovT4KBzUN+1RLFN+KMP6R2w9Y9Xrzkn
+         D6dA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723487405; x=1724092205;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=NB3Eki21XhsNlD3Mfr0DW4smFeZb//ku8IQAOfu1j28=;
-        b=CuOZ2vHCPNP6Pbhg6h1f63ryHlLXniXOiiYGo7R8J87VG55Z1JFkRj5EQFQtnuxFEL
-         mpsfZu/v9A6KKuHjj3z3tHzlJvqpqAf7yOtWmRuylPgYwn+T52k9XNSFBPex0Sh0mAK3
-         jQzg3PV2AvzRD7TDGwZggh3iwBV2YIZg3Rz24Tzklo0SueAqKJtKKMNJYf1RxKzenHTy
-         LTNF/wyIhTDVAhpnYmLiMnE1VWufuhGsv3AYnrj3FpAqUVMNvPNpqyYHGghaOk8Yu3NS
-         CYxXf+u1i4ntT1bwdCeUHD+ICmUNJv34YJLISnwWtturEJPq6zjhqL2qMrAOLfdf4KOh
-         /Sdg==
-X-Gm-Message-State: AOJu0Yzr5uQYr1iD9AH1TtBBVOHtkJrduLX+v756UasF2ooq5dRNSniY
-	E1PKBb2oDcSLLqChuzAbEHI5IJ/Rx89V9vaQnvsJ9gIYnAjxQN5M7s4RCQ==
-X-Google-Smtp-Source: AGHT+IFSms8zJaMxjvhDR1WtJTKFA0jCTl774QNOKKhLihzcRgt6GHlwoOs9NEnk+fCuRnyKMVBiwA==
-X-Received: by 2002:a05:6402:40cc:b0:5a1:21df:752d with SMTP id 4fb4d7f45d1cf-5bd44c26d39mr973191a12.10.1723487404867;
-        Mon, 12 Aug 2024 11:30:04 -0700 (PDT)
-Received: from LOCLAP699.vf-sint-niklaas.locus ([152.193.78.90])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5bd196a61e2sm2340833a12.51.2024.08.12.11.30.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 12 Aug 2024 11:30:04 -0700 (PDT)
-From: James Prestwood <prestwoj@gmail.com>
-To: iwd@lists.linux.dev
-Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH] auto-t: add SAE-H2E test for setting the default ECC group
-Date: Mon, 12 Aug 2024 11:29:58 -0700
-Message-Id: <20240812182958.175048-1-prestwoj@gmail.com>
-X-Mailer: git-send-email 2.34.1
+        d=1e100.net; s=20230601; t=1723487421; x=1724092221;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=6Qx5jRIYWTZYHhXfy47i3AgbPsXvW/t+C0jg5UzEDE4=;
+        b=RI3xJzHBIIG+iYWexyOOAWNPD4tCPLdjVSfQSbJHBQ3r94Npo+ELvaMNgJU22zLpVy
+         6XfeCGhGiXbfIl2D/v2X5seg6fTAPOTTtel/r7Va/efPc/r950W/0BEcU4RQBnPTtb1O
+         S5lPnjFN6Fj1j/KWBwOU1f5kgFf65eKn5jZ9Aw+eSmzmnFqEOiEZvJOOIHWwXLqY0HlV
+         3sdX6OILEGhKm3aLa1y/jyihwnTtX8Gu5LbBnkaeSRvn75Q14b6IXg0rrfWQS+1aoUMy
+         7vZ3VHC0karjU+/t5OtVp4bqkI/BLD+pUc18ExkrklvOe94/Rr7AUuPapQIH1rfhROMK
+         qb8w==
+X-Forwarded-Encrypted: i=1; AJvYcCUQzniGXZiEw+mRlFM2w8aKMTjJlMt0CZgyhLhF6FM6pZGB8nGDCCrrfU9ja/oh+fuxHd3m5pVQRetUrUa9f/EeiAEx
+X-Gm-Message-State: AOJu0YwiMAQ6wBFEhLRxe+MGiQowU4EQ004h6MI6Sc3Zt2hjENKbX9bD
+	XCLXTNh8SRO8kUimoeQkxJQMV6sukkD3OG67Ocueq7vEQ74lAkm6VXzJPw==
+X-Google-Smtp-Source: AGHT+IFjMpa0smKkzVV+Ihc6G4/28nYEfsTDw8DC8euUUM9swPG9BUhQTdGpC069RJ6oNqt9YKJlGQ==
+X-Received: by 2002:a05:6512:2243:b0:52f:d69e:bb58 with SMTP id 2adb3069b0e04-5321368120amr799891e87.44.1723487420622;
+        Mon, 12 Aug 2024 11:30:20 -0700 (PDT)
+Received: from [10.100.121.195] ([152.193.78.90])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5bd190ac8b9sm2344659a12.23.2024.08.12.11.30.19
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 12 Aug 2024 11:30:20 -0700 (PDT)
+Message-ID: <afbdadb3-af35-454f-8004-e5f2d891792b@gmail.com>
+Date: Mon, 12 Aug 2024 11:30:17 -0700
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] sae: support default group for H2E
+To: Denis Kenzior <denkenz@gmail.com>, iwd@lists.linux.dev
+References: <20240812171649.163687-1-prestwoj@gmail.com>
+ <d70a8db7-acb9-4d1c-8b01-0090c7e40cec@gmail.com>
+Content-Language: en-US
+From: James Prestwood <prestwoj@gmail.com>
+In-Reply-To: <d70a8db7-acb9-4d1c-8b01-0090c7e40cec@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
----
- autotests/testSAE/default_group_test.py | 26 ++++++++++++++++---------
- 1 file changed, 17 insertions(+), 9 deletions(-)
+Hi Denis,
 
-diff --git a/autotests/testSAE/default_group_test.py b/autotests/testSAE/default_group_test.py
-index d72c96ca..3b7812c3 100644
---- a/autotests/testSAE/default_group_test.py
-+++ b/autotests/testSAE/default_group_test.py
-@@ -13,7 +13,7 @@ import testutil
- 
- class Test(unittest.TestCase):
- 
--    def validate_connection(self, wd, rejected=False):
-+    def validate_connection(self, wd, hostapd, rejected=False):
-         devices = wd.list_devices(1)
-         self.assertIsNotNone(devices)
-         device = devices[0]
-@@ -29,14 +29,14 @@ class Test(unittest.TestCase):
-         wd.wait(2)
- 
-         testutil.test_iface_operstate(intf=device.name)
--        testutil.test_ifaces_connected(if0=device.name, if1=self.hostapd.ifname)
-+        testutil.test_ifaces_connected(if0=device.name, if1=hostapd.ifname)
- 
-         if not rejected:
-             self.assertEqual(device.event_ocurred("ecc-group-rejected"), False)
- 
--        print(self.hostapd._get_status())
-+        print(hostapd._get_status())
- 
--        sta_status = self.hostapd.sta_status(device.address)
-+        sta_status = hostapd.sta_status(device.address)
- 
-         print(sta_status)
- 
-@@ -51,22 +51,27 @@ class Test(unittest.TestCase):
-     #   - Connect, try only group 19
-     def test_auto_selection(self):
-         IWD.copy_to_storage("profiles/ssidSAE.psk.default", name="ssidSAE.psk")
--        self.validate_connection(self.wd, rejected=True)
-+        self.validate_connection(self.wd, self.hostapd, rejected=True)
- 
--        self.validate_connection(self.wd, rejected=False)
-+        self.validate_connection(self.wd, self.hostapd, rejected=False)
- 
-     # Try group 19 first
-     def test_default_group_enabled(self):
-         IWD.copy_to_storage("profiles/ssidSAE.psk.default_group", name="ssidSAE.psk")
--        self.validate_connection(self.wd)
-+        self.validate_connection(self.wd, self.hostapd)
-+
-+    # Try group 19 first, with H2E
-+    def test_default_group_enabled_h2e(self):
-+        IWD.copy_to_storage("profiles/ssidSAE-H2E.psk.default_group", name="ssidSAE-H2E.psk")
-+        self.validate_connection(self.wd, self.hostapd_h2e)
- 
-     # Same as auto-selection but won't retain the default group setting
-     def test_default_group_disabled(self):
-         IWD.copy_to_storage("profiles/ssidSAE.psk.most_secure", name="ssidSAE.psk")
--        self.validate_connection(self.wd, rejected=True)
-+        self.validate_connection(self.wd, self.hostapd, rejected=True)
- 
-         # IWD should then retry but use only group 19
--        self.validate_connection(self.wd, rejected=True)
-+        self.validate_connection(self.wd, self.hostapd, rejected=True)
- 
-     def setUp(self):
-         self.hostapd.default()
-@@ -88,6 +93,9 @@ class Test(unittest.TestCase):
-         cls.hostapd = HostapdCLI(config='ssidSAE.conf')
-         cls.hostapd.default()
- 
-+        cls.hostapd_h2e = HostapdCLI(config='ssidSAE-H2E.conf')
-+        cls.hostapd_h2e.default()
-+
-     @classmethod
-     def tearDownClass(cls):
-         pass
--- 
-2.34.1
-
+On 8/12/24 11:14 AM, Denis Kenzior wrote:
+> Hi James,
+>
+> On 8/12/24 12:16 PM, James Prestwood wrote:
+>> This was seemingly trivial at face value but doing so ended up
+>> pointing out a bug with how group_retry is set when forcing
+>> the default group. Since group_retry is initialized to -1 the
+>> increment in the force_default_group block results in it being
+>> set to zero, which is actually group 20, not 19. This did not
+>> matter for hunt and peck, but H2E actually uses the retry value
+>> to index its pre-generated points which then breaks SAE if
+>> forcing the default group with H2E.
+>>
+>> To handle H2E and force_default_group, the group selection
+>> logic will always begin iterating the group array regardless of
+>> SAE type.
+>> ---
+>>   src/sae.c | 41 ++++++++++++++++++-----------------------
+>>   1 file changed, 18 insertions(+), 23 deletions(-)
+>
+> Applied.  Do we have test for H2E & force behavior?
+Meant to send that, its on the list now.
+>
+> Regards,
+> -Denis
+>
