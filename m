@@ -1,147 +1,96 @@
-Received: from mail-ej1-f44.google.com (mail-ej1-f44.google.com [209.85.218.44])
+Received: from mail-oa1-f54.google.com (mail-oa1-f54.google.com [209.85.160.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76DEA16D4DF
-	for <iwd@lists.linux.dev>; Mon, 12 Aug 2024 17:16:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69F7F1898EE
+	for <iwd@lists.linux.dev>; Mon, 12 Aug 2024 18:14:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723483019; cv=none; b=ANBKm85ofCKZaiBd9V2GvH5NckYq1DNTPbZqjuQMDW9ATMSvty5rUG11OL3Sw26aZditcy1f62RYngx4kxiNB9WBAWAX4OxTTkYgDyw6NMGBJ1n0PSgtOqZKSlEQXdjmdyKgTiZCR7Dg0Zb4yYlbvbGniRgjecM4QfbvX+IM/E8=
+	t=1723486489; cv=none; b=bHzYiGiSDfU2wjPmEMwUXyz9K3OBBSazvLbWyshfCMbs/EB3FdsDCQ+CfVgONf5nAShs++h09du8rIZSuunqc32CKcTYGRs/oaoDmI60lmOy0hTG4fm4wmZC6HIhBoiQUqZ7sgXgW4h+cfw5Yn9RXhQpJ975y/mO5iQ/gRTn3J8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723483019; c=relaxed/simple;
-	bh=ClcEZ3H3cApisXv5Ttm4PL5KofRxHlOdgQ2zdc78BgU=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=J9Dqc6lRhB/NCAmq3kSF8GlxPHaixtOERg4D7xUb5npZru5IaZnOii3j8BeTZhDZhHB27PQeZ+NRti9r57R7NA/70msvOpkg1UxWmwGrTSDfGxCB2RMduzPGQucP5jsDbW+krEuCo/D3UNxAM1RwUbVKSaVUqD4o4LumWovZN8M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=V3UhBNr6; arc=none smtp.client-ip=209.85.218.44
+	s=arc-20240116; t=1723486489; c=relaxed/simple;
+	bh=UZPOQKPbp27cNmCYjtAEVij9TfuwJHphxzaubBmwTYc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=aSda35d6WEheXpitD+/mASWOXCB45DbyAJ8mUPKe8kSKssT3c1xwHv9jQbyhE7ZXVnznAYWDhary4mP8MTBchbx2BKDPRX5pTuSmrahTRXWOw5BOfJmI9qckCI8QmLPAyaqzSlYDd+7gD2V3t8jqADqr6FGH5KfBo6oetA8D3fo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=I1ZeVNCb; arc=none smtp.client-ip=209.85.160.54
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="V3UhBNr6"
-Received: by mail-ej1-f44.google.com with SMTP id a640c23a62f3a-a7aabb71bb2so479849966b.2
-        for <iwd@lists.linux.dev>; Mon, 12 Aug 2024 10:16:57 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="I1ZeVNCb"
+Received: by mail-oa1-f54.google.com with SMTP id 586e51a60fabf-264545214efso2489935fac.3
+        for <iwd@lists.linux.dev>; Mon, 12 Aug 2024 11:14:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1723483015; x=1724087815; darn=lists.linux.dev;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=e/YsVcI98Ga8C9uJHtlonm5I15d8+7Qs9Rc5jNWNgiI=;
-        b=V3UhBNr6/Ji5s2sgerzGxJ4KCwAaVubJGEHnV7PKeXGJIj0DgQcQ6+AGOCApXQY6Pz
-         rZaeTmXx7ciBkB9O1AxdlTTq/86VQkZCBZRNQVElVPhU2GlWdLdHZpPyWwXMZWTc8IYd
-         kHXFCHDceX6piU7KiJ/h/jsa4txnVIrmLa+8xp7Sh2MIXoYm8BUISkDEL/fiTPKG4565
-         UGv2P/o6PLkSQSnXlTppN6iGlLPC7rmgK4RuOeS+/jqOM63EnMrzK9egvRiTKFhWMYyg
-         NbL5zTuO5AM1gEd7MGHVAw5KhaXQb/CcPphzx+KD1vhlcBLGAm7otglP3VGr9RCtuhox
-         fDfg==
+        d=gmail.com; s=20230601; t=1723486487; x=1724091287; darn=lists.linux.dev;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:to:subject:user-agent:mime-version:date:message-id:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=sLD9RMwzSeu7OBAiAvSbLjKuvjfqpU+RMCC2OkxwO/k=;
+        b=I1ZeVNCbh5vwQkYyi+PQpjiBIUJ3LM2YUapwugmPA4wUjBEnchi+GJ6zi3jH24VZpB
+         eIBiRvXAZsPiRtlqKXXZCuFRiqb/GEmZUkrvp7C7pDK1RY519aX6LvoIFZr7tirURtJM
+         jtHJOFgnlReLmuHUGbwVnWz7guY9GSe3SGs6HZICKO4S9KdlW/SI0gNT5RM0Ek10XKqs
+         PEL2mJrCuj4XPcs25CnPSM7RCUP2bHUsGZSvJmWpmY1jNEiq41i3VJOKWCbvAQ6MT+fp
+         XM4L5uFye2kZwXVs7E3uTG3F2WodH9i5M253jivJCtw05fWeMSYmcEidhUy1h+NTdUMX
+         kkrg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723483015; x=1724087815;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=e/YsVcI98Ga8C9uJHtlonm5I15d8+7Qs9Rc5jNWNgiI=;
-        b=NLCqVc9OHjhoVjHsJ99/9ItaJR3t29iRbGikQrBn7Uexd6B2MXYvl/XomA0nunLDR6
-         tnaaBwXX+pWIYA5YuHx9pN3w5CyLs/wZIqUlwSS471zfQGKwM6+O45Zx5ZAp77+hReb2
-         eE+01DMkRXRxRfs5+8ADmSICvY2NifAmBs37DDj2F+Pk/LbVbUIp+9VDdQ/ofSm3Jeb/
-         /zIUvhIz/I2kuD3elLpizCxyaytfj0+/MEtqGa+tgYVwig99nKXOxKMmEXoCvNfU6BbS
-         uPe5uU77FufAZ4u5Vr0pIW26SCpy8CMoL/4auNWMrAfLvhV5CAtSpHvlCPwLtka8t9QR
-         zZBw==
-X-Gm-Message-State: AOJu0YxVR/FVcKHZtxJJfmszhuZQF8IIiPvy9JH6EMaVYURyJOrDv/Pp
-	zE8gT3sWwptsRiLrYAsvNHmSRshGVAYIDlv/g276wTstKUYJ4xT9QILf/w==
-X-Google-Smtp-Source: AGHT+IHDzrk0cu9RcEQFDFD8RXeOVTRvkemyFa5zjvPSpoht082il/KYOrFAlIomOKqg9m3AL66xoQ==
-X-Received: by 2002:a17:907:f15a:b0:a7a:a557:4548 with SMTP id a640c23a62f3a-a80ed1c1ee5mr75970566b.21.1723483015116;
-        Mon, 12 Aug 2024 10:16:55 -0700 (PDT)
-Received: from LOCLAP699.vf-sint-niklaas.locus ([152.193.78.90])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a80bb2422efsm245695466b.197.2024.08.12.10.16.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 12 Aug 2024 10:16:54 -0700 (PDT)
-From: James Prestwood <prestwoj@gmail.com>
-To: iwd@lists.linux.dev
-Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH] sae: support default group for H2E
-Date: Mon, 12 Aug 2024 10:16:49 -0700
-Message-Id: <20240812171649.163687-1-prestwoj@gmail.com>
-X-Mailer: git-send-email 2.34.1
+        d=1e100.net; s=20230601; t=1723486487; x=1724091287;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=sLD9RMwzSeu7OBAiAvSbLjKuvjfqpU+RMCC2OkxwO/k=;
+        b=ud4MHUPb0c8S0B68DjsKnK5rxfo6eM99ljckRF/T9/DM2RVdcAmd0584KMg456MnBE
+         ep0VYcXgj8h+Y+odssMtmcyRsC1LBblRy2D8IfU0IYN6aJwXFB7Iw7hvF8Csk/tXHG2d
+         V9Ft8RC6tUmjzC7wg4LxNU8B83+uRyf35aQyfdkSZhGajpLf9GCDxHzyvTQM/c4KSRqU
+         SVT1khbujvAcFyPoSBeMOQ/506z9yg7sMBT6luOIpIG/ArJRkdVrE1sYNOf37iKylbbA
+         ILIuR/pK6y8fOIIYkrEVsT2IJUhkK6vNbARwzO23WzwHFtvbcFh5Pgwylwx7rBrgECC/
+         4WuA==
+X-Forwarded-Encrypted: i=1; AJvYcCVxLlMlQynvtMDSm43w6TdCQbhl1fRDLlw8O4nHZkz5EvZJ5HIr0zh5T0zcjVhKFrO3H5m1sXZTvlMV1YRcUto2HMIf
+X-Gm-Message-State: AOJu0YxP0nVC7VcgWjMpJD5InAH4jLOYF4yKkIM5sTb/W6DStAUHgIAq
+	4Hsi76Fu7z3vSELDHvaVtbDH4lc8zOXCyZo5mNtj/ZbYkmLLdmGg
+X-Google-Smtp-Source: AGHT+IHH7zegLzEfY+T0XqS6HZQaadwbzM3k5BeIcac4mnWed6HnbIPJHEVuWfeG6wEHtaVp9zaBNA==
+X-Received: by 2002:a05:6870:e242:b0:25e:7a9:b603 with SMTP id 586e51a60fabf-26fcb62e123mr959163fac.5.1723486486763;
+        Mon, 12 Aug 2024 11:14:46 -0700 (PDT)
+Received: from [192.168.1.22] (syn-070-114-247-242.res.spectrum.com. [70.114.247.242])
+        by smtp.googlemail.com with ESMTPSA id 586e51a60fabf-26c7203f3dasm1922512fac.9.2024.08.12.11.14.46
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 12 Aug 2024 11:14:46 -0700 (PDT)
+Message-ID: <d70a8db7-acb9-4d1c-8b01-0090c7e40cec@gmail.com>
+Date: Mon, 12 Aug 2024 13:14:45 -0500
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] sae: support default group for H2E
+To: James Prestwood <prestwoj@gmail.com>, iwd@lists.linux.dev
+References: <20240812171649.163687-1-prestwoj@gmail.com>
+Content-Language: en-US
+From: Denis Kenzior <denkenz@gmail.com>
+In-Reply-To: <20240812171649.163687-1-prestwoj@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-This was seemingly trivial at face value but doing so ended up
-pointing out a bug with how group_retry is set when forcing
-the default group. Since group_retry is initialized to -1 the
-increment in the force_default_group block results in it being
-set to zero, which is actually group 20, not 19. This did not
-matter for hunt and peck, but H2E actually uses the retry value
-to index its pre-generated points which then breaks SAE if
-forcing the default group with H2E.
+Hi James,
 
-To handle H2E and force_default_group, the group selection
-logic will always begin iterating the group array regardless of
-SAE type.
----
- src/sae.c | 41 ++++++++++++++++++-----------------------
- 1 file changed, 18 insertions(+), 23 deletions(-)
+On 8/12/24 12:16 PM, James Prestwood wrote:
+> This was seemingly trivial at face value but doing so ended up
+> pointing out a bug with how group_retry is set when forcing
+> the default group. Since group_retry is initialized to -1 the
+> increment in the force_default_group block results in it being
+> set to zero, which is actually group 20, not 19. This did not
+> matter for hunt and peck, but H2E actually uses the retry value
+> to index its pre-generated points which then breaks SAE if
+> forcing the default group with H2E.
+> 
+> To handle H2E and force_default_group, the group selection
+> logic will always begin iterating the group array regardless of
+> SAE type.
+> ---
+>   src/sae.c | 41 ++++++++++++++++++-----------------------
+>   1 file changed, 18 insertions(+), 23 deletions(-)
 
-diff --git a/src/sae.c b/src/sae.c
-index 9bce8faa..97c0af05 100644
---- a/src/sae.c
-+++ b/src/sae.c
-@@ -152,39 +152,34 @@ static int sae_choose_next_group(struct sae_sm *sm)
- {
- 	const unsigned int *ecc_groups = l_ecc_supported_ike_groups();
- 	bool reset = sm->group_retry >= 0;
-+	unsigned int group;
- 
--	/*
--	 * If this is a buggy AP in which group negotiation is broken use the
--	 * default group 19 and fail if this is a retry.
--	 */
--	if (sm->sae_type == CRYPTO_SAE_LOOPING && sm->force_default_group) {
--		if (sm->group_retry != -1) {
--			l_warn("Forced default group but was rejected!");
--			return -ENOENT;
--		}
--
--		sae_debug("Forcing default SAE group 19");
-+	/* Find the next group in the list */
-+	while ((group = ecc_groups[++sm->group_retry])) {
-+		/*
-+		 * Forcing the default group; only choose group 19. If we have
-+		 * already passed 19 (due to a retry) we will exhaust all other
-+		 * groups and should fail.
-+		 */
-+		if (sm->force_default_group && group != 19)
-+			continue;
- 
--		sm->group_retry++;
--		sm->group = 19;
-+		/* Ensure the PT was derived for this group */
-+		if (sm->sae_type == CRYPTO_SAE_HASH_TO_ELEMENT &&
-+				!sm->handshake->ecc_sae_pts[sm->group_retry])
-+			continue;
- 
--		goto get_curve;
-+		break;
- 	}
- 
--	do {
--		sm->group_retry++;
-+	if (!group)
-+		return -ENOENT;
- 
--		if (ecc_groups[sm->group_retry] == 0)
--			return -ENOENT;
--	} while (sm->sae_type != CRYPTO_SAE_LOOPING &&
--			!sm->handshake->ecc_sae_pts[sm->group_retry]);
-+	sm->group = group;
- 
- 	if (reset)
- 		sae_reset_state(sm);
- 
--	sm->group = ecc_groups[sm->group_retry];
--
--get_curve:
- 	sae_debug("Using group %u", sm->group);
- 
- 	sm->curve = l_ecc_curve_from_ike_group(sm->group);
--- 
-2.34.1
+Applied.  Do we have test for H2E & force behavior?
+
+Regards,
+-Denis
 
