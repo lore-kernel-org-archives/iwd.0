@@ -1,62 +1,62 @@
-Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com [209.85.208.47])
+Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com [209.85.208.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C097186E3B
-	for <iwd@lists.linux.dev>; Mon, 12 Aug 2024 15:46:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF3B3183CD9
+	for <iwd@lists.linux.dev>; Mon, 12 Aug 2024 15:46:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723477601; cv=none; b=cP/god/F/jV7Aohij5kk7z4D7AIr6ljhRpcJ13PcZAcAW44AVq7t2OPSmKQPnTFShA9b+bAC1gcYATgW2DTDH3fCzYeWOeA6sugSfZVntSpM16d8TxNn+fMA91HulszDm8gG0C4vMrrK//2YJbT1mRl4371ypF831x8YlxPWyAk=
+	t=1723477603; cv=none; b=GZZe+RWVLjUMtDeLGWRrC9yzOf8za85AJ4HVGKVqNQ5KNcVeNiLdQYDdrkqoBti7zIw3UCVNmN3Ns1feHvCQkQAqeAAaIQ5+qHVF3M4aNhJlAEZFnr8pZT6HynSt693ehA7utMyGxNCmEPri2rBTZMmdv0KnVpeLiW16j1V9WDo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723477601; c=relaxed/simple;
-	bh=uogCmoUQVgnF0uaW38LuJljWcL/2D2EDL+jnqvpBV1Q=;
+	s=arc-20240116; t=1723477603; c=relaxed/simple;
+	bh=gCdwM5boUrxXJykMfnN7bEjV0cAfhvzuqH+rcGbJXMI=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=r5myxruI5SLfs1uke5WAWYeQiaR3xwfEpNMMMY6IQOQhp+ZxE1ZaFr/yVFn0xijB9C1J5XtEPkkLO9bZOjbcXP2LOibqK4HUm07sakAuK2jypXC+vkrvfI5FIl8xd2/kNrZq4FDp9Ae33W5v5leQHc0H1x0LiRjmCxmRjSg5yvU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Pd+UG4Ow; arc=none smtp.client-ip=209.85.208.47
+	 MIME-Version; b=N7I3uX/76tpPcVUQNeZmx1mrhqxNIM/99wcbZ1vT41KBC6WKbYZWYuzDsA+GcuWYiiGSiPXuNshUXzLokqwshqAsrJEOx33iuL8nCSn5gMx2KWlX9NZOtG9MVB9lBPrVeYRzQ8i+xnsb/46wc6p4sGyeXu9/JjQs4GT2kRS7rwg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AuKC0GXu; arc=none smtp.client-ip=209.85.208.43
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Pd+UG4Ow"
-Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-5b8c2a6135dso5191670a12.1
-        for <iwd@lists.linux.dev>; Mon, 12 Aug 2024 08:46:39 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AuKC0GXu"
+Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-58ef19aa69dso4404657a12.3
+        for <iwd@lists.linux.dev>; Mon, 12 Aug 2024 08:46:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1723477598; x=1724082398; darn=lists.linux.dev;
+        d=gmail.com; s=20230601; t=1723477600; x=1724082400; darn=lists.linux.dev;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=2Qky0MQJeJF3LCCWOtjL0pplPriz27AORg7Oa63Y+U0=;
-        b=Pd+UG4OwpVcURM5ktAsIXq+28ZqgpdPJf9i/rQq1wu5Oir95+8mlUc/tJP3rQ3/cnd
-         NPR42Xlicx+HY5dE5ZwjVBMMNHv2j/NNgoCSGmGQwrvZu+K5Ip7oJqY/Qsn0KVAtiL2p
-         kAYiS9tbSP7e+YjWBdaHBwOaZYDGl6z5gEX+wlz+KjwuUpCyxpylVCYZkXY/r8ohfOMv
-         w0WbNyrzKNJ21D+lc6uEmYzDNz5KFB9OCMC63JxUhhXwZIf4zNI2kUAmeg5xgokwRmhY
-         VDcFBfeBG4Xjdq2npLhOU2DRo61fQ3VjkJlZg1gahUkaoyzMk+E9nW4IUz8yhwfIFJro
-         Ol8g==
+        bh=+PuzQJECGUFs6HRFSL9Henz0/P8ilvHbUqfcGwqXeJg=;
+        b=AuKC0GXueVjduHpPbsHygXTHyUjJSEJ+eZOYldLrtLGGPuKmEOJL8R9Rta+DeG+rjB
+         JpfTqpOYVk7iLrkIzmpREIfCt7S1Ct6FN5pjULg1lU4GCpnJHnh3NOYQ+HmEsaQOCz90
+         Us8MvKUKkfZOt5rndpKxXfmAzNp9vl3Y26Bo+bFV8qk6FG/9zQPWtxwOq9OAPY08gy65
+         WjyjuEjVfqWAfbr2WnjdthiyW6r7OiMztYYW98XPrWvBy0NnLV+o8iYwMlBu20mg9Mxq
+         KASUR4Q7NkhhnUQBwVOErqRlqgvYVCfrF4PULsR+Ys6YtD62yi0iYdMV2h9zY+Dz42mF
+         1WGQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723477598; x=1724082398;
+        d=1e100.net; s=20230601; t=1723477600; x=1724082400;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=2Qky0MQJeJF3LCCWOtjL0pplPriz27AORg7Oa63Y+U0=;
-        b=LyZuiI6wgkiLZQ/TM/YEmQuicB4xsqtllBEMw147TqO5+DbaI5VFtEFbQcXquZnePw
-         JDiXiNjTeSfD9KOvckO99Mkc7Hfq3VKlcPiACsijRAmGKVUgiayiPeczawuLxrTms0VX
-         CqYvyNx+SC8E4hAFkY0/oHjeqO7dkXnx9HQ4EDoiSi8OdZ95gUvjQByGvhSR7xlbwAu2
-         bIFtxMXQYGvKL2+zHfkBYreF4Wnv/0x83f1fZ/Vq+UZBUEvo3j9oW9lqeu2RGEHc87Oj
-         eOc652BViI/7nk19f4A3WNohj8QGL3KRrVUOQiqo1keQFTnjafN9ZFgPmLrRMKHezT2E
-         4hcQ==
-X-Gm-Message-State: AOJu0YzT7i9WeJ1w3LqGc+6pKRrED6VCutMGbgGKrtFEAZq2gejrUkKS
-	jSMFNOhbu6fMxvUZSZusT1CLAmWVEld65yDaSy3UXjUAjo4+u3pybz4k3g==
-X-Google-Smtp-Source: AGHT+IEUJmvQHYOLqKqUBFx4P6C9a8islU2TGrN/DtmMMNw2LhF6ggqjwxyDpdp0CN6Dbe+NzH2mRQ==
-X-Received: by 2002:a05:6402:34c6:b0:5a2:d970:114c with SMTP id 4fb4d7f45d1cf-5bd44c15055mr537663a12.4.1723477597922;
-        Mon, 12 Aug 2024 08:46:37 -0700 (PDT)
+        bh=+PuzQJECGUFs6HRFSL9Henz0/P8ilvHbUqfcGwqXeJg=;
+        b=U2LQTZ6whrrE8Og4f7muLO1h7MgTrvwVFrkzuxGTbOFs45O6g5j6dDsbJJ3TRomYhf
+         q74h6LVJw48g6SQM8Te8GQfSbbjZYYQea9GDDKmgsuJpkTwc23bVWYezoZeNscJ1rFwZ
+         kNfviVI+8glXL2TvOj52sUoZjF/wz/Yr86pI4zl2eUk5B07c26DFjUQoGXyswPuKYNYM
+         h5u3P03sVG2OYWo0P8Ki0tiQfgMLCddY3CiPc3Qv1zFlYSvxeGAyigfcjkBo+cz9xtdV
+         yKD2w8h2jQGrvnJZzUNUfWLebPScic8VUcScQc7nWX7FThVSIf5V1NAnbjFAVELBoyda
+         1kJQ==
+X-Gm-Message-State: AOJu0Yx4/im5SP+YHqkpad99HgtVYeMu/iVAYidPo1/Mwz/V37U5778c
+	8FIiCGA2ndZjscELVECmuqjBcia6XG2MzsDU2iVjqNkcmmv711fRqEMcCA==
+X-Google-Smtp-Source: AGHT+IFLLWOqdDMX8srVFCYMKQ94O8V2kaelxTG+jM3XL1U2KkOeQiUi2GYrl7r76PGaIoYzRS0ISA==
+X-Received: by 2002:a05:6402:3813:b0:58d:81ac:ea90 with SMTP id 4fb4d7f45d1cf-5bd44c7cc25mr494401a12.38.1723477599666;
+        Mon, 12 Aug 2024 08:46:39 -0700 (PDT)
 Received: from LOCLAP699.vf-sint-niklaas.locus ([152.193.78.90])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5bd190adb45sm2224931a12.32.2024.08.12.08.46.36
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5bd190adb45sm2224931a12.32.2024.08.12.08.46.38
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 12 Aug 2024 08:46:37 -0700 (PDT)
+        Mon, 12 Aug 2024 08:46:39 -0700 (PDT)
 From: James Prestwood <prestwoj@gmail.com>
 To: iwd@lists.linux.dev
 Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH v3 11/13] client: add BasicServiceSet interface
-Date: Mon, 12 Aug 2024 08:46:11 -0700
-Message-Id: <20240812154613.126522-11-prestwoj@gmail.com>
+Subject: [PATCH v3 12/13] client: refactor cmd_connect() and add find_network()
+Date: Mon, 12 Aug 2024 08:46:12 -0700
+Message-Id: <20240812154613.126522-12-prestwoj@gmail.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240812154613.126522-1-prestwoj@gmail.com>
 References: <20240812154613.126522-1-prestwoj@gmail.com>
@@ -68,139 +68,82 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
+This will do all the lookup/searching needed to find a network
+proxy object.
 ---
- Makefile.am  |   1 +
- client/bss.c | 109 +++++++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 110 insertions(+)
- create mode 100644 client/bss.c
+ client/station.c | 35 +++++++++++++++++++++++++----------
+ 1 file changed, 25 insertions(+), 10 deletions(-)
 
-diff --git a/Makefile.am b/Makefile.am
-index 0c152216..d438a5ba 100644
---- a/Makefile.am
-+++ b/Makefile.am
-@@ -319,6 +319,7 @@ client_iwctl_SOURCES = client/main.c \
- 			client/daemon.c client/daemon.h \
- 			client/dpp.c client/dpp-pkex.c \
- 			client/station-debug.c \
-+			client/bss.c \
- 			src/util.c src/util.h \
- 			src/band.c src/band.h
+diff --git a/client/station.c b/client/station.c
+index affb7f15..58aac29e 100644
+--- a/client/station.c
++++ b/client/station.c
+@@ -283,28 +283,26 @@ static char *connect_cmd_arg_completion(const char *text, int state,
+ 	return network_name_completion(device, text, state);
+ }
  
-diff --git a/client/bss.c b/client/bss.c
-new file mode 100644
-index 00000000..def4de7f
---- /dev/null
-+++ b/client/bss.c
-@@ -0,0 +1,109 @@
-+/*
-+ *
-+ *  Wireless daemon for Linux
-+ *
-+ *  Copyright (C) 2024, Locus Robotics
-+ *
-+ *  This library is free software; you can redistribute it and/or
-+ *  modify it under the terms of the GNU Lesser General Public
-+ *  License as published by the Free Software Foundation; either
-+ *  version 2.1 of the License, or (at your option) any later version.
-+ *
-+ *  This library is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ *  Lesser General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU Lesser General Public
-+ *  License along with this library; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-+ *
-+ */
+-static enum cmd_status cmd_connect(const char *device_name,
+-						char **argv, int argc)
++static const struct proxy_interface *find_network(const char *device_name,
++						const char *name,
++						const char *type)
+ {
+ 	struct network_args network_args;
+ 	struct l_queue *match;
+ 	const struct proxy_interface *network_proxy;
+ 	const struct proxy_interface *device_proxy;
+ 
+-	if (argc < 1)
+-		return CMD_STATUS_INVALID_ARGS;
+-
+ 	device_proxy = device_proxy_find_by_name(device_name);
+ 	if (!device_proxy)
+-		return CMD_STATUS_INVALID_VALUE;
++		return NULL;
+ 
+-	network_args.name = argv[0];
+-	network_args.type = argc >= 2 ? argv[1] : NULL;
++	network_args.name = name;
++	network_args.type = type;
+ 
+ 	match = network_match_by_device_and_args(device_proxy, &network_args);
+ 	if (!match) {
+ 		display("Invalid network name '%s'\n", network_args.name);
+-		return CMD_STATUS_INVALID_VALUE;
++		return NULL;
+ 	}
+ 
+ 	if (l_queue_length(match) > 1) {
+@@ -315,11 +313,28 @@ static enum cmd_status cmd_connect(const char *device_name,
+ 
+ 		l_queue_destroy(match, NULL);
+ 
+-		return CMD_STATUS_INVALID_VALUE;
++		return NULL;
+ 	}
+ 
+ 	network_proxy = l_queue_pop_head(match);
+ 	l_queue_destroy(match, NULL);
 +
-+#ifdef HAVE_CONFIG_H
-+#include <config.h>
-+#endif
-+
-+#include <ell/ell.h>
-+#include "ell/useful.h"
-+
-+#include "client/dbus-proxy.h"
-+#include "client/display.h"
-+
-+struct bss {
-+	char *address;
-+};
-+
-+static const char *get_address(const void *data)
-+{
-+	const struct bss *bss = data;
-+
-+	return bss->address;
++	return network_proxy;
 +}
 +
-+static void update_address(void *data, struct l_dbus_message_iter *variant)
++static enum cmd_status cmd_connect(const char *device_name,
++						char **argv, int argc)
 +{
-+	struct bss *bss = data;
-+	const char *value;
++	const struct proxy_interface *network_proxy;
 +
-+	l_free(bss->address);
++	if (argc < 1)
++		return CMD_STATUS_INVALID_ARGS;
 +
-+	if (!l_dbus_message_iter_get_variant(variant, "s", &value)) {
-+		bss->address = NULL;
++	network_proxy = find_network(device_name, argv[0],
++					argc >= 2 ? argv[1] : NULL);
++	if (!network_proxy)
++		return CMD_STATUS_INVALID_VALUE;
 +
-+		return;
-+	}
-+
-+	bss->address = l_strdup(value);
-+}
-+
-+static const struct proxy_interface_property bss_properties[] = {
-+	{ "Address",       "s", update_address, get_address },
-+	{ }
-+};
-+
-+static void *bss_create(void)
-+{
-+	return l_new(struct bss, 1);
-+}
-+
-+static void bss_destroy(void *data)
-+{
-+	struct bss *bss = data;
-+
-+	l_free(bss->address);
-+	l_free(bss);
-+}
-+
-+static void bss_display_inline(const char *margin, const void *data)
-+{
-+	const struct bss *bss = data;
-+
-+	display("%s%s\n", margin, bss->address);
-+}
-+
-+static const struct proxy_interface_type_ops ops = {
-+	.create = bss_create,
-+	.destroy = bss_destroy,
-+	.display = bss_display_inline,
-+};
-+
-+static struct proxy_interface_type bss_interface_type = {
-+	.interface = IWD_BSS_INTERFACE,
-+	.properties = bss_properties,
-+	.ops = &ops,
-+};
-+
-+static int bss_interface_init(void)
-+{
-+	proxy_interface_type_register(&bss_interface_type);
-+
-+	return 0;
-+}
-+
-+static void bss_interface_exit(void)
-+{
-+	proxy_interface_type_unregister(&bss_interface_type);
-+}
-+
-+INTERFACE_TYPE(bss_interface_type, bss_interface_init, bss_interface_exit)
+ 	network_connect(network_proxy);
+ 
+ 	return CMD_STATUS_TRIGGERED;
 -- 
 2.34.1
 
