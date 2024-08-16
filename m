@@ -1,119 +1,122 @@
-Received: from mail-ot1-f47.google.com (mail-ot1-f47.google.com [209.85.210.47])
+Received: from mail-qt1-f178.google.com (mail-qt1-f178.google.com [209.85.160.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8065C143757
-	for <iwd@lists.linux.dev>; Fri, 16 Aug 2024 11:53:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88D69156F34
+	for <iwd@lists.linux.dev>; Fri, 16 Aug 2024 12:52:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723809226; cv=none; b=ASvtZ5+zDu4n9Bk+hhOGM5oXib/E6luArBmPdFKJngwBRVUJBziQm/U+aVcpSkMQCOEq6g0JL3sAIMF5ePXcYHfws0N2BZCt1rUd8wrczFShmv4/zJISe3liwFyd9F+7ALlln0ZbKoE7+mHIvZfWzBEkjpCCPt915ejdqaFl7Pk=
+	t=1723812741; cv=none; b=GKamqYOs5Vv2XBwBGptZtLP4lUp0UxurW8XP+dsJIJBYV+lciVvu4N28Y6+lJBu+lxddZGtHQ0FvhWIOXOLfBvePORFhOCvQ7DTxwoLPGAAC+Llo9Zj16UoYOx8SYB7M+GwclWtb+wfIqqao2jIaEx4mg18X8Kwr2ROwj0TWQAg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723809226; c=relaxed/simple;
-	bh=FHmfksPvxphLbM44/ajckFccdhXWgwLBt1A2g+sLBVc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=c7P7fHhNRMlHS8LmrByC6EYZ8E0ZfEqdwxjfZlhyLd0M30opADwFBk+fASbaMiwC8nbsDohYOaW/VCsNthVC329dHeL2OW6R7eOrID8B4r3GS6u6492XY4dENe2G8/Pe0lOYUUtn+eYIg9xTagvc32e3D/DfvTsgq5rvIVrKDN0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AZy6JJkn; arc=none smtp.client-ip=209.85.210.47
+	s=arc-20240116; t=1723812741; c=relaxed/simple;
+	bh=Xo0jQKN0L3cPu7vcQ9s1yXgfKSMGdhZqcDWEIRz2Tbk=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=SptjNe+TXNhxV/hH2nDTnMFxnHjaawaG0p//PmBGyAsftFBxqu8NRb9EZ52jDkZevo6BDMyLHjWtz15hcpPoKnzCJSLPyrbpTWIf3pFOZ4CPGEI8LYmVz3DFOKdoAEbLAKf94fiz+oPLVmCNxUS/6YvgIbROHYmm8R5h1QX/FQk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Jzn6V455; arc=none smtp.client-ip=209.85.160.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AZy6JJkn"
-Received: by mail-ot1-f47.google.com with SMTP id 46e09a7af769-70968db52d0so2025143a34.3
-        for <iwd@lists.linux.dev>; Fri, 16 Aug 2024 04:53:45 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Jzn6V455"
+Received: by mail-qt1-f178.google.com with SMTP id d75a77b69052e-44fdcd7a622so11337281cf.0
+        for <iwd@lists.linux.dev>; Fri, 16 Aug 2024 05:52:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1723809224; x=1724414024; darn=lists.linux.dev;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=48+g1BiOySXyTqPWxTBKLIgxQp70v+IW2ioOUSa6Q+I=;
-        b=AZy6JJknoO/NHX7EdrJWOcvMRDdD/O13GDOCCSl5U6J84wX0O8yjnbYuTnVlXG1AGj
-         uuv+j6C8x0wO9nKqaxbj5w2vCeq6f8Jp5ES8nf+eJrfNR9zSwVg0K1WK3Rml8YslDFws
-         a0v0oAzFSrgDWTTmw/BPKUhHKGEIXWu5fQGXQ/OfQmtKSIWzZ/oYk4cwrljVL3dbkXZs
-         kJppr4zYdtujhfdPOPw3Tcz/vzQKfFKd0TIv7bVCKVXfwcOI2AezDwV1VGgKABePQYox
-         UQq3gHxo8M5C+Ax5CmYI3xdjN7lR4frgrALuFdanOVabiIr85qGyH0Aqv46AoihEABrf
-         +f8A==
+        d=gmail.com; s=20230601; t=1723812738; x=1724417538; darn=lists.linux.dev;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=qBTWjnhGFVMdytmi/xL+pxTD5kCqfJksEi160IRlQa0=;
+        b=Jzn6V45569mQ0MLUTlMsrOhGvnAf1khuCtQK4CzU2D/6uArYScZqtUi1wuUchrpgxk
+         zikRiuRJ1/b2Q1uDUZAwnyiASfcZ3jRDrxkvH1Rp6On5GIiSnRwdlbKvUH25Dl78KwAy
+         3atcn/7teYH+sjxZ2xFM63829BV6/mtDSjePQTUGPZtPA7yn9i5lPFV9NU1wLPGKniAA
+         onjPgMZ+AAniDjwDLSv3ZsLUQeu24dlGjgRWGrre7sof0CN3ADVzwpqF5mRC/Lg1gLHe
+         W0jxzZPo1U4kAyKe1g4JZKmAoQ+JJKyUp5j+P0r9oOPDloCN7vXM4+kgjlCLUjD9VKHJ
+         H4FQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723809224; x=1724414024;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=48+g1BiOySXyTqPWxTBKLIgxQp70v+IW2ioOUSa6Q+I=;
-        b=FsgGhYQbS0UiX3+Gd4o76AvG/4sC5SLONJo+DgqAx45xFUnvIvPsKityUryslvJWWI
-         WUWBltZcxHrz0SjFC3kOS2XdUQPCQaTXXkteR9Jf99qXsnTiTrLFKdySF5l/j59AzAz3
-         zJiCgXXE4jvRZ5BtOxEZSFjK3whEUMHlxHWFpk+kmPARSSdKbLp/CaHikCPHU+w84A7f
-         LXpXC/bTkWwRKr2C0cHF2cuniEtA3T/rkclVE4SEqxyWQPTcPFXoNRicueaaGMARRWLd
-         cZ2E23SLedBolPn0qONxoPWOkXfQxCSBQUbsc8hU4RVDoQQviwDw/DJ7dofl5bTwyTrB
-         0XHg==
-X-Forwarded-Encrypted: i=1; AJvYcCX2D6u3SQFAwhVTHpOSxFlZru/R6WDyK+wXo9Rzn+clAbU1G+/WuIJWZsjIFGba5iYUGxJg5OHeFrbqvkX2drsw6CXr
-X-Gm-Message-State: AOJu0Yz4t0ugikLs/uO+jo5dSB051k90bZOVPdi2Y6zAE7lEcWDWznDg
-	6bLyMS6VO0HYt4q09c/r/ih1E6Ypc0VbifbjEsPYq/UMFF5BjWz9
-X-Google-Smtp-Source: AGHT+IHIR83IoBTMhL4a149JGhd848uMED61jAHTFD3kwq5e4Ia3GwONHSiIi7uc59ub5A5PXjK8vQ==
-X-Received: by 2002:a05:6358:6f15:b0:1aa:d71f:692a with SMTP id e5c5f4694b2df-1b39313f1a1mr340199055d.5.1723809224305;
-        Fri, 16 Aug 2024 04:53:44 -0700 (PDT)
-Received: from [10.100.121.195] ([152.193.78.90])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7a4ff055a92sm162517585a.50.2024.08.16.04.53.43
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 16 Aug 2024 04:53:43 -0700 (PDT)
-Message-ID: <5096b486-d2c1-4a7b-826a-d3e4af9e2eed@gmail.com>
-Date: Fri, 16 Aug 2024 04:53:41 -0700
+        d=1e100.net; s=20230601; t=1723812738; x=1724417538;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=qBTWjnhGFVMdytmi/xL+pxTD5kCqfJksEi160IRlQa0=;
+        b=qZQPf4V4vFxGKqiW6tcD+vD628SS2nS9+624AJR0BK33VmVV4fD6LEDaAqd2UqAcB+
+         FL3JkAdOwzCGmoQ4gaY5ytgFkcujSbMi6omAWxCxd4OKmI2a1iZ89ZjoiciUn7dJssbD
+         saUH1ItVO0VGzmRGQzpH64VVD23Tf3aLDHKhphr9X+5cwTF9oBcC4LaR6HU5GjEWEnfn
+         t9kPlzXUuDgCImBugRXtVm96CZXyFU9K/wY3/EniQg9k4LV4uq5I2u/e6I6K1KHB9Ooi
+         4hSuoCxD5uXWVaa7Nrii7iJPVw4+2TKzjw7qJdtYdL9TmI/sJ5QuPuRdICZA2ItGTli5
+         xfaw==
+X-Gm-Message-State: AOJu0YyFqCaDC8vi8kkTKkl+/mB1HNgiihuT7ygNYlQEezqHJ5CN+JmN
+	o33TRz/RSshxkqz/1Rw5QTaAzahXqC+hFQdaO98tVr8krCB5zwSXD0qlLA==
+X-Google-Smtp-Source: AGHT+IHtd0kYQnbp67gMm6YoHkQD5JDQzUMogS+NxLtPIdAYN/NMwSNrBiERdfX7TurgmV/uX3vGNg==
+X-Received: by 2002:ac8:7418:0:b0:453:74a5:3a3f with SMTP id d75a77b69052e-45374a53ad2mr22504801cf.0.1723812738064;
+        Fri, 16 Aug 2024 05:52:18 -0700 (PDT)
+Received: from LOCLAP699.locus-rst-dev-locuspark.locus ([152.193.78.90])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-45369ff54ffsm15921931cf.36.2024.08.16.05.52.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 16 Aug 2024 05:52:17 -0700 (PDT)
+From: James Prestwood <prestwoj@gmail.com>
+To: iwd@lists.linux.dev
+Cc: James Prestwood <prestwoj@gmail.com>
+Subject: [PATCH 1/6] network: add __network_path_append_bss
+Date: Fri, 16 Aug 2024 05:52:09 -0700
+Message-Id: <20240816125214.1162415-1-prestwoj@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: Segmentation fault when taking device for a walk
-To: Richard Acayan <mailingradian@gmail.com>, iwd@lists.linux.dev
-References: <Zr6cKJePuQd4Dm_n@radian>
-Content-Language: en-US
-From: James Prestwood <prestwoj@gmail.com>
-In-Reply-To: <Zr6cKJePuQd4Dm_n@radian>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-Hi Richard,
+To reduce code duplication and prepare for moving the BSS interface
+to station, add a new API so station can create a BSS path without
+a network object directly.
+---
+ src/network.c | 12 +++++++++---
+ src/network.h |  3 +++
+ 2 files changed, 12 insertions(+), 3 deletions(-)
 
-On 8/15/24 5:24 PM, Richard Acayan wrote:
-> Hi,
->
-> A segmentation fault occurs in station_start_roam() when the station is
-> disconnected from an access point, or in other words, when the station's
-> connected_bss is NULL. Usually, this is triggered by a timeout, possibly
-> scheduled in response to a weak signal event.
->
-> This is occurring on my Pixel 3a running postmarketOS/Alpine Linux, when
-> receding from an access point, on iwd 2.19. I have collected 6 coredumps
-> of the crash in the span of around 2 weeks and would be willing to use
-> GDB if more information is necessary for a patch.
->
-> Sample:
->
-> 	Program terminated with signal SIGSEGV, Segmentation fault.
-> 	#0  0x0000aaaadf2086a0 in station_start_roam (station=0xffff8776ae50) at src/station.c:2880
-> 	
-> 	warning: 2880	src/station.c: No such file or directory
-> 	(gdb) bt
-> 	#0  0x0000aaaadf2086a0 in station_start_roam (station=0xffff8776ae50) at src/station.c:2880
-> 	#1  0x0000aaaadf28c544 in timeout_callback (fd=<optimized out>, events=<optimized out>,
-> 	    user_data=0xffff876b2e20) at ell/timeout.c:68
-> 	#2  timeout_callback (fd=<optimized out>, events=<optimized out>, user_data=0xffff876b2e20)
-> 	    at ell/timeout.c:57
-> 	#3  0x0000aaaadf28b9d0 in l_main_iterate (timeout=<optimized out>) at ell/main.c:461
-> 	#4  0x0000aaaadf28bac0 in l_main_run () at ell/main.c:508
-> 	#5  l_main_run () at ell/main.c:490
-> 	#6  0x0000aaaadf28bce4 in l_main_run_with_signal (
-> 	    callback=callback@entry=0xaaaadf1f1110 <signal_handler>, user_data=user_data@entry=0x0)
-> 	    at ell/main.c:630
-> 	#7  0x0000aaaadf1f0b0c in main (argc=<optimized out>, argv=<optimized out>) at src/main.c:611
-> 	(gdb) p station->connected_bss
-> 	$1 = (struct scan_bss *) 0x0
->
-Its hard to say without any debug logs as well but it appears the 
-disconnect never cleared out the timer used for the next roam attempt. I 
-did fix a hang due to a disconnect coming in during a roam attempt after 
-2.19, but I can't really make heads or tails without debug logs to see 
-what happened before/after the disconnect.
-
-Thanks,
-
-James
+diff --git a/src/network.c b/src/network.c
+index 85d2a983..a8e61d48 100644
+--- a/src/network.c
++++ b/src/network.c
+@@ -1130,17 +1130,23 @@ bool network_update_known_frequencies(struct network *network)
+ 	return true;
+ }
+ 
+-const char *network_bss_get_path(const struct network *network,
+-						const struct scan_bss *bss)
++const char *__network_path_append_bss(const char *network_path,
++					const struct scan_bss *bss)
+ {
+ 	static char path[256];
+ 
+ 	snprintf(path, sizeof(path), "%s/%02x%02x%02x%02x%02x%02x",
+-			network->object_path, MAC_STR(bss->addr));
++			network_path, MAC_STR(bss->addr));
+ 
+ 	return path;
+ }
+ 
++const char *network_bss_get_path(const struct network *network,
++						const struct scan_bss *bss)
++{
++	return __network_path_append_bss(network->object_path, bss);
++}
++
+ static bool network_unregister_bss(void *a, void *user_data)
+ {
+ 	struct scan_bss *bss = a;
+diff --git a/src/network.h b/src/network.h
+index 78ced99d..c9f73200 100644
+--- a/src/network.h
++++ b/src/network.h
+@@ -77,6 +77,9 @@ const char *network_bss_get_path(const struct network *network,
+ 						const struct scan_bss *bss);
+ bool network_bss_list_isempty(struct network *network);
+ 
++const char *__network_path_append_bss(const char *network_path,
++					const struct scan_bss *bss);
++
+ struct scan_bss *network_bss_list_pop(struct network *network);
+ struct scan_bss *network_bss_find_by_addr(struct network *network,
+ 							const uint8_t *addr);
+-- 
+2.34.1
 
