@@ -1,452 +1,99 @@
-Received: from mail-qv1-f51.google.com (mail-qv1-f51.google.com [209.85.219.51])
+Received: from mail-qv1-f42.google.com (mail-qv1-f42.google.com [209.85.219.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F0BC1A0AF3
-	for <iwd@lists.linux.dev>; Tue, 13 Aug 2024 15:56:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2799A59
+	for <iwd@lists.linux.dev>; Fri, 16 Aug 2024 00:24:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723564620; cv=none; b=NIlWAKA96469E8BHNZQaRD8ULy1fPb1Cjc+GBPVDxN6h0WGr0amOCm4+sLWOYmImLtX9cEGTPk1y6qYEsmQc8SCqCuc5dNkoVA4WxaBLearmZzcL0C/ATsojt8Vm2QGaowf4hR0KY58t5FrCUtgoTcDeqhO7uPuxM/0NeFjegTQ=
+	t=1723767853; cv=none; b=e2+7BmalAC4wjKFtl53AdayEhZKpTn8Y7seI05uAq/8Tn70jMtzkfHi/rh9h0nhgqigECpHAVXahoIBqJQaBUtWLfR62vqW3tj+U8w6VAkBPfo8/vnM/w0YqrC6YB3I50fGsxab0EACu65ixsDBL4kfeQyU5tYS4N5QWE+gkSok=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723564620; c=relaxed/simple;
-	bh=8hLMnJe9bIdtE+LX70MNwmIvB2g5jRKJo39S8/tGCVk=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=GKCCQdCEGgsrDCSrLYT2ZLBIvCUyLob4H8Sjd/EoAc/cLdeXouL5VKzIBHCcqN1xUeQRTHyirj2BFpqs/2I7017E1J88Z6lDUbAD0zd5zkkigEktCwHDnJoisdq0jksiHnyuee625rPymwrzj4RUD4KzNLKAC1aqaMcYUrJxbzc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MPKKLE56; arc=none smtp.client-ip=209.85.219.51
+	s=arc-20240116; t=1723767853; c=relaxed/simple;
+	bh=TzCLwPf/t/0/3bt0jdGzDaxMOShHoAq+JQbM/vSnxcI=;
+	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=lTc2qtggTVgFU6oW4dRQCL/MskntlFjK/H75A+Al0XxJq0Bj37rNHm5Cvh8Tm1bUVWjqTdXMFt2Z6jAuVWzotsIrozxtZ4Z045fZf8/4/INyrXq03M5AnrExDebw5UWyJeALi0IJ/725zix6NSbBVaOUhr1LIBY/2JjnzDiDaok=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HkIq6oJI; arc=none smtp.client-ip=209.85.219.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MPKKLE56"
-Received: by mail-qv1-f51.google.com with SMTP id 6a1803df08f44-6b78c980981so31857726d6.2
-        for <iwd@lists.linux.dev>; Tue, 13 Aug 2024 08:56:58 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HkIq6oJI"
+Received: by mail-qv1-f42.google.com with SMTP id 6a1803df08f44-6bf7ba05f75so4773306d6.0
+        for <iwd@lists.linux.dev>; Thu, 15 Aug 2024 17:24:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1723564617; x=1724169417; darn=lists.linux.dev;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=4uKfMHqNkvdM8b0cHGDx72DZKGmRqCA0kvcVQsRlpbM=;
-        b=MPKKLE56MNq+1RWSgOUvtikQowTGmk2w88xlpZznFDvUqdd8ET4SpoXG3/dQJA9ZOP
-         sVxT4I2NmTERWlBOC+GooKSJqLexLu+WLKpVUGmE2lv+jBaI4Ro5rHN5CLtqjtvUdeg1
-         YkXagZS6VffaTA39cqJeBTukGj6m5QZ9tM9UCgM1H+Xi5jOzSb5VTYVwATa/IDnIPgVb
-         hAfEe7riCiSgp+vhE7MRAARBRUBHgxdxSwBzl6WkDqSGOVFjwIH0lTSGNpE9lsbjgnss
-         n4nQijTjB43us9oi7QGQs5LhJjPQyOt3FYCdm8EuCXCwSy4O9yZm+wbAIwoq7AYAcabk
-         xANA==
+        d=gmail.com; s=20230601; t=1723767851; x=1724372651; darn=lists.linux.dev;
+        h=content-disposition:mime-version:message-id:subject:to:from:date
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=YmskmZd2nnWew3kycfSSOdPXGRZew/+Dew5DSlEs31w=;
+        b=HkIq6oJIMfKWhyUrSASfLDmYnXld8kOmBIWNUOgFOwt8FPWXfpA4KSwGFKObC4Vptn
+         tSB1H6EhSmxEk567XQIRX7kfST4Xi3EPDATvLHrB/GyAeKQQrYxjrjDvjqC0NJ0RsxcE
+         7ZAmq1TYVhPpuPC1da46AT9OZBZb6kstr9HuODZ4CtzsSPxnfQmCvvnJiYJ36EfZCTgO
+         OqY16FC/cJepFPIJyPzNlvsvcBvHE1Et7jdz2dK7NepfBvt4XEieu+P6iiZD19lctuIe
+         j4fVlkKrS8XpCod3/Tc2xLSrfhUzFox7rGBy8+PiU+paw6ZETwJatwxMaay3nVN+V9NL
+         BFmg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723564617; x=1724169417;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=4uKfMHqNkvdM8b0cHGDx72DZKGmRqCA0kvcVQsRlpbM=;
-        b=CiTbdeq3wW5bc+k/Mzw+XcZfi95NgcyM7VJ7FxacL/X8pD6H32DN7y/OWBVV037x0i
-         3yQUqDo2HNEI5CTrRbpsMP7ezlbxSGeYNRukfEpfnPFMeZSJxLQvxsdLzJ0/50kcw0iL
-         d2AfNSrcx0734rpocfeFE95V3z421xXT094adIwUsOhNLnelEcyEEDQJg6H8OHjavGG8
-         zf1Lr4gUzfMwQBhMp1G/93Iii+Stmb2sq7iFlQkRQ7YExlKPjbmzjGxFl8fI1lEmuqWi
-         WNBgtNokcHzJe6WeoWTNMttYxoRFv/IStHGch4ZuMEHj25i1YvhXV0zPN10+G8bB32h+
-         Td2A==
-X-Gm-Message-State: AOJu0YxA5sF0DUz+RSUYH7ZKZWHUOT/FoNZH635L3aAm576TDlMrkeST
-	KTrNfq5ZqzuJ3ljMLvrBKGnbhOSVQe1L3SFzQz/cz6a8cmSm7z4Cpz6fFg==
-X-Google-Smtp-Source: AGHT+IHFu+sjIvqpdjiYMoov7ibJd1T0PBS215F5B1AZZPLD9XLl/cMdc8EGelgOftSPy8KpDg46hQ==
-X-Received: by 2002:a05:6214:468c:b0:6bb:be58:f282 with SMTP id 6a1803df08f44-6bf4f884af2mr54070626d6.53.1723564616973;
-        Tue, 13 Aug 2024 08:56:56 -0700 (PDT)
-Received: from LOCLAP699.locus-rst-dev-locuspark.locus ([152.193.78.90])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6bd82ca2024sm35825706d6.72.2024.08.13.08.56.56
+        d=1e100.net; s=20230601; t=1723767851; x=1724372651;
+        h=content-disposition:mime-version:message-id:subject:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=YmskmZd2nnWew3kycfSSOdPXGRZew/+Dew5DSlEs31w=;
+        b=mUzi9w831zWjXLodeOTwvzXYb7pcL7WTD9DB7jaRvdn53fkRkbcHtctDspUCC+xz/r
+         a9K67/6msDqshAmxEngFJh7UCfpbCWJ9vXUxMkkdRv7AIBDMTRORK8H86+rROOjE87zI
+         lm5SOkS4Yl++E+ovBm2QN6Zwn/cRxOZpfcktyMLvJixysaShrz8EPoLF5kfM6zr4IO8i
+         2nZKd/4q73nGe5gtM37sna4l88+vMPMe+rM612OF5WHyw+lPnJVhi2oXj0theK5uxzVi
+         B8aulPaXV4sPburD9ICsW2HDL2Lung3fVHYfH6VFQqVkncf2daKM6wG4ehUyph2IUsem
+         J8Uw==
+X-Gm-Message-State: AOJu0Yz1q40pWz36ew0hClERNW+oh3x2vSuPCEQ5K7uSj4YAijZOSG7i
+	s8broPJp6wds0fwbXnr+1QExiKuB5/QYZNElxiap1aqO/0tN1zV7iSO8aBGd
+X-Google-Smtp-Source: AGHT+IFz9DThDRQsBL3ocWadpWEOfkDgexyv1BnYFo9EClkCDJmFeVvzE64p8aaLMUqzVpYp4yh0kA==
+X-Received: by 2002:a05:6214:2622:b0:6b7:923c:e0b7 with SMTP id 6a1803df08f44-6bf6de389a2mr93375296d6.21.1723767850596;
+        Thu, 15 Aug 2024 17:24:10 -0700 (PDT)
+Received: from localhost ([2607:fea8:52a3:d200:324c:b818:b179:79b])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6bf6fec6006sm11541136d6.76.2024.08.15.17.24.10
+        for <iwd@lists.linux.dev>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 13 Aug 2024 08:56:56 -0700 (PDT)
-From: James Prestwood <prestwoj@gmail.com>
+        Thu, 15 Aug 2024 17:24:10 -0700 (PDT)
+Date: Thu, 15 Aug 2024 20:24:08 -0400
+From: Richard Acayan <mailingradian@gmail.com>
 To: iwd@lists.linux.dev
-Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 9/9] auto-t: add tests for Affinities behavior
-Date: Tue, 13 Aug 2024 08:56:38 -0700
-Message-Id: <20240813155638.74987-9-prestwoj@gmail.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240813155638.74987-1-prestwoj@gmail.com>
-References: <20240813155638.74987-1-prestwoj@gmail.com>
+Subject: Segmentation fault when taking device for a walk
+Message-ID: <Zr6cKJePuQd4Dm_n@radian>
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
----
- autotests/testAffinity/TestFT.psk           |   2 +
- autotests/testAffinity/ft-psk-ccmp-1.conf   |  41 ++++
- autotests/testAffinity/ft-psk-ccmp-2.conf   |  41 ++++
- autotests/testAffinity/hw.conf              |   8 +
- autotests/testAffinity/main.conf            |   5 +
- autotests/testAffinity/test_set_affinity.py | 231 ++++++++++++++++++++
- 6 files changed, 328 insertions(+)
- create mode 100644 autotests/testAffinity/TestFT.psk
- create mode 100644 autotests/testAffinity/ft-psk-ccmp-1.conf
- create mode 100644 autotests/testAffinity/ft-psk-ccmp-2.conf
- create mode 100644 autotests/testAffinity/hw.conf
- create mode 100644 autotests/testAffinity/main.conf
- create mode 100644 autotests/testAffinity/test_set_affinity.py
+Hi,
 
-diff --git a/autotests/testAffinity/TestFT.psk b/autotests/testAffinity/TestFT.psk
-new file mode 100644
-index 00000000..e82d1295
---- /dev/null
-+++ b/autotests/testAffinity/TestFT.psk
-@@ -0,0 +1,2 @@
-+[Security]
-+Passphrase=EasilyGuessedPassword
-diff --git a/autotests/testAffinity/ft-psk-ccmp-1.conf b/autotests/testAffinity/ft-psk-ccmp-1.conf
-new file mode 100644
-index 00000000..839eb496
---- /dev/null
-+++ b/autotests/testAffinity/ft-psk-ccmp-1.conf
-@@ -0,0 +1,41 @@
-+hw_mode=g
-+channel=1
-+ssid=TestFT
-+utf8_ssid=1
-+ctrl_interface=/var/run/hostapd
-+
-+r1_key_holder=120000000001
-+nas_identifier=dummy1
-+
-+wpa=2
-+# Can support WPA-PSK and FT-PSK (space separated list) and/or EAP at the same
-+# time but we want to force FT
-+wpa_key_mgmt=FT-PSK
-+wpa_pairwise=CCMP
-+wpa_passphrase=EasilyGuessedPassword
-+ieee80211w=0
-+rsn_preauth=1
-+rsn_preauth_interfaces=lo
-+disable_pmksa_caching=0
-+# Allow PMK cache to be shared opportunistically among configured interfaces
-+# and BSSes (i.e., all configurations within a single hostapd process).
-+okc=1
-+mobility_domain=1234
-+reassociation_deadline=60000
-+r0kh=12:00:00:00:00:01 dummy1 000102030405060708090a0b0c0d0e0f
-+r0kh=12:00:00:00:00:02 dummy2 000102030405060708090a0b0c0d0e0f
-+r1kh=12:00:00:00:00:01 00:00:00:00:00:01 000102030405060708090a0b0c0d0e0f
-+r1kh=12:00:00:00:00:02 00:00:00:00:00:02 000102030405060708090a0b0c0d0e0f
-+# Push mode only needed for 8021x, not PSK mode since msk already known
-+pmk_r1_push=0
-+# Allow locally generated FT response so we don't have to configure push/pull
-+# between BSSes running as separate hostapd processes as in the test-runner
-+# case.  Only works with FT-PSK, otherwise brctl needs to be installed and
-+# CONFIG_BRIDGE enabled in the kernel.
-+ft_psk_generate_local=1
-+rkh_pull_timeout=50
-+ft_over_ds=0
-+ap_table_expiration_time=36000
-+ap_table_max_size=10
-+rrm_neighbor_report=1
-+ocv=1
-diff --git a/autotests/testAffinity/ft-psk-ccmp-2.conf b/autotests/testAffinity/ft-psk-ccmp-2.conf
-new file mode 100644
-index 00000000..2ffd7262
---- /dev/null
-+++ b/autotests/testAffinity/ft-psk-ccmp-2.conf
-@@ -0,0 +1,41 @@
-+hw_mode=g
-+channel=2
-+ssid=TestFT
-+utf8_ssid=1
-+ctrl_interface=/var/run/hostapd
-+
-+r1_key_holder=120000000002
-+nas_identifier=dummy2
-+
-+wpa=2
-+# Can support WPA-PSK and FT-PSK (space separated list) and/or EAP at the same
-+# time but we want to force FT
-+wpa_key_mgmt=FT-PSK
-+wpa_pairwise=CCMP
-+wpa_passphrase=EasilyGuessedPassword
-+ieee80211w=0
-+rsn_preauth=1
-+rsn_preauth_interfaces=lo
-+disable_pmksa_caching=0
-+# Allow PMK cache to be shared opportunistically among configured interfaces
-+# and BSSes (i.e., all configurations within a single hostapd process).
-+okc=1
-+mobility_domain=1234
-+reassociation_deadline=60000
-+r0kh=12:00:00:00:00:01 dummy1 000102030405060708090a0b0c0d0e0f
-+r0kh=12:00:00:00:00:02 dummy2 000102030405060708090a0b0c0d0e0f
-+r1kh=12:00:00:00:00:01 00:00:00:00:00:01 000102030405060708090a0b0c0d0e0f
-+r1kh=12:00:00:00:00:02 00:00:00:00:00:02 000102030405060708090a0b0c0d0e0f
-+# Push mode only needed for 8021x, not PSK mode since msk already known
-+pmk_r1_push=0
-+# Allow locally generated FT response so we don't have to configure push/pull
-+# between BSSes running as separate hostapd processes as in the test-runner
-+# case.  Only works with FT-PSK, otherwise brctl needs to be installed and
-+# CONFIG_BRIDGE enabled in the kernel.
-+ft_psk_generate_local=1
-+rkh_pull_timeout=50
-+ft_over_ds=0
-+ap_table_expiration_time=36000
-+ap_table_max_size=10
-+rrm_neighbor_report=1
-+ocv=1
-diff --git a/autotests/testAffinity/hw.conf b/autotests/testAffinity/hw.conf
-new file mode 100644
-index 00000000..c2b35d6e
---- /dev/null
-+++ b/autotests/testAffinity/hw.conf
-@@ -0,0 +1,8 @@
-+[SETUP]
-+num_radios=3
-+start_iwd=0
-+hwsim_medium=yes
-+
-+[HOSTAPD]
-+rad0=ft-psk-ccmp-1.conf
-+rad1=ft-psk-ccmp-2.conf
-diff --git a/autotests/testAffinity/main.conf b/autotests/testAffinity/main.conf
-new file mode 100644
-index 00000000..3d93ff57
---- /dev/null
-+++ b/autotests/testAffinity/main.conf
-@@ -0,0 +1,5 @@
-+[Scan]
-+DisableMacAddressRandomization=true
-+
-+[General]
-+RoamRetryInterval=1
-diff --git a/autotests/testAffinity/test_set_affinity.py b/autotests/testAffinity/test_set_affinity.py
-new file mode 100644
-index 00000000..efd914a4
---- /dev/null
-+++ b/autotests/testAffinity/test_set_affinity.py
-@@ -0,0 +1,231 @@
-+#! /usr/bin/python3
-+
-+import unittest
-+import sys, os
-+import dbus
-+
-+sys.path.append('../util')
-+from config import ctx
-+import iwd
-+from iwd import IWD, IWDDBusAbstract
-+from iwd import NetworkType
-+from hwsim import Hwsim
-+from hostapd import HostapdCLI
-+
-+#
-+# Separate client used to test DBus disconnects so we don't bring down the
-+# entire IWD python library
-+#
-+class AffinityClient(IWDDBusAbstract):
-+    def __init__(self, device_path):
-+        self._bus = dbus.bus.BusConnection(address_or_type=ctx.dbus_address)
-+        self._station_prop_if = dbus.Interface(
-+                        self._bus.get_object(iwd.IWD_SERVICE, device_path),
-+                        iwd.DBUS_PROPERTIES)
-+
-+    def set(self, values):
-+        self._station_prop_if.Set(iwd.IWD_STATION_INTERFACE, 'Affinities', dbus.Array([dbus.ObjectPath(v) for v in values], signature="o"))
-+
-+    def close(self):
-+        self._bus.close()
-+
-+class Test(unittest.TestCase):
-+    def connect(self, device, hapd):
-+        ordered_network = device.get_ordered_network('TestFT', full_scan=True)
-+
-+        self.assertEqual(ordered_network.type, NetworkType.psk)
-+
-+        condition = 'not obj.connected'
-+        self.wd.wait_for_object_condition(ordered_network.network_object, condition)
-+
-+        device.connect_bssid(hapd.bssid)
-+
-+        condition = 'obj.state == DeviceState.connected'
-+        self.wd.wait_for_object_condition(device, condition)
-+
-+    def test_set_affinity(self):
-+        device = self.wd.list_devices(1)[0]
-+
-+        self.connect(device, self.bss_hostapd[0])
-+
-+        print(device.connected_bss)
-+
-+        device.affinities = [device.connected_bss]
-+
-+        # IWD should not attempt to roam
-+        with self.assertRaises(TimeoutError):
-+            device.wait_for_event("roam-scan-triggered")
-+
-+        device.affinities = []
-+        device.wait_for_event("roam-scan-triggered")
-+
-+    def test_roam_below_critical(self):
-+        device = self.wd.list_devices(1)[0]
-+
-+        self.connect(device, self.bss_hostapd[0])
-+
-+        device.affinities = [device.connected_bss]
-+
-+        # IWD should not attempt to roam
-+        with self.assertRaises(TimeoutError):
-+            device.wait_for_event("roam-scan-triggered")
-+
-+        # Lower signal past critical level
-+        self.bss0_rule.signal = -9000
-+
-+        device.wait_for_event("roam-scan-triggered")
-+
-+    def test_error_conditions(self):
-+        device = self.wd.list_devices(1)[0]
-+
-+        # Calling set while disconnected should fail
-+        with self.assertRaises(iwd.NotConnectedEx):
-+            device.affinities = ["/some/path"]
-+
-+        self.connect(device, self.bss_hostapd[0])
-+
-+        device.affinities = [device.connected_bss]
-+
-+        # An invalid path should fail
-+        with self.assertRaises(iwd.InvalidArgumentsEx):
-+            device.affinities = [device.connected_bss, "/an/invalid/path"]
-+
-+    def test_affinity_client_disconnect(self):
-+        device = self.wd.list_devices(1)[0]
-+
-+        client = AffinityClient(device.device_path)
-+
-+        self.connect(device, self.bss_hostapd[0])
-+
-+        client.set([device.connected_bss])
-+
-+        with self.assertRaises(TimeoutError):
-+            device.wait_for_event("roam-scan-triggered")
-+
-+        client._bus.close()
-+
-+        device.wait_for_event("roam-scan-triggered")
-+
-+    def test_affinity_client_reconnect_during_roam(self):
-+        device = self.wd.list_devices(1)[0]
-+
-+        client = AffinityClient(device.device_path)
-+
-+        self.connect(device, self.bss_hostapd[0])
-+
-+        client.set([device.connected_bss])
-+
-+        # Lower signal past critical level
-+        self.bss0_rule.signal = -9000
-+
-+        device.wait_for_event("roam-scan-triggered")
-+
-+        client.close()
-+        del client
-+        client = AffinityClient(device.device_path)
-+        # setting here should get cleared after connecting
-+        client.set([device.connected_bss])
-+
-+        device.wait_for_event("ft-authenticating")
-+        device.wait_for_event("associating")
-+        device.wait_for_event("connected")
-+
-+        # Affinity should be reset, and IWD should be trying to roam
-+        device.wait_for_event("roam-scan-triggered")
-+
-+    def test_cleanup_with_connected_client(self):
-+        device = self.wd.list_devices(1)[0]
-+
-+        client = AffinityClient(device.device_path)
-+
-+        self.connect(device, self.bss_hostapd[0])
-+
-+        client.set([device.connected_bss])
-+        self.wd.stop()
-+
-+    def test_affinity_directed_roaming(self):
-+        device = self.wd.list_devices(1)[0]
-+        network = device.get_ordered_network("TestFT").network_object
-+
-+        self.bss0_rule.signal = -7500
-+        self.bss1_rule.signal = -7500
-+
-+        self.connect(device, self.bss_hostapd[0])
-+
-+        # Don't set the affinity on the current BSS, but on the other
-+        affinities = [path for path in network.extended_service_set if path != device.connected_bss]
-+
-+        device.affinities = affinities
-+
-+        # We should roam to the other BSS.
-+        device.wait_for_event("ft-authenticating")
-+        device.wait_for_event("associating")
-+        device.wait_for_event("connected")
-+
-+        # The affinity should still be set on this new BSS, causing the roam
-+        # threshold to drop. We should not roam in this case.
-+        with self.assertRaises(TimeoutError):
-+            device.wait_for_event("roam-scan-triggered")
-+
-+        # Now set the affinity back to the prior BSS, which should adjust the
-+        # ranking such that we roam back
-+        device.affinities = [device.connected_bss]
-+
-+        device.wait_for_event("ft-authenticating")
-+        device.wait_for_event("associating")
-+        device.wait_for_event("connected")
-+
-+
-+    def tearDown(self):
-+        os.system('ip link set "' + self.bss_hostapd[0].ifname + '" down')
-+        os.system('ip link set "' + self.bss_hostapd[1].ifname + '" down')
-+        os.system('ip link set "' + self.bss_hostapd[0].ifname + '" up')
-+        os.system('ip link set "' + self.bss_hostapd[1].ifname + '" up')
-+
-+        self.wd.stop()
-+        self.wd = None
-+
-+    def setUp(self):
-+        self.bss0_rule.signal = -8000
-+        self.bss1_rule.signal = -8000
-+
-+        self.wd = IWD(True)
-+
-+    @classmethod
-+    def setUpClass(cls):
-+        hwsim = Hwsim()
-+
-+        IWD.copy_to_storage('TestFT.psk')
-+
-+        cls.bss_hostapd = [ HostapdCLI(config='ft-psk-ccmp-1.conf'),
-+                            HostapdCLI(config='ft-psk-ccmp-2.conf') ]
-+
-+        rad0 = hwsim.get_radio('rad0')
-+        rad1 = hwsim.get_radio('rad1')
-+
-+        cls.bss0_rule = hwsim.rules.create()
-+        cls.bss0_rule.source = rad0.addresses[0]
-+        cls.bss0_rule.bidirectional = True
-+        cls.bss0_rule.signal = -8000
-+        cls.bss0_rule.enabled = True
-+
-+        cls.bss1_rule = hwsim.rules.create()
-+        cls.bss1_rule.source = rad1.addresses[0]
-+        cls.bss1_rule.bidirectional = True
-+        cls.bss1_rule.signal = -8000
-+        cls.bss1_rule.enabled = True
-+
-+        cls.bss_hostapd[0].set_address('12:00:00:00:00:01')
-+        cls.bss_hostapd[1].set_address('12:00:00:00:00:02')
-+
-+        HostapdCLI.group_neighbors(*cls.bss_hostapd)
-+
-+    @classmethod
-+    def tearDownClass(cls):
-+        IWD.clear_storage()
-+        cls.bss_hostapd = None
-+        cls.bss0_rule.remove()
-+        cls.bss1_rule.remove()
-+
-+if __name__ == '__main__':
-+    unittest.main(exit=True)
--- 
-2.34.1
+A segmentation fault occurs in station_start_roam() when the station is
+disconnected from an access point, or in other words, when the station's
+connected_bss is NULL. Usually, this is triggered by a timeout, possibly
+scheduled in response to a weak signal event.
 
+This is occurring on my Pixel 3a running postmarketOS/Alpine Linux, when
+receding from an access point, on iwd 2.19. I have collected 6 coredumps
+of the crash in the span of around 2 weeks and would be willing to use
+GDB if more information is necessary for a patch.
+
+Sample:
+
+	Program terminated with signal SIGSEGV, Segmentation fault.
+	#0  0x0000aaaadf2086a0 in station_start_roam (station=0xffff8776ae50) at src/station.c:2880
+	
+	warning: 2880	src/station.c: No such file or directory
+	(gdb) bt
+	#0  0x0000aaaadf2086a0 in station_start_roam (station=0xffff8776ae50) at src/station.c:2880
+	#1  0x0000aaaadf28c544 in timeout_callback (fd=<optimized out>, events=<optimized out>, 
+	    user_data=0xffff876b2e20) at ell/timeout.c:68
+	#2  timeout_callback (fd=<optimized out>, events=<optimized out>, user_data=0xffff876b2e20)
+	    at ell/timeout.c:57
+	#3  0x0000aaaadf28b9d0 in l_main_iterate (timeout=<optimized out>) at ell/main.c:461
+	#4  0x0000aaaadf28bac0 in l_main_run () at ell/main.c:508
+	#5  l_main_run () at ell/main.c:490
+	#6  0x0000aaaadf28bce4 in l_main_run_with_signal (
+	    callback=callback@entry=0xaaaadf1f1110 <signal_handler>, user_data=user_data@entry=0x0)
+	    at ell/main.c:630
+	#7  0x0000aaaadf1f0b0c in main (argc=<optimized out>, argv=<optimized out>) at src/main.c:611
+	(gdb) p station->connected_bss 
+	$1 = (struct scan_bss *) 0x0
