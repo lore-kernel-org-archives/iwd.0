@@ -1,242 +1,257 @@
-Received: from mail-ot1-f47.google.com (mail-ot1-f47.google.com [209.85.210.47])
+Received: from mail-pj1-f42.google.com (mail-pj1-f42.google.com [209.85.216.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C84B1741D2
-	for <iwd@lists.linux.dev>; Fri, 16 Aug 2024 12:52:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 505AA9460
+	for <iwd@lists.linux.dev>; Sat, 17 Aug 2024 20:50:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723812746; cv=none; b=oGvoOIB1HJwEwBpbUCje1e/4oP9zxaAZ6PaEYzNp0sHSqcJx1x+KzM4U1Yqv/SnMTt4dVT77AkjIH0cYyibbSq9OqVOSc3+QTesBmZYMIhf86ylfrNf0bD11V5MEEDtGGnFpeHCdUJfNs/cSHPbjl02M28qX6g8KxIllce91eIo=
+	t=1723927808; cv=none; b=R2Fj6qKQz0vyTar7WZ4fG7IAJdR6MchVP6lppV4od/rGna7ixnlW3ewMmYsIN7q30pBcB1k0Ca3d7+pg6gkIbbNFZx+gLGrR5t26czrox4FjwYprBNfPDKwxCDoC1oI3emmXpBcpwvqugai6usI1duFhMnTJqZRjGbYjpu4INGg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723812746; c=relaxed/simple;
-	bh=8eNGP5xOxlNPfHibAF8pSEIVZ1lGWsy8Ru/702n2+jM=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=qcr9/N5ko0Jn99aXzFujZYlU4yfCeXiSZ/NOA5cYPqP+a7Q9j3Hn0FTkIoyVANQ+adv5TiMEAMMc61xCv/OVpSLvBM81gQ3W7+3qwB5VKgv4X0shFcsrSD+5aCAsLe16IDfYgI3k0KSfTvTfpoy7WXnvb9e2X33kAdO3mm0VMrg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LrYu13lK; arc=none smtp.client-ip=209.85.210.47
+	s=arc-20240116; t=1723927808; c=relaxed/simple;
+	bh=TgXo9ouEWv4MIABtCewfjclnOGlcZtPBuEVwjvoA/qg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=r4p6oaSrEoQwBURA9BAzIdXUxe9vL+4TZZ2RaAAPqEVnkuJ46G/oxSUQWzDjx8FG4xYrURfOPRb5sL2Wqnjfj0MpJMnOxLrxiXrmZEgu8FcsT2BacSsBDdtRXxhtSWATD3oLnyxg94bNuM+yo2gD+fVhfDxi/Xy6E67gBpH1I+Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LbECxB05; arc=none smtp.client-ip=209.85.216.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LrYu13lK"
-Received: by mail-ot1-f47.google.com with SMTP id 46e09a7af769-70940c9657dso956232a34.1
-        for <iwd@lists.linux.dev>; Fri, 16 Aug 2024 05:52:25 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LbECxB05"
+Received: by mail-pj1-f42.google.com with SMTP id 98e67ed59e1d1-2d1daa2577bso2368858a91.2
+        for <iwd@lists.linux.dev>; Sat, 17 Aug 2024 13:50:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1723812744; x=1724417544; darn=lists.linux.dev;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1723927806; x=1724532606; darn=lists.linux.dev;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=kmKr4wShoxfc/Ar3yqI0w/yD7Vp7QvgQQW1F8edHasQ=;
-        b=LrYu13lKBGLlMobW/3LJfA78ZNPSwuED25E1+scc4OLazNxlvW0YlfgszuWWDvdXa0
-         qfDd8xqsVH6RVzt39PlPLkMpLR0s435+GLR981IBIhEDBoj8nY9XI0yQquHBDCctwTcm
-         jz2AkwUDTvuBdvpb+n/CwzY5UbF6ITrIXMCYTiYqQMAvWhHbnm1hsC+w/Z0XSAUlXGPh
-         CfNkxUlmqbSX3TzElUV4ox/dTx1bZM2iixCnuvJ2xU1TImpmXySmu7hErmmWHgH+2vy/
-         qn7Kp0cOlAIVB019MWQnYAF03iXYqEkLhQpS/YjMaxqJ9NjtUc9apownMlR9ZVQWs5EV
-         /DbQ==
+        bh=svwiOMSb5IPYcSpVmtPzg/VZsplQokoIeCYimbNfBaY=;
+        b=LbECxB05dkW0M1MwJPI9KcH1e0skgscmvOq9yLaJeYoKqlL+a/MI+/rnaEkyJbmpTA
+         +Z38aZrH32NoWzVfTtD2ZhCGtf0CieHsizUXg9KXt8m9Ci55DU8unvksI2jGH8PLs3OR
+         eXcO6PrHxnqU+4tDXAoDDUpyU1unDnivIwi1IM4oLbo4Tt1xPCwzw0GhoTRdrlDfitsK
+         0aKkkKJTQeP2IbLagdI6qeNg4EbU0nfkRN0FRlOEQ/zWIWq/FZjU0hyQY3S7q9FKZFJT
+         R89+JdEqbqiug+oWAXWdnRyy18FEJG1YpPjnWlt7oG95EtTD7Bkm6pDXT8daQkWLCvBY
+         8Mug==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723812744; x=1724417544;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1723927806; x=1724532606;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=kmKr4wShoxfc/Ar3yqI0w/yD7Vp7QvgQQW1F8edHasQ=;
-        b=mYXolwFUINvHUXPACmYpXacV1sGH9Pro4quNvyo3UFWD7jbhq/EMkY6nhOxqur0A+0
-         TbY6vWuPY2QNWoGhF/8xvH+WUz5EEjIFDu291ltg1eLSFSUJXec3GXlZM/TjGSNjO9p1
-         ecnFPz7Pu52isGHuhvIu9QgzeH/jVDlX+oe6T5H5S3a/lSogCzbPPwhXzVz6WLTOAq8/
-         plxwFpWnt/+ayna1lPHvfLtHZDeDkxPsieJzHNUknGUxIjGs8BiiuGJK0jygvvTsbhiL
-         /NvfnYKSA5HjBU0wAcxLLioX8VimXjfKJdJ4ESNdh4+kp4ImQSMQfWTofHhs8ueHmnoM
-         sTyQ==
-X-Gm-Message-State: AOJu0YyNSr0GxLenYEjTpJaUYPeAd6Ni7ijIP6VHgVtmPRsele/tzd/Y
-	vSeWLvWJarfZxQHtRAjOk+zRRGkJAYI1G9lg1dv98qFw9OzlzZKFua8ekA==
-X-Google-Smtp-Source: AGHT+IEwuJ7jwdzHunkvLvu3/9A7Y1vBi6Bi/dWATVytAvvu5tk0SOlg1aGrl04ldI5YDfR56PzU0g==
-X-Received: by 2002:a05:6830:6208:b0:709:4552:1f70 with SMTP id 46e09a7af769-70cac89c417mr3295328a34.24.1723812744189;
-        Fri, 16 Aug 2024 05:52:24 -0700 (PDT)
-Received: from LOCLAP699.locus-rst-dev-locuspark.locus ([152.193.78.90])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-45369ff54ffsm15921931cf.36.2024.08.16.05.52.23
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 16 Aug 2024 05:52:23 -0700 (PDT)
-From: James Prestwood <prestwoj@gmail.com>
-To: iwd@lists.linux.dev
-Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 6/6] auto-t: Add test for BasicServiceSets
-Date: Fri, 16 Aug 2024 05:52:14 -0700
-Message-Id: <20240816125214.1162415-6-prestwoj@gmail.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240816125214.1162415-1-prestwoj@gmail.com>
-References: <20240816125214.1162415-1-prestwoj@gmail.com>
+        bh=svwiOMSb5IPYcSpVmtPzg/VZsplQokoIeCYimbNfBaY=;
+        b=I2rAzOysSb8+odrKrxf6EQSdALi9aLm9m3nKif9KVed4drEKVqiTUKx+Ib9SeM+DMb
+         mxqEjuKv40Vg/taV8A6XQg4FShKnFtooveq/22D8HeQEfVIryR81twCQ73gC0+FAJTMu
+         zVAKCe80afQcGFSn6toTEU8t+wCT+0DqZhLtMFeq8qZA/JVJrVi/I4VddBxsdqMqU+mu
+         8NNEoAICT4PcmwK5NBYCHh1HHEYwHSMeMWTM6z4mJyh3ly4tmGfNAeNI59ZoB7vKX67p
+         AnsOs+XXCqI98qtBI61uVG4bsPQwgHbN+rf3N9gSV4yADZSR/PntGF7WSGeAbEeSE/47
+         AioA==
+X-Forwarded-Encrypted: i=1; AJvYcCUgM4rZ//6MOv4hxMRtkyxRz6jKf+Uw/kBCnPsSrElsZJE/TE6GeYTGycprbU+W1oFbRfI/V/9DWB38qtyfznPNJJ7l
+X-Gm-Message-State: AOJu0YzES3uHc6UYZHlACcq67tOlo7vu74dZT+sexwWixf8TkcDnIPcI
+	LNdmIZ45AB5kPGlOrCwLKyFeZXGLoeTZk2tO6tuO+BJtZu/p0AKjkc6xeaeMJqW7tZPm1nv85Lj
+	DtNGgi4PK+ZlYd5TAQGyNBSRXGGQ=
+X-Google-Smtp-Source: AGHT+IFq29WY3gV8m7dN7NyH/9gilf6AaQQN7DOI2x5TRU9R7pvAYeqY/bC5nZ0NRVtP0/Lo+DB4voV+8Q+q8bWO6gg=
+X-Received: by 2002:a17:90b:1807:b0:2d3:caa7:cf8f with SMTP id
+ 98e67ed59e1d1-2d3dffe3fc2mr7950520a91.24.1723927805238; Sat, 17 Aug 2024
+ 13:50:05 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <CAG17S_N+Hjt2c8t8hN4VMx79QsQ3hiiE_cwOErg6fKoyHkr67A@mail.gmail.com>
+ <ef38aa12-634e-4870-888c-219c961f301c@gmail.com> <b0ef10a2-c30b-4b6c-8370-66f9e0ace7b1@gmail.com>
+ <CAG17S_P_MO4_BZYTCp4WDkJ_q4j=0s_s3azCOWrsvqmLD0ravw@mail.gmail.com>
+ <de951e97-547f-4c14-841c-267f64b0020b@gmail.com> <CAG17S_Oh_1NS9SUSadAJkMXtJ3s_AjMhnUDSqrKMzEiO69jBPA@mail.gmail.com>
+ <cf5ba208-58d9-44e8-bd91-0639ea062d5d@gmail.com>
+In-Reply-To: <cf5ba208-58d9-44e8-bd91-0639ea062d5d@gmail.com>
+From: KeithG <ys3al35l@gmail.com>
+Date: Sat, 17 Aug 2024 15:49:54 -0500
+Message-ID: <CAG17S_P_QS4wjqrMgtLryrmx2eoJAYJF7SE1AJdOces-cFPacg@mail.gmail.com>
+Subject: Re: [Request] iwd to support brcmfmac 'SAE with AUTHENTICATE'
+To: James Prestwood <prestwoj@gmail.com>
+Cc: Denis Kenzior <denkenz@gmail.com>, iwd@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
----
- .../basic_service_set_test.py                 | 100 ++++++++++++++++++
- autotests/testBasicServiceSet/hw.conf         |   7 ++
- autotests/testBasicServiceSet/ssidTKIP-1.conf |   7 ++
- autotests/testBasicServiceSet/ssidTKIP-2.conf |   7 ++
- autotests/testBasicServiceSet/ssidTKIP.psk    |   5 +
- 5 files changed, 126 insertions(+)
- create mode 100644 autotests/testBasicServiceSet/basic_service_set_test.py
- create mode 100644 autotests/testBasicServiceSet/hw.conf
- create mode 100644 autotests/testBasicServiceSet/ssidTKIP-1.conf
- create mode 100644 autotests/testBasicServiceSet/ssidTKIP-2.conf
- create mode 100644 autotests/testBasicServiceSet/ssidTKIP.psk
+On Mon, Aug 12, 2024 at 6:36=E2=80=AFAM James Prestwood <prestwoj@gmail.com=
+> wrote:
+>
+> Hi Keith,
+>
+> On 8/11/24 6:19 PM, KeithG wrote:
+> > On Sun, Aug 11, 2024 at 2:38=E2=80=AFPM Denis Kenzior <denkenz@gmail.co=
+m> wrote:
+> >> Hi Keith,
+> >>
+> >>>       Supported extended features:
+> >>>           * [ CQM_RSSI_LIST ]: multiple CQM_RSSI_THOLD records
+> >>>           * [ DFS_OFFLOAD ]: DFS offload
+> >>>
+> >> <snip>
+> >>
+> >>> The pcap is uploaded to my gdrive:
+> >>> https://drive.google.com/file/d/1vIuje60MGFPklcXtSNMi9-IOlV_6sBJ8/vie=
+w?usp=3Ddrivesdk
+> >> What is the PCAP supposed to show?  There's no Connection attempt in t=
+here.
+> >>
+> >>> Hopefully, this helps to get started.
+> >>>
+> >> Anyway, I was curious and snooped on wpa_s from git trying to connect =
+to an
+> >> iPhone 12 Personal Hotspot (Maximum Compatibility option off, so it us=
+es SAE).
+> >> Not a pretty sight.  Firmware fails with errno=3D-52, Invalid exchange=
+.  Has
+> >> anyone from RPI team actually tested this firmware before pushing it o=
+ut?
+> >>
+> >> I also tried the old firmware with SAE_OFFLOAD bits, and that doesn't =
+work with
+> >> wpa_s or iwd either.
+> >>
+> >> Until someone sends me a iwmon trace showing CMD_EXTERNAL_AUTH exchang=
+e working
+> >> on an WPA3-Personal Only network, I remain skeptical that any of the C=
+ypress
+> >> firmwares actually work.
+> >>
+> >> Regards,
+> >> -Denis
+> > Denis,
+> >
+> > I did not attempt a connect with that first log. I misunderstood what
+> > James was asking for.
+>
+> You didn't misunderstand :) I was confused by what I thought brcmfmac
+> supported but Denis pointed out that the "Device supports SAE with
+> AUTHENTICATE command" only mean NL80211_FEATURE_SAE was set, not that
+> CMD_AUTHENTICATE is actually supported (really dumb and confusing, I know=
+).
+>
+> What is interesting though is even in your pcap CMD_EXTERNAL_AUTH isn't
+> showing up as a supported command.
+>
+>      Supported Commands:
+>          New Interface [7]
+>          Set Interface [6]
+>          New Key [11]
+>          Start AP [15]
+>          Join IBSS [43]
+>          Set PMKSA [52]
+>          Del PMKSA [53]
+>          Flush PMKSA [54]
+>          Remain on Channel [55]
+>          Frame [59]
+>          Set Wiphy Netns [49]
+>          Set Channel [65]
+>          Start Sched Scan [75]
+>          Start P2P Device [89]
+>          Connect [46]
+>          Disconnect [48]
+>          Crit Protocol Start [98]
+>          Crit Protocol Stop [99]
+>          Update Connect Params [122]
+>
+> So I'm even more confused now. But as Denis said, we do need a iwmon
+> pcap of wpa_supplicant working I think to see how its actually
+> connecting successfully.
+>
+> Thanks,
+>
+> James
+>
+> >   I tried connecting
+> > with my Samsung phone and was able to connect so it seems that the AP
+> > is working and allows a
+> > connection from my phone.
+> >
+> > I tried to connect from the Pi with iwctl:
+> > https://drive.google.com/file/d/1f1jnD0EUOJSaJXd8l7uYG9nisAxCPeo4/view?=
+usp=3Ddrivesdk
+> >
+> > I uninstalled iwd, installed wpa_supplicant (built from git) rebooted
+> > and tried to connect with connman and collected another pcap and it
+> > did not connect:
+> > https://drive.google.com/file/d/1zuVSF0xu4Nk2fN9ketBSv1tiquT-Sc-p/view?=
+usp=3Ddrivesdk
+> >
+> > I then tried from wpa_cli and did not connect. I tried again with a
+> > wpa_supplicant.conf and also could not connect.
+> >
+> > Now I am trying to figure out what I did to allow this connection to a
+> > sae AP... Now that I have nlmon
+> > module and iwmon, I will see if I can re-connect, somehow.
+> > The brcmfmac is such a pain.
+> > When I get a wpa3/SAE connection, I will make a pcap and post it.
+> > I actually was able to make one with wpa_supplicant once and actually
+> > passed data, but it does not seem to work today.
+> >
+> > Keith
 
-diff --git a/autotests/testBasicServiceSet/basic_service_set_test.py b/autotests/testBasicServiceSet/basic_service_set_test.py
-new file mode 100644
-index 00000000..c99f1901
---- /dev/null
-+++ b/autotests/testBasicServiceSet/basic_service_set_test.py
-@@ -0,0 +1,100 @@
-+#! /usr/bin/python3
-+
-+import unittest
-+import sys, os
-+
-+sys.path.append('../util')
-+import iwd
-+from iwd import IWD
-+from iwd import PSKAgent
-+from iwd import NetworkType
-+from hwsim import Hwsim
-+from hostapd import HostapdCLI
-+import testutil
-+
-+class Test(unittest.TestCase):
-+    def test_bss_unregister(self):
-+        device = self.wd.list_devices(1)[0]
-+
-+        ordered_network = device.get_ordered_network('ssidTKIP', full_scan=True)
-+        network = ordered_network.network_object
-+
-+        self.assertEqual(len(network.extended_service_set), 2)
-+
-+        ends = [parts.split('/')[-1] for parts in network.extended_service_set]
-+
-+        self.assertIn(self.bss_hostapd[0].bssid.replace(':', ''), ends)
-+        self.assertIn(self.bss_hostapd[1].bssid.replace(':', ''), ends)
-+
-+        self.rule_bss1.enabled = True
-+
-+        # Even with flushing, the kernel still seems to return the scan
-+        # results
-+        self.wd.wait(40)
-+        ordered_network = device.get_ordered_network('ssidTKIP', full_scan=True)
-+        network = ordered_network.network_object
-+
-+        ends = [parts.split('/')[-1] for parts in network.extended_service_set]
-+
-+        self.assertIn(self.bss_hostapd[0].bssid.replace(':', ''), ends)
-+        self.assertNotIn(self.bss_hostapd[1].bssid.replace(':', ''), ends)
-+
-+        self.rule_bss0.enabled = True
-+
-+        self.wd.wait(40)
-+        ordered_networks = device.get_ordered_networks('ssidTKIP', full_scan=True)
-+        self.assertIsNone(ordered_networks)
-+
-+        self.rule_bss0.enabled = False
-+
-+        ordered_networks = device.get_ordered_networks('ssidTKIP', full_scan=True)
-+        ends = [parts.split('/')[-1] for parts in network.extended_service_set]
-+
-+        self.assertIn(self.bss_hostapd[0].bssid.replace(':', ''), ends)
-+        self.assertNotIn(self.bss_hostapd[1].bssid.replace(':', ''), ends)
-+
-+    def tearDown(self):
-+        self.rule_bss0.enabled = False
-+        self.rule_bss1.enabled = False
-+
-+        self.wd.stop()
-+        self.wd.wait(10)
-+        self.wd = None
-+
-+    def setUp(self):
-+        self.wd = IWD(True)
-+
-+    @classmethod
-+    def setUpClass(cls):
-+        hwsim = Hwsim()
-+
-+        IWD.copy_to_storage('ssidTKIP.psk')
-+
-+        cls.bss_hostapd = [ HostapdCLI(config='ssidTKIP-1.conf'),
-+                            HostapdCLI(config='ssidTKIP-2.conf') ]
-+
-+
-+        rad0 = hwsim.get_radio('rad0')
-+        rad1 = hwsim.get_radio('rad1')
-+
-+        cls.rule_bss0 = hwsim.rules.create()
-+        cls.rule_bss0.source = rad0.addresses[0]
-+        cls.rule_bss0.bidirectional = True
-+        cls.rule_bss0.drop = True
-+
-+        cls.rule_bss1 = hwsim.rules.create()
-+        cls.rule_bss1.source = rad1.addresses[0]
-+        cls.rule_bss1.bidirectional = True
-+        cls.rule_bss1.drop = True
-+
-+
-+
-+    @classmethod
-+    def tearDownClass(cls):
-+        IWD.clear_storage()
-+        cls.bss_hostapd = None
-+        cls.rule_bss0.remove()
-+        cls.rule_bss1.remove()
-+
-+if __name__ == '__main__':
-+    unittest.main(exit=True)
-diff --git a/autotests/testBasicServiceSet/hw.conf b/autotests/testBasicServiceSet/hw.conf
-new file mode 100644
-index 00000000..ff1075fa
---- /dev/null
-+++ b/autotests/testBasicServiceSet/hw.conf
-@@ -0,0 +1,7 @@
-+[SETUP]
-+num_radios=3
-+hwsim_medium=yes
-+
-+[HOSTAPD]
-+rad0=ssidTKIP-1.conf
-+rad1=ssidTKIP-2.conf
-diff --git a/autotests/testBasicServiceSet/ssidTKIP-1.conf b/autotests/testBasicServiceSet/ssidTKIP-1.conf
-new file mode 100644
-index 00000000..11ef15f0
---- /dev/null
-+++ b/autotests/testBasicServiceSet/ssidTKIP-1.conf
-@@ -0,0 +1,7 @@
-+hw_mode=g
-+channel=1
-+ssid=ssidTKIP
-+
-+wpa=1
-+wpa_pairwise=TKIP
-+wpa_passphrase=secret123
-diff --git a/autotests/testBasicServiceSet/ssidTKIP-2.conf b/autotests/testBasicServiceSet/ssidTKIP-2.conf
-new file mode 100644
-index 00000000..0ed132c1
---- /dev/null
-+++ b/autotests/testBasicServiceSet/ssidTKIP-2.conf
-@@ -0,0 +1,7 @@
-+hw_mode=g
-+channel=2
-+ssid=ssidTKIP
-+
-+wpa=1
-+wpa_pairwise=TKIP
-+wpa_passphrase=secret123
-diff --git a/autotests/testBasicServiceSet/ssidTKIP.psk b/autotests/testBasicServiceSet/ssidTKIP.psk
-new file mode 100644
-index 00000000..85d25d8d
---- /dev/null
-+++ b/autotests/testBasicServiceSet/ssidTKIP.psk
-@@ -0,0 +1,5 @@
-+[Security]
-+Passphrase=secret123
-+
-+[Settings]
-+AutoConnect=False
--- 
-2.34.1
+I am back at this. Messed around for a *lot* trying to get it to
+connect via wpa_cli and connman and was unable to get it to connect. I
+find both connman and wpa_supplicant so tough to figure out what I am
+supposed to do to get it to work. I was able to, once, get wpa_cli to
+connect via wpa3 a while back, but no more. It does not appear that
+the current git version nor the default version of connman allow an
+SAE connection on the Pi...
 
+Finally, I was able to get it to connect using the current, default
+RPiOS wpa_supplicant and nmcli on a Pi5. No purpose built packages.
+just the defaults. Now to see if I can get it to work on the one I
+built using the later kernel that I built with the nlmon module. If I
+have luck, I'll post a log.
+
+On the hostapd computer:
+Aug 17 15:36:25 jackson hostapd[2204]: ap0: AP-STA-CONNECTED d8:3a:dd:d2:ae=
+:3c
+Aug 17 15:36:25 jackson hostapd[2204]: ap0: STA d8:3a:dd:d2:ae:3c
+RADIUS: starting accounting session ACB7F795BBC8FF5E
+Aug 17 15:36:25 jackson hostapd[2204]: ap0: STA d8:3a:dd:d2:ae:3c WPA:
+pairwise key handshake completed (RSN)
+Aug 17 15:36:25 jackson hostapd[2204]: ap0: EAPOL-4WAY-HS-COMPLETED
+d8:3a:dd:d2:ae:3c
+Aug 17 15:36:25 jackson hostapd[2204]: ap0: STA d8:3a:dd:d2:ae:3c
+RADIUS: starting accounting session ACB7F795BBC8FF5E
+Aug 17 15:36:25 jackson hostapd[2204]: ap0: STA d8:3a:dd:d2:ae:3c WPA:
+pairwise key handshake completed (RSN)
+
+and on the Pi:
+Aug 17 15:36:25 pi5 wpa_supplicant[669]: wlan0: Trying to associate
+with SSID 'deskSAE'
+Aug 17 15:36:25 pi5 NetworkManager[2142]: <info>  [1723926985.4925]
+device (wlan0): supplicant interface state: scanning -> associating
+Aug 17 15:36:25 pi5 NetworkManager[2142]: <info>  [1723926985.4925]
+device (p2p-dev-wlan0): supplicant management interface state:
+scanning -> a>
+Aug 17 15:36:25 pi5 wpa_supplicant[669]: wlan0: Associated with
+d8:3a:dd:60:a3:0c
+Aug 17 15:36:25 pi5 wpa_supplicant[669]: wlan0:
+CTRL-EVENT-SUBNET-STATUS-UPDATE status=3D0
+Aug 17 15:36:25 pi5 wpa_supplicant[669]: wlan0: WPA: Key negotiation
+completed with d8:3a:dd:60:a3:0c [PTK=3DCCMP GTK=3DCCMP]
+Aug 17 15:36:25 pi5 wpa_supplicant[669]: wlan0: CTRL-EVENT-CONNECTED -
+Connection to d8:3a:dd:60:a3:0c completed [id=3D0 id_str=3D]
+Aug 17 15:36:25 pi5 NetworkManager[2142]: <info>  [1723926985.6431]
+device (wlan0): supplicant interface state: associating -> completed
+Aug 17 15:36:25 pi5 NetworkManager[2142]: <info>  [1723926985.6432]
+device (wlan0): Activation: (wifi) Stage 2 of 5 (Device Configure)
+successfu>
+Aug 17 15:36:25 pi5 NetworkManager[2142]: <info>  [1723926985.6433]
+device (p2p-dev-wlan0): supplicant management interface state:
+associating ->
+Aug 17 15:36:25 pi5 NetworkManager[2142]: <info>  [1723926985.6441]
+device (wlan0): state change: config -> ip-config (reason 'none',
+sys-iface->
+Aug 17 15:36:25 pi5 NetworkManager[2142]: <info>  [1723926985.6452]
+dhcp4 (wlan0): activation: beginning transaction (timeout in 45
+seconds)
+Aug 17 15:36:25 pi5 avahi-daemon[542]: Registering new address record
+for fe80::d8bd:98f9:b458:1f79 on wlan0.*.
+Aug 17 15:36:25 pi5 NetworkManager[2142]: <info>  [1723926985.6629]
+dhcp4 (wlan0): state changed new lease, address=3D192.168.5.177
+
+root@pi5(rw):~# wpa_supplicant -v
+wpa_supplicant v2.10
+Copyright (c) 2003-2022, Jouni Malinen <j@w1.fi> and contributors
+root@pi5(rw):~# NetworkManager -V
+1.42.4
