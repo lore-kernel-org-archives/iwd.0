@@ -1,62 +1,62 @@
-Received: from mail-pg1-f182.google.com (mail-pg1-f182.google.com [209.85.215.182])
+Received: from mail-pg1-f179.google.com (mail-pg1-f179.google.com [209.85.215.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50A4B13A3F4
-	for <iwd@lists.linux.dev>; Mon, 19 Aug 2024 15:57:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F305613698B
+	for <iwd@lists.linux.dev>; Mon, 19 Aug 2024 15:57:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724083066; cv=none; b=KKBzHUsyUWjxup65zYNnL+XME5RZSrTuEd3rDXATlmyBX4Dspe30Haq8Cgh41na2hX6uqXog8WnI0ckHNxLIAVFs6LtE5iNULtIeFODChtRop+0yNhi1xugLUiT6f/9e2QjFaTiQhSlS00Gcri109dWF23B9pKtjt386XpEtZIA=
+	t=1724083068; cv=none; b=RGwm+A5A8QJWxmMr8YkeiMqEhZCFRYp/6+Z3k8vYm4/dee0BS2HbuwaxoDor/mv0QwXBbmDMJcIngi/PtpKmtJMydpDLHEBooitq1GXvJ/x7Gd+mPMSK0QogahvNjLsgRiDVG8bkh6TnGAPgm4WXOUObd2oZ+x4R8qGTV74cJDk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724083066; c=relaxed/simple;
-	bh=2HqIBExNRmwUHO+XHHwxK4p1f6S0ypn3Q0S/iPGc28k=;
+	s=arc-20240116; t=1724083068; c=relaxed/simple;
+	bh=RC1rsY0tGCRivMAspeEl23nEHI5GpA0HFim2qN46O1Y=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=r76HAfAS5XwoeCKjQXuFOV0BG782+dYeYyoSrH9DoGODLEvgRmHhjvRkmThAvGFoHQYEyAXfCQE/mRb5Y+O3Rk2f53CWQ1KajIk3giFyZM8IL2grttF90IcSZmwExRJo9ID8ZXQRwTp5rPqkdzHUvDXSVBZa+MacV5KanvZkArA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=M82SMlzQ; arc=none smtp.client-ip=209.85.215.182
+	 MIME-Version; b=QA1WYacJNhRAY9+IvyLhKSuXbTOBBd11AlkqdDZCsbIj3QKOSkVidlOqIoJkF481Jwq9ufPtKif3bw4WDTr0XifX9RUMHHQHFXfF8tqWj5w9adohPrs4PpDoJtqxyHW19UHOep/ItEYTmyLjssLP/DSwKgDiHUTRxwxo2u5WyvY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RYdF0WaS; arc=none smtp.client-ip=209.85.215.179
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="M82SMlzQ"
-Received: by mail-pg1-f182.google.com with SMTP id 41be03b00d2f7-6c5bcb8e8edso3337680a12.2
-        for <iwd@lists.linux.dev>; Mon, 19 Aug 2024 08:57:45 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RYdF0WaS"
+Received: by mail-pg1-f179.google.com with SMTP id 41be03b00d2f7-7a115c427f1so2699317a12.0
+        for <iwd@lists.linux.dev>; Mon, 19 Aug 2024 08:57:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1724083064; x=1724687864; darn=lists.linux.dev;
+        d=gmail.com; s=20230601; t=1724083066; x=1724687866; darn=lists.linux.dev;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=FkdPtJF6Yfs9+V2+uZ5QEN9qO8E9CKv0LgQx8qXBJyU=;
-        b=M82SMlzQ0/H2TbJtUJeVlrZW8z5/HcpzishEX+mrAQVt+ny53j1kYekADw7pZht7lQ
-         u0cI8AzCxr8v668c4yR9/U5hmuYo5a5lmWLel8JvDYgUODOLEU14owyuj/kJrHF/7tKk
-         jRMk2oyMtMv/gGLtsr2mPDydrRT9XFc6KFSzTQ/mwCVyWsqFS/WJnEXHJeWbbkawgoXd
-         EdNKZvbGjwwN5WFD5Yi4oWVWfWvIvUCxPZbYBVE3X402LpSIVt4KQEn68Y9Zg8KiResW
-         DEcxgiqG2vcp6GUbUBLucbXPCr5LckfoJ/k8XglVRfNbv3I10kn5eCDRc6/d6nDkNFsv
-         t+tg==
+        bh=GOtO/WMTZo4GLFRZfbqnYPS7ONYYi4bw8wetTO1+J64=;
+        b=RYdF0WaS9HBGSGWIJBPpV7M+0//HEN9WjAG7nou+C4ugGJFVfvll2YNKL83XkYaX39
+         zMQt+TnAG59sEAHc0UjOqQmrCy4OZbEzp/frKCiWhZb/xswqdCjRkULm684n434+qvBm
+         IwIBZbOhBl+M2TBUL4HLN3rm6kBipSlPzEnOAy9OnKIxe9tnhcL+mE4sZbbuanCYLjMz
+         82rwgBierZuFyQozn+KEIqYMEcbmQPVdEc4Azr7mvySPvIQrRVPnF0WR7rv4rv/sMXf4
+         FvD2Pk4fyOdobfZybY6N9fwRtcpIkxE58tg35WcLt7jYT2yO8Nd2BL9DUc9z/To4FrD2
+         pC/g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724083064; x=1724687864;
+        d=1e100.net; s=20230601; t=1724083066; x=1724687866;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=FkdPtJF6Yfs9+V2+uZ5QEN9qO8E9CKv0LgQx8qXBJyU=;
-        b=fY5Ai8aKcYpWzpkicJ/cNPgXa2N7Z18s0U+58Qr0du/WVkw6RgPtYr+bhpFXPqADZn
-         qBDgomAKBHr6SKZ0Y2NWNZ/nIvEp2ow7y3fo+Q+0SxtfaMms3T83cyio0/Yn4h3Ku34v
-         Lh2/wexAYGlcbuyuU1pHgPq9p/SCpM7Z0HPO0Snxy3xhg3/4w4GoUfGLox98aoVfsxGf
-         QJCOhjROzuibcHg8kLfQKg6SaQFbyahcp+jW0J9EoxmIvSLuiQw/zJBfnjzcp/XJbst2
-         /qbGbuSQmL/O9xn3J3YxB48+0va/XtRabG0KPZaUcnudNYXZh6fV57MluilEMG/f8rUF
-         JFbQ==
-X-Gm-Message-State: AOJu0YzFrCI0xV11kgG7RTnCCUZTWe8DORFCfN407BmDHz15axLrx1vz
-	NPshbBqSrwQfW6zrXBrd2r5zd+tGQ9Ppbu8yO0OMfsUHgkgaVzYFSMs0cQ==
-X-Google-Smtp-Source: AGHT+IFkVeS9t71cA08lZ8xMg/m9pRP9Lp5Gdjb393i5rUmWXbTOrgzOaVZfNDRCf7BYYioFgoG4gA==
-X-Received: by 2002:a05:6a20:6f05:b0:1c4:ba7c:741c with SMTP id adf61e73a8af0-1c904f91357mr14768318637.21.1724083064243;
-        Mon, 19 Aug 2024 08:57:44 -0700 (PDT)
+        bh=GOtO/WMTZo4GLFRZfbqnYPS7ONYYi4bw8wetTO1+J64=;
+        b=rnvMLfmo8fumKywP5AnJthJjiWW5LiMlGW1gQA63kjmXiRdl5b9HpJDH8VLULacj21
+         xfp9Ko7hDvPtQbEMYM57Yf4YL7+Uq7FqARcXjCW43/m3Nz6k671lZu2CxVOoAKE74X97
+         w6FPKeaw75kwOO5CG9Cz0+4ZbeWRfzR/SaONCRbzg7PJIqTuGXwerjbFc/UHvCucq+CS
+         nbF8DFQLvGatKg9e3WjISapAxdHovhvB4O+WWoVnZKanis2HqFh1mV/IU4HSwFAGtDGJ
+         acrewdmVOJtClWKR4fAi0I0anx1avwhGfOtPuy4quHJrOu6lj9gAHYGEvYaGsbQF0UxS
+         4OgQ==
+X-Gm-Message-State: AOJu0YxE7wnOSkXno8gp5lCmqwLv2i00W8ey1Pd2F8uMlXjY2ntAB+4G
+	mWrNQEgTXTj/SxHuvhSDMrTj05QL9fyONZayihKDoaI5Kj3j4Z9+y+1Xmw==
+X-Google-Smtp-Source: AGHT+IGc+KwtYW733TUBIqSq6VTb4DrJsVWvhE7Hxz878dOW7bXHBckZRKR8Ac6E52lsHA8PKh2XKw==
+X-Received: by 2002:a05:6a20:6f8a:b0:1c0:eba5:e192 with SMTP id adf61e73a8af0-1c904fb8e21mr11291845637.27.1724083065803;
+        Mon, 19 Aug 2024 08:57:45 -0700 (PDT)
 Received: from LOCLAP699.locus-rst-dev-locuspark.locus ([152.193.78.90])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7127ae0cb5asm6752277b3a.69.2024.08.19.08.57.42
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7127ae0cb5asm6752277b3a.69.2024.08.19.08.57.44
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 19 Aug 2024 08:57:43 -0700 (PDT)
+        Mon, 19 Aug 2024 08:57:45 -0700 (PDT)
 From: James Prestwood <prestwoj@gmail.com>
 To: iwd@lists.linux.dev
 Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH v2 3/6] network: remove BasicServiceSet DBus registration code
-Date: Mon, 19 Aug 2024 08:57:31 -0700
-Message-Id: <20240819155734.1276476-3-prestwoj@gmail.com>
+Subject: [PATCH v2 4/6] network: add back network_bss_list_clear
+Date: Mon, 19 Aug 2024 08:57:32 -0700
+Message-Id: <20240819155734.1276476-4-prestwoj@gmail.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240819155734.1276476-1-prestwoj@gmail.com>
 References: <20240819155734.1276476-1-prestwoj@gmail.com>
@@ -68,175 +68,53 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This was moved into station.
+Rename network_bss_update_start back to network_bss_list_clear, since
+this is what its now doing again.
 ---
- src/network.c | 100 ++------------------------------------------------
- src/network.h |   2 -
- 2 files changed, 4 insertions(+), 98 deletions(-)
+ src/network.c | 2 +-
+ src/network.h | 2 +-
+ src/station.c | 2 +-
+ 3 files changed, 3 insertions(+), 3 deletions(-)
 
 diff --git a/src/network.c b/src/network.c
-index a8e61d48..b9194b3c 100644
+index b9194b3c..300e8090 100644
 --- a/src/network.c
 +++ b/src/network.c
-@@ -75,7 +75,6 @@ struct network {
- 	struct l_ecc_point *sae_pt_20; /* SAE PT for Group 20 */
- 	unsigned int agent_request;
- 	struct l_queue *bss_list;
--	struct l_queue *old_bss_list;
- 	struct l_settings *settings;
- 	struct l_queue *secrets;
- 	struct l_queue *blacklist; /* temporary blacklist for BSS's */
-@@ -1147,101 +1146,20 @@ const char *network_bss_get_path(const struct network *network,
+@@ -1146,7 +1146,7 @@ const char *network_bss_get_path(const struct network *network,
  	return __network_path_append_bss(network->object_path, bss);
  }
  
--static bool network_unregister_bss(void *a, void *user_data)
--{
--	struct scan_bss *bss = a;
--	struct network *network = user_data;
--
--	l_dbus_unregister_object(dbus_get_bus(),
--					network_bss_get_path(network, bss));
--
--	l_dbus_property_changed(dbus_get_bus(), network->object_path,
--				IWD_NETWORK_INTERFACE, "ExtendedServiceSet");
--
--	return true;
--}
--
--static bool network_register_bss(struct network *network, struct scan_bss *bss)
--{
--	const char *path = network_bss_get_path(network, bss);
--	struct scan_bss *old;
--
--	/*
--	 * If we find this path in the object tree update the data to the new
--	 * scan_bss pointer, as this one will be freed soon.
--	 */
--	old = l_dbus_object_get_data(dbus_get_bus(), path, IWD_BSS_INTERFACE);
--	if (old)
--		return l_dbus_object_set_data(dbus_get_bus(), path,
--						IWD_BSS_INTERFACE, bss);
--
--	if (!l_dbus_object_add_interface(dbus_get_bus(), path,
--						IWD_BSS_INTERFACE, bss))
--		return false;
--
--	if (!l_dbus_object_add_interface(dbus_get_bus(), path,
--					L_DBUS_INTERFACE_PROPERTIES, bss))
--		return false;
--
--	l_dbus_property_changed(dbus_get_bus(), network->object_path,
--				IWD_NETWORK_INTERFACE, "ExtendedServiceSet");
--
--	return true;
--}
--
- void network_bss_start_update(struct network *network)
+-void network_bss_start_update(struct network *network)
++void network_bss_list_clear(struct network *network)
  {
--	network->old_bss_list = network->bss_list;
-+	l_queue_destroy(network->bss_list, NULL);
+ 	l_queue_destroy(network->bss_list, NULL);
  	network->bss_list = l_queue_new();
- }
- 
--void network_bss_stop_update(struct network *network,
--				const struct scan_freq_set *limit_freqs)
--{
--	const struct l_queue_entry *e;
--
--	/*
--	 * Update has finished, clean up any BSS's from the old list that have
--	 * been registered on DBus.
--	 */
--	for (e = l_queue_get_entries(network->old_bss_list); e; e = e->next) {
--		const struct scan_bss *old = e->data;
--		const struct scan_bss *bss;
--		const char *path = network_bss_get_path(network, old);
--
--		bss = l_dbus_object_get_data(dbus_get_bus(), path,
--						IWD_BSS_INTERFACE);
--
--		/*
--		 * Don't remove BSS's who's frequencies were not in the set.
--		 * This happens due to scan subsets (i.e. from station) so some
--		 * BSS's won't be seen since the frequency is not being scanned.
--		 * These BSS's will get cleared out eventually if they have
--		 * actually disappeared.
--		 */
--		if (!scan_freq_set_contains(limit_freqs, bss->frequency))
--			continue;
--
--		/*
--		 * The lookup matched the user data of an old BSS. This should
--		 * be unregistered from DBus
--		 */
--		if (bss && bss == old)
--			l_dbus_object_remove_interface(dbus_get_bus(), path,
--							IWD_BSS_INTERFACE);
--	}
--
--	l_queue_destroy(network->old_bss_list, NULL);
--	network->old_bss_list = NULL;
--}
--
- bool network_bss_add(struct network *network, struct scan_bss *bss)
- {
- 	if (!l_queue_insert(network->bss_list, bss, scan_bss_rank_compare,
- 									NULL))
- 		return false;
- 
--	network_register_bss(network, bss);
-+	l_dbus_property_changed(dbus_get_bus(), network->object_path,
-+				IWD_NETWORK_INTERFACE, "ExtendedServiceSet");
- 
- 	/* Done if BSS is not HS20 or we already have network_info set */
- 	if (!bss->hs20_capable)
-@@ -1276,8 +1194,6 @@ bool network_bss_update(struct network *network, struct scan_bss *bss)
- 
- 	l_queue_insert(network->bss_list, bss, scan_bss_rank_compare, NULL);
- 
--	network_register_bss(network, bss);
--
- 	/* Sync frequency for already known networks */
- 	if (network->info) {
- 		known_network_add_frequency(network->info, bss->frequency);
-@@ -1294,12 +1210,7 @@ bool network_bss_list_isempty(struct network *network)
- 
- struct scan_bss *network_bss_list_pop(struct network *network)
- {
--	struct scan_bss *bss = l_queue_pop_head(network->bss_list);
--
--	if (bss)
--		network_unregister_bss(bss, network);
--
--	return bss;
-+	return l_queue_pop_head(network->bss_list);
- }
- 
- struct scan_bss *network_bss_find_by_addr(struct network *network,
-@@ -2030,9 +1941,6 @@ static void network_unregister(struct network *network, int reason)
- 
- void network_remove(struct network *network, int reason)
- {
--	l_queue_foreach_remove(network->bss_list,
--				network_unregister_bss, network);
--
- 	if (network->object_path)
- 		network_unregister(network, reason);
- 
 diff --git a/src/network.h b/src/network.h
-index c9f73200..73d2ddb0 100644
+index 73d2ddb0..849051dd 100644
 --- a/src/network.h
 +++ b/src/network.h
-@@ -69,8 +69,6 @@ int network_can_connect_bss(struct network *network,
+@@ -68,7 +68,7 @@ int network_can_connect_bss(struct network *network,
+ 						const struct scan_bss *bss);
  int network_autoconnect(struct network *network, struct scan_bss *bss);
  void network_connect_failed(struct network *network, bool in_handshake);
- void network_bss_start_update(struct network *network);
--void network_bss_stop_update(struct network *network,
--				const struct scan_freq_set *freqs);
+-void network_bss_start_update(struct network *network);
++void network_bss_list_clear(struct network *network);
  bool network_bss_add(struct network *network, struct scan_bss *bss);
  bool network_bss_update(struct network *network, struct scan_bss *bss);
  const char *network_bss_get_path(const struct network *network,
+diff --git a/src/station.c b/src/station.c
+index 2a58c69a..6a28254b 100644
+--- a/src/station.c
++++ b/src/station.c
+@@ -1016,7 +1016,7 @@ void station_set_scan_results(struct station *station,
+ 	l_queue_foreach_remove(new_bss_list, bss_free_if_ssid_not_utf8, NULL);
+ 
+ 	while ((network = l_queue_pop_head(station->networks_sorted)))
+-		network_bss_start_update(network);
++		network_bss_list_clear(network);
+ 
+ 	l_queue_clear(station->hidden_bss_list_sorted, NULL);
+ 
 -- 
 2.34.1
 
