@@ -1,62 +1,62 @@
-Received: from mail-vs1-f47.google.com (mail-vs1-f47.google.com [209.85.217.47])
+Received: from mail-oo1-f50.google.com (mail-oo1-f50.google.com [209.85.161.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85E5018787E
-	for <iwd@lists.linux.dev>; Mon, 19 Aug 2024 17:52:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C02B416132E
+	for <iwd@lists.linux.dev>; Mon, 19 Aug 2024 17:52:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724089929; cv=none; b=OxVOCreO2EKbH8MU9l9ppIXClkpDJiyvPEfCWjV2gn3nSThhQyn9VNGzodpgLDikTmG+ZEwHHq6CfXT3vmqd464XGzulewzeqNxgIYNGGCg8Dky5DnxIDv2xAXpk7Dyq0NkVKcCquu59Yiu1N5GWta/Kcy91Gx8+Bf2ieZWpyCk=
+	t=1724089930; cv=none; b=kw34Bf0v44X9uBMaD5C9bO7ArRnyax8x0mrFEdoPF4/O38HkMFVlTxX51dymHvkbuWyMgiuwhtWs8r7284NfCvMJhex5P212ZfqzrRwES3O0y4WwcgvWqkwpnEiLGy20f6DT1PoNg1yVXhZjbxaLFvTtc2q+Tl19WBzxuo+v/5M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724089929; c=relaxed/simple;
-	bh=O2Tm/DmKVyNIBo1VCiKb2tFPdHzhCB6yuWw9ik1DHns=;
+	s=arc-20240116; t=1724089930; c=relaxed/simple;
+	bh=1pYxZdt/cb6QaZROUOt/UXNKrd4LBk55ZWX1Jek2/YY=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=MX7wvSJGupJtjwEOC6gMs/dI8MpTsKvf7nB/HiAdw+GgH6dIM/wkp0DZsJLJGPWzIQg4SjxOkDfPiXR2paNOUWoUYKIrZxqfyay/y8LFb22/8CEUKQMn48CJGItxzrdSUhJk3SpnZh8TdNeFo/SwcKKxIArSVnioeyWH+ZdcFfQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MHYsBIqv; arc=none smtp.client-ip=209.85.217.47
+	 MIME-Version; b=gLs3lUvZzj3Jp08+EyLkElwx8eLliM4yd89WYbnDPwhOsAvtebyqoNpnnHUTz3CXFyW4wyP65iAoR1Oygl2X/7Fhy6xp31gEfzGz2FpwQqB/TqUK3vGsBBtw/asae8Vdoya1XURueTY6+rZIB4uOTOc2yvidk6HtRVQifgpMUBA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UIs2SNQb; arc=none smtp.client-ip=209.85.161.50
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MHYsBIqv"
-Received: by mail-vs1-f47.google.com with SMTP id ada2fe7eead31-4928fa870a9so1342228137.2
-        for <iwd@lists.linux.dev>; Mon, 19 Aug 2024 10:52:07 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UIs2SNQb"
+Received: by mail-oo1-f50.google.com with SMTP id 006d021491bc7-5d82eb2c4feso3026752eaf.2
+        for <iwd@lists.linux.dev>; Mon, 19 Aug 2024 10:52:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1724089926; x=1724694726; darn=lists.linux.dev;
+        d=gmail.com; s=20230601; t=1724089927; x=1724694727; darn=lists.linux.dev;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=/p0vLPm1eouQISn2iDnK/ypztLjVsmPD/wZd6WRG3ek=;
-        b=MHYsBIqvyYWtNH3a5PFeBTyCSTpDLfmsr+xymY6a2NSpx+QF8CTrmn35i9Kz5P6cRs
-         bRadSD0afMpW/PHEMNoqowKmMDIDJQ5Ypy6NPoEBn7GYJ0Fg4r3sQY8Wlk2U+J9Geu97
-         hd0JfRTatkyX8kmeo7pkcWxLu3FKcmbX9xUtsYY5AI90QkgWK4IBFhfle0aIDmsDbMrT
-         R1Rsbn82eYXFFduvqwilVsTKHy0kupuuerEO51lsEwKdfm2JnMq3HUgZiIK4rH7aKOyH
-         7Zs0qbdu+0TEVMR/l2fj8ulrMWBwR8UvF1KAq3shuY4ynP5QPpvJehXQcFbmNwNy9PMR
-         tAhQ==
+        bh=6IFPs/YJKFaYy3RoCHH1SN5YV4xFWkPxPc6QvHkhBzc=;
+        b=UIs2SNQbR5ngGpyrDttLNIi88Gui37Fm0IMd1HL+7+wTXtWbaZlJS5XR+yS9LWbGeJ
+         tZXTGDltvq6azPmS2r/rQAtju5Mv8vq2HjUEBJW6UHeLzjQlLCczxwD7cyJjaxR5iuuZ
+         5OeBD7ROKORdKftvVvtvmoHHIOjg20giKKuxpwdi0Ov05o75CbK1e0HUc/w/fj7WO0Id
+         j80yAyOJqb7GNmyph2Oa+FwBzZXvIYotK4coeaoEiLvna52EwoUCt1JtW70q+209a6wI
+         ZZgCi1edMjr31MP52+JMKeSyaZ00ER2EKOWeeVNq5ucXcWjKgP8BhWDxdAdjjT1xWgAB
+         wPLA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724089926; x=1724694726;
+        d=1e100.net; s=20230601; t=1724089927; x=1724694727;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=/p0vLPm1eouQISn2iDnK/ypztLjVsmPD/wZd6WRG3ek=;
-        b=p4Kv6B2bYT5m1T/tndH2e8RcbvC1Iipama0woNFv3OD+crEJwQ0eCFv+D6BatKh9Td
-         OnvpcBMfd4pdO3UBCaqlJAj00trPjUnsVHMYLWrHTk8jWo/o2Eb8U92pns8eYrVwpQbf
-         /VCo91FlCh0YbpOvwj+xkMDlQbn3KfTAtrRzIGcA47iGyYhi8xF76p1UIoaVTqUzT6JE
-         x6JVIba1tbKClNUh6OS8EnRsvJmmB5XnbL4bqTXREIU93eZOdbpAdHRLxfiWu+6dBSrl
-         iedFASdzvtTUU0H2hAI0ZSkfLExKCagx0GE+u/HaSdVdnRppJlYn9jnL+n7gjmeLwEJJ
-         5Ahw==
-X-Gm-Message-State: AOJu0YwrN3EEjJEPWgIUHtBvDpq42O3+XImdL6TEbPLggqYeK1zf1vIi
-	tL4FWSH65UXIkppaNK/Zzkp6VcZCWbAxTg42LC0Jn4LgvOBJGwrGygyzuA==
-X-Google-Smtp-Source: AGHT+IEMcHF4F7tL8tmBHNdINOgSp1TO2ABU5TRAAh54bys+18walgod9Jbk2pyMFZ0l/eD8w3W7qw==
-X-Received: by 2002:a05:6102:1626:b0:497:70db:ffc5 with SMTP id ada2fe7eead31-49779930599mr9712945137.8.1724089926221;
-        Mon, 19 Aug 2024 10:52:06 -0700 (PDT)
+        bh=6IFPs/YJKFaYy3RoCHH1SN5YV4xFWkPxPc6QvHkhBzc=;
+        b=vc/Famnu1IQ+EULox3JOGtvWtEStNO6BTZWpwuMHao89kopocMj/TEYqQeP3Z/cK9/
+         7Ot/WlWh1tn8tIfW3v55g4fr8bw48mA4GwaxcG//dHmGsiL41Iz/LwIr/GDPllr0PaNJ
+         9//0f0vUP0vqyCFtis0vH1O1KNPYOLfV5VpoMmJ/HaGHPFK4PZ2pI8O2FAECQKcIZBrL
+         ISmHrDl6hcx1FwMuq/3u/i64hOYbAIS2jM26xpBJvaGvB3PqXC0qpoS3qx2ykxMT1xHj
+         ipggBiq7sEFcZ4VCxDbPcgMMJ9Bc12bPObcGRUZ3qQ+8yEavttYbbnbgfbKhQSLCSwRs
+         UKHQ==
+X-Gm-Message-State: AOJu0Yz3PxMeUYM0GDH7Si2uteebT4THJoH6IEgzv+qlALpHo2jgwXJY
+	bbVTCxfZr+vHx1M2jBVCQzVqh0aYPYkmUaaYqAEruwq0KW7MacZck2DVgA==
+X-Google-Smtp-Source: AGHT+IEt+YkZ+prg8ocwHalmf21Wx/6X559ZEQfXkSaPqBlF38hDD6B/ecZgTnGNtSKytB+6O3wMcQ==
+X-Received: by 2002:a05:6359:4c89:b0:1af:4626:7e42 with SMTP id e5c5f4694b2df-1b39330c7ecmr1398627655d.25.1724089927493;
+        Mon, 19 Aug 2024 10:52:07 -0700 (PDT)
 Received: from LOCLAP699.locus-rst-dev-locuspark.locus ([152.193.78.90])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7a4ff0e5a1csm451854685a.74.2024.08.19.10.52.05
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7a4ff0e5a1csm451854685a.74.2024.08.19.10.52.06
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 19 Aug 2024 10:52:05 -0700 (PDT)
+        Mon, 19 Aug 2024 10:52:07 -0700 (PDT)
 From: James Prestwood <prestwoj@gmail.com>
 To: iwd@lists.linux.dev
 Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH v2 6/8] station: Use Affinities property to change roaming threshold
-Date: Mon, 19 Aug 2024 10:51:49 -0700
-Message-Id: <20240819175151.1310546-6-prestwoj@gmail.com>
+Subject: [PATCH v2 7/8] auto-t: add affinities property for station, and extended_service_set
+Date: Mon, 19 Aug 2024 10:51:50 -0700
+Message-Id: <20240819175151.1310546-7-prestwoj@gmail.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240819175151.1310546-1-prestwoj@gmail.com>
 References: <20240819175151.1310546-1-prestwoj@gmail.com>
@@ -68,63 +68,46 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-When the affinity is set to the current BSS lower the roaming
-threshold to loosly lock IWD to the current BSS. The lower
-threshold is automatically removed upon roaming/disconnection
-since the affinity array is also cleared out.
 ---
- src/station.c | 17 +++++++++++++++++
- 1 file changed, 17 insertions(+)
+ autotests/util/iwd.py | 18 ++++++++++++++++++
+ 1 file changed, 18 insertions(+)
 
-diff --git a/src/station.c b/src/station.c
-index 3b64cd75..31faa5e8 100644
---- a/src/station.c
-+++ b/src/station.c
-@@ -4580,6 +4580,9 @@ static void station_affinity_disconnected_cb(struct l_dbus *dbus,
- 	station->affinity_watch = 0;
+diff --git a/autotests/util/iwd.py b/autotests/util/iwd.py
+index 74bb25c0..83f2d9ef 100755
+--- a/autotests/util/iwd.py
++++ b/autotests/util/iwd.py
+@@ -596,6 +596,11 @@ class Device(IWDDBusAbstract):
+         props = self._station_properties()
+         return props.get('ConnectedNetwork')
  
- 	l_debug("client that set affinity has disconnected");
++    @property
++    def connected_bss(self):
++        props = self._station_properties()
++        return props.get('ConnectedAccessPoint')
 +
-+	/* The client who set the affinity disconnected, raise the threshold */
-+	netdev_raise_signal_threshold(station->netdev);
- }
+     @property
+     def powered(self):
+         '''
+@@ -630,6 +635,19 @@ class Device(IWDDBusAbstract):
+         self._station_debug._prop_proxy.Set(IWD_STATION_DEBUG_INTERFACE,
+                                             'AutoConnect', value)
  
- static void station_affinity_watch_destroy(void *user_data)
-@@ -4609,6 +4612,7 @@ static struct l_dbus_message *station_property_set_affinities(
- 	const char *sender = l_dbus_message_get_sender(message);
- 	const char *path;
- 	struct l_queue *new_affinities;
-+	bool lower_threshold = false;
- 
- 	if (!station->connected_network)
- 		return dbus_error_not_connected(message);
-@@ -4645,6 +4649,8 @@ static struct l_dbus_message *station_property_set_affinities(
- 			return dbus_error_invalid_args(message);
- 		}
- 
-+		lower_threshold = true;
++    @property
++    def affinities(self):
++        return self._station_properties()['Affinities']
 +
- 		l_queue_push_head(new_affinities, l_strdup(path));
- 	}
- 
-@@ -4654,6 +4660,17 @@ static struct l_dbus_message *station_property_set_affinities(
- 	l_dbus_property_changed(dbus, netdev_get_path(station->netdev),
- 				IWD_STATION_INTERFACE, "Affinities");
- 
-+	/*
-+	 * If affinity was set to the current BSS, lower the roam threshold. If
-+	 * the connected BSS was not in the list raise the signal threshold.
-+	 * The threshold may already be raised, in which case netdev will detect
-+	 * this and do nothing.
-+	 */
-+	if (lower_threshold)
-+		netdev_lower_signal_threshold(station->netdev);
-+	else
-+		netdev_raise_signal_threshold(station->netdev);
++    @affinities.setter
++    def affinities(self, values):
++        self._station_properties()
++        self._station_prop_if.Set(
++            IWD_STATION_INTERFACE, 'Affinities',
++            dbus.Array([dbus.ObjectPath(v) for v in values], signature="o"),
++            reply_handler=self._success, error_handler=self._failure)
++        self._wait_for_async_op()
 +
- 	complete(dbus, message, NULL);
+     def scan(self, wait=True):
+         '''Schedule a network scan.
  
- 	return NULL;
 -- 
 2.34.1
 
