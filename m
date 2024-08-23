@@ -1,62 +1,62 @@
-Received: from mail-oo1-f44.google.com (mail-oo1-f44.google.com [209.85.161.44])
+Received: from mail-ot1-f52.google.com (mail-ot1-f52.google.com [209.85.210.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90B6A18BB83
-	for <iwd@lists.linux.dev>; Fri, 23 Aug 2024 18:00:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCEB218DF62
+	for <iwd@lists.linux.dev>; Fri, 23 Aug 2024 18:00:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724436021; cv=none; b=iFC/0TFpuwjrgxRQTkxkoe5BeUodJwa41KBFjpCJkf8DcMjDVa6ZzdRRYtvd36bjtllZ+e/0QcCzwd8qmT9mqhp5/Mtavvy94WCpTuDFE1oM+YSe1dfheByUg5+L6fBGvq4Ywp9NZNftNyoWRXnxSqsUYAIc2xsiyNpxpIldMB0=
+	t=1724436022; cv=none; b=ag78ldjcPou3w5yJAddpaK3HC9QgjBnP/Y3w4QDvsn+Z8HL8k+9NUWBqfoBDPbj8/3/R14jkhyvGiz5/vDiW5nbvzopnvbcddnc2PrU2cFe+fmZavR/KUuyk4OPpqvMREpklzuGhJnm38EIbveC1l0gDmDWwOZe2VA6hY34X+YY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724436021; c=relaxed/simple;
-	bh=btwTRtLqSGcWqZ6Ne9I+fe1S4wcBvGWmUpVBKLImO7c=;
+	s=arc-20240116; t=1724436022; c=relaxed/simple;
+	bh=ZljTQtXq98cRA+kwtS2Z0zd4CWtfUqva1KNY1MkV0Go=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=dHfpEaBdcVwwNEa4AvpJaXMmG2Yf4xJ4oeQLJuFpCLXvM0V9R03nLlDC1xvu1Wpxsaf0vJvGYNmhFzFK7kPdz+ChhwN0JX3lDAIKM7mz/vvOZhTuSf7BTI1lpq1478lS6tBFB4viviGr2KkM7z1w18BaPGqE0UxG+kcvSNVMjsE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WnwUDVdC; arc=none smtp.client-ip=209.85.161.44
+	 MIME-Version; b=jKwxDEg5C9N7kb6oXh8l5Y0fOq+ODHBB3qqan0eY55YSeueYApyaUc2eZ6tiHzecHaf1XJ7+KRdUHeF3BvOCIWo+PaWbY2TuclPX4WjlwMA7WCdPK+B34AMipqfDKdBssQdxWCywWC92HhND9fiwNjSzlVjZqaVgdWyK3+mlOfA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IAjFyvv4; arc=none smtp.client-ip=209.85.210.52
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WnwUDVdC"
-Received: by mail-oo1-f44.google.com with SMTP id 006d021491bc7-5da686531d3so1675168eaf.3
-        for <iwd@lists.linux.dev>; Fri, 23 Aug 2024 11:00:19 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IAjFyvv4"
+Received: by mail-ot1-f52.google.com with SMTP id 46e09a7af769-7094468d392so1764896a34.0
+        for <iwd@lists.linux.dev>; Fri, 23 Aug 2024 11:00:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1724436018; x=1725040818; darn=lists.linux.dev;
+        d=gmail.com; s=20230601; t=1724436019; x=1725040819; darn=lists.linux.dev;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=N/gRqrTjMi6ShOPOHtkjCdl7RgioLdEkQjLXtXh16+U=;
-        b=WnwUDVdC7r5xGyZE6nGQvjOCjSw6pc0j718eVQu0x7p5C7gyqX7bcS/Ud2+j+W3s3k
-         wwLKB4aGml/oK+mxl0xmJT8gLksVI+NMUg2Z4V5yZm/t1yXoKl7rRzjZjudmMNkNX3qj
-         zeAy/L6r/az/kRUECFLUvsPex4kGjIfGjxMkFDH5oqYfo9YP2GIBPiLZhjOBXlgnYkTI
-         C51JRlw7lCMAU1D5axFBNGm3Ce8Oirghc762E8wwNMjX075tObhSNyFyn3hi6mdYfMFa
-         ELkbReh+PnGoDK+aPLmdqni+IMnkAy673SGRMUzGlNLOGJWLaaSS4wQyDeHuer0Yi5M+
-         2f9g==
+        bh=9jkjOZ/MabxyN8XvAZyvEOd32VeO/sg6Mr+9d65TU/o=;
+        b=IAjFyvv4B35YDdzC7kUubX6aoxByG53yXjSaESTHF84fqpNRAUMps9cPInnreOQBtq
+         JdjDIHJuReMfzbdZJ8Rpc+LWZnq0UNvH8QmEZl62gAGqZ+Xd459mQgHPk2rx5/Hiw7z/
+         R4dNBQ/UrpFwDtPCx4V2YWYPKimsj1lofNiP4MQyLgUQ47d/BmLTk2D5pHD7tBHGOCLP
+         EtNrW1XnhFSakOkO03lTLyoRKzz/S9L49VUtFu+Opsv2Y6wTm59JgGbgQPOnsW9sbnC3
+         ohFWk8321Znpdw1UVyX0Q6JDf42B0DU23JOhATrP2pwnX10dQ3/lqeypuAICS9z2qimq
+         Y/rw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724436018; x=1725040818;
+        d=1e100.net; s=20230601; t=1724436019; x=1725040819;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=N/gRqrTjMi6ShOPOHtkjCdl7RgioLdEkQjLXtXh16+U=;
-        b=fpWN3/+WqNDfdWTXwxJ6ubystybfm0l2lPe8VH+ugHsG4ONcIPUZ+ResHdwok8HCmq
-         bwlRl8j3M0KHvPZk7jftUF5dHJjHFNIf+TJ+eQHVb6xqVJ9A8sPhYAsL7+Gt8eHfnwYn
-         woIE17Lq/O4dXIMsot8IouVXtpAQtGqblbdxji0zgHiHLyRfq8LRiVcZiK6mtBl43HVS
-         /yn1NS5m2pP/DQYmAzS1zLsGaedtJgesAQ8AnR5Ef6hBhby4ydSwbrVdPyP0JC17d99v
-         p16PAru6q0KEofv/+0WuYOy3aX/JYsYoCj+0tWf8toW/2s1e2MQ8BXSQqhK2gF0XS2ej
-         bEMg==
-X-Gm-Message-State: AOJu0YwGRzrNa/vM9uh55kbBnBQmSF+Mpx8KRXj/YQ/7kIdFOjzsJt0X
-	CDOryoT7haN2HF0DQcBx7mkcKv86OXcm7dj9AIZg52TJGrHg4bUPmFn6Mw==
-X-Google-Smtp-Source: AGHT+IEI/bfkUIU+TUk5wbyhDsTOAfJE2AHITDR5iNf83MEB+46DJm/FiqrHunwVIA5rkl18+ETFhg==
-X-Received: by 2002:a05:6808:bc7:b0:3de:ed0:680 with SMTP id 5614622812f47-3de2a86ef6emr3007531b6e.3.1724436018252;
-        Fri, 23 Aug 2024 11:00:18 -0700 (PDT)
+        bh=9jkjOZ/MabxyN8XvAZyvEOd32VeO/sg6Mr+9d65TU/o=;
+        b=u3vVcCUyYdyqnSBX2u/cSM/ZXp+oj46q49PN4AD0mxeL41ltn9A5BSc/pWdgUeQVKD
+         eA4eLdmg26nx0ZOHkBOWFgY53F7M2wb7wGOh+34OlwQebaIAivAqRXIC+ZZ9ZjCcc4cj
+         qJ5nGxvlPifMwBpj0whB9i2U13dHyRTrOlbTMouJEOw2YtZ+ONBvRWlVL53iQS5LTBiw
+         qRmXRX8MZZoSSAWQxRwnQjVrIYW7wpIoonzhs3XRJdo1nYvzppxSCZx6jftS76qBjHcL
+         JR+WGvdBVKzSbYKbIOsJxNKaKsJ/HCOjTNPf40XzJDYjSD6Gjnc0U+G2Mh5cWYDeXlBq
+         mwsQ==
+X-Gm-Message-State: AOJu0Yy084pibcECeSsjKF1YbYSZg/oPHWg7TWDDH3fp5Ci100JKaMZr
+	1qm4yC1reGyueELUsWa4uHEbv4u+44b73BF/mn6G6Uh3//ACcw4+SVpTkg==
+X-Google-Smtp-Source: AGHT+IHsoZXs8m7peX7Jcxy0rhlHAJM0IYWfGBkGHPtPwHSKZNo3r0ZagHnt7k3cTER1HlBq+BtZzw==
+X-Received: by 2002:a05:6830:2645:b0:703:79f5:fabb with SMTP id 46e09a7af769-70e0eb0d34emr3127681a34.11.1724436019557;
+        Fri, 23 Aug 2024 11:00:19 -0700 (PDT)
 Received: from LOCLAP699.locus-rst-dev-locuspark.locus ([152.193.78.90])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-454fe0f0507sm19683131cf.47.2024.08.23.11.00.17
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-454fe0f0507sm19683131cf.47.2024.08.23.11.00.18
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 23 Aug 2024 11:00:17 -0700 (PDT)
+        Fri, 23 Aug 2024 11:00:19 -0700 (PDT)
 From: James Prestwood <prestwoj@gmail.com>
 To: iwd@lists.linux.dev
 Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH v3 3/8] netdev: store signal threshold in netdev object, not globally
-Date: Fri, 23 Aug 2024 11:00:01 -0700
-Message-Id: <20240823180006.317353-3-prestwoj@gmail.com>
+Subject: [PATCH v3 4/8] netdev: add critical signal threshold level
+Date: Fri, 23 Aug 2024 11:00:02 -0700
+Message-Id: <20240823180006.317353-4-prestwoj@gmail.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240823180006.317353-1-prestwoj@gmail.com>
 References: <20240823180006.317353-1-prestwoj@gmail.com>
@@ -68,81 +68,138 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This prepares for the ability to toggle between two signal
-thresholds in netdev. Since each netdev may not need/want the
-same threshold store it in the netdev object rather than globally.
+This adds a secondary set of signal thresholds. The purpose of these
+are to provide more flexibility in how IWD roams. The critical
+threshold is intended to be temporary and is automatically reset
+upon any connection changes: disconnects, roams, or new connections.
 ---
- src/netdev.c | 22 ++++++++++++++--------
- 1 file changed, 14 insertions(+), 8 deletions(-)
+ src/netdev.c | 51 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ src/netdev.h |  5 +++++
+ 2 files changed, 56 insertions(+)
+
+v3:
+ * Moved the new settings into a #define in netdev.h
 
 diff --git a/src/netdev.c b/src/netdev.c
-index 4d6aae6b..e392c654 100644
+index e392c654..cd3cfc78 100644
 --- a/src/netdev.c
 +++ b/src/netdev.c
-@@ -172,6 +172,9 @@ struct netdev {
- 
- 	struct netdev_ext_key_info *ext_key_info;
- 
-+	int low_signal_threshold;
-+	int low_signal_threshold_5ghz;
-+
- 	bool connected : 1;
- 	bool associated : 1;
- 	bool operational : 1;
-@@ -206,6 +209,9 @@ static struct l_genl_family *nl80211;
- static struct l_queue *netdev_list;
- static struct watchlist netdev_watches;
- static bool mac_per_ssid;
-+/* Threshold RSSI for roaming to trigger, configurable in main.conf */
-+static int LOW_SIGNAL_THRESHOLD;
-+static int LOW_SIGNAL_THRESHOLD_5GHZ;
+@@ -212,6 +212,8 @@ static bool mac_per_ssid;
+ /* Threshold RSSI for roaming to trigger, configurable in main.conf */
+ static int LOW_SIGNAL_THRESHOLD;
+ static int LOW_SIGNAL_THRESHOLD_5GHZ;
++static int CRITICAL_SIGNAL_THRESHOLD;
++static int CRITICAL_SIGNAL_THRESHOLD_5GHZ;
  
  static unsigned int iov_ie_append(struct iovec *iov,
  					unsigned int n_iov, unsigned int c,
-@@ -1058,10 +1064,6 @@ struct netdev *netdev_find(int ifindex)
- 	return l_queue_find(netdev_list, netdev_match, L_UINT_TO_PTR(ifindex));
+@@ -841,6 +843,10 @@ static void netdev_connect_free(struct netdev *netdev)
+ 		l_genl_family_cancel(nl80211, netdev->get_oci_cmd_id);
+ 		netdev->get_oci_cmd_id = 0;
+ 	}
++
++	/* Reset thresholds back to default */
++	netdev->low_signal_threshold = LOW_SIGNAL_THRESHOLD;
++	netdev->low_signal_threshold_5ghz = LOW_SIGNAL_THRESHOLD_5GHZ;
  }
  
--/* Threshold RSSI for roaming to trigger, configurable in main.conf */
--static int LOW_SIGNAL_THRESHOLD;
--static int LOW_SIGNAL_THRESHOLD_5GHZ;
--
- static void netdev_cqm_event_rssi_threshold(struct netdev *netdev,
- 						uint32_t rssi_event)
- {
-@@ -1089,8 +1091,9 @@ static void netdev_cqm_event_rssi_value(struct netdev *netdev, int rssi_val)
- {
- 	bool new_rssi_low;
- 	uint8_t prev_rssi_level_idx = netdev->cur_rssi_level_idx;
--	int threshold = netdev->frequency > 4000 ? LOW_SIGNAL_THRESHOLD_5GHZ :
--						LOW_SIGNAL_THRESHOLD;
-+	int threshold = netdev->frequency > 4000 ?
+ static void netdev_connect_failed(struct netdev *netdev,
+@@ -3674,6 +3680,39 @@ static int netdev_cqm_rssi_update(struct netdev *netdev)
+ 	return 0;
+ }
+ 
++static int netdev_set_signal_thresholds(struct netdev *netdev, int threshold,
++					int threshold_5ghz)
++{
++	int current = netdev->frequency > 4000 ?
 +					netdev->low_signal_threshold_5ghz :
 +					netdev->low_signal_threshold;
- 
- 	if (!netdev->connected)
- 		return;
-@@ -3585,8 +3588,9 @@ static struct l_genl_msg *netdev_build_cmd_cqm_rssi_update(
- 	uint32_t hyst = 5;
- 	int thold_count;
- 	int32_t thold_list[levels_num + 2];
--	int threshold = netdev->frequency > 4000 ? LOW_SIGNAL_THRESHOLD_5GHZ :
--						LOW_SIGNAL_THRESHOLD;
-+	int threshold = netdev->frequency > 4000 ?
-+					netdev->low_signal_threshold_5ghz :
-+					netdev->low_signal_threshold;
- 
- 	if (levels_num == 0) {
- 		thold_list[0] = threshold;
-@@ -6163,6 +6167,8 @@ struct netdev *netdev_create_from_genl(struct l_genl_msg *msg,
- 	l_strlcpy(netdev->name, ifname, IFNAMSIZ);
- 	netdev->wiphy = wiphy;
- 	netdev->pae_over_nl80211 = pae_io == NULL;
++	int new = netdev->frequency > 4000 ? threshold_5ghz : threshold;
++
++	if (current == new)
++		return -EALREADY;
++
++	l_debug("changing low signal threshold to %d", new);
++
++	netdev->low_signal_threshold = threshold;
++	netdev->low_signal_threshold_5ghz = threshold_5ghz;
++
++	netdev_cqm_rssi_update(netdev);
++
++	return 0;
++}
++
++int netdev_lower_signal_threshold(struct netdev *netdev)
++{
++	return netdev_set_signal_thresholds(netdev, CRITICAL_SIGNAL_THRESHOLD,
++						CRITICAL_SIGNAL_THRESHOLD_5GHZ);
++}
++
++int netdev_raise_signal_threshold(struct netdev *netdev)
++{
++	return netdev_set_signal_thresholds(netdev, LOW_SIGNAL_THRESHOLD,
++						LOW_SIGNAL_THRESHOLD_5GHZ);
++}
++
+ static bool netdev_connection_work_ready(struct wiphy_radio_work_item *item)
+ {
+ 	struct netdev *netdev = l_container_of(item, struct netdev, work);
+@@ -3887,6 +3926,8 @@ done:
+ 	netdev->handshake = hs;
+ 	netdev->sm = sm;
+ 	netdev->cur_rssi = bss->signal_strength / 100;
 +	netdev->low_signal_threshold = LOW_SIGNAL_THRESHOLD;
 +	netdev->low_signal_threshold_5ghz = LOW_SIGNAL_THRESHOLD_5GHZ;
  
- 	if (set_mac)
- 		memcpy(netdev->set_mac_once, set_mac, 6);
+ 	if (netdev->rssi_levels_num)
+ 		netdev_set_rssi_level_idx(netdev);
+@@ -4260,6 +4301,8 @@ int netdev_ft_reassociate(struct netdev *netdev,
+ 	netdev->event_filter = event_filter;
+ 	netdev->connect_cb = cb;
+ 	netdev->user_data = user_data;
++	netdev->low_signal_threshold = LOW_SIGNAL_THRESHOLD;
++	netdev->low_signal_threshold_5ghz = LOW_SIGNAL_THRESHOLD_5GHZ;
+ 
+ 	/*
+ 	 * Cancel commands that could be running because of EAPoL activity
+@@ -6278,6 +6321,14 @@ static int netdev_init(void)
+ 					&LOW_SIGNAL_THRESHOLD_5GHZ))
+ 		LOW_SIGNAL_THRESHOLD_5GHZ = -76;
+ 
++	if (!l_settings_get_int(settings, NETDEV_CRITICAL_ROAM_THRESHOLD,
++					&CRITICAL_SIGNAL_THRESHOLD))
++		CRITICAL_SIGNAL_THRESHOLD = -80;
++
++	if (!l_settings_get_int(settings, NETDEV_CRITICAL_ROAM_THRESHOLD_5G,
++					&CRITICAL_SIGNAL_THRESHOLD_5GHZ))
++		CRITICAL_SIGNAL_THRESHOLD_5GHZ = -82;
++
+ 	rand_addr_str = l_settings_get_value(settings,
+ 						NETDEV_ADDRESS_RANDOMIZATION);
+ 	if (rand_addr_str && !strcmp(rand_addr_str, "network"))
+diff --git a/src/netdev.h b/src/netdev.h
+index d718fa6a..46845c36 100644
+--- a/src/netdev.h
++++ b/src/netdev.h
+@@ -33,6 +33,9 @@ struct diagnostic_station_info;
+ #define NETDEV_ADDRESS_RANDOMIZATION GENERAL, "AddressRandomization"
+ #define NETDEV_ROAM_THRESHOLD GENERAL, "RoamTreshold"
+ #define NETDEV_ROAM_TRHESHOLD_5G GENERAL, "RoamThreshold5G"
++#define NETDEV_CRITICAL_ROAM_THRESHOLD GENERAL, "CriticalRoamThreshold"
++#define NETDEV_CRITICAL_ROAM_THRESHOLD_5G GENERAL, "CriticalRoamThreshold5G"
++
+ 
+ enum netdev_result {
+ 	NETDEV_RESULT_OK,
+@@ -202,6 +205,8 @@ int netdev_neighbor_report_req(struct netdev *netdev,
+ 
+ int netdev_set_rssi_report_levels(struct netdev *netdev, const int8_t *levels,
+ 					size_t levels_num);
++int netdev_lower_signal_threshold(struct netdev *netdev);
++int netdev_raise_signal_threshold(struct netdev *netdev);
+ 
+ int netdev_get_station(struct netdev *netdev, const uint8_t *mac,
+ 			netdev_get_station_cb_t cb, void *user_data,
 -- 
 2.34.1
 
