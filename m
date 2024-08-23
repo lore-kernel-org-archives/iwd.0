@@ -1,59 +1,59 @@
-Received: from mail-ot1-f46.google.com (mail-ot1-f46.google.com [209.85.210.46])
+Received: from mail-oa1-f42.google.com (mail-oa1-f42.google.com [209.85.160.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3059A18594C
-	for <iwd@lists.linux.dev>; Fri, 23 Aug 2024 17:24:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 686598488
+	for <iwd@lists.linux.dev>; Fri, 23 Aug 2024 17:31:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724433855; cv=none; b=twyP59DI3veZHVM/kk5VGT0WtKDjjiPeyJykeXDy1E9sRYpfZzGBjegJamlk7YBdz1X444+nrNycO6DFR0wdBxqAYHDNESXBWpD2cWwyOb5d6gG/y+06DMyWuwP49AWxA35G57l63tOQ+nJEJja1m2pEo569fJOYB3wo3C0kTo0=
+	t=1724434283; cv=none; b=bLCJnNV9H6ZsGeH+36h5st1+YoSR9r9QfFSHfHW5dmdrPyS2GRt1+WVX0AwqfY2c6eMSg4YXH+gaKuqEZswfPlcTi6lcjrJYeT3RkSFXZtu/A7H5ASegjqKXygzXd4xIQwcStqxKG/KmJlaenaNyh/dFcXyDbytAUVYl+XoIW5Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724433855; c=relaxed/simple;
-	bh=NqsWr/fPfK3HeGl9rI5ptDjTI+v3oBxVsxc2DGjvDzE=;
+	s=arc-20240116; t=1724434283; c=relaxed/simple;
+	bh=hDe/+HazXrZ8gIaCzCOH3S88KUS9QIS00IjIfV2iwa0=;
 	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=GjrQGjFFn0O7ZWJqNz4ILkuYrXzlJegNFYRYnVR00Sb/IK2zF7aA9tExhqqL6bnfMkgpohgmDOMplrBuS2258Tnweqtn/JqovFDCV4tdGhZorAsMyo3hFTAQD0CbLi5ZznElu5zDznn3Qyj6Co1Fkgvgvl9G+hQpxXYPrHyaEyY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aaQADv95; arc=none smtp.client-ip=209.85.210.46
+	 In-Reply-To:Content-Type; b=OZnjV7vzPRZqA3QcJhhx2FlFsHeDoL0V3oxCKGHxfnaOIcJ8Ems623HJzlBwgFUgM5KudcZskcK0mgrzHhaLFLfu+sJCljizIGtQmWNs5Hv10d5WejsfvDWDMMecyXRy5Ldgq8/IqlYC8ksKuvLVGX7v9BPI+f/1IFQjxnVQEmg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=X9WbZvWV; arc=none smtp.client-ip=209.85.160.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aaQADv95"
-Received: by mail-ot1-f46.google.com with SMTP id 46e09a7af769-70945a007f0so1819204a34.2
-        for <iwd@lists.linux.dev>; Fri, 23 Aug 2024 10:24:14 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="X9WbZvWV"
+Received: by mail-oa1-f42.google.com with SMTP id 586e51a60fabf-2701c010388so1396907fac.0
+        for <iwd@lists.linux.dev>; Fri, 23 Aug 2024 10:31:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1724433853; x=1725038653; darn=lists.linux.dev;
+        d=gmail.com; s=20230601; t=1724434281; x=1725039081; darn=lists.linux.dev;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:to:subject:user-agent:mime-version:date:message-id:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=ty5CmpcLfJ8w0wet6waN1TqYu26HE618P0LAyZtYt6s=;
-        b=aaQADv95mS7h8Fe83ZruFa9efTZTisW+yE8Wx9zUy5NO89yeOg8OukfRHVN3dpQr8O
-         FrDiD2F/9sNz2qFcrBSbw6LcskZoukSczagJOMXVCpC0CCLkVU9qEq1ZoA3Vlq+jIYtM
-         od6vKGW8mOVZ7xLOlszfegVuHfzO5fF78Ye8tU15aHEqb8RedMfJXYy99Flxpvs3+uWo
-         V0SF4HfH/CLVhraP3xa+RqF/oAlQ0g4Amr9/jsPlgmmiIeiJJ/eCHfHCF+oDW93MzR/g
-         gUA46ZyGXHAvuxn19V2XVjO1Nb8HeMDq63hWEkz5dkROjVgOZ/afCKyk3wBn5VCjnjHZ
-         WcIw==
+        bh=dnLnTh119A3RWkef9yN2B3w4lQzPk9GOiDwkQpiN8lU=;
+        b=X9WbZvWVdxWYwi6R6nVIcsfxkK7EMqXyeebNavBtMa77jbg/aeCVPfcOCogdpvh4lt
+         aKGuWEZq6AhNvzT/knZBWe5u7LTZs92hHLZf3jaY61UaSjBy6kkjXxkZD0gMFfacJXJy
+         Hy5fPmHJm4LeYqmLIEuaxBArGxHCP9jdmpPcOvWIJEFWCKd2+M7hJPumzOuNsXWZemng
+         ir8crmbT6mU9adNgTpR4OdOo5MPaz5itxLNASzICOu24dcQV/c2UoXKPBCKWQLGxjgBZ
+         o35Pw87lBGLSYgiW7NYJqCHAAlEsmlpAUrvLTn6U/+GdTteL4HWVRPBc/mbvczODWOzK
+         1IoA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724433853; x=1725038653;
+        d=1e100.net; s=20230601; t=1724434281; x=1725039081;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ty5CmpcLfJ8w0wet6waN1TqYu26HE618P0LAyZtYt6s=;
-        b=TGSSPmiIKWRPBqsTiGgNWu6SFN5mmr3rDVO+QZJeuLcP72zfv7XlhP+e+rslD7aXi2
-         aKt7COuvSYwujeOX4mHkc77BRaszFdRqhT9EOG+iY+QUKI149P1Z0yfcG5obwbJvpm6h
-         +95n/Bpm3J/U/dbbc71glkfqolBnUbZD0UwT0s36Qbn4ag3zWYpFm1+7jsBGkWQvRqyc
-         KFhkOKdi116IDHTjP2IhC4h4G6AR8X7s2TZMDT4qgHbbitj8t61EmeoqQOUdTSfWMFxa
-         MVb/TaJkl/Pq0lZ2210OpuxejcH7izpLJHcoEvPbTaPfkceylh9IU/yzDjBY4Y3/eHSL
-         DfKw==
-X-Gm-Message-State: AOJu0Yx6c4LxhTsq23MdlxaaiMImUt1W3VYW5zy68seKy/NgSrjmhCHl
-	abBQ60dcogr34hsPe/BSXhktddZaKT7so4c+/3xr0vq8Klp8k+EIE5U1Gg==
-X-Google-Smtp-Source: AGHT+IF0an2oYm11kPV7ff81QxkOBtlrS03vVFvqVljgv7HA7wSUUSKuqPG1KZPwELMw7f+MBU1ZMA==
-X-Received: by 2002:a05:6830:498b:b0:708:b344:fed8 with SMTP id 46e09a7af769-70e0ec2a5ddmr3183740a34.33.1724433853194;
-        Fri, 23 Aug 2024 10:24:13 -0700 (PDT)
+        bh=dnLnTh119A3RWkef9yN2B3w4lQzPk9GOiDwkQpiN8lU=;
+        b=K7xehsQZENi/IVNcnkWf8D8Qffpx9wfaFuB5aeCvO//4h3oTgecjFtylCvpR6YNQJn
+         u96J1w8gUbNfILkffSnf88vwVYesHk715xfihuXmF60g7QMxLRBADuFDuJK/1ZQYJVir
+         F+V9vyMDZ2/YQhCSavGRgYxX68MWGwTNFM27m/15O4DMs+zs8uvj4W24HQgOZ3z8lW5c
+         Aq1bbkg3oxGKZP5IwBQjDj4rzv07qbrrvWc3tFLNTxHhPJlKmcc2idwYKhEO3VdRStY1
+         Vnl0ciIsDNAm58kBiBE1sZSA7qeYKC5+1TxQf/dsFD4whMnr7wPpvoYyKCeQTtYuW5Hn
+         /ydQ==
+X-Gm-Message-State: AOJu0YwwPwap1bKSqDH+CBZwVYRBEinGdwE91V3VWu7A6FsGpHFWf5CD
+	dE64DXPQNEhbuPPp5ymSP2NmOuVQQzoh2jJz3cN/ftj3r0HkTysdd/s+dA==
+X-Google-Smtp-Source: AGHT+IEqr5azCfSWay59GK95wh9fi8qlW2QldvhtsPDhmZcsqdWN4EsHYUHpzZJTJiv8xPz9Ly88xA==
+X-Received: by 2002:a05:6870:1682:b0:25b:6d53:d294 with SMTP id 586e51a60fabf-273e64e6edbmr3470222fac.23.1724434281377;
+        Fri, 23 Aug 2024 10:31:21 -0700 (PDT)
 Received: from [192.168.1.22] (syn-070-114-247-242.res.spectrum.com. [70.114.247.242])
-        by smtp.googlemail.com with ESMTPSA id 46e09a7af769-70e03b5fba1sm724516a34.56.2024.08.23.10.24.12
+        by smtp.googlemail.com with ESMTPSA id 586e51a60fabf-273ceb6bc1bsm972539fac.44.2024.08.23.10.31.20
         for <iwd@lists.linux.dev>
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 23 Aug 2024 10:24:13 -0700 (PDT)
-Message-ID: <688bf80b-5c66-4e6b-8098-c44e4e8995b0@gmail.com>
-Date: Fri, 23 Aug 2024 12:24:12 -0500
+        Fri, 23 Aug 2024 10:31:21 -0700 (PDT)
+Message-ID: <1ebd99e9-447a-4db1-9256-bd264d22391e@gmail.com>
+Date: Fri, 23 Aug 2024 12:31:20 -0500
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
@@ -61,46 +61,20 @@ List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/5] defs: Add defs.h to hold certain global definitions
+Subject: Re: [PATCH] monitor: Print rmnet flags
 To: iwd@lists.linux.dev
-References: <20240823161848.485685-1-denkenz@gmail.com>
+References: <20240823160901.474421-1-denkenz@gmail.com>
 Content-Language: en-US
 From: Denis Kenzior <denkenz@gmail.com>
-In-Reply-To: <20240823161848.485685-1-denkenz@gmail.com>
+In-Reply-To: <20240823160901.474421-1-denkenz@gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 8/23/24 11:18 AM, Denis Kenzior wrote:
-> This will help to get rid of magic number use throughout the project.
-> The definitions should be limited to global magic numbers that are used
-> throughout the project, for example SSID length, MAC address length,
-> etc.
+On 8/23/24 11:08 AM, Denis Kenzior wrote:
 > ---
->   Makefile.am         |  3 ++-
->   src/ap.c            |  8 ++++----
->   src/crypto.c        |  3 ++-
->   src/defs.h          | 13 +++++++++++++
->   src/dpp-util.h      |  5 ++++-
->   src/eap-wsc.c       |  4 ++--
->   src/handshake.h     |  2 +-
->   src/ie.c            |  2 +-
->   src/ie.h            |  3 ++-
->   src/knownnetworks.h |  4 +++-
->   src/network.c       |  2 +-
->   src/p2putil.h       |  3 ++-
->   src/rrm.c           |  4 ++--
->   src/scan.c          |  2 +-
->   src/scan.h          |  4 +++-
->   src/station.c       |  4 ++--
->   src/storage.c       |  3 ++-
->   src/util.c          |  5 +++--
->   src/wsc.h           |  2 +-
->   src/wscutil.c       |  2 +-
->   src/wscutil.h       |  4 +++-
->   unit/test-util.c    |  3 ++-
->   22 files changed, 57 insertions(+), 28 deletions(-)
->   create mode 100644 src/defs.h
+>   monitor/nlmon.c | 36 ++++++++++++++++++++++++++++++++++++
+>   1 file changed, 36 insertions(+)
 > 
 
-All applied
+Applied
 
