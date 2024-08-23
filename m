@@ -1,130 +1,145 @@
-Received: from mail-ej1-f43.google.com (mail-ej1-f43.google.com [209.85.218.43])
+Received: from mail-qk1-f177.google.com (mail-qk1-f177.google.com [209.85.222.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40397189B89
-	for <iwd@lists.linux.dev>; Fri, 23 Aug 2024 21:03:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A39419258E
+	for <iwd@lists.linux.dev>; Fri, 23 Aug 2024 22:23:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724447033; cv=none; b=DbL7AxljAQ9gl8kWM5M7QIZWmMwhZs3yaSUUT7TrztNHuYfyvMEx/MrLZeUG2BBfMLkSrqiugmqLQwguTtdKtZX7cTo2ojRYkKB5BG3GswzLOzJfvFmhQXKSp13/7sWj/Wc9uJAhEoa3lzd4VIUBfvpJiXSARIxG9UVNxTwzKhI=
+	t=1724451828; cv=none; b=m/gE4yNNrfSILyQBU/DteiW4Kx1pKJoKplzGPDtDpZOeRPnifI2ZFO5C9/Vgye/9VTLc+jTOtlr7KIAFreHF8CZ7TaIjzxcNELW1mm5uOITIQZM0QTIrH/x4ThuKCecy25oWO5tkZOdpGRCvCfillE7b3p2+ufL2rdGVCPRQ9NY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724447033; c=relaxed/simple;
-	bh=aKGI9w/BYE3OLoFosCGM2SOGycMc1QKApraDCnUdwf0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=q+JXnhiU1L66aSRTmMPhMCBHyLBa06FMlgZlnY/GKEb4VsuXt3lMQTFIW7V8DgeowRC1G9Q1mfo8DKMV4aFA4czewG2we/DOIyWJSLv3aaENYjCgMaZRKb/msJAqDKj81xBap4iRF3/iNFMCs8AFnNTfFnrCFP2afW1XY4SQrsw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=density.io; spf=pass smtp.mailfrom=density.io; dkim=pass (1024-bit key) header.d=density.io header.i=@density.io header.b=s/H7RK5u; arc=none smtp.client-ip=209.85.218.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=density.io
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=density.io
+	s=arc-20240116; t=1724451828; c=relaxed/simple;
+	bh=dS0tyOjSd4TPPSvvYfg8CAQBd6kK7xkQ5caCa/Or0ZI=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=qe7PJZfsv+QeyfW50dAH+MJB8AbtRkmTfKWVoaHUjajewfBlYMUFQs6by+q4LaswIAfWs6xXcDwqpBrq17IiI0Us8t07XYSOAR7UGtfkXV+xcroYYNyPHN6fPZMHdpHMlvBXS2XnqtDDeoT/tBXJQ5TYOfo6mOEDx3qBq4y0FM4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MbbiBIG0; arc=none smtp.client-ip=209.85.222.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=density.io header.i=@density.io header.b="s/H7RK5u"
-Received: by mail-ej1-f43.google.com with SMTP id a640c23a62f3a-a86abbd68ffso149515066b.0
-        for <iwd@lists.linux.dev>; Fri, 23 Aug 2024 14:03:50 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MbbiBIG0"
+Received: by mail-qk1-f177.google.com with SMTP id af79cd13be357-7a1d6f4714bso234190585a.1
+        for <iwd@lists.linux.dev>; Fri, 23 Aug 2024 15:23:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=density.io; s=google; t=1724447029; x=1725051829; darn=lists.linux.dev;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ip1T9ZzHjFnn9G4x9f1+YHOf6hwHrVOOWEK4u+mukGE=;
-        b=s/H7RK5u6gCiWRGE7KZfwJkMav11r67tfkodKsJ0+YndyvvFpaY96h8YVrwaNXdQjg
-         +EQsVk2RqI/7hgzvx5mRr0vMNDqd73YLUnD5d9aUcoRuYET2BhvmaoDp+sjiYRA8x6Dm
-         DMqHqvp1G84ouLNrhTHaL2uj6Dmoh0Laz3pdE=
+        d=gmail.com; s=20230601; t=1724451826; x=1725056626; darn=lists.linux.dev;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=6eVTC1Aym8sF7ndRgQcB/wj5IW7I/Jj97dqCANyEsNk=;
+        b=MbbiBIG0o0CHhSooDF1g2utnlIbkQV9/yjfI74wFilbbQiIZvDAfkuORqou3J4tO2p
+         ba3DXkRY4GBH6MI2ugMuBGfbWzfCrmp9eVtlsQ9jq66eO0dkCNKaXqcszAZ4IPYrGcg2
+         TXzcqEfY1wIfYc1ck32MpAoqxaidrvoIoiY+UkrZOZZLutFnubZ0F1dZuV2Pfwj8n+5l
+         NXVUsmsHOey5om+qAivBSkIlBamlBzjvm2E8dn1Zz+ZQaOXClGRc+n4hnuyb04gWAAcE
+         3t90GNb3GWa+AzQ/USHklQUZYVVCj61dAWekj0/Gd9RqarQkwN72YAMG56+HKZwQrRZj
+         y/cw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724447029; x=1725051829;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ip1T9ZzHjFnn9G4x9f1+YHOf6hwHrVOOWEK4u+mukGE=;
-        b=vyu1DwolcE7jtBIgySy8i/h2PmFuVeusQRPhBzGeMm3xaSfChA2lIGJvdnKoHdsmln
-         sUOlW8xTjcs34SVZ6BWUmytK/ID0/r1BB+mjzCjZFYnYq6D9yJNm0V82epLPgCYBqRNn
-         VWV+uKx5PxU+BOnTf0LeHQ5cOlcTlVvd5PFzO6sE3tAuOqbWwPGLw5dz/NmrWYIeo5S2
-         G3fO4q5H77VJmjC2V2aOnFrLkUwkMxv+2BVS6oRJhV43/nXyl9keai4TYGNd7oSm3Efd
-         yqh5HEb/S8TCSpVEoMcFshapXCQ1Hc121VVB24kHn8g9u/XM5h/aeaG2P9WGgbmQvDhS
-         2ZxA==
-X-Gm-Message-State: AOJu0Yxmun8vyE7Ad4yHiPXStMJtQfqA0hRFhh7JyS5qkt56x8uoAAAv
-	T8ICs6OvtyzjZSyGt8+nnN2WEkraTeZ4arwMffQa7AIQbnU2OjyxHTIKd+vqZGIJhesEIFj0Fsz
-	8ASvWfgnGcO/b4vOs33bxwylTdDuugfSRl+N7d7+w6xz2zUAenJU=
-X-Google-Smtp-Source: AGHT+IE54z9TNCg+YGZMZcYK+MPIjMGg16wrDVdyZX9/BOWiDOgM/+YIQb3v6fEIP3lw3Js/v/kBJ4COBl2ui8RfatI=
-X-Received: by 2002:a17:907:7f1f:b0:a7d:89ac:9539 with SMTP id
- a640c23a62f3a-a868a5af23cmr787600366b.7.1724447028724; Fri, 23 Aug 2024
- 14:03:48 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1724451826; x=1725056626;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=6eVTC1Aym8sF7ndRgQcB/wj5IW7I/Jj97dqCANyEsNk=;
+        b=pWuUx/7LFeLjKPkGuk3u+JiiV6Dbya47OJ8rOo52RvfDL64S11lofs+kfo7ec2C7Kl
+         Xx/kPiGXyhokz4xGdo1rVbSAja/Ijrq7cB3CIuEGc1agyNlbhAKuviNbXmJroc2Wm72p
+         OAHLGn4X8oCVwQAXgboYWGbwKj7mLlH85CMKECza1gLpbyMw66EwcZagvCxi8HgdZLii
+         H245m9l86XHOt0f1dTFBHzPx1WTPbXwDr0S1vLxPqJdkV3HEsZlLgXwnDqFmENJxySIU
+         kMj2LoFazM0fweJ2YtpOC72CVnTwKziOcareLGKHhaUI9d1kWcR9Y4C5Bu7W2bpYwGFS
+         0ifw==
+X-Gm-Message-State: AOJu0YzGDJ2MWUqcc1Im4G5+mFq2bxIISsx37rrQXw0Gpn7pkt7pg/z+
+	WUF0lUWwpDtNxdpAI0+VA15IXWKD+7NSc1l13Qv8wE5MMTSOi17xW10KNg==
+X-Google-Smtp-Source: AGHT+IFlXucXrk6/krEUD7rPL54Ycn5IEKM5aN5Y1yXLrftsgdCQnJsu7DLqNkm+KtkkO2PfBMhn2A==
+X-Received: by 2002:a05:620a:2994:b0:79e:f878:7ffb with SMTP id af79cd13be357-7a688d2fea1mr734844885a.9.1724451825830;
+        Fri, 23 Aug 2024 15:23:45 -0700 (PDT)
+Received: from LOCLAP699.locus-rst-dev-locuspark.locus ([152.193.78.90])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7a67f41f507sm218860385a.132.2024.08.23.15.23.44
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 23 Aug 2024 15:23:45 -0700 (PDT)
+From: James Prestwood <prestwoj@gmail.com>
+To: iwd@lists.linux.dev
+Cc: James Prestwood <prestwoj@gmail.com>
+Subject: [PATCH v4 1/8] doc: Document station Affinities property
+Date: Fri, 23 Aug 2024 15:23:32 -0700
+Message-Id: <20240823222339.328006-1-prestwoj@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20240823180006.317353-1-prestwoj@gmail.com> <20240823180006.317353-2-prestwoj@gmail.com>
-In-Reply-To: <20240823180006.317353-2-prestwoj@gmail.com>
-From: Ryan Smith <ryan.smith@density.io>
-Date: Fri, 23 Aug 2024 15:03:37 -0600
-Message-ID: <CAM7Wg-V7rGu1P666PFpVb2sHKbe+34r=GBZgRT6VePkjzmFEVA@mail.gmail.com>
-Subject: Re: [PATCH v3 2/8] netdev: define netdev settings in netdev.h
-To: iwd@lists.linux.dev
-Cc: James Prestwood <prestwoj@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-Hi,
-Just glancing through this...
+This documents new DBus property that expose a bit more control to
+how IWD roams.
 
-On Fri, Aug 23, 2024 at 12:00=E2=80=AFPM James Prestwood <prestwoj@gmail.co=
-m> wrote:
->
-> Following knownnetworks, this moves the settings into a header file
-> which is easier to maintain/read.
-> ---
->  src/netdev.c | 8 ++++----
->  src/netdev.h | 5 +++++
->  2 files changed, 9 insertions(+), 4 deletions(-)
->
-> diff --git a/src/netdev.c b/src/netdev.c
-> index 494e46a5..4d6aae6b 100644
-> --- a/src/netdev.c
-> +++ b/src/netdev.c
-> @@ -6264,16 +6264,16 @@ static int netdev_init(void)
->                 goto fail_netlink;
->         }
->
-> -       if (!l_settings_get_int(settings, "General", "RoamThreshold",
-> +       if (!l_settings_get_int(settings, NETDEV_ROAM_THRESHOLD,
->                                         &LOW_SIGNAL_THRESHOLD))
->                 LOW_SIGNAL_THRESHOLD =3D -70;
->
-> -       if (!l_settings_get_int(settings, "General", "RoamThreshold5G",
-> +       if (!l_settings_get_int(settings, NETDEV_ROAM_TRHESHOLD_5G,
->                                         &LOW_SIGNAL_THRESHOLD_5GHZ))
->                 LOW_SIGNAL_THRESHOLD_5GHZ =3D -76;
->
-> -       rand_addr_str =3D l_settings_get_value(settings, "General",
-> -                                               "AddressRandomization");
-> +       rand_addr_str =3D l_settings_get_value(settings,
-> +                                               NETDEV_ADDRESS_RANDOMIZAT=
-ION);
->         if (rand_addr_str && !strcmp(rand_addr_str, "network"))
->                 mac_per_ssid =3D true;
->
-> diff --git a/src/netdev.h b/src/netdev.h
-> index db0440d0..d718fa6a 100644
-> --- a/src/netdev.h
-> +++ b/src/netdev.h
-> @@ -29,6 +29,11 @@ struct eapol_sm;
->  struct mmpdu_header;
->  struct diagnostic_station_info;
->
-> +#define GENERAL "General"
-> +#define NETDEV_ADDRESS_RANDOMIZATION GENERAL, "AddressRandomization"
-> +#define NETDEV_ROAM_THRESHOLD GENERAL, "RoamTreshold"
+Setting the affinity on the connected BSS effectively "locks" IWD to
+that BSS (except at critical RSSI levels, explained below). This can
+be useful for clients that have access to more information about the
+environment than IWD. For example, if a client is stationary there
+is likely no point in trying to roam until it has moved elsewhere.
 
-Spelling typo - RoamThreshold
+A new main.conf option would also be added:
 
-> +#define NETDEV_ROAM_TRHESHOLD_5G GENERAL, "RoamThreshold5G"
+[General].CriticalRoamThreshold
 
-Spelling typo - NETDEV_ROAM_THRESHOLD_5G
+This would be the new roam threshold set if the currently connected
+BSS is in the Affinities list. If the RSSI continues to drop below
+this level IWD will still attempt to roam.
+---
+ doc/station-api.txt | 17 +++++++++++++++++
+ src/iwd.config.rst  | 16 ++++++++++++++++
+ 2 files changed, 33 insertions(+)
 
-> +
->  enum netdev_result {
->         NETDEV_RESULT_OK,
->         NETDEV_RESULT_AUTHENTICATION_FAILED,
-> --
-> 2.34.1
->
->
+diff --git a/doc/station-api.txt b/doc/station-api.txt
+index 84f1b7bf..707c6834 100644
+--- a/doc/station-api.txt
++++ b/doc/station-api.txt
+@@ -170,6 +170,23 @@ Properties	string State [readonly]
+ 			BSS the device is currently connected to or to which
+ 			a connection is in progress.
+ 
++		ao Affinities [optional] [experimental]
++
++			Array of net.connman.iwd.BasicServiceSet object paths
++			that will be treated with higher affinity compared to
++			other BSS's. Currently the only allowed value to be
++			set in this array is the path to the currently connected
++			BasicServiceSet object, i.e.
++			Station.ConnectedAccessPoint.
++
++			Setting the affinity will lower the roaming threshold,
++			effectively locking IWD to the current BSS unless the
++			RSSI drops below the critical threshold set by
++			[General].CriticalRoamThreshold{5G} at which point
++			IWD will proceed with normal roaming behavior.
++
++			This property is cleared on roams/disconnections.
++
+ SignalLevelAgent hierarchy
+ ==========================
+ 
+diff --git a/src/iwd.config.rst b/src/iwd.config.rst
+index d9c94e01..2d1f6dcd 100644
+--- a/src/iwd.config.rst
++++ b/src/iwd.config.rst
+@@ -130,6 +130,22 @@ The group ``[General]`` contains general settings.
+        This value can be used to control how aggressively **iwd** roams when
+        connected to a 5GHz access point.
+ 
++   * - CriticalRoamThreshold
++     - Value: rssi dBm value, from -100 to 1, default: **-80**
++
++       The threshold (for 2.4GHz) at which IWD will roam regardless of the
++       affinity set to the current BSS. If the connected BSS has affinity
++       (set in Station's Affinities list) the roam threshold will be lowed to
++       this value and IWD will not attempt to roam (or roam scan) until either
++       the affinity is cleared, or the signal drops below this threshold.
++
++
++   * - CriticalRoamThreshold5G
++     - Value: rssi dBm value, from -100 to 1, default: **-82**
++
++       This has the same effect as ``CriticalRoamThreshold``, but for the 5GHz
++       band.
++
+    * - RoamRetryInterval
+      - Value: unsigned int value in seconds (default: **60**)
+ 
+-- 
+2.34.1
+
