@@ -1,80 +1,85 @@
-Received: from mail-oa1-f42.google.com (mail-oa1-f42.google.com [209.85.160.42])
+Received: from mail-oa1-f53.google.com (mail-oa1-f53.google.com [209.85.160.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 686598488
-	for <iwd@lists.linux.dev>; Fri, 23 Aug 2024 17:31:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65EA618660B
+	for <iwd@lists.linux.dev>; Fri, 23 Aug 2024 17:42:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724434283; cv=none; b=bLCJnNV9H6ZsGeH+36h5st1+YoSR9r9QfFSHfHW5dmdrPyS2GRt1+WVX0AwqfY2c6eMSg4YXH+gaKuqEZswfPlcTi6lcjrJYeT3RkSFXZtu/A7H5ASegjqKXygzXd4xIQwcStqxKG/KmJlaenaNyh/dFcXyDbytAUVYl+XoIW5Y=
+	t=1724434944; cv=none; b=ZhJzfOgF7qPk4mXRB7jky75QqXoMiz1AdYlp/IomrTjlA5C5RiYd7kYmNNG+i/uhKDfCavXLWDcx19QynNzUXns2Q5B7du6walM9LjFOwTYcT8sJ1Obryk6lBjCYvtl1Jc+OToHdSVENdN+B68xgCKLOYFG88RBwXqWnxm/SZ+g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724434283; c=relaxed/simple;
-	bh=hDe/+HazXrZ8gIaCzCOH3S88KUS9QIS00IjIfV2iwa0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=OZnjV7vzPRZqA3QcJhhx2FlFsHeDoL0V3oxCKGHxfnaOIcJ8Ems623HJzlBwgFUgM5KudcZskcK0mgrzHhaLFLfu+sJCljizIGtQmWNs5Hv10d5WejsfvDWDMMecyXRy5Ldgq8/IqlYC8ksKuvLVGX7v9BPI+f/1IFQjxnVQEmg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=X9WbZvWV; arc=none smtp.client-ip=209.85.160.42
+	s=arc-20240116; t=1724434944; c=relaxed/simple;
+	bh=7ffU0K4HFcNUHBJV3yk/OIFVAaI/7Qhs/esgmZcPMns=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=COgPZpP3dEHtrOr4l9x5DXEDWDvsoF+PX+pmhglvZXAZlGvvf+ypLIHa8TVnySN2LiFXzPBaykybP/pizQxlm8nKJL+xY/qSrN6156DIyEneQ4Om711umbE+aHP+QuBR8NFV/kPLavRXCpXt3Buo3HitB/ew8/QpjfaGaedUqxc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jqVD/J6y; arc=none smtp.client-ip=209.85.160.53
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="X9WbZvWV"
-Received: by mail-oa1-f42.google.com with SMTP id 586e51a60fabf-2701c010388so1396907fac.0
-        for <iwd@lists.linux.dev>; Fri, 23 Aug 2024 10:31:22 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jqVD/J6y"
+Received: by mail-oa1-f53.google.com with SMTP id 586e51a60fabf-2702a00aad4so1539099fac.1
+        for <iwd@lists.linux.dev>; Fri, 23 Aug 2024 10:42:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1724434281; x=1725039081; darn=lists.linux.dev;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=dnLnTh119A3RWkef9yN2B3w4lQzPk9GOiDwkQpiN8lU=;
-        b=X9WbZvWVdxWYwi6R6nVIcsfxkK7EMqXyeebNavBtMa77jbg/aeCVPfcOCogdpvh4lt
-         aKGuWEZq6AhNvzT/knZBWe5u7LTZs92hHLZf3jaY61UaSjBy6kkjXxkZD0gMFfacJXJy
-         Hy5fPmHJm4LeYqmLIEuaxBArGxHCP9jdmpPcOvWIJEFWCKd2+M7hJPumzOuNsXWZemng
-         ir8crmbT6mU9adNgTpR4OdOo5MPaz5itxLNASzICOu24dcQV/c2UoXKPBCKWQLGxjgBZ
-         o35Pw87lBGLSYgiW7NYJqCHAAlEsmlpAUrvLTn6U/+GdTteL4HWVRPBc/mbvczODWOzK
-         1IoA==
+        d=gmail.com; s=20230601; t=1724434942; x=1725039742; darn=lists.linux.dev;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=gzxVQ+cdcrpSLpKmcvI8Wd6Xc5dRgyESTgAGBBSy9qI=;
+        b=jqVD/J6y0T7v7JACp4CvqzegOZZtjq2TJ8Q86lVkpFQKDq6JCBYfECYuDGBLCo2kNt
+         PTnTjr7XYuz8nXj7VWNu/XEQx4GfgUjmoQUZDEKc/s4DGRO5yaB70Q8PTECT2HafpI3C
+         Ul4Xuej/Ht6BGHMrV4c3zHQWALjXYVIW/1zuZMnZWy9sSMDms8ax8yLx8CV9rwJ5g9xo
+         TCJs3j1QvwWqfW2K5iCV7nl+WIb427ub+lTZd7BOw5Gr8mTTjq9SbpILXfDLi3TgTaTB
+         av+jPDEhSb1QiKNhJGobZc7lhVRqDtskB/zpuQ2GllZNm+9OzpSJ6RCG3MVkZOyrav2W
+         M2FQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724434281; x=1725039081;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=dnLnTh119A3RWkef9yN2B3w4lQzPk9GOiDwkQpiN8lU=;
-        b=K7xehsQZENi/IVNcnkWf8D8Qffpx9wfaFuB5aeCvO//4h3oTgecjFtylCvpR6YNQJn
-         u96J1w8gUbNfILkffSnf88vwVYesHk715xfihuXmF60g7QMxLRBADuFDuJK/1ZQYJVir
-         F+V9vyMDZ2/YQhCSavGRgYxX68MWGwTNFM27m/15O4DMs+zs8uvj4W24HQgOZ3z8lW5c
-         Aq1bbkg3oxGKZP5IwBQjDj4rzv07qbrrvWc3tFLNTxHhPJlKmcc2idwYKhEO3VdRStY1
-         Vnl0ciIsDNAm58kBiBE1sZSA7qeYKC5+1TxQf/dsFD4whMnr7wPpvoYyKCeQTtYuW5Hn
-         /ydQ==
-X-Gm-Message-State: AOJu0YwwPwap1bKSqDH+CBZwVYRBEinGdwE91V3VWu7A6FsGpHFWf5CD
-	dE64DXPQNEhbuPPp5ymSP2NmOuVQQzoh2jJz3cN/ftj3r0HkTysdd/s+dA==
-X-Google-Smtp-Source: AGHT+IEqr5azCfSWay59GK95wh9fi8qlW2QldvhtsPDhmZcsqdWN4EsHYUHpzZJTJiv8xPz9Ly88xA==
-X-Received: by 2002:a05:6870:1682:b0:25b:6d53:d294 with SMTP id 586e51a60fabf-273e64e6edbmr3470222fac.23.1724434281377;
-        Fri, 23 Aug 2024 10:31:21 -0700 (PDT)
-Received: from [192.168.1.22] (syn-070-114-247-242.res.spectrum.com. [70.114.247.242])
-        by smtp.googlemail.com with ESMTPSA id 586e51a60fabf-273ceb6bc1bsm972539fac.44.2024.08.23.10.31.20
-        for <iwd@lists.linux.dev>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 23 Aug 2024 10:31:21 -0700 (PDT)
-Message-ID: <1ebd99e9-447a-4db1-9256-bd264d22391e@gmail.com>
-Date: Fri, 23 Aug 2024 12:31:20 -0500
+        d=1e100.net; s=20230601; t=1724434942; x=1725039742;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=gzxVQ+cdcrpSLpKmcvI8Wd6Xc5dRgyESTgAGBBSy9qI=;
+        b=wgLs8ch3C9rtPE33lKjGXROBfFtT1AhXWHfrLTRRgcnEXMuvRSbmS8vKeUH9W0lOX9
+         fYJ/OwZPyW3NmYerDinXqDTQMO4O5Fz5GsehAUBL46QXQmRJwLAsDWj+JjWMVAxAGFHW
+         RS+KtCzM+krORGDr2CDlb1XBMhzjYL8tc84SQ8M6IcagPXAZ88pssaXhzfWuZK4WylWb
+         CbN5E+cCq6xaIplrm+smDyggffQ6o7/MuS5xSvwCNjXt3CvMZ3RyEDw3MuAtHKLxfb+M
+         vmN08C0Y9Q1lIyrLzBc3B+K5/TsDgS/s+vjoI/i9nlusdemjHssQNXx8U4FajeCttjYQ
+         LxCw==
+X-Gm-Message-State: AOJu0Yz9JQZ78uUhpyl9H9Z8+zg7Dyg5NwWlfjOOnP3NDD/kkoYqMUAF
+	qMDSDuoPGn8Zi1g4BDwekCldZXc1VUg27xQVLmc4SZNhGjY5Q17D9JtX1Q==
+X-Google-Smtp-Source: AGHT+IGDooptQrLXp8SZhF1ZeshK95C1gAkUnG/l9EdwwnbCfs8UfROjGU3/hinTk74KpU6L/uerRA==
+X-Received: by 2002:a05:6871:293:b0:260:fb01:5651 with SMTP id 586e51a60fabf-273e64673b3mr3245370fac.12.1724434942095;
+        Fri, 23 Aug 2024 10:42:22 -0700 (PDT)
+Received: from archdev.attlocal.net (syn-070-114-247-242.res.spectrum.com. [70.114.247.242])
+        by smtp.gmail.com with ESMTPSA id 46e09a7af769-70e03aa9c67sm728506a34.30.2024.08.23.10.42.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 23 Aug 2024 10:42:21 -0700 (PDT)
+From: Denis Kenzior <denkenz@gmail.com>
+To: iwd@lists.linux.dev
+Cc: Denis Kenzior <denkenz@gmail.com>
+Subject: [RFC PATCH v1 0/2] External Auth support
+Date: Fri, 23 Aug 2024 12:41:52 -0500
+Message-ID: <20240823174220.498594-1-denkenz@gmail.com>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] monitor: Print rmnet flags
-To: iwd@lists.linux.dev
-References: <20240823160901.474421-1-denkenz@gmail.com>
-Content-Language: en-US
-From: Denis Kenzior <denkenz@gmail.com>
-In-Reply-To: <20240823160901.474421-1-denkenz@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 8/23/24 11:08 AM, Denis Kenzior wrote:
-> ---
->   monitor/nlmon.c | 36 ++++++++++++++++++++++++++++++++++++
->   1 file changed, 36 insertions(+)
-> 
+This series implements External Auth support on Full MAC cards that do
+not support SAE offload.  I have not been able to test this fully since
+the brcmfmac firmware on the RPi 5 does not actually work properly.
+Maybe some enterprising person can test it on a firmware that does work?
 
-Applied
+Denis Kenzior (2):
+  netdev: external auth support
+  sae: Allow ability to force Group 19 / Hunt and Peck
+
+ src/netdev.c      | 258 +++++++++++++++++++++++++++++++++++++++++-----
+ src/nl80211util.c |   4 +-
+ src/sae.c         |  20 ++++
+ src/sae.h         |   3 +
+ src/wiphy.c       |  19 ++--
+ 5 files changed, 263 insertions(+), 41 deletions(-)
+
+-- 
+2.45.2
 
