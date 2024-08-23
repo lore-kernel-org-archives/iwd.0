@@ -1,110 +1,129 @@
-Received: from mail-ot1-f54.google.com (mail-ot1-f54.google.com [209.85.210.54])
+Received: from mail-oa1-f49.google.com (mail-oa1-f49.google.com [209.85.160.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C32F118593A
-	for <iwd@lists.linux.dev>; Fri, 23 Aug 2024 16:07:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE70118593A
+	for <iwd@lists.linux.dev>; Fri, 23 Aug 2024 16:09:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724429250; cv=none; b=YSUY5eoVM3n4+p33NbMolONjzYPeOqKlLU8v/8FG3OMxjKQoQzRWb38IGi1hHilXscXHZerKirBmNXtxE/m62lxoSOA2rU1nQSPs3gwt1Qia3RjpOXlht1XtZiAyi+ziqOAFr0lufKAa0Iypg3/KtdkI+rPt7+2b+HPKZjcybSM=
+	t=1724429345; cv=none; b=f/+7UvNWWLOidIpzQMvJkPHFahZyWi2x/A2K6Jcawta79j88upjbl0jRIwTRfAFXwsUv2Qujq75vjOD0ch//7gj/urffX7Ol5itknYz2mWKkEqKrWuT8jCHZaECCpjWFmZY1LXo1eFKSgNctbTvsdPLQkuY3mv43MF9ghUxSD64=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724429250; c=relaxed/simple;
-	bh=UkvcUWlLr9yPpAv6R8LWcmv2IW81L3jPCKMgOeGZt6Y=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=rzciYBDeyAnPmzYen9dzK/26S4RNiX5T3SqECV+51XzhKnNj0iOpPnTCnOay7hHEMpH0C3ZMAMtn/D/GXoGbhwvjqjnFVMgcGYxNAlJfRKF9efelWHQcf1nwC56yJxsjgx6vSjprUqkgCwZTbjadok4TZ291hP025SDbeTouZGU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=meGjT3s0; arc=none smtp.client-ip=209.85.210.54
+	s=arc-20240116; t=1724429345; c=relaxed/simple;
+	bh=4jpHMWzGBI290rcbQ5ImOXYnSJUoFg2NKaX2QC6N4yc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=T4mkfWYaT1QYlvTnfZckVDyGSsRa7IWGhYg3DKngGVdC1qyUdGs/0I9ZuySxJZKYv8eAnc/b2G0r7tpbZ50+Ta4NFh4fFiPvaswbZrV6OHtG3dkUkaki7a91vp5UlEjjcr2mH2X3K6WKm5N/PjZiL1f9QCyJP4oMUZap00xfC50=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NT+9cgQr; arc=none smtp.client-ip=209.85.160.49
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="meGjT3s0"
-Received: by mail-ot1-f54.google.com with SMTP id 46e09a7af769-70968db52d0so2241637a34.3
-        for <iwd@lists.linux.dev>; Fri, 23 Aug 2024 09:07:28 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NT+9cgQr"
+Received: by mail-oa1-f49.google.com with SMTP id 586e51a60fabf-270420e231aso1436058fac.2
+        for <iwd@lists.linux.dev>; Fri, 23 Aug 2024 09:09:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1724429248; x=1725034048; darn=lists.linux.dev;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=UXRfUABbxMbMuV0fUCYWW4QaNO6i2bUTErnpV3oCWK0=;
-        b=meGjT3s0+Ksu8ZjYk3KR5JLgI6Gpa1tMYcp5BA+m86/sQdbL6wTwtLG3zY3Z8PRaPg
-         uKf4TeRXWtDkgSqTiD4boLiqgfewEzg3Fl5h4XuYYsL5DUAuwqwHw+CAoylVyYganiiX
-         PqTafBFECctWJlVlQO6u0uFREJw3OF1t1ZKwH+RwkEDMZDwqbdj8mQH5yav18gWpEaN+
-         4XP/gdRs0c8OEHeQBzEJxgcOdsbp9MlxU21e3rDEimaO4BuIUYnJ5PBFHwWEmMnYQ+Gp
-         hFbIi00nU2fHbqYI4MDRorDLs3z0abEI12Z1VY1w5ATthe0tJvEOJnnaz7CH1J4qsZxz
-         R0Cg==
+        d=gmail.com; s=20230601; t=1724429343; x=1725034143; darn=lists.linux.dev;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=XP9KeFwtjHU6wlD3XjFZLpdG9NSs4YavtLDZyR9Dh1c=;
+        b=NT+9cgQrYBW2TRLL+8ZfVzOr9vjaxmTx3kTw2ERy62uB0sagnM44KE9vH6yp7cWrdk
+         k7mVBtZYLGAkjaYBwnfm1vcaAtULJ3l6LZgp8RhQmFlc5eBwLHP4AJ9odQt9Z/bgzP5g
+         IPFhKoaP3n96iw7b2xc+P1dDA2898kz1psziomn8JWQY7NDE3J9Z9SealnisIm1P9PO8
+         b2nU6s58L+RY/578GdBGwqqY+kKFI/LXlXGJF8sV/Nj80Da1hPzDlBw+udr/at2RmekX
+         9NWkPzbYimJ9e0elMERprfos2BqxL9/RIR8UzctDqd4wcHy178a/kqLAP3L5vyptC5fH
+         7PBQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724429248; x=1725034048;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=UXRfUABbxMbMuV0fUCYWW4QaNO6i2bUTErnpV3oCWK0=;
-        b=h75/SAoAZC32QT+9vWPbVwqFVqGm5NwN2uyMoRDaOjYRTk5nwiF+l4CjroHrXhS3D/
-         kmstfp/FQEeDh9MVuTh1afufxKug6aHL/MXLFS6zpWoNJ1CSOkcCD2E/kk47f7h4DJEW
-         l9cSQUDONkE/C0bI2GEKgtPVqbb9Hg0J5PhDejf+nSpdiS4AdDdPYo8L6OEIQ90mhh7u
-         GxQXXDl7YbsQDEUzE47iAp2euvuqlGw4LjOO4bW5zNMJICj8tX8PByVHQrytVwgrIrDX
-         B9yTmyXpjhdLv5QzsD7AmlK9k/5d4crpyvYpqwHvDgc3HgIlr2qZgwgJSJY98mt2Oc3i
-         Df/w==
-X-Forwarded-Encrypted: i=1; AJvYcCV7EInZxpIh31lpPHh9TCFI7cCExB/fNwbWPPSHvWYbzT8bnHO8xmjvJU9XDVIYTIQnC9E=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yzhu0U5xqPEohXI4D9rDAHDIWebQGx5yZ2jzk+vmPqWTr6AiWQR
-	bnfVM/E1zSVg5Lwvjx//67VuxMW2fiH1Ehu1gbSV5McRiqFlb1q2CPpITw==
-X-Google-Smtp-Source: AGHT+IFm3kpVfcrW0dvGjitjtpHPu+1sAkO0Dwc1oM+7viqXPwwNf1DesGOCkMXQtbo4KXDsDIvgMw==
-X-Received: by 2002:a05:6830:2705:b0:708:5f27:ce89 with SMTP id 46e09a7af769-70e0eb1e442mr2961145a34.14.1724429247762;
-        Fri, 23 Aug 2024 09:07:27 -0700 (PDT)
-Received: from [192.168.1.22] (syn-070-114-247-242.res.spectrum.com. [70.114.247.242])
-        by smtp.googlemail.com with ESMTPSA id 46e09a7af769-70e03abe7b6sm710375a34.41.2024.08.23.09.07.27
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 23 Aug 2024 09:07:27 -0700 (PDT)
-Message-ID: <1582d6d0-a5c5-4c72-a170-f49b53b213e4@gmail.com>
-Date: Fri, 23 Aug 2024 11:07:26 -0500
+        d=1e100.net; s=20230601; t=1724429343; x=1725034143;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=XP9KeFwtjHU6wlD3XjFZLpdG9NSs4YavtLDZyR9Dh1c=;
+        b=OqS//MuWy3ItY5idMEVERNRNfWh95s5/C8Fh/7orbdwxqp4X3mJbKY0nTHxTfidw0L
+         z8zZDfy6ZP5QEBDMVH/LldGyeFJf5tcBQ21DTqgE7cKEd95qmYJtLhw9yjOreBkwgUj+
+         axnQkz6sFdSgp3+mFT8l+K+NlmIgkhL7Dq/gpfdbFpYncJvdUO6eChZChUxdFKi1UFA9
+         xVzwK3XuQLvj8bSTqXWlwJgUhIEErGfK0AVtw2wefFGl9+UDgCZSc5DUef39yMnFGjhW
+         Mj19wWXqK6zEvIvSxN6ohhtFlsaRaGAeD2vkPYa4y8p5dlOeXeNh0rJ/t00l1leAzGaH
+         D9Fg==
+X-Gm-Message-State: AOJu0YyY8lwIP7vEGD93lIdjQW39Vs8yvigfSrVIvNQ3syo/uL3qpf+c
+	Pa58GTVWwgKLHjLmk/o1+sjAFWaGZqGbgw1HUPibmxBekdHwCDojE+CAcQ==
+X-Google-Smtp-Source: AGHT+IEUbjttjMFwarYDqQj8PeXUvUbV8uSdGloUFaNlLP7ksFT6oi1m5uIa4MQiUKPgOVh0zYxVrA==
+X-Received: by 2002:a05:6870:2182:b0:25e:c013:a7fb with SMTP id 586e51a60fabf-273e669b009mr2770429fac.43.1724429342879;
+        Fri, 23 Aug 2024 09:09:02 -0700 (PDT)
+Received: from archdev.attlocal.net (syn-070-114-247-242.res.spectrum.com. [70.114.247.242])
+        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-273ce9e0952sm932755fac.13.2024.08.23.09.09.02
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 23 Aug 2024 09:09:02 -0700 (PDT)
+From: Denis Kenzior <denkenz@gmail.com>
+To: iwd@lists.linux.dev
+Cc: Denis Kenzior <denkenz@gmail.com>
+Subject: [PATCH] monitor: Print rmnet flags
+Date: Fri, 23 Aug 2024 11:08:48 -0500
+Message-ID: <20240823160901.474421-1-denkenz@gmail.com>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 3/8] netdev: add critical signal threshold level
-To: James Prestwood <prestwoj@gmail.com>, iwd@lists.linux.dev
-References: <20240819175151.1310546-1-prestwoj@gmail.com>
- <20240819175151.1310546-3-prestwoj@gmail.com>
-Content-Language: en-US
-From: Denis Kenzior <denkenz@gmail.com>
-In-Reply-To: <20240819175151.1310546-3-prestwoj@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-Hi James,
+---
+ monitor/nlmon.c | 36 ++++++++++++++++++++++++++++++++++++
+ 1 file changed, 36 insertions(+)
 
-On 8/19/24 12:51 PM, James Prestwood wrote:
-> This adds a secondary set of signal thresholds. The purpose of these
-> are to provide more flexibility in how IWD roams. The critical
-> threshold is intended to be temporary and is automatically reset
-> upon any connection changes: disconnects, roams, or new connections.
-> ---
->   src/netdev.c | 51 +++++++++++++++++++++++++++++++++++++++++++++++++++
->   src/netdev.h |  2 ++
->   2 files changed, 53 insertions(+)
-> 
-
-<snip>
-
-> @@ -6278,6 +6321,14 @@ static int netdev_init(void)
->   					&LOW_SIGNAL_THRESHOLD_5GHZ))
->   		LOW_SIGNAL_THRESHOLD_5GHZ = -76;
->   
-> +	if (!l_settings_get_int(settings, "General", "CriticalRoamThreshold",
-
-Can we move the strings to a #define somewhere, similar to how knownnetworks.h 
-does this?  Easier to review and make sure the setting matches the docs.
-
-> +					&CRITICAL_SIGNAL_THRESHOLD))
-> +		CRITICAL_SIGNAL_THRESHOLD = -80;
-> +
-> +	if (!l_settings_get_int(settings, "General", "CriticalRoamThreshold5G",
-> +					&CRITICAL_SIGNAL_THRESHOLD_5GHZ))
-> +		CRITICAL_SIGNAL_THRESHOLD_5GHZ = -82;
-> +
->   	rand_addr_str = l_settings_get_value(settings, "General",
->   						"AddressRandomization");
-
-Regards,
--Denis
+diff --git a/monitor/nlmon.c b/monitor/nlmon.c
+index 214246ea72c2..fdf16fbe7a04 100644
+--- a/monitor/nlmon.c
++++ b/monitor/nlmon.c
+@@ -37,6 +37,7 @@
+ #include <linux/if.h>
+ #include <linux/if_packet.h>
+ #include <linux/if_ether.h>
++#include <linux/if_link.h>
+ #include <linux/netlink.h>
+ #include <linux/genetlink.h>
+ #include <linux/rtnetlink.h>
+@@ -7597,8 +7598,43 @@ static void flags_str(const struct flag_names *table,
+ 	pos += sprintf(str + pos, "]");
+ }
+ 
++static void print_rmnet_flags(unsigned int indent,
++					const char *label, uint32_t flags)
++{
++	if (flags & RMNET_FLAGS_INGRESS_DEAGGREGATION)
++		print_attr(indent, "%s:%s", label, "deaggregation");
++	if (flags & RMNET_FLAGS_INGRESS_MAP_COMMANDS)
++		print_attr(indent, "%s:%s", label, "map commands");
++	if (flags & RMNET_FLAGS_INGRESS_MAP_CKSUMV4)
++		print_attr(indent, "%s:%s", label, "ingress_mapv4");
++	if (flags & RMNET_FLAGS_EGRESS_MAP_CKSUMV4)
++		print_attr(indent, "%s:%s", label, "egress_mapv4");
++	if (flags & RMNET_FLAGS_INGRESS_MAP_CKSUMV5)
++		print_attr(indent, "%s:%s", label, "ingress_mapv5");
++	if (flags & RMNET_FLAGS_EGRESS_MAP_CKSUMV5)
++		print_attr(indent, "%s:%s", label, "egress_mapv5");
++}
++
++static void print_ifla_rmnet_flags(unsigned int indent, const char *str,
++						const void *buf, uint16_t size)
++{
++	struct ifla_rmnet_flags flags;
++
++	if (size != 8) {
++		printf("malformed packet\n");
++		return;
++	}
++
++	memcpy(&flags, buf, size);
++
++	print_rmnet_flags(indent + 1, "Flags", flags.flags);
++	print_rmnet_flags(indent + 1, "Mask", flags.mask);
++}
++
+ static struct attr_entry link_info_data_entry[] = {
+ 	{ IFLA_RMNET_MUX_ID,	"RMNet Mux Id",		ATTR_U16 },
++	{ IFLA_RMNET_FLAGS,	"RMNet Flags",		ATTR_CUSTOM,
++					{ .function = print_ifla_rmnet_flags } },
+ 	{ },
+ };
+ 
+-- 
+2.45.2
 
