@@ -1,65 +1,61 @@
-Received: from mail-oa1-f51.google.com (mail-oa1-f51.google.com [209.85.160.51])
+Received: from mail-qt1-f169.google.com (mail-qt1-f169.google.com [209.85.160.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF15D188A1E
-	for <iwd@lists.linux.dev>; Fri, 23 Aug 2024 17:42:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 735C518BB83
+	for <iwd@lists.linux.dev>; Fri, 23 Aug 2024 18:00:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724434946; cv=none; b=QznSoaRTOZ2aXtGJOoF+dRPnUxSeikfYtrbp73zrDgsWKxgg19sYqxb1dSJT25oGDgZses0Gj+ZMaSlhrqGowo/2Xxk8FPlv4259AZO69ZbPfe3BmpP78ETYy1dTWiLFvhCcml5b4BztiYTBMMvtJ95/gw7WTYJyhsebHBky1AU=
+	t=1724436018; cv=none; b=o05dSSoodz6Sz8VY511v/CpVgeBn/wkaAbWUoEKkLLwHcZFknN50+mUaZ9bouQDuV62SvL100Ivq0o3oUpkGQ8eOVIryIb9QYrNnIs/2zDJP+8JpA+Q+tXUdX/sdTNspkqNN0AyV77u3kGN38E+UTn7VBr9xnsL5YVYalXY+lmE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724434946; c=relaxed/simple;
-	bh=tmhe17w0MUON0Ltr3IWGGWNMcO52QtlvNz0AQQLViqM=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=GUskm9o5T3btRz85QC7PY829Dol+SGiS8ySRLPlv4uJ0EUe5oOrZWWN6hwJcBBpKUP179TER3+HhT+Pzldw+SdYQVQX33++I0cqht4XqK7eYY5vJ1jNI1KMHVAS/eCGF1kUKfEWPzZF3ZQoKZUVFODG0S5KVrH434qn0ED5V2Lc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EltEJVza; arc=none smtp.client-ip=209.85.160.51
+	s=arc-20240116; t=1724436018; c=relaxed/simple;
+	bh=n+J0VgqPpR4EeYOrZu01+32SQDmrML3IpcCjqcqRtJI=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=iAOqMxtW70BGCz0Jt2EBhYXlIEa5EDSKDrYHsYTSl5JiGY3tvHBa4nmhuA2OGSsq0+N1MYBJtI6IiKE3w1m5ETBFfJ52k+6DoDc0RxnPDIbhtMdpj7pGDv6s2WTeufstmx34jfWK2bZ7LtDC9iX9UiGNZIeNfrQxh30mG8Ento8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=h+mXmm6O; arc=none smtp.client-ip=209.85.160.169
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EltEJVza"
-Received: by mail-oa1-f51.google.com with SMTP id 586e51a60fabf-2702ed1054fso1659346fac.3
-        for <iwd@lists.linux.dev>; Fri, 23 Aug 2024 10:42:24 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="h+mXmm6O"
+Received: by mail-qt1-f169.google.com with SMTP id d75a77b69052e-44ff99fcd42so12889431cf.0
+        for <iwd@lists.linux.dev>; Fri, 23 Aug 2024 11:00:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1724434944; x=1725039744; darn=lists.linux.dev;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=bOMbLA58dsGBxNJVuB+4YhT7/UnNmjgblcH1i5wJeVw=;
-        b=EltEJVzapgqomTH3flkcctBxPXFIHjE69tAYh3rDrGLJYz7ZJ1fE0hWY7noTnVXkIe
-         H4hhCaXlMY4j/Pyrwp5z4CIJOJt+FgPGgPtuB3ade6jzQAz5UpaJCRvg4MqjEdf5LBsN
-         CSXt1EEZUn4X+PB94UNl30pa+dIoUgOD/iGm2mpT1uVQ+wWHSmdQfJPEVgztzQ0vxwoh
-         CKE+scfgsvUldX4g9SnCLqliQ9FhSWa2QSeRK+pEykYHCcyPh+fhUBqgFY85WYTWAnUh
-         gfvZW29WQNbXUglgXK9yJ6UX91jn3cKRDXFeMBSZNBGsEsWsEFoGZ4eBY0azUQlDs1Dp
-         7Hmg==
+        d=gmail.com; s=20230601; t=1724436016; x=1725040816; darn=lists.linux.dev;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=9aFfc/G92BSYc+ccc7FukmxlIFRNIq41Om4fmsWhHOE=;
+        b=h+mXmm6Oq60mFg2F/jh886U7CocRD5zSpUIZ0uDtHwP1R49ozmvX/7XEA8e9oBJg1H
+         LW4ZSs4pWeV09KTdAbrF2ovp6Pc/WXmoP16QxVU0exT9ngfG8lkty9WKrpJXiXVBn4kE
+         KJtfCwU5palrHs3TVAYHQzJDJ0hAOAED/3koHVh4aw2Qzj8M+g29JmFVS6dI6hO0gtI4
+         fIiKC0eDIKX7iRN67l1h+8TXYqtgnalrYrP121TqOJPRsMdZX+IIsRERwG0enP4l07eB
+         B3SulAazwFuaaMsTsUblTnaz8Yf8J0SkUBQmFUy2CL+t6SYUzTgDjzCPZm62iVNTy/vY
+         Nsng==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724434944; x=1725039744;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=bOMbLA58dsGBxNJVuB+4YhT7/UnNmjgblcH1i5wJeVw=;
-        b=sNxcFoaqed1y5ZM84Ceyqncd6d8lhlhSjimmNaeRqLvhlDpHuWGJnczSjFxbIhCxWm
-         qvzv1Hc5apdK859dLZj1rIG1bShd6atgKmYsgoU9rnm2zPBTA3Bj8RS4MYnxhPa/Y0G7
-         yG848sOoSNx7sr145nsGNd2Xx8brXj2OFFzXjFZ94wzGYZTUqW2LHS8z7vpu1p9FzQeV
-         dd8YS77H5uUqh44O5v5nDh2X2GB2vKoxVF2XEn7Ev9muU+wGuEOulP/SdBPmk707Y83d
-         6aC8HKCZV7g3zoMi2dok/KgKVC7v5bCH6NCNTMuiSJ2ZeFsaLQi/woxXkTQSKG0SxQXa
-         9HyA==
-X-Gm-Message-State: AOJu0YzBD1A5yqWLWHbezNot4Evvyx+QyR/BUdHnd8+AaUAO2wPyoQMk
-	jzHKFZCFtSVYuuMwznhPdwumEJKJ38ZxQLIRnU1DnppF2cWsQ26vJ68Xqw==
-X-Google-Smtp-Source: AGHT+IGz3174ETaCOY8QybyCtSIqLhQ/QWVbw5dB4ZsxB0f4D0ckdTjf7clyQoq3JLYwyM/kRp3TvA==
-X-Received: by 2002:a05:6870:808c:b0:259:88b4:976 with SMTP id 586e51a60fabf-273e6692602mr2907414fac.43.1724434943732;
-        Fri, 23 Aug 2024 10:42:23 -0700 (PDT)
-Received: from archdev.attlocal.net (syn-070-114-247-242.res.spectrum.com. [70.114.247.242])
-        by smtp.gmail.com with ESMTPSA id 46e09a7af769-70e03aa9c67sm728506a34.30.2024.08.23.10.42.23
+        d=1e100.net; s=20230601; t=1724436016; x=1725040816;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=9aFfc/G92BSYc+ccc7FukmxlIFRNIq41Om4fmsWhHOE=;
+        b=VusdKMY+fQZLYrPCEr/kFS/uKm39v5w7H0Atfy3pm0X50hX1hTMHxUZcNip2W59GI1
+         paCzxyKS6tbqf4bDKvI2fXKlaJHeZfKL2Jl7h6+Eme3Y0T8LJ4NPIMJQZi0afYVnr/AC
+         hAfAQyqIVm5IdKDwLbrn2YPfEn14JSdglfv3Ie6seDL8vIhN0epl7I18wS5brkUHBfpW
+         6e3+k4EbiE/mMNFRWv6JHMfWpvsWh+K5d3S/E+Php4zFkAuh3hU+HnhVaNE/tmWb0lEb
+         jFst2nYMXCjcbXyneTamcKejzys1FyTSASo7KhJ5NzUnCcOOKk+8WeGTvOa4vQ36t+tl
+         0IKg==
+X-Gm-Message-State: AOJu0YyL6qohZpaNQpdONVq5p3Ompl25MfN7Btt+tGMUEKC9DDHxtq71
+	/ac+I/m21yOVGR85IuMNTN98KKwOTA7BL0VRYd/75d746pSPkMz7iNZgmg==
+X-Google-Smtp-Source: AGHT+IFLNh2JTAgQTK7VuTjRfWW4212YnCCnIyzMXPKSvfxrSPk8TqvD+aCMV1SN56Yl06Rw+UYVBQ==
+X-Received: by 2002:a05:622a:6091:b0:453:767a:183b with SMTP id d75a77b69052e-4550967870bmr26144801cf.30.1724436015815;
+        Fri, 23 Aug 2024 11:00:15 -0700 (PDT)
+Received: from LOCLAP699.locus-rst-dev-locuspark.locus ([152.193.78.90])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-454fe0f0507sm19683131cf.47.2024.08.23.11.00.14
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 23 Aug 2024 10:42:23 -0700 (PDT)
-From: Denis Kenzior <denkenz@gmail.com>
+        Fri, 23 Aug 2024 11:00:15 -0700 (PDT)
+From: James Prestwood <prestwoj@gmail.com>
 To: iwd@lists.linux.dev
-Cc: Denis Kenzior <denkenz@gmail.com>
-Subject: [RFC PATCH v1 2/2] sae: Allow ability to force Group 19 / Hunt and Peck
-Date: Fri, 23 Aug 2024 12:41:54 -0500
-Message-ID: <20240823174220.498594-3-denkenz@gmail.com>
-X-Mailer: git-send-email 2.45.2
-In-Reply-To: <20240823174220.498594-1-denkenz@gmail.com>
-References: <20240823174220.498594-1-denkenz@gmail.com>
+Cc: James Prestwood <prestwoj@gmail.com>
+Subject: [PATCH v3 1/8] doc: Document station Affinities property
+Date: Fri, 23 Aug 2024 10:59:59 -0700
+Message-Id: <20240823180006.317353-1-prestwoj@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
@@ -68,74 +64,85 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
----
- src/netdev.c |  5 ++++-
- src/sae.c    | 20 ++++++++++++++++++++
- src/sae.h    |  3 +++
- 3 files changed, 27 insertions(+), 1 deletion(-)
+This documents new DBus property that expose a bit more control to
+how IWD roams.
 
-diff --git a/src/netdev.c b/src/netdev.c
-index a1342d1bef94..5bc055acacfe 100644
---- a/src/netdev.c
-+++ b/src/netdev.c
-@@ -3933,11 +3933,14 @@ static void netdev_connect_common(struct netdev *netdev,
- 		netdev->ap = sae_sm_new(hs, netdev_sae_tx_authenticate,
- 					netdev_sae_tx_associate,
- 					netdev);
--	else
-+	else {
- 		netdev->ap =
- 			sae_sm_new(hs, netdev_external_auth_sae_tx_authenticate,
- 					netdev_external_auth_sae_tx_associate,
- 					netdev);
-+		sae_sm_force_default_group(netdev->ap);
-+		sae_sm_force_hunt_and_peck(netdev->ap);
-+	}
+Setting the affinity on the connected BSS effectively "locks" IWD to
+that BSS (except at critical RSSI levels, explained below). This can
+be useful for clients that have access to more information about the
+environment than IWD. For example, if a client is stationary there
+is likely no point in trying to roam until it has moved elsewhere.
+
+A new main.conf option would also be added:
+
+[General].CriticalRoamThreshold
+
+This would be the new roam threshold set if the currently connected
+BSS is in the Affinities list. If the RSSI continues to drop below
+this level IWD will still attempt to roam.
+---
+ doc/station-api.txt | 17 +++++++++++++++++
+ src/iwd.config.rst  | 16 ++++++++++++++++
+ 2 files changed, 33 insertions(+)
+
+v3:
+ * Fixed typo
+
+diff --git a/doc/station-api.txt b/doc/station-api.txt
+index 84f1b7bf..707c6834 100644
+--- a/doc/station-api.txt
++++ b/doc/station-api.txt
+@@ -170,6 +170,23 @@ Properties	string State [readonly]
+ 			BSS the device is currently connected to or to which
+ 			a connection is in progress.
  
- 	if (sae_sm_is_h2e(netdev->ap)) {
- 		uint8_t own_rsnxe[20];
-diff --git a/src/sae.c b/src/sae.c
-index 97c0af052f14..eb4634848afa 100644
---- a/src/sae.c
-+++ b/src/sae.c
-@@ -1550,6 +1550,26 @@ struct auth_proto *sae_sm_new(struct handshake_state *hs,
- 	return &sm->ap;
- }
++		ao Affinities [optional] [experimental]
++
++			Array of net.connman.iwd.BasicServiceSet object paths
++			that will be treated with higher affinity compared to
++			other BSS's. Currently the only allowed value to be
++			set in this array is the path to the currently connected
++			BasicServiceSet object, i.e.
++			Station.ConnectedAccessPoint.
++
++			Setting the affinity will lower the roaming threshold,
++			effectively locking IWD to the current BSS unless the
++			RSSI drops below the critical threshold set by
++			[General].CriticalRoamThreshold{5G} at which point
++			IWD will proceed with normal roaming behavior.
++
++			This property is cleared on roams/disconnections.
++
+ SignalLevelAgent hierarchy
+ ==========================
  
-+bool sae_sm_force_hunt_and_peck(struct auth_proto *ap)
-+{
-+	struct sae_sm *sm = l_container_of(ap, struct sae_sm, ap);
+diff --git a/src/iwd.config.rst b/src/iwd.config.rst
+index d9c94e01..2d1f6dcd 100644
+--- a/src/iwd.config.rst
++++ b/src/iwd.config.rst
+@@ -130,6 +130,22 @@ The group ``[General]`` contains general settings.
+        This value can be used to control how aggressively **iwd** roams when
+        connected to a 5GHz access point.
+ 
++   * - CriticalRoamThreshold
++     - Value: rssi dBm value, from -100 to 1, default: **-80**
 +
-+	sae_debug("Forcing SAE Hunting and Pecking");
-+	sm->sae_type = CRYPTO_SAE_LOOPING;
++       The threshold (for 2.4GHz) at which IWD will roam regardless of the
++       affinity set to the current BSS. If the connected BSS has affinity
++       (set in Station's Affinities list) the roam threshold will be lowed to
++       this value and IWD will not attempt to roam (or roam scan) until either
++       the affinity is cleared, or the signal drops below this threshold.
 +
-+	return true;
-+}
 +
-+bool sae_sm_force_default_group(struct auth_proto *ap)
-+{
-+	struct sae_sm *sm = l_container_of(ap, struct sae_sm, ap);
++   * - CriticalRoamThreshold5G
++     - Value: rssi dBm value, from -100 to 1, default: **-82**
 +
-+	sae_debug("Forcing Default Group");
-+	sm->force_default_group = true;
++       This has the same effect as ``CriticalRoamThreshold``, but for the 5GHz
++       band.
 +
-+	return true;
-+}
-+
- static int sae_init(void)
- {
- 	if (getenv("IWD_SAE_DEBUG"))
-diff --git a/src/sae.h b/src/sae.h
-index 668d084f3402..4a59999bfba0 100644
---- a/src/sae.h
-+++ b/src/sae.h
-@@ -34,3 +34,6 @@ struct auth_proto *sae_sm_new(struct handshake_state *hs,
- 				sae_tx_authenticate_func_t tx_auth,
- 				sae_tx_associate_func_t tx_assoc,
- 				void *user_data);
-+
-+bool sae_sm_force_hunt_and_peck(struct auth_proto *ap);
-+bool sae_sm_force_default_group(struct auth_proto *ap);
+    * - RoamRetryInterval
+      - Value: unsigned int value in seconds (default: **60**)
+ 
 -- 
-2.45.2
+2.34.1
 
