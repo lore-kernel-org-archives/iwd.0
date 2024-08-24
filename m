@@ -1,138 +1,117 @@
-Received: from mail-qv1-f54.google.com (mail-qv1-f54.google.com [209.85.219.54])
+Received: from mail-pg1-f173.google.com (mail-pg1-f173.google.com [209.85.215.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95868191F6B
-	for <iwd@lists.linux.dev>; Fri, 23 Aug 2024 22:24:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B923161
+	for <iwd@lists.linux.dev>; Sat, 24 Aug 2024 00:39:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724451860; cv=none; b=WngsWZjoodYN7mLh1hf1JI1cbe5f3Lchpv0zB9QRMJiz6hbX33R7ql1BILDon2UYhl4sdMo6fhzsFikIW1XzEV1Sao1lNWiWrZZSIdkl3T+eIVIzzPozIq7sjtjVP2obvRBvxowG7PAbcgGWDDlt5VBfYx+q7uVJ2TOrRW/rA5Q=
+	t=1724459944; cv=none; b=kDrDgLG/CBPATGokm6XctgrXkMJ6EGXqR+2DN6aZzucM2rkKTAYKaErjykS34UAoAi8lhNAMBiK0SG7MVgluQw5gs4BtU9NnVl8QyK7EWZNGdUkYhEc63umYzhImRw08I85hLPYBQK33nrbMgCzwriLDOzxAMOc4OGjSU4KS7Uo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724451860; c=relaxed/simple;
-	bh=EQKjWB9c6rMiD0Hcu5EQs/D/3jKDl9sbtQ+JSBGSDB4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=Tvm4E8vYlLGWKSFENvAAOJor+FavJJ4oGpGhLimg8Dq4W5qGkGg8AxkyIDLnAk2PJsQf3pCiEmzaZXjQ9gFc68+R2GNE7hJQMP1vmdrE87/3BS11SXwR1E+rXpUOle0lnUKbx8EgbPBomLhXxGDflQe6NVzLXNicjkVJTp5VSqA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Opon2Vut; arc=none smtp.client-ip=209.85.219.54
+	s=arc-20240116; t=1724459944; c=relaxed/simple;
+	bh=1pA/4Qvk+rPmt50nccwgK5B0jTiJ0gzFCBQ9cCyHmgQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=i9lWWBcN6y/ru3PKOoJu8e/xFFLsaR9hRM/bhw/HRyWwsemVgmx+LmXGu6RPLOJnPsb7A2uzPHPTY0Dy4lXNpsCJxoC8FbEppvbka/wjNhlzc1rUdXAejoGezqoVfRGwg/kcBBy7K631J1uoehw6vsqo57NaKwYWeRPqoGCLSyc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JduP9p1r; arc=none smtp.client-ip=209.85.215.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Opon2Vut"
-Received: by mail-qv1-f54.google.com with SMTP id 6a1803df08f44-6bd6f2c9d52so12030876d6.3
-        for <iwd@lists.linux.dev>; Fri, 23 Aug 2024 15:24:18 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JduP9p1r"
+Received: by mail-pg1-f173.google.com with SMTP id 41be03b00d2f7-7cd895682fcso1037407a12.0
+        for <iwd@lists.linux.dev>; Fri, 23 Aug 2024 17:39:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1724451857; x=1725056657; darn=lists.linux.dev;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=FmWIm5DeugPNTbIun2KiR8748EkAbKdXboWtPaf2ihc=;
-        b=Opon2VutrNBo/L430ER4cg4FMkiHfnmHuK9gzjzTM11d4XNFmGSKqPg7XPrL77qWLZ
-         0Zih4eM1EwFDe5TRwHUUMw+W3CgTxGv7X8X3/krWT6gxWI2IW360AgyrGDG9QgCO3aPp
-         kTvFgpweB8iyDQYoJbQP6Y65IHS9RVfBmVrEl3LRb8f88W6RrClxOz1b5qL94wXMEGl4
-         ypExiE2mSVVUfHzYPsFHhrAWo4mevhx1osySE1sCiuEUYg0LDFDwMClqcCKYyH4aXFLv
-         lYEaWc4CVX+eQ5VnCX4NguHVA78JvHikZ/ny/tp/5sXEfo3IrPlCmfxpZyvrjSpLR8L+
-         ju8g==
+        d=gmail.com; s=20230601; t=1724459942; x=1725064742; darn=lists.linux.dev;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=KZRioy5vmROrbI42J4/dMWyDU9xLDCEp4z8dEMEnCLw=;
+        b=JduP9p1rMAF6KPvsU4UU5NTs6uOutKdcSCnZqbfDdpZw3IbkVMD3FCG4QNAT+FY6VM
+         0AIU74rWrH9ieVsOqcA7JmD6s2gi3LjglzG7R2aKVAUw1c/MxPyO9It8MbGnwalzDarn
+         g99n7OaAffpof8c435saL/zNvQDS1dxbHtlfOy/aBsakE6+YR87nUzyr1RoivNvc6wCX
+         22wujzn9fsvOIv+IC7L8KVNnHJH0cmafLduziQ0HogjE5l9MQ08q20ZMTjnUc/LgS5xI
+         XVuDwfK75yjdCtoUyWvKzN2ninT60nKdWzrsIdAnaUJTKyA9+3dIXbwLehp0It71Imf/
+         MHng==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724451857; x=1725056657;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=FmWIm5DeugPNTbIun2KiR8748EkAbKdXboWtPaf2ihc=;
-        b=UzGMgv+Y2pUcJ3BKbNB7sL7vXUXnWmRs0RwF0kwRvZkXGm6mQN17NpTYin+hh2JrU4
-         EbRUuyXpohtqlYb6qHyN8uF2W1ubwSI4p6kgoHbLKX8KXim2S53s5aGhqfi3U67niDUZ
-         +oqLIk3XUgzuzVAPdOrNT0PjHv8vllbTXaUD9JJDtnmFgThM+6YCV7J5OwBokAn6PkMF
-         /YEIofa/9TLCTrKt6wDkVodN8OZZmgJhHtxOjzb5p2W6LSDjj9ZNSfoxkbMtLpqODHzQ
-         QAFs1JfGZ4fftRW+4p0J8ex3iaGltk64+VWp+u3LUjcVbNs39/LwIjO/PMGLqY1neeoX
-         hHgg==
-X-Forwarded-Encrypted: i=1; AJvYcCXuBXLHkuxCat86EKmDruGxOORAusbBo1b4j2RABrCVC2TYotI1PVJX0VJHXlNlZxuQb58=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yx/aUOhogHOEdVvHkXzrDeuqD1V9yG76le8r7SqMRxuzoiKlB2R
-	eINhyCKy5KTWz2C5bGnggPSxOEtfucOFYx7lbSCevtVzoojLpuwGnEcS0w==
-X-Google-Smtp-Source: AGHT+IE8IzJZrE7issL1sWcX2W6MiiXrBZ4wGNjoAajZpDlASF1iq8Fyr0MuKV0cuKvrIgW7Q47jMA==
-X-Received: by 2002:a05:6214:5a02:b0:6c1:6add:d26e with SMTP id 6a1803df08f44-6c16dc24ec2mr42522396d6.11.1724451857470;
-        Fri, 23 Aug 2024 15:24:17 -0700 (PDT)
-Received: from [10.100.121.195] ([152.193.78.90])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6c162dcd08fsm22687646d6.107.2024.08.23.15.24.16
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 23 Aug 2024 15:24:17 -0700 (PDT)
-Message-ID: <cbd19eb3-4bfb-43d5-8937-f1455bbf2671@gmail.com>
-Date: Fri, 23 Aug 2024 15:24:14 -0700
+        d=1e100.net; s=20230601; t=1724459942; x=1725064742;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=KZRioy5vmROrbI42J4/dMWyDU9xLDCEp4z8dEMEnCLw=;
+        b=R28HRsqhKjkEfIK+9Tu5diYZ0rybTK1DPcA/kX+CMnxIbbVIxZdKzAhdTGAZ8mHAQY
+         cGOC+vGRnF9e3jV3qYHZJJkxreG5kR5GafvmfqnoFTu0bHEEhsBqz/WFRKRszlSb6Pre
+         qcX7Mf/1iEbnDGyOuFogqAQXEWYtNCGG0ohJDtbGv3wd3pfZS1Bxa4LKFuDr7dD9tebF
+         TNxfCl1YPI/FTSPhu8Y25LMiNqRYst9uzcn6FSR6WcNkAb+avOmaTJ/1exR7LRFx7pUy
+         WKEvIn8Lcj/frJprBnDYgbHTsdFVaQ4EeXqk93gyhvahV8aP+kJR3MaZNIXTwG8xnICO
+         ra/g==
+X-Gm-Message-State: AOJu0YxsTSzcLT56296J1H/PGKxRP9/Yrty6jc+PrnTLIsMogwIq/MD6
+	KaR7wz020mE2DOam7CqNcIoy9Z5gysw2pVi/o7i0wzUlsr5zikODr7t3Bs+34BeP+b24wnR3DYs
+	aYNkCRj1lLDm0JKhx06OI/HHZsrw=
+X-Google-Smtp-Source: AGHT+IHzNp9eZHtNo5erIV+BOFphz7jtNXPpzlAb6k3T2KqDlHrfyAE1gJ0Jvc+4oc9ggQC9bfqWTU3qF3RSKXKxpv4=
+X-Received: by 2002:a05:6a20:d98:b0:1bd:2a8d:e25d with SMTP id
+ adf61e73a8af0-1cc8b5c6c65mr4327734637.47.1724459941927; Fri, 23 Aug 2024
+ 17:39:01 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 2/8] netdev: define netdev settings in netdev.h
-To: Ryan Smith <ryan.smith@density.io>, iwd@lists.linux.dev
-References: <20240823180006.317353-1-prestwoj@gmail.com>
- <20240823180006.317353-2-prestwoj@gmail.com>
- <CAM7Wg-V7rGu1P666PFpVb2sHKbe+34r=GBZgRT6VePkjzmFEVA@mail.gmail.com>
-Content-Language: en-US
-From: James Prestwood <prestwoj@gmail.com>
-In-Reply-To: <CAM7Wg-V7rGu1P666PFpVb2sHKbe+34r=GBZgRT6VePkjzmFEVA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+References: <20240823174220.498594-1-denkenz@gmail.com>
+In-Reply-To: <20240823174220.498594-1-denkenz@gmail.com>
+From: KeithG <ys3al35l@gmail.com>
+Date: Fri, 23 Aug 2024 19:38:50 -0500
+Message-ID: <CAG17S_NjMwU4=qn_jJzUJwPEOTT1H-SPVb7Re0P4fyPNUg=WqA@mail.gmail.com>
+Subject: Re: [RFC PATCH v1 0/2] External Auth support
+To: Denis Kenzior <denkenz@gmail.com>
+Cc: iwd@lists.linux.dev, James Prestwood <prestwoj@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Ryan,
+Denis,
 
-On 8/23/24 2:03 PM, Ryan Smith wrote:
-> Hi,
-> Just glancing through this...
+
+On Fri, Aug 23, 2024 at 12:42=E2=80=AFPM Denis Kenzior <denkenz@gmail.com> =
+wrote:
 >
-> On Fri, Aug 23, 2024 at 12:00 PM James Prestwood <prestwoj@gmail.com> wrote:
->> Following knownnetworks, this moves the settings into a header file
->> which is easier to maintain/read.
->> ---
->>   src/netdev.c | 8 ++++----
->>   src/netdev.h | 5 +++++
->>   2 files changed, 9 insertions(+), 4 deletions(-)
->>
->> diff --git a/src/netdev.c b/src/netdev.c
->> index 494e46a5..4d6aae6b 100644
->> --- a/src/netdev.c
->> +++ b/src/netdev.c
->> @@ -6264,16 +6264,16 @@ static int netdev_init(void)
->>                  goto fail_netlink;
->>          }
->>
->> -       if (!l_settings_get_int(settings, "General", "RoamThreshold",
->> +       if (!l_settings_get_int(settings, NETDEV_ROAM_THRESHOLD,
->>                                          &LOW_SIGNAL_THRESHOLD))
->>                  LOW_SIGNAL_THRESHOLD = -70;
->>
->> -       if (!l_settings_get_int(settings, "General", "RoamThreshold5G",
->> +       if (!l_settings_get_int(settings, NETDEV_ROAM_TRHESHOLD_5G,
->>                                          &LOW_SIGNAL_THRESHOLD_5GHZ))
->>                  LOW_SIGNAL_THRESHOLD_5GHZ = -76;
->>
->> -       rand_addr_str = l_settings_get_value(settings, "General",
->> -                                               "AddressRandomization");
->> +       rand_addr_str = l_settings_get_value(settings,
->> +                                               NETDEV_ADDRESS_RANDOMIZATION);
->>          if (rand_addr_str && !strcmp(rand_addr_str, "network"))
->>                  mac_per_ssid = true;
->>
->> diff --git a/src/netdev.h b/src/netdev.h
->> index db0440d0..d718fa6a 100644
->> --- a/src/netdev.h
->> +++ b/src/netdev.h
->> @@ -29,6 +29,11 @@ struct eapol_sm;
->>   struct mmpdu_header;
->>   struct diagnostic_station_info;
->>
->> +#define GENERAL "General"
->> +#define NETDEV_ADDRESS_RANDOMIZATION GENERAL, "AddressRandomization"
->> +#define NETDEV_ROAM_THRESHOLD GENERAL, "RoamTreshold"
-> Spelling typo - RoamThreshold
+> This series implements External Auth support on Full MAC cards that do
+> not support SAE offload.  I have not been able to test this fully since
+> the brcmfmac firmware on the RPi 5 does not actually work properly.
+> Maybe some enterprising person can test it on a firmware that does work?
 >
->> +#define NETDEV_ROAM_TRHESHOLD_5G GENERAL, "RoamThreshold5G"
-> Spelling typo - NETDEV_ROAM_THRESHOLD_5G
+> Denis Kenzior (2):
+>   netdev: external auth support
+>   sae: Allow ability to force Group 19 / Hunt and Peck
 >
->> +
->>   enum netdev_result {
->>          NETDEV_RESULT_OK,
->>          NETDEV_RESULT_AUTHENTICATION_FAILED,
->> --
->> 2.34.1
->>
->>
-Thanks, good catch!
+>  src/netdev.c      | 258 +++++++++++++++++++++++++++++++++++++++++-----
+>  src/nl80211util.c |   4 +-
+>  src/sae.c         |  20 ++++
+>  src/sae.h         |   3 +
+>  src/wiphy.c       |  19 ++--
+>  5 files changed, 263 insertions(+), 41 deletions(-)
+>
+> --
+> 2.45.2
+>
+>
+I was watching for this. I built iwd from git and tried it on my Pi5.
+As you said, it did not work:
+
+Aug 23 19:24:29 pi5 iwd[16297]: SAE unsupported: brcmfmac needs
+CMD_EXTERNAL_AUTH for SAE
+Aug 23 19:24:29 pi5 iwd[16297]: src/wiphy.c:wiphy_select_akm() Can't
+use SAE, trying WPA2
+Aug 23 19:24:32 pi5 iwd[16297]: src/agent.c:agent_disconnect() agent
+:1.471 disconnected
+Aug 23 19:24:32 pi5 iwd[16297]: src/agent.c:agent_free() agent free
+0x5555946ddaf0
+
+I believe this is the latest firmware from Infineon for the RPi fmac cards:
+Firmware: BCM4345/6 wl0: Aug 29 2023 01:47:08 version 7.45.265
+(28bca26 CY) FWID 01-b677b91b
+Firmware: BCM43430/1 wl0: Jun 14 2023 07:27:45 version 7.45.96.s1
+(gf031a129) FWID 01-70bd2af7 es7
+
+I know there are a number of fmac cards. Does the firmware on these
+work differently to other brcmfmac cards? Do all of them use
+CMD_EXTERNAL_AUTH?
+
+Keith
