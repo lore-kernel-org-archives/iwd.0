@@ -1,158 +1,172 @@
-Received: from mail-ot1-f44.google.com (mail-ot1-f44.google.com [209.85.210.44])
+Received: from mail-lj1-f171.google.com (mail-lj1-f171.google.com [209.85.208.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F271B189509
-	for <iwd@lists.linux.dev>; Mon, 26 Aug 2024 15:43:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C98C19750B
+	for <iwd@lists.linux.dev>; Mon, 26 Aug 2024 16:54:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724687005; cv=none; b=qGzrsz5fyXTAVg2RvIyzzpNBE48cJs0TdrEQbYsANj9lgotJKPVnvJR7CLVRnmirBBnPj+DHLeRF3o8jBE7iEtUU4SLFYYPiCWqQb3lTnaituFXybmy+RTZ6H8zoWOYpnkTsS7IBXcEKkKRHurkHw9eZT8mfhBs5ep+xYI5pS/c=
+	t=1724691284; cv=none; b=LQe4ko95cozwgnVbmwBxY0Ot2WEn1CYxAK0xHXjZ05ffpdDeelMJQLsipWJjASxNT1xYCq1C6KS5lpvUZVJLM+H16xDsNFocilTQENScSnf940ZjLQnmZ8LNIO+Ii8DTbOkEmUOzDrFQKUgyEs59oeIID3N3EXTiRnEDnc7HD24=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724687005; c=relaxed/simple;
-	bh=qyccldYwQQnwSrNlXmUpGSRjPlc28r6ErZKJHxUxZsE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=H2iII/lIGR+ny6j9l7TSVosGTzDGIicYVRnqjJ6+WNrbSGMiQu7U+sllB4DvDhdHr+Abumdk9MPFOea3ps7LnFBAV5S4z5O2rINAsuL5qY4SwX4rOqBPhXxKs8x9AF/9ms372jE99w/wx6njIJGse9ZqlDXi8/QXQ9xKc1t8Ri4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RBoF6zFT; arc=none smtp.client-ip=209.85.210.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1724691284; c=relaxed/simple;
+	bh=aH2qttuGMrScajbyCcZLL212ugwm5JmecTVYdCq/v6I=;
+	h=From:To:CC:Date:Message-ID:In-Reply-To:References:Subject:
+	 MIME-Version:Content-Type; b=j9afw8k8sbi+wDvV5c+n/zfxF0fwyWf6f2iksR/QSrVfoiyNXCrGRYNApKEJtbcVpwHobdAxWp5O1+Njv1CHQV1rJyEjQXnDBvqvBS9XwIFgB4nrX5l6t0M2lu2e3bGvmsPc4ZByjsuZcPLEcDIsp8SBJBJ80P0dQdjn6a482nE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=hN1YkpW9; arc=none smtp.client-ip=209.85.208.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RBoF6zFT"
-Received: by mail-ot1-f44.google.com with SMTP id 46e09a7af769-70f44b88bf0so245713a34.1
-        for <iwd@lists.linux.dev>; Mon, 26 Aug 2024 08:43:23 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="hN1YkpW9"
+Received: by mail-lj1-f171.google.com with SMTP id 38308e7fff4ca-2f50ca18a13so17597481fa.1
+        for <iwd@lists.linux.dev>; Mon, 26 Aug 2024 09:54:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1724687003; x=1725291803; darn=lists.linux.dev;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=0OFhiwfqxqo9fcipxA+VFN1iuMQTDRczd1d7rbCfRZ8=;
-        b=RBoF6zFTPrqTXw2IwT3ykymzXO+aPj4x6xyiucHP0d1Q99l/fOuUmzGaZONUCnhEOR
-         S+c3QVpOLIhs07TFwUnvflSt1AQk+AOo/qJP5OyUShj+/2//V7G5QN4QyZ9IMrZ9xN5o
-         +9l9ec7/x3P2LH6yLBK+K7OvdRfmYfza635Hn8tZEZAzlpwii55XeyzUJL7grAbUdiRh
-         xDoprCezLjD3IkwyROAEnxv45Tt+EKdQovzarFQMUo5QcGtyvhk4Mp7TZCjhUur+NRkz
-         ZKQlMWjlewhroqMSrcmp0hegSHilXQqjnU85H1ImUa1V8By05jUgR6xxRCri/+edk7kW
-         3AzA==
+        d=broadcom.com; s=google; t=1724691281; x=1725296081; darn=lists.linux.dev;
+        h=content-transfer-encoding:mime-version:subject:user-agent
+         :references:in-reply-to:message-id:date:cc:to:from:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=w8nKuFEZPw2THCfHRIyPfnP2hhoiw0AHChWyrzvAYRE=;
+        b=hN1YkpW9Fk0ct1VMIr9btx2Bd7M8OspQGbjG0V0qo+9aR8fb3fFxczdXNnaKzT2SqR
+         Qj5l9GleYW3g9A0J/IbjmBlq/XgI4H3UIFF2fmzFA5aU3CrKUXu254Jh4gnrRLuGwF2x
+         OuNicTgeNxECjplDctxBtqSlV0XHDTviS3FSc=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724687003; x=1725291803;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
+        d=1e100.net; s=20230601; t=1724691281; x=1725296081;
+        h=content-transfer-encoding:mime-version:subject:user-agent
+         :references:in-reply-to:message-id:date:cc:to:from
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=0OFhiwfqxqo9fcipxA+VFN1iuMQTDRczd1d7rbCfRZ8=;
-        b=wcor2CYCXOxi/yKbu6lFM56QCX6bvGULYOjCXFBZ4gbG7yS94GZzheMJT7BYkt7fOI
-         6Yll2y/JGBRf+dIkZzHm0brkibTy2x87LoiwC+MNncFFiiqvK03wZqbBva6BfJ5d3RfV
-         GG+wyqdbaB5y8J88Gr6G7E8Bwvs8G++SnvCf4gbCtm2hLSeu8plxtcbff4di+dMorfND
-         em7VpLMw5lR6b2f5KX3g/z/LMDfcbysSeVF1jo4ZbalFlJwPh8cTYFe02pTZ9evxlyQ9
-         j4LNhm1aFR2r5qMDwliqZw+AmG82YlkNsJ1z8TRSx/o0IQXFKlhnZpO7YqwO5vDoPMfl
-         gbcQ==
-X-Gm-Message-State: AOJu0Yw4lUdGST2BgojLN+Vp+bTnXY/2gw8kL5UbapN89+db0/Ibe/LF
-	KmwL31udJIJVc7Ef3sJ1zcKyj9Xmcw/WwyoPAxsFElFlKt5F8Rx2
-X-Google-Smtp-Source: AGHT+IHXLsAgSG9w/GUn/MPI8eVfTf9kMnXtW+OovitNx8r9KRxFHjY8CcPSVQin6u11GCpirMneeQ==
-X-Received: by 2002:a05:6808:10cb:b0:3d5:6277:77b with SMTP id 5614622812f47-3def3bf1047mr17263b6e.12.1724687002961;
-        Mon, 26 Aug 2024 08:43:22 -0700 (PDT)
-Received: from [192.168.1.22] (syn-070-114-247-242.res.spectrum.com. [70.114.247.242])
-        by smtp.googlemail.com with ESMTPSA id 5614622812f47-3de2258173fsm2046106b6e.33.2024.08.26.08.43.22
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 26 Aug 2024 08:43:22 -0700 (PDT)
-Message-ID: <93c94dfc-2121-4b7d-b069-8b6ce22290fb@gmail.com>
-Date: Mon, 26 Aug 2024 10:43:21 -0500
+        bh=w8nKuFEZPw2THCfHRIyPfnP2hhoiw0AHChWyrzvAYRE=;
+        b=QXnyB91yger2n9NncAx2ygdt/p/JBMZ+jWFiBwAqRfTlhS8WgeZPCmD8+kH+N0zDxr
+         SpRjuiBCWJs56svpmBLmVwOwvYXikwEZLm63kgpwgC/GybSe2kmHGKmm0BOdHICPuogc
+         sq4BgfHG1oCg6fUN+HSfx4Rs0ZedvQ/93uc5eiEo5UKk5Vj8XrPQeVVi7CJKGb5/etI7
+         YPbhr9CC5tg0rWlqtBM15ZqwQqyvQZDL+np6zC9FM92mAUUkAvHneQTpurqL1RUis9A2
+         1nYrGSsH3GVzE50Dkj9ImUOO1j+rzdpGYnCWNvL3AplVo7OkuRHO5Z0/zk3pJ1PNUvQZ
+         e86g==
+X-Gm-Message-State: AOJu0YwEdJ7zcRCIDVBuJcaOSmJoS1iI/9Um4caylpENuqkG6ebwzAjy
+	60o27ohsVL05OCjNIi963kuO44Anj/M85vGmJpC/EnE0gHTKSr17fVv9QMEESg==
+X-Google-Smtp-Source: AGHT+IHa/yj47aRfADrtULkcTjyuWOcDZnRvVtpDun6d/0Vp8PMOLaYCCj6LueVIG74GWuCQr7E9Vw==
+X-Received: by 2002:a2e:3207:0:b0:2f1:929b:af03 with SMTP id 38308e7fff4ca-2f4f5797917mr55178801fa.30.1724691280022;
+        Mon, 26 Aug 2024 09:54:40 -0700 (PDT)
+Received: from [192.168.178.38] (f215227.upc-f.chello.nl. [80.56.215.227])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5c04a4c6ce9sm5823939a12.72.2024.08.26.09.54.39
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Mon, 26 Aug 2024 09:54:39 -0700 (PDT)
+From: Arend Van Spriel <arend.vanspriel@broadcom.com>
+To: Denis Kenzior <denkenz@gmail.com>, KeithG <ys3al35l@gmail.com>
+CC: <iwd@lists.linux.dev>, James Prestwood <prestwoj@gmail.com>
+Date: Mon, 26 Aug 2024 18:54:37 +0200
+Message-ID: <1918f9c64c8.279b.9b12b7fc0a3841636cfb5e919b41b954@broadcom.com>
+In-Reply-To: <93c94dfc-2121-4b7d-b069-8b6ce22290fb@gmail.com>
+References: <20240823174220.498594-1-denkenz@gmail.com>
+ <CAG17S_NjMwU4=qn_jJzUJwPEOTT1H-SPVb7Re0P4fyPNUg=WqA@mail.gmail.com>
+ <f36d03e4-e85a-438e-adef-b6c2da0c8f72@gmail.com>
+ <CAG17S_P615tCPt0Jy+-BLzFx0N9JiksVXdUj4-iRAA9JTWdotg@mail.gmail.com>
+ <CAG17S_Oe0_DnVZW32GrArC9XCQUHh3QEYXxvXatWQiuwV5_QkA@mail.gmail.com>
+ <93c94dfc-2121-4b7d-b069-8b6ce22290fb@gmail.com>
+User-Agent: AquaMail/1.51.5 (build: 105105504)
+Subject: Re: [RFC PATCH v1 0/2] External Auth support
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH v1 0/2] External Auth support
-To: KeithG <ys3al35l@gmail.com>
-Cc: iwd@lists.linux.dev, James Prestwood <prestwoj@gmail.com>,
- Arend Van Spriel <arend.vanspriel@broadcom.com>
-References: <20240823174220.498594-1-denkenz@gmail.com>
- <CAG17S_NjMwU4=qn_jJzUJwPEOTT1H-SPVb7Re0P4fyPNUg=WqA@mail.gmail.com>
- <f36d03e4-e85a-438e-adef-b6c2da0c8f72@gmail.com>
- <CAG17S_P615tCPt0Jy+-BLzFx0N9JiksVXdUj4-iRAA9JTWdotg@mail.gmail.com>
- <CAG17S_Oe0_DnVZW32GrArC9XCQUHh3QEYXxvXatWQiuwV5_QkA@mail.gmail.com>
-Content-Language: en-US
-From: Denis Kenzior <denkenz@gmail.com>
-In-Reply-To: <CAG17S_Oe0_DnVZW32GrArC9XCQUHh3QEYXxvXatWQiuwV5_QkA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; format=flowed; charset="us-ascii"
+Content-Transfer-Encoding: 8bit
 
-Hi Keith,
+On August 26, 2024 5:43:23 PM Denis Kenzior <denkenz@gmail.com> wrote:
 
->>
->> iwctl looks like it is trying something:
->> [iwd]# station wlan0 connect deskSAE
->> Type the network passphrase for deskSAE psk.
->> Passphrase: *********
->> [iwd]#
->>
->> but it never connects. I do notice that connman thinks it is up and
->> assigns a 169.254.x.x address
->>
->> Aug 24 11:18:06 pi5 iwd[28085]: src/wiphy.c:wiphy_select_akm() Network
->> is WPA3-Personal...
->> Aug 24 11:18:06 pi5 iwd[28085]: event: connect-info, FullMAC driver:
->> brcmfmac using SAE.  Expect EXTERNAL_AUTH
->> Aug 24 11:18:06 pi5 iwd[28085]:
->> src/network.c:network_generate_sae_pt() Generating PT for Group 19
->> Aug 24 11:18:06 pi5 iwd[28085]:
->> src/network.c:network_generate_sae_pt() Generating PT for Group 20
->> Aug 24 11:18:06 pi5 iwd[28085]: src/wiphy.c:wiphy_select_akm() Network
->> is WPA3-Personal...
->> Aug 24 11:18:06 pi5 iwd[28085]: event: connect-info, FullMAC driver:
->> brcmfmac using SAE.  Expect EXTERNAL_AUTH
->> Aug 24 11:18:06 pi5 iwd[28085]: src/netdev.c:netdev_cqm_rssi_update()
->> Aug 24 11:18:06 pi5 iwd[28085]: src/wiphy.c:wiphy_radio_work_insert()
->> Inserting work item 4
->> Aug 24 11:18:06 pi5 iwd[28085]: src/wiphy.c:wiphy_radio_work_next()
->> Starting work item 4
->> Aug 24 11:18:06 pi5 iwd[28085]: event: connect-info, ssid: deskSAE,
->> bss: d8:3a:dd:60:a3:0c, signal: -63, load: 0/255
->> Aug 24 11:18:06 pi5 iwd[28085]: event: state, old: autoconnect_full,
->> new: connecting
->> Aug 24 11:18:06 pi5 iwd[28085]: src/scan.c:scan_periodic_stop()
->> Stopping periodic scan for wdev 1
->> Aug 24 11:18:06 pi5 iwd[28085]: CMD_SET_CQM failed: Operation not supported
->> Aug 24 11:18:06 pi5 connmand[635]: Interface wlan0 [ wifi ] state is
->> configuration
->> Aug 24 11:18:06 pi5 iwd[28085]: src/netdev.c:netdev_unicast_notify()
->> Unicast notification External Auth(127)
->> Aug 24 11:18:06 pi5 iwd[28085]: event: connect-info, External Auth to
->> SSID: deskSAE, bssid: d8:3a:dd:60:a3:0c
->> Aug 24 11:18:06 pi5 iwd[28085]:
->> src/netdev.c:netdev_external_auth_sae_tx_authenticate()
->> Aug 24 11:18:06 pi5 iwd[28085]: src/netdev.c:netdev_mlme_notify() MLME
->> notification Frame TX Status(60)
->> Aug 24 11:18:06 pi5 iwd[28085]:
->> src/netdev.c:netdev_external_auth_sae_tx_authenticate()
->> Aug 24 11:18:06 pi5 iwd[28085]: src/netdev.c:netdev_unicast_notify()
->> Unicast notification Frame(59)
->> Aug 24 11:18:06 pi5 iwd[28085]: src/netdev.c:netdev_mlme_notify() MLME
->> notification Frame TX Status(60)
->> Aug 24 11:18:06 pi5 iwd[28085]:
->> src/netdev.c:netdev_external_auth_sae_tx_associate()
->> Aug 24 11:18:06 pi5 iwd[28085]: src/netdev.c:netdev_unicast_notify()
->> Unicast notification Frame(59)
->> Aug 24 11:18:06 pi5 iwd[28085]: src/netdev.c:netdev_external_auth_cb()
->> Failed to send External Auth: Invalid exchange(52)
+> Hi Keith,
+>
+>>>
+>>> iwctl looks like it is trying something:
+>>> [iwd]# station wlan0 connect deskSAE
+>>> Type the network passphrase for deskSAE psk.
+>>> Passphrase: *********
+>>> [iwd]#
+>>>
+>>> but it never connects. I do notice that connman thinks it is up and
+>>> assigns a 169.254.x.x address
+>>>
+>>> Aug 24 11:18:06 pi5 iwd[28085]: src/wiphy.c:wiphy_select_akm() Network
+>>> is WPA3-Personal...
+>>> Aug 24 11:18:06 pi5 iwd[28085]: event: connect-info, FullMAC driver:
+>>> brcmfmac using SAE.  Expect EXTERNAL_AUTH
+>>> Aug 24 11:18:06 pi5 iwd[28085]:
+>>> src/network.c:network_generate_sae_pt() Generating PT for Group 19
+>>> Aug 24 11:18:06 pi5 iwd[28085]:
+>>> src/network.c:network_generate_sae_pt() Generating PT for Group 20
+>>> Aug 24 11:18:06 pi5 iwd[28085]: src/wiphy.c:wiphy_select_akm() Network
+>>> is WPA3-Personal...
+>>> Aug 24 11:18:06 pi5 iwd[28085]: event: connect-info, FullMAC driver:
+>>> brcmfmac using SAE.  Expect EXTERNAL_AUTH
+>>> Aug 24 11:18:06 pi5 iwd[28085]: src/netdev.c:netdev_cqm_rssi_update()
+>>> Aug 24 11:18:06 pi5 iwd[28085]: src/wiphy.c:wiphy_radio_work_insert()
+>>> Inserting work item 4
+>>> Aug 24 11:18:06 pi5 iwd[28085]: src/wiphy.c:wiphy_radio_work_next()
+>>> Starting work item 4
+>>> Aug 24 11:18:06 pi5 iwd[28085]: event: connect-info, ssid: deskSAE,
+>>> bss: d8:3a:dd:60:a3:0c, signal: -63, load: 0/255
+>>> Aug 24 11:18:06 pi5 iwd[28085]: event: state, old: autoconnect_full,
+>>> new: connecting
+>>> Aug 24 11:18:06 pi5 iwd[28085]: src/scan.c:scan_periodic_stop()
+>>> Stopping periodic scan for wdev 1
+>>> Aug 24 11:18:06 pi5 iwd[28085]: CMD_SET_CQM failed: Operation not supported
+>>> Aug 24 11:18:06 pi5 connmand[635]: Interface wlan0 [ wifi ] state is
+>>> configuration
+>>> Aug 24 11:18:06 pi5 iwd[28085]: src/netdev.c:netdev_unicast_notify()
+>>> Unicast notification External Auth(127)
+>>> Aug 24 11:18:06 pi5 iwd[28085]: event: connect-info, External Auth to
+>>> SSID: deskSAE, bssid: d8:3a:dd:60:a3:0c
+>>> Aug 24 11:18:06 pi5 iwd[28085]:
+>>> src/netdev.c:netdev_external_auth_sae_tx_authenticate()
+>>> Aug 24 11:18:06 pi5 iwd[28085]: src/netdev.c:netdev_mlme_notify() MLME
+>>> notification Frame TX Status(60)
+>>> Aug 24 11:18:06 pi5 iwd[28085]:
+>>> src/netdev.c:netdev_external_auth_sae_tx_authenticate()
+>>> Aug 24 11:18:06 pi5 iwd[28085]: src/netdev.c:netdev_unicast_notify()
+>>> Unicast notification Frame(59)
+>>> Aug 24 11:18:06 pi5 iwd[28085]: src/netdev.c:netdev_mlme_notify() MLME
+>>> notification Frame TX Status(60)
+>>> Aug 24 11:18:06 pi5 iwd[28085]:
+>>> src/netdev.c:netdev_external_auth_sae_tx_associate()
+>>> Aug 24 11:18:06 pi5 iwd[28085]: src/netdev.c:netdev_unicast_notify()
+>>> Unicast notification Frame(59)
+>>> Aug 24 11:18:06 pi5 iwd[28085]: src/netdev.c:netdev_external_auth_cb()
+>>> Failed to send External Auth: Invalid exchange(52)
+>
+> You're seeing the exact broken behavior I'm seeing.  To summarize:
+>
+> - IWD issues CMD_CONNECT
+> - Firmware/Kernel sends CMD_EXTERNAL_AUTH to iwd
+> - IWD performs SAE handshake using CMD_FRAME successfully
+> - IWD sends CMD_EXTERNAL_AUTH with a success status_code to kernel/firmware
+> - Kernel/Firmware rplies with error 52, Invalid Exchange.
+>
+>>> Aug 24 11:18:06 pi5 kernel: ieee80211 phy0:
+>>> brcmf_cfg80211_external_auth: auth_status iovar failed: ret=-52
+>>> Aug 24 11:18:46 pi5 connmand[635]: Interface wlan0 [ wifi ] state is ready
+>>> Aug 24 11:18:46 pi5 connmand[635]: wlan0 {add} address
+>>> 169.254.242.107/16 label wlan0 family 2
+>>>
+>>>
+>>> Need a log of some sort or is this adequate?
+>
+> No.  We need someone who can tell us how this firmware is supposed to operate.
+> Perhaps Arend can help?
 
-You're seeing the exact broken behavior I'm seeing.  To summarize:
+Hi Denis,
 
-- IWD issues CMD_CONNECT
-- Firmware/Kernel sends CMD_EXTERNAL_AUTH to iwd
-- IWD performs SAE handshake using CMD_FRAME successfully
-- IWD sends CMD_EXTERNAL_AUTH with a success status_code to kernel/firmware
-- Kernel/Firmware rplies with error 52, Invalid Exchange.
+Perhaps I can. I am working on porting/implementing this for upstream 
+linux. I guess this is running an Infineon downstream kernel, right? If 
+brcmfmac is compiled with CONFIG_BRCMDBG you can load the driver with debug 
+module param, ie.:
 
->> Aug 24 11:18:06 pi5 kernel: ieee80211 phy0:
->> brcmf_cfg80211_external_auth: auth_status iovar failed: ret=-52
->> Aug 24 11:18:46 pi5 connmand[635]: Interface wlan0 [ wifi ] state is ready
->> Aug 24 11:18:46 pi5 connmand[635]: wlan0 {add} address
->> 169.254.242.107/16 label wlan0 family 2
->>
->>
->> Need a log of some sort or is this adequate?
+# modprobe brcmfmac debug=0x5416
 
-No.  We need someone who can tell us how this firmware is supposed to operate. 
-Perhaps Arend can help?
+That will log some more details. Error -52 is generic code that something 
+went wrong in communication with firmware. The debug level above will among 
+other things show the actual firmware error code. Another interesting thing 
+shown are the firmware capabilities which can also be examined through debugfs.
 
 Regards,
--Denis
+Arend
+
+
