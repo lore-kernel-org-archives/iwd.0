@@ -1,101 +1,85 @@
-Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
+Received: from mail-oi1-f170.google.com (mail-oi1-f170.google.com [209.85.167.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B67351C4620
-	for <iwd@lists.linux.dev>; Tue, 27 Aug 2024 14:21:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF15F42065
+	for <iwd@lists.linux.dev>; Wed, 28 Aug 2024 02:23:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724768515; cv=none; b=kpSLGxqE0Kcwjlf8hL3zuim3MUkRszGthwZ7rBd57hLRYKW6lFg1/scmJYf2dgjIN28nwkyC+bcaH200kjiwn9vL18vW8oDFr0pcjaJewkDIzd7ef7N/k3j/CBzstrQbwAO4e4Qi5jQIz97i1IUIchHMJXwKwhKRLgPG8sN7wBU=
+	t=1724811811; cv=none; b=U++Z5awR+PQDh76UFIa466hk/s9qInjlgHksQxwbwYndnhdQdbuxb6bupRbpJIxwOkvSLRaYa0LIaks4rpH1RLdi4vQz8R/6t82jw5XOlGkBOsSY4EwNu8sMze6WRTpLrOgjCjnf1DcTLvf8H+ZDS8NXZcOwdd0ctj4U1LMJ8x0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724768515; c=relaxed/simple;
-	bh=4OeSd2SPy5Feagw4CT4hsHzqulHO1yry7kR+i7xao00=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=pjESDarkxfPYcQk8/AINeBETYJKgecn1XsvAt8Qv3DByKqg3I9XyjtBoN+XGIj7EiWBmhvj0s18cvDOwEndLJjjjg95FKm1bY/QtOzp4jGpSTLFvaLi4d4y16npm0yXPexIhaZYMLfUzOsnxKf3FVtGPbxFM0u7iOz8ZEE4y+OU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MPN1hmKg; arc=none smtp.client-ip=209.85.214.175
+	s=arc-20240116; t=1724811811; c=relaxed/simple;
+	bh=Iw0j+L8lJaI9jEplxV/WMjVYxN/Ca1s3yk2UpkxCZFA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=bUJc6tZ0pxsdS4jaWDnNsOLg+cwRmaLYNxl08Jpy55wCeGroaJjzFACIftiUSU8U5zrw5ysF6BVDUObHGf50cV4Nj67dwIkNa3eOz1PwwvFIZkAP47BIxB8CkzcyfGvgiigIH818lcA0DUBstvvyqSM3m6xAqHLxhHOxMygGy+c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MMGPzOCs; arc=none smtp.client-ip=209.85.167.170
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MPN1hmKg"
-Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-201df0b2df4so45300015ad.0
-        for <iwd@lists.linux.dev>; Tue, 27 Aug 2024 07:21:53 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MMGPzOCs"
+Received: by mail-oi1-f170.google.com with SMTP id 5614622812f47-3db1d0fca58so915791b6e.3
+        for <iwd@lists.linux.dev>; Tue, 27 Aug 2024 19:23:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1724768513; x=1725373313; darn=lists.linux.dev;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=/mjhiey7NRC+rkwJf+1XNqX2fw39I3dE4iuM5M2DZ80=;
-        b=MPN1hmKgFCQLTGcZwgXSa0+bvufT8c+KqVwS1HlWp5UBlY6SSHiAYlvmKe9BnC7iPM
-         4IBsJfE6VnKVgTdca4/pKPcP6hftk7u91KYi5CN7UX7NMktyw8DYwBHzUAEGZx7sLZNL
-         sZ9OQUciyQtn57JmMVjsMuRVblyuJfpIcb042p62a6NqJNT7ms1LBhZVeAlRrIPm2Sn4
-         s6NTJA836CiL8w9hV3vhjp97v/SItnRoxYJSoikvBTceJN+AzIFDDodKwf8FZYTC9f2i
-         I5yrCzxW/jZR4+3WYtmuebrpEfkGersW5WiyZR+zNHMB+wx2LpFzW2YM2DM+rVydcpyH
-         Fo0Q==
+        d=gmail.com; s=20230601; t=1724811809; x=1725416609; darn=lists.linux.dev;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:to:subject:user-agent:mime-version:date:message-id:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=T17fVVejQCOmFR81E3XCOa8rcgWv1f5XPSuFtI7mBVs=;
+        b=MMGPzOCsVcGs/VmqX9yHKrsV+T+O+VITaEu3XnXlsAg/go2wVlo6cUdHX/ljQJoRA9
+         wBYhaEALKPMWeQA2IrkU5kXSZDaFIxqBjeDduas13+UZ7yI9jmsUTy6nEz8n1hApCJJ+
+         yWd1fTlsUZDjfEGThylPD92DmOIZWdmb92JQE2CjBOuOv0ZyNnUS99WoeSyz0O5zHm07
+         s+Db86KUGbMA1keavgcX4tE/vJIuJI0zdZhWV8j5c0o0t/W9S7rtqp13QvwO0WHknD8K
+         8jalNTCiE/0Ed+dJ9lV/OgxpZb2L5HNdhaJDSfsI/g3TseswTOjm1OoQNUiIfm05b2j2
+         mVTw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724768513; x=1725373313;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=/mjhiey7NRC+rkwJf+1XNqX2fw39I3dE4iuM5M2DZ80=;
-        b=ugAWYjqX+5npRmeADHzePlArxc0g81ao0vw/etxYVvix6VAv5jVe4kXuqdaXk9IzdU
-         JGvJRibVroS6AZvKamHXJSz5ApZlyHbZQBdwP18/+a8fIEmgO4NJQLHJ48Y4XzbaXBj2
-         oVB4GQzS2Te69A7vkb7mZMl8gzrBxoUeI/gB1vYvGJ+Z9jPW3+WKluAg5Ric6R1zK31R
-         JkRr0JazRPN7eahpt2cl+gsxRGVn3ZbWA55aYJXw9WsM9/X6u09CAFKR11R6rSavv8k/
-         uSrnWD1dMSdCcvOO094/exhM8aAAdj9ylgIuMzecr6eBxUvXjy4ZfLEQzh/Spps2W1mj
-         xB7g==
-X-Gm-Message-State: AOJu0YwlI39aUIHXZpmIMW4nWweLQwppdCTXUgqYllHSVWfVWpVoC2J6
-	VfLxKHQcZ5ekLFnPUJhzGEWfcKbwskl60b0beeI1CPAcOigJfFyY4uJ9iQ==
-X-Google-Smtp-Source: AGHT+IEWBenVyJbwsOplsFqWqWNVyKfkHZ5rAzWBDm9UZ85+JA2xfL5DALBxC0ixuHGK4qgxcuwfXA==
-X-Received: by 2002:a17:903:2288:b0:203:a134:78ce with SMTP id d9443c01a7336-203a13478ecmr154212565ad.14.1724768512600;
-        Tue, 27 Aug 2024 07:21:52 -0700 (PDT)
-Received: from LOCLAP699.locus-rst-dev-locuspark.locus ([152.193.78.90])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-20385609099sm83635695ad.192.2024.08.27.07.21.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 27 Aug 2024 07:21:52 -0700 (PDT)
-From: James Prestwood <prestwoj@gmail.com>
-To: iwd@lists.linux.dev
-Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 4/4] dpp: scale PKEX timeout by the number of frequencies used
-Date: Tue, 27 Aug 2024 07:21:25 -0700
-Message-Id: <20240827142125.751023-4-prestwoj@gmail.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240827142125.751023-1-prestwoj@gmail.com>
-References: <20240827142125.751023-1-prestwoj@gmail.com>
+        d=1e100.net; s=20230601; t=1724811809; x=1725416609;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=T17fVVejQCOmFR81E3XCOa8rcgWv1f5XPSuFtI7mBVs=;
+        b=irsP3gaAdm5EHtq/FHcnIxyOFJUprlxuLK4f5RR+StcL0uiMePn9DHcyeJk4gG082J
+         xtkObX15MC9etro6j6SkKpaIqkjy1aPBL1CICFIPEU0rnB8iFLgG3RpsnZ6ar/T43Lb8
+         qiiwX438UCJHVEE5luoKcIdgb65Qf6ReBUeb8kPAv1Nfnzey5gerVxflxgRhEgZskqkQ
+         uEPPyxhI4n6/Wscu0LvBV0e9mNG/78GSf59VPFVqPGjCzG2d5LDITN1ekz+0dxNYoP80
+         i+vL2jcrVP6JOfofgPqjQhzfPcHEN9HXMmIlL0gShHb3j4rWTnzjU2bVZ8+krXDUJKiG
+         T5HQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVfVdKnPpcsdHbzFERjueP1MaPzML8EgbmL5mToWOEoqrvYEmb9p4GfxBw6dUvQ8S4BnMw=@lists.linux.dev
+X-Gm-Message-State: AOJu0YxUisGdsmf/F1e/UDIacfAnw/byUR4mRTvW1ip8lQ9DbGV3HTGv
+	hqyIkV7zUjXiGCyMKZOpEP+iZziLrZ50WaJR+EaupH1MF8jSBsMD
+X-Google-Smtp-Source: AGHT+IH4ghZ8xkNvQqj3vl8omo2WHGcMlXvdu5pos6CTETHXxcYaEWoILCxLnRhw9OI+yogLELe0Mw==
+X-Received: by 2002:a05:6808:3c98:b0:3dc:172b:dcc3 with SMTP id 5614622812f47-3deffb9e8e0mr864425b6e.34.1724811808809;
+        Tue, 27 Aug 2024 19:23:28 -0700 (PDT)
+Received: from [192.168.1.22] (syn-070-114-247-242.res.spectrum.com. [70.114.247.242])
+        by smtp.googlemail.com with ESMTPSA id 5614622812f47-3de2252d3basm2919432b6e.2.2024.08.27.19.23.27
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 27 Aug 2024 19:23:28 -0700 (PDT)
+Message-ID: <4c5400ab-d416-40d0-8c4b-b64c773d69e6@gmail.com>
+Date: Tue, 27 Aug 2024 21:23:27 -0500
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/2] doc: deprecate UseDefaultInterface in docs
+To: James Prestwood <prestwoj@gmail.com>, iwd@lists.linux.dev
+References: <20240827141810.750603-1-prestwoj@gmail.com>
+Content-Language: en-US
+From: Denis Kenzior <denkenz@gmail.com>
+In-Reply-To: <20240827141810.750603-1-prestwoj@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-If the number of frequencies used is very small reduce the timeout
-to avoid waiting for extended periods of time.
----
- src/dpp.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+Hi James,
 
-diff --git a/src/dpp.c b/src/dpp.c
-index dad74efe..5d56456d 100644
---- a/src/dpp.c
-+++ b/src/dpp.c
-@@ -59,6 +59,7 @@
- #define DPP_FRAME_RETRY_TIMEOUT 1
- #define DPP_AUTH_PROTO_TIMEOUT 10
- #define DPP_PKEX_PROTO_TIMEOUT 120
-+#define DPP_PKEX_PROTO_PER_FREQ_TIMEOUT 10
- 
- static uint32_t netdev_watch;
- static struct l_genl_family *nl80211;
-@@ -4284,7 +4285,8 @@ static void __dpp_pkex_start_enrollee(struct dpp_sm *dpp)
- {
- 	dpp->current_freq = dpp->freqs[0];
- 
--	dpp_reset_protocol_timer(dpp, DPP_PKEX_PROTO_TIMEOUT);
-+	dpp_reset_protocol_timer(dpp,
-+			dpp->freqs_len * DPP_PKEX_PROTO_PER_FREQ_TIMEOUT);
- 
- 	l_debug("PKEX start enrollee (id=%s)", dpp->pkex_id ?: "unset");
- 
--- 
-2.34.1
+On 8/27/24 9:18 AM, James Prestwood wrote:
+> ---
+>   src/iwd.config.rst | 5 ++++-
+>   1 file changed, 4 insertions(+), 1 deletion(-)
+> 
+
+All applied, thanks.
+
+Regards,
+-Denis
 
