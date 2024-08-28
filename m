@@ -1,59 +1,59 @@
-Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
+Received: from mail-ot1-f41.google.com (mail-ot1-f41.google.com [209.85.210.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2AF816BE34
-	for <iwd@lists.linux.dev>; Wed, 28 Aug 2024 12:08:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A81F45C1C
+	for <iwd@lists.linux.dev>; Wed, 28 Aug 2024 14:41:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724846888; cv=none; b=TuZ5A0rFjXxMXm8QEWIyoy13UuDEelNWiWYxj7bogSTUx9QBBr+NB64DdRC97W63vpjfsHEid6FE51hTnVkcSoAktfXq9hdtOhlfVinjLR4HQWMHncv48xbdQUjOkZTjog4fGjkeZEHJjs67QfnFo9tYR7AAxfma6Gqrya9zyJY=
+	t=1724856101; cv=none; b=dkUt+seUvVSn5I/PXmgVRqPNnm0FcAVSoGcc6MZ17wfVIZDbB9bLE67fb7WRQbq7+7g/jbT3BOB05kb017irF4NTGx6g3LArKpXDHe9phqNppogf+RrzKn7b9B+GYn0u+H1uoF6zFDnRIlTdacDvK1jDnEmLce7eO4074rmYEXo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724846888; c=relaxed/simple;
-	bh=KRTT+fiS5dw8icB/UDcr3RdYRRcJ6qXverKlSBDIuQ0=;
+	s=arc-20240116; t=1724856101; c=relaxed/simple;
+	bh=NHUliooDHZ/SaNIkSLwRT8P7W8BjYxXckpBXa4LT3MU=;
 	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=Zri0t79UGUxPXQMz4TawWxpdKAr4m6ATAKxxY5C/E9Ot/9NLUHVKyFD717a9N0z5H8GzOiS15SMHHtnbWoqwiV47/P/s/pFpNIuTl3OJJHF9alTRkgGv6SkAec3WpfGJ/EeO3JvO2EHaCZ6tKseBNOS9++z6JcLtuYYXeKhUPfE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TYQ6aDM2; arc=none smtp.client-ip=209.85.214.170
+	 In-Reply-To:Content-Type; b=OxP+USGxDtaQBrv8jj4ZnHE3EowjzrnAgI+aUazt5fORUQlyVkc4oOAXXXoQRfpdOXfZJJeJJhhb409Mg6C33MMo8kUplJoxaws4wbzNrRh0sCrVST5DOQRlWbrIBtR1jRK3twyyqd/tGxOsGDxiIf8aI66NosVBE6UbO+qC8nA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Jhoc/Tx9; arc=none smtp.client-ip=209.85.210.41
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TYQ6aDM2"
-Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-1fc47abc040so57905785ad.0
-        for <iwd@lists.linux.dev>; Wed, 28 Aug 2024 05:08:06 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Jhoc/Tx9"
+Received: by mail-ot1-f41.google.com with SMTP id 46e09a7af769-709346604a7so4855649a34.1
+        for <iwd@lists.linux.dev>; Wed, 28 Aug 2024 07:41:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1724846886; x=1725451686; darn=lists.linux.dev;
+        d=gmail.com; s=20230601; t=1724856099; x=1725460899; darn=lists.linux.dev;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:to:subject:user-agent:mime-version:date:message-id:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=0vfPvlqMqix0WWwnk7T5dCbfxCIyaFmXu6roj4Z3g04=;
-        b=TYQ6aDM2y+z/zy4QAiEs91Mp5GS6AhUBzFhop81DQOmgsJiv2eTIhk4KfFWUhVtDFG
-         RW+0ZYIiCyrJIXd6z1DqdY/EuFX1w08NXNgAzleFva1Xwe1a1+g19hg8sUSRPzbjZpKv
-         Dj1Iuo88H/CefDWS25BKOsCavoy/PpNAvv2PFh/9G4QyuGHSjTkz4ciV0CZEpwmcNwPP
-         AvuHZhUcZVoPJ3Ts2eM/nN5z/NxNkXwBpFs91qaCdD/NGlLamn3MJI72eafhmwHsGEZZ
-         kSvyvYAaxeBBVWTCKkogIqgdvXTAMHjM2Wq9F9sQk7exgDrWI6uu0054K5tdyGw2Erki
-         Zicw==
+        bh=P2H3FA8KzeW+iZ2jebfDk02R8T3IH5K2DKkEKfKdZu4=;
+        b=Jhoc/Tx9v8p6Xl1kIZyJBhW7FxQM+HMyzQNiAgMtLhCNVkwuvu9fh2JV/HM49dHKx2
+         XGFDtO9YW/ho7q5fa1ApOEgEqHcn86MnQz7E0oIDoeaEkbmCF9Hu4ZZ8opWWGLiRFXRy
+         jWFdJBV2Vp1q+U6Wr7ojTTJyswCMxjGUHH9sdSqz4Vq/Y4gIh3x69QGFKEU8W00MHKaI
+         GbOXqMVWy1OzIcSULJBxYovd0v/od6sMx5VHHw7md3zpK3mZuDw2h/Ml0TQ3Z9go+lZr
+         gCZ3iILoWTHXWqnuviVVWrM0kuhDJbZFAppGvoWDjGsoaHXM1COBJzRHOvo0skCMCWU8
+         4VhQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724846886; x=1725451686;
+        d=1e100.net; s=20230601; t=1724856099; x=1725460899;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=0vfPvlqMqix0WWwnk7T5dCbfxCIyaFmXu6roj4Z3g04=;
-        b=lqCF1ve+JsJBHsITqlfOk4Wy6lLNOS4jImWuBKEkDbAz5LuZOXvx10nuaSeQYV0Fba
-         J46T5QOqvqlzNPz3otOKKHIdYT4yJ+rYR24O6UBYIWgAXh6hln34mtV/lWBOmoQ6YMqv
-         VM51Z9KQ36XbUVGNbak0lL45enjqdjGCP4gMdU0HD/fW38/yRC1m612PL3rAJclF8+yq
-         txT8fjkq8xod2xwhcQ+EnN3vIwH6nOh0nNflO8xnYMjS5Xr4zBpljqaqH4ssLrFwtILr
-         JCNUE/bHUSWw+Dfz7v0gMC9oFSGfP6u0cJ4Q+2J4Jmz+kTfTlj752FhhcRGdmUXM4RIO
-         IrMw==
-X-Forwarded-Encrypted: i=1; AJvYcCX1cjNtQVMPgWf1y+6cSseh5qyzvNfj8dJeoQxO4Ebsdvta6fKEkujk+VV1ij7LH/rLvCc=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yytrxl8kSIhpHLSEleGqviFf3ZBFGZRD+FZzypL3Pg+d0Woi/uX
-	Vi15WxzIM/6JnJvlaG1a4AQK4Axl/eGO51N3+YtZ3iqFB4hKNdmq
-X-Google-Smtp-Source: AGHT+IHqaJaEWvPkaIZMq0Xspx+MXN/7ydK/svI6LCotvMRrWLwG0k+eVGQPJJ718j/7Drm5sQvQfg==
-X-Received: by 2002:a17:902:db02:b0:1fd:82ac:7c39 with SMTP id d9443c01a7336-2039e4ef32bmr156250495ad.41.1724846885921;
-        Wed, 28 Aug 2024 05:08:05 -0700 (PDT)
-Received: from [10.100.121.195] ([152.193.78.90])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-20385609a88sm97826515ad.208.2024.08.28.05.08.04
+        bh=P2H3FA8KzeW+iZ2jebfDk02R8T3IH5K2DKkEKfKdZu4=;
+        b=ilItZ7t04tCTPf3GogeAPNagvVM+230B39xfL2Mz2E3i+RLVL3HYWeK5WFaSG06PAX
+         SaQXhzF3tDZtwnV8iUtndCxfAmfsaZk5jx88o3JlVc50Vr3giyTuoZbynCIvy2EIktDK
+         zj7j1ENyxwAQg0lqOXW9DbLNRgTiS0o0vhPF+CFdQtK+Krqr6WErVorjRj5sYEPUtpNy
+         Ariho3lK1W03CKMWI1a338pJVxGYho+u8+Y7RlCrnDr0mumxawlBZvycSOcmojjXjX68
+         udVYnc5AahC6Yrw4bsRmGO5n772dFnXERddNgtUol/aF9jCgPJ9saLsihymAzCi+KoMS
+         g6vg==
+X-Forwarded-Encrypted: i=1; AJvYcCWnbdQ7I3MM81mzEGEEOqjC5wGNrWQe/cPvKpzUudOnoKKyu+BFB4h2D0CT8lO5K4Jt+HY=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yx03iEnXFhm/FeSmVBQkmjJDylwNdxMKjvUhlfLr9H9Wxk1Kp20
+	CFG9RO3qR2xVHXkGExrW/8OzQ33K4OCdjujjXrEPu0peOQZzT+cj
+X-Google-Smtp-Source: AGHT+IHrFCw2VJSBrNFQAhUFA/K9uUxqHHkH4FjhW82P0m++CDDHaWRJNzJUi+sg39L5THYdFxFfaw==
+X-Received: by 2002:a05:6830:6183:b0:709:61c1:374c with SMTP id 46e09a7af769-70e0eb88668mr22649646a34.20.1724856099221;
+        Wed, 28 Aug 2024 07:41:39 -0700 (PDT)
+Received: from [192.168.1.22] (syn-070-114-247-242.res.spectrum.com. [70.114.247.242])
+        by smtp.googlemail.com with ESMTPSA id 46e09a7af769-70e03a8d22fsm2913797a34.26.2024.08.28.07.41.38
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 28 Aug 2024 05:08:05 -0700 (PDT)
-Message-ID: <96473c52-e2d9-4a3c-b38c-0cc430d18d17@gmail.com>
-Date: Wed, 28 Aug 2024 05:08:01 -0700
+        Wed, 28 Aug 2024 07:41:38 -0700 (PDT)
+Message-ID: <054fff6d-24e9-46d3-8812-86cd5e0777c9@gmail.com>
+Date: Wed, 28 Aug 2024 09:41:37 -0500
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
@@ -62,91 +62,30 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 Subject: Re: [PATCH] station: check for roam timeout before rearming
-To: Denis Kenzior <denkenz@gmail.com>, iwd@lists.linux.dev
+To: James Prestwood <prestwoj@gmail.com>, iwd@lists.linux.dev
 References: <20240827141037.745738-1-prestwoj@gmail.com>
  <0c2294f1-8b91-446e-ab08-048d40e0aeff@gmail.com>
+ <96473c52-e2d9-4a3c-b38c-0cc430d18d17@gmail.com>
 Content-Language: en-US
-From: James Prestwood <prestwoj@gmail.com>
-In-Reply-To: <0c2294f1-8b91-446e-ab08-048d40e0aeff@gmail.com>
+From: Denis Kenzior <denkenz@gmail.com>
+In-Reply-To: <96473c52-e2d9-4a3c-b38c-0cc430d18d17@gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-Hi Denis,
+Hi James,
 
-On 8/27/24 7:36 PM, Denis Kenzior wrote:
-> Hi James,
->
-> On 8/27/24 9:10 AM, James Prestwood wrote:
->> A user reported a crash which was due to the roam trigger timeout
->> being overwritten, followed by a disconnect. Post-disconnect the
->> timer would fire and result in a crash. Its not clear exactly where
->> the overwrite was happening but upon code inspection it could
->> happen in the following scenario:
 >>
->> 1. Beacon loss event, start roam timeout
->> 2. Signal low event, no check if timeout is running and the timeout
->>     gets overwritten.
->>
->> The reported crash actually didn't appear to be from the above
->> scenario but something else, so now all instances where the timer
->> is rearmed we also check if there is already a timer set.
->> ---
->>   src/station.c | 7 +++++--
->>   1 file changed, 5 insertions(+), 2 deletions(-)
->>
->> diff --git a/src/station.c b/src/station.c
->> index 30a1232a..e188aed4 100644
->> --- a/src/station.c
->> +++ b/src/station.c
->> @@ -2221,7 +2221,7 @@ static void station_roamed(struct station 
->> *station)
->>        * Schedule another roaming attempt in case the signal 
->> continues to
->>        * remain low. A subsequent high signal notification will 
->> cancel it.
->>        */
->> -    if (station->signal_low)
->> +    if (station->signal_low && 
->> L_WARN_ON(!station->roam_trigger_timeout))
->
-> I'm reading this as:
-> if signal_low and roam_trigger_timeout is NULL:
->     1. print a warning
->     2. rearm the timer
->
-> Is 1. intended?
->
->> station_roam_timeout_rearm(station, roam_retry_interval);
->>         if (station->netconfig)
->> @@ -2260,7 +2260,7 @@ static void station_roam_retry(struct station 
->> *station)
->>       station->roam_scan_full = false;
->>       station->ap_directed_roaming = false;
->>   -    if (station->signal_low)
->> +    if (station->signal_low && !station->roam_trigger_timeout)
->>           station_roam_timeout_rearm(station, roam_retry_interval);
->>   }
->>   @@ -3202,6 +3202,9 @@ static void station_low_rssi(struct station 
->> *station)
->>       if (station_cannot_roam(station))
->>           return;
->>   +    if (station->roam_trigger_timeout)
->> +        return;
->> +
->
-> One thing I'm a bit worried about with such a simple approach is that 
-> we might have different roam timeouts.  For example, the 60 second 
-> roam retry interval is active and we get a low rssi event. In this 
-> case we probably should schedule a roam sooner.  Maybe we should 
-> book-keep timeout information better better and make sure the timeout 
-> happens within the minimum time (active time remaining / new timeout)?
-Sure, the thought crossed my mind as well. Looks like there is no way to 
-get the active timeout within the l_timeout itself, it doesn't track 
-that so we can manually.
->
->>       /* Set a 5-second initial timeout */
->>       station_roam_timeout_rearm(station, 5);
->>   }
->
-> Regards,
-> -Denis
+>> One thing I'm a bit worried about with such a simple approach is that we might 
+>> have different roam timeouts.  For example, the 60 second roam retry interval 
+>> is active and we get a low rssi event. In this case we probably should 
+>> schedule a roam sooner.  Maybe we should book-keep timeout information better 
+>> better and make sure the timeout happens within the minimum time (active time 
+>> remaining / new timeout)?
+> Sure, the thought crossed my mind as well. Looks like there is no way to get the 
+> active timeout within the l_timeout itself, it doesn't track that so we can 
+> manually.
+
+You might be able to add something into ell using timerfd_gettime.
+
+Regards,
+-Denis
