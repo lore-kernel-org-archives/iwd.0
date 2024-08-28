@@ -1,61 +1,65 @@
-Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
+Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C4BE1ABEA7
-	for <iwd@lists.linux.dev>; Wed, 28 Aug 2024 19:24:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B88B41ABEA9
+	for <iwd@lists.linux.dev>; Wed, 28 Aug 2024 19:24:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724873076; cv=none; b=KroxowpuuDBQXJr6mDJuCsmZbJ+iDMnavE/UEj233ZV+5glXl3NdhjpvyGwTGWa8eDEgPYZ/eO7B7zDWnEbwBAf6HGl5phZsxvoWK3UJEEvBsuxPfERkIUSRs/Lg/19G8oD+Of+iQ2QFBwEE7rve/DhrXnc+uJLu7FECkTA24Hk=
+	t=1724873078; cv=none; b=SsribpRaMJwSeT9Zw0Za7QuJY5X27QKmnuHWh9Mp3o5tzGeNAUsbAuR6aFJwI0VqOkLFDLrooFvJ4JTXcuneUaHVSWY3zifzzVH5tybO3gBp5HbcJm8lmYyoh73Pm9TWWIz739Ec7U7Oh7KEA7IN9SWWzrzkmei431fXhZuhzlU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724873076; c=relaxed/simple;
-	bh=6sPDRJOD0zxcNzux6fRSpLWWbyFPNTzxv1nmN/eSBX0=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=IxTeh3OawWwKo8eqIVq7LrSOAgEl1mYp+PIE/b/+i49awYfE2w0uZ4IRvH7BFZngUcbs8i1/QpN1OHtSxTyeefEzAdF9Zd0wk29JiXTBYosbN9uz3iWfFIFOc8Xbg2yzrnyMCgDgikfuEoQJDYIIP89lLtLVbGWtoe9JI5uZiQs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Id7GYZNQ; arc=none smtp.client-ip=209.85.210.174
+	s=arc-20240116; t=1724873078; c=relaxed/simple;
+	bh=NIfjGt2bpC2A6vEZMyAy4JdMJbSFpPFhCXk8SaX+deE=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=MOdNmSt8k1slDKJJLK/SidvuMGICJJEXziGyIpTHJwL1+W8c0Sv/KWIx1k37Q65ArReL7XfuoQeFG3o4ElhviS03hZ9SRy6BAl+/ntfKQOOYX8ScKl1t9yilrTEH58vdu6m5oNiiGOmT8wVPS1k9cXo6pqWpJ9aMk6t6e3KlWns=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XS7Xyc3k; arc=none smtp.client-ip=209.85.210.176
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Id7GYZNQ"
-Received: by mail-pf1-f174.google.com with SMTP id d2e1a72fcca58-7141285db14so6073670b3a.1
-        for <iwd@lists.linux.dev>; Wed, 28 Aug 2024 12:24:35 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XS7Xyc3k"
+Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-715cdc7a153so781216b3a.0
+        for <iwd@lists.linux.dev>; Wed, 28 Aug 2024 12:24:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1724873074; x=1725477874; darn=lists.linux.dev;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=Tio7v8U3brCXEVpg4JvgYJu9CPfPEeJf/Lf1dRgQjuU=;
-        b=Id7GYZNQM9lJVLaTaHIqhyuAWII8fxxdWDUFkOoMikSYcETa9a1MYSvrNdGrq1jACl
-         pFjQo2Bolz79/z1aGimP1I8m28hUSHOOLmD0DU6f+sgvO2OXVLgv/PhzXeK6oJMy7Ebl
-         Np7E35hrY2MIBZ45TKTuJWl+vgXoHQGQmLS7MsX7to4svPnCJST9Fw6T+b2v4klspgzR
-         OPl11S/VoTvCqW8uMKhEf6PqfdU5BASfo25BNU1AClyMvlaMzjbW5LPjQuTuYExxTqO2
-         YWyrpp2Sk5yz5NqdpRKNT2dy5XFjDXm/3D9VAT71xcPHFG+70gCXHr6caUYrRdkHLuMN
-         luLw==
+        d=gmail.com; s=20230601; t=1724873076; x=1725477876; darn=lists.linux.dev;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=tryyBdZ446X/A40KPsC+AsZfsXC92MsVqd9qgR4Y1BI=;
+        b=XS7Xyc3kx1lyJB2E9tO9WKy5hPrsLCHTST43owaAlBWXNBhQ/ghIXjXn/EWCkM1Llh
+         Wmb/1g5FttUGxaRoj9RTmLgRPBwqMs3wvCzEDFbhbZwywuGxrqn4XEdew5eJznHX+j2I
+         09CNvcBV3E0n+TQfnv0KjjGA7h5lLjovj8wCce9uZzdl5jXQVS5bf6Ef4dawWm9tMlZP
+         22bSyZfPPorw+WgkB04ePdOg75xR9WVqoH8IHJadZCiqpBaHU+b69ranDoPCgQI0cdbI
+         lE9fTZvOOzI76WTbYwEGcEFOeNd0WAmGumJKqcU7Y2qtq6uSB6Ya/ySHzp76BbJV1kEw
+         5Yxg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724873074; x=1725477874;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Tio7v8U3brCXEVpg4JvgYJu9CPfPEeJf/Lf1dRgQjuU=;
-        b=LHHVZ/KrwxSpRsfcn7ksYL0+lI6Cm8gJM9BwccmbD4NI5Hzk3Fcr+9H5R0HIT20CHp
-         s+oMCHDldCxql9Pyd90F3fcPBpMH8C9lM179KtCYZyhH0fLcqFn7v+8bjiiXCoLb5/Px
-         eigk4tNPoO7kxuJMXtmyN0OVFu/+bPmi9vQStQZc8jrokRMeGgrFBxB6dC+nhhWXISaJ
-         xTJPXEgJfFzDTdy28EL1oS0BVxSc37cdv3Z00k4VE6Da/t7Oi8Ryo3zT40BctDzlNdao
-         Mc8uCjpxPhUX67WzacKHM1rrWlRWKhz/il3Tlkp8okeRHmeoYT69/q1TkVVw6AUxMx3S
-         dAtQ==
-X-Gm-Message-State: AOJu0YwahXZ/rL+ifI2mCAxMrJJQ5uSNFn9HB1fQbUWyhqXVeb6GYIg9
-	p6I4IaI6uqkziqiGymfWDvA3Bypq2TaljTL0wDAQ2vdb71ZtogoXmELKtQ==
-X-Google-Smtp-Source: AGHT+IGN3nd3qoEf2obHGzQMHVIXaRD0OR9wxz54GXq0Pt8Re59XghN5krTLY3F0+s4yF5tWUl35cQ==
-X-Received: by 2002:a05:6a00:3911:b0:70d:2693:d215 with SMTP id d2e1a72fcca58-715dfb77efdmr682228b3a.16.1724873074141;
-        Wed, 28 Aug 2024 12:24:34 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1724873076; x=1725477876;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=tryyBdZ446X/A40KPsC+AsZfsXC92MsVqd9qgR4Y1BI=;
+        b=K0Y7NnAabgxInUbhIN4oNXfJDOpufpZ3w18MxVIPDBhur5Cst4sPByJhmS0DRPX+os
+         9FlnIKx+dZsZ82bspM3gnh2rpuhFqMMxhIoAM6dflLMLbzJg2s0ZD9n2oTuEM76oklPW
+         6az8J5ShLqE/3y8YD011ItI4LzHhvhn4h5gg3LSU9MeBPfN8eAm2cKgdv2AVDkAljo3h
+         uOVx/jVmyVit3VZAuMw+d1MiPoyPpC0cxNWPvEeE+Y/2j+uERdS1trICNAdt4CE71NI5
+         3tT2ib4Mw4t9U6ix10z9T97Mjl8IIPWxJ97eytTPmfD1lI4sBtm19upW5YpO9NRAW5zh
+         eMtg==
+X-Gm-Message-State: AOJu0YzH40Lh3HxsNEdTKxbkhCd032tpFp3M+QDC4+tRe8KV/GaKp9BN
+	k/UD/W5tZfMU6XA8HNLT0SA+wUsezG6eM+ut+jGdqgM/h+M33NeacPZAqg==
+X-Google-Smtp-Source: AGHT+IHyFKrrWT68xBFO1hW+2O9IMW2J3fJWLMPKJvizoimSW8euDc0I2HxoJureWNAYcPQ4LdoDnA==
+X-Received: by 2002:a05:6a00:8785:b0:706:aa39:d5c1 with SMTP id d2e1a72fcca58-715e0fbe611mr251452b3a.8.1724873075700;
+        Wed, 28 Aug 2024 12:24:35 -0700 (PDT)
 Received: from LOCLAP699.localdomain ([152.193.78.90])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-7cd9ac994a3sm11081635a12.16.2024.08.28.12.24.32
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-7cd9ac994a3sm11081635a12.16.2024.08.28.12.24.34
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 28 Aug 2024 12:24:33 -0700 (PDT)
+        Wed, 28 Aug 2024 12:24:35 -0700 (PDT)
 From: James Prestwood <prestwoj@gmail.com>
 To: iwd@lists.linux.dev
 Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH v5 1/6] doc: Document station Affinities property
-Date: Wed, 28 Aug 2024 12:24:23 -0700
-Message-Id: <20240828192428.902761-1-prestwoj@gmail.com>
+Subject: [PATCH v5 2/6] dbus: add PermissionDenied DBus error
+Date: Wed, 28 Aug 2024 12:24:24 -0700
+Message-Id: <20240828192428.902761-2-prestwoj@gmail.com>
 X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20240828192428.902761-1-prestwoj@gmail.com>
+References: <20240828192428.902761-1-prestwoj@gmail.com>
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
@@ -64,82 +68,40 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This documents new DBus property that expose a bit more control to
-how IWD roams.
-
-Setting the affinity on the connected BSS effectively "locks" IWD to
-that BSS (except at critical RSSI levels, explained below). This can
-be useful for clients that have access to more information about the
-environment than IWD. For example, if a client is stationary there
-is likely no point in trying to roam until it has moved elsewhere.
-
-A new main.conf option would also be added:
-
-[General].CriticalRoamThreshold
-
-This would be the new roam threshold set if the currently connected
-BSS is in the Affinities list. If the RSSI continues to drop below
-this level IWD will still attempt to roam.
 ---
- doc/station-api.txt | 17 +++++++++++++++++
- src/iwd.config.rst  | 16 ++++++++++++++++
- 2 files changed, 33 insertions(+)
+ src/dbus.c | 6 ++++++
+ src/dbus.h | 1 +
+ 2 files changed, 7 insertions(+)
 
-diff --git a/doc/station-api.txt b/doc/station-api.txt
-index 84f1b7bf..707c6834 100644
---- a/doc/station-api.txt
-+++ b/doc/station-api.txt
-@@ -170,6 +170,23 @@ Properties	string State [readonly]
- 			BSS the device is currently connected to or to which
- 			a connection is in progress.
+diff --git a/src/dbus.c b/src/dbus.c
+index 32de1e1a..b3799b55 100644
+--- a/src/dbus.c
++++ b/src/dbus.c
+@@ -134,6 +134,12 @@ struct l_dbus_message *dbus_error_not_hidden(struct l_dbus_message *msg)
+ 					"Not hidden");
+ }
  
-+		ao Affinities [optional] [experimental]
++struct l_dbus_message *dbus_error_permission_denied(struct l_dbus_message *msg)
++{
++	return l_dbus_message_new_error(msg, IWD_SERVICE ".PermissionDenied",
++					"Permission Denied");
++}
 +
-+			Array of net.connman.iwd.BasicServiceSet object paths
-+			that will be treated with higher affinity compared to
-+			other BSS's. Currently the only allowed value to be
-+			set in this array is the path to the currently connected
-+			BasicServiceSet object, i.e.
-+			Station.ConnectedAccessPoint.
-+
-+			Setting the affinity will lower the roaming threshold,
-+			effectively locking IWD to the current BSS unless the
-+			RSSI drops below the critical threshold set by
-+			[General].CriticalRoamThreshold{5G} at which point
-+			IWD will proceed with normal roaming behavior.
-+
-+			This property is cleared on roams/disconnections.
-+
- SignalLevelAgent hierarchy
- ==========================
+ struct l_dbus_message *dbus_error_from_errno(int err,
+ 						struct l_dbus_message *msg)
+ {
+diff --git a/src/dbus.h b/src/dbus.h
+index 14814b5d..6d7074bf 100644
+--- a/src/dbus.h
++++ b/src/dbus.h
+@@ -82,6 +82,7 @@ struct l_dbus_message *dbus_error_service_set_overlap(
+ struct l_dbus_message *dbus_error_already_provisioned(
+ 						struct l_dbus_message *msg);
+ struct l_dbus_message *dbus_error_not_hidden(struct l_dbus_message *msg);
++struct l_dbus_message *dbus_error_permission_denied(struct l_dbus_message *msg);
  
-diff --git a/src/iwd.config.rst b/src/iwd.config.rst
-index 0b2878b8..9dc0fe0c 100644
---- a/src/iwd.config.rst
-+++ b/src/iwd.config.rst
-@@ -133,6 +133,22 @@ The group ``[General]`` contains general settings.
-        This value can be used to control how aggressively **iwd** roams when
-        connected to a 5GHz access point.
- 
-+   * - CriticalRoamThreshold
-+     - Value: rssi dBm value, from -100 to -1, default: **-80**
-+
-+       The threshold (for 2.4GHz) at which IWD will roam regardless of the
-+       affinity set to the current BSS. If the connected BSS has affinity
-+       (set in Station's Affinities list) the roam threshold will be lowed to
-+       this value and IWD will not attempt to roam (or roam scan) until either
-+       the affinity is cleared, or the signal drops below this threshold.
-+
-+
-+   * - CriticalRoamThreshold5G
-+     - Value: rssi dBm value, from -100 to -1, default: **-82**
-+
-+       This has the same effect as ``CriticalRoamThreshold``, but for the 5GHz
-+       band.
-+
-    * - RoamRetryInterval
-      - Value: unsigned int value in seconds (default: **60**)
- 
+ struct l_dbus_message *dbus_error_from_errno(int err,
+ 						struct l_dbus_message *msg);
 -- 
 2.34.1
 
