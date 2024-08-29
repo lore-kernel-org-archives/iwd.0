@@ -1,139 +1,142 @@
-Received: from mail-vk1-f181.google.com (mail-vk1-f181.google.com [209.85.221.181])
+Received: from mail-oa1-f51.google.com (mail-oa1-f51.google.com [209.85.160.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE69D1922FA
-	for <iwd@lists.linux.dev>; Thu, 29 Aug 2024 12:29:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4185C446D1
+	for <iwd@lists.linux.dev>; Thu, 29 Aug 2024 13:26:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724934563; cv=none; b=b5DY3ouFVz0JUfLpcCnA3J8RENvEHd6+r7ouvo80FfkUEbrMaAzz2Z23KSRGOy15++y8XE+2WN44sfDrio12eylQWJ6Z0qw35sj9OdMcYlPh0/mS+s+AGlJZiEur1sPM5fuOTMgZRRBuN1Loi9rnbx802M9Yy2S5VmHNUUBolmg=
+	t=1724937977; cv=none; b=L8uLZ+6soxmw/hpPQhUxhgvjTRxAHbtkSiv0fE1lsH8avocIOJX0i/LUA0GEW+/eh/sWQOdxFEcFyTKAxr4t2OqHVLm6Mi/LfSm8+cPxkTeM/6fTYJfj8/QKoVwXImB8EqxWn57Nylcp6btWO7FVTKNpTkSH+y1RL//CnUTW5u4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724934563; c=relaxed/simple;
-	bh=bfSH81jqlvqO5khMnwJ3OHtcdfFqcSiMD+N3KvEvjqU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=gZix0DIcO8mnd2T/LyjkP2bBGJfjPt6dD9grtA/lCVffAojB7Ayxm96JKw0tQRgwp4gTGWiKAp7sDvVJ8zJ6hQ7XplaicG2kgSHtoyER8opTyQx+HAWUr5t8Qx/OtOXcAq/7+l2NmsoiovAxzjBFa4ZSWyO7gC/dpzx/DEep3Wo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CtVViQ6p; arc=none smtp.client-ip=209.85.221.181
+	s=arc-20240116; t=1724937977; c=relaxed/simple;
+	bh=KF1FBHsx3a6QLVrN9PrFg0a2tpWWxa9dXECVSmFGUgs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=I1qUefwtMPZSuqmn9GDNlQlx4TgsR9d0ENarQvQM3C0doCWyG/RKPd0fLxv55fb0/M2yKhQm8qVhprpk7pkClC+GvvPGcJchbzjm1y+c00KRuz+eRKU5UtrTK6wJssgghmaNjz63gprJ87i0VA/9Bx9fZ/wxdrYFJHrOj8ofpLk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bXd1OZMR; arc=none smtp.client-ip=209.85.160.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CtVViQ6p"
-Received: by mail-vk1-f181.google.com with SMTP id 71dfb90a1353d-4fce2c0707bso211973e0c.2
-        for <iwd@lists.linux.dev>; Thu, 29 Aug 2024 05:29:21 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bXd1OZMR"
+Received: by mail-oa1-f51.google.com with SMTP id 586e51a60fabf-2703e8d3f7bso333719fac.2
+        for <iwd@lists.linux.dev>; Thu, 29 Aug 2024 06:26:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1724934561; x=1725539361; darn=lists.linux.dev;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=bfSH81jqlvqO5khMnwJ3OHtcdfFqcSiMD+N3KvEvjqU=;
-        b=CtVViQ6pJKHtTZ9ZSXOgxJiFkepdmjacJe5UwYl5JxNr11the5KivULIm834WXwTgd
-         c+FSKtbuueJrQVtUa1z8/txb0RxvQfLdzDNANohByytqkcfHwgmrE4MHThmDyT0FYB2y
-         O2DpCatceL5Cit34+FXhEwkEyu/lWVK4vmb/LUC67GUH8nYKp9ngWt7uXORu/HqQJARv
-         C4SfZqUPsCArWFyMM5k7FM1mGj13iDRwjygiph/HY3dF2ER/rMTACpS5o2NzAcK5dXoZ
-         GIopCr4d2+KJympqbt31rAokzkuQmSDOUWayDPoA/RLPqM9Tq9goV3lwrWYzrzQr/deO
-         6fOQ==
+        d=gmail.com; s=20230601; t=1724937975; x=1725542775; darn=lists.linux.dev;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:to:subject:user-agent:mime-version:date:message-id:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=prtdVcY9kAPB6PbL5itaUDMGYptmzWKiH8LELROGZME=;
+        b=bXd1OZMRuzzcEWBqp50ZOc9uMOwVBQj7mTW/J8FEukLI7ESzDIeIkpzuXGkhNqeRGw
+         accodbZCyt0NB2dBXRpPCCOgzAsLa6caxLEh+fs+jz30/5U8mp2UXUse9DMmqngJ8rS3
+         AehdGPQ8Qk+e3oGA5EdYrxR+LNW3HQaOpUT0Jf14oBfyQg5mkmgHABuJcDv53wFCfuR1
+         ZW/2PbpFNl32CnWoIfjhwzYm/vKW/oGIGRpsm/huCs6bjj2M/vXrk17O12VKVG4dqF6a
+         OBY4xvxKzTmvptgOXyeyzR9JKhIOOYIAn7WAAmehV+ov5oBIwojg/vdEjhERsa7kOO9c
+         tBjA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724934561; x=1725539361;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=bfSH81jqlvqO5khMnwJ3OHtcdfFqcSiMD+N3KvEvjqU=;
-        b=wOJ0DH6fhFc8gnD+jYsHn3UHaNHpkAC7h0gCu3+PpNQ7qkYfFa222LzUy0CgGH47b9
-         Mu84dFAtQPUd0aLxA06hnu1b0zRccon4mw414PlJ0j46Iixx8bxFQUhZMMinRb7AB7oR
-         pUBQChOMFzkTqq/noZI+xqEvuD3+SqGkhkshgOVHqthSXsGKFHaJL2Mq9fMOrJkayHgi
-         hwfMVlkRqoqa6M3VTTDS7593VT36alhaJ+NyyM4R000vfi7VZvJQPK8KjegXdalxocsO
-         wEJWmmPj+QMaAMqaFsr6Zjy/9o9Bel6ScrdKDmKFJHMnmPr18EYQP5joFsWwTDkRIpTW
-         strQ==
-X-Gm-Message-State: AOJu0YyQbp83ShxcspxRrJCXIlHRmauKNXe1IAm/emM14WGcuw8MtWGs
-	a7+jmO/QZ7Oc7yB5cScWwGGMPEPQ2QBUzLqbEYGcSQsadYmLFvbvZkC/VcoDzJJb0lsPSclYdKT
-	hSKxqU1XfqyAVkyS0pcApSU02MPErmrrtkUA=
-X-Google-Smtp-Source: AGHT+IHVQ8iGCZ1BT881fu4bR63OwvRITEzW3TrOSdleyT+EAKQ8IEHObTBgIIqXndBolry4wSK2LgQ/GnXlj0ZbsVQ=
-X-Received: by 2002:a05:6122:d9e:b0:4fc:e729:f788 with SMTP id
- 71dfb90a1353d-4fffe45b990mr2743626e0c.14.1724934560526; Thu, 29 Aug 2024
- 05:29:20 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1724937975; x=1725542775;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=prtdVcY9kAPB6PbL5itaUDMGYptmzWKiH8LELROGZME=;
+        b=Xah0j2BboipnAVAsNyiL5GeCFwFNhsEGNEpm3D3GLUX25xyN8bNnfIno829pBj8Efk
+         KLyJ/bLNw3ETZbrgvOnaSqnqkYkNKa/Qn0ISJpKU4WfH8t6mfbGeSocEvti2k9VWMobw
+         obdI2JVHYYtzCPbvb8x0Yu/g4fjboTLeSQ9qI6vXWbPZ/0F7WVcKGJqYPCNWNtTdEBcf
+         WakAJV+5DLN9d7LdcyC3G/PdIT3ua+tAr/5uh3IHam0g67r/t8i7HZ6/wg8C+zH8e5y3
+         cKSE7SNw6OhZKC1lxPjZZWCU5YL9uYmBRNAieLMbHIsGjapI41MiY2Py4eMmPgnZOWpz
+         tfOg==
+X-Forwarded-Encrypted: i=1; AJvYcCXENGCPSCGTY13C6ksSQc/qWVcO7Lq1fYRpRZEbgPTG0jtCU10tNYs0+g1QnB/kgXnnmHw=@lists.linux.dev
+X-Gm-Message-State: AOJu0YzY/NYNpBSeQQeuWfJPhq4CH8w1D4nl6v7c6b0sh+RiQary1aiv
+	swofFx2NpOgRVOzpKRdxHX9FEeL9lt7d0km/IWbu4r3vi9w0aodf28yj0A==
+X-Google-Smtp-Source: AGHT+IGVgJUNxVzojL3Xu1gSS5+QefcpRNEA4NrX6CrSIGwipk64Kpz8xQ0JoLE2A6o68BlRxbaxHg==
+X-Received: by 2002:a05:6870:1c9:b0:270:3120:c55b with SMTP id 586e51a60fabf-2779036810amr2677915fac.50.1724937975169;
+        Thu, 29 Aug 2024 06:26:15 -0700 (PDT)
+Received: from [10.100.121.195] ([152.193.78.90])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7a806bf75e4sm50964585a.11.2024.08.29.06.26.14
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 29 Aug 2024 06:26:14 -0700 (PDT)
+Message-ID: <d10b9c12-25fd-4e58-9ab1-061af4a3b09f@gmail.com>
+Date: Thu, 29 Aug 2024 06:26:12 -0700
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <CA+iibzCB-6wXch6yFu-4V9dKgz0sJRopsd7wXchccptT5hNB-A@mail.gmail.com>
- <444d59ad-9a07-4d2c-922b-e6c43b7d8cb0@gmail.com> <CA+iibzAq50zn7=J+XtH28T=XKbk_Ukoms-K4PYoTrRPEi0J1gg@mail.gmail.com>
- <1c8086ac-1d28-4c02-8c21-c7a37148a9f1@gmail.com> <CA+iibzD=UQC5sDwcoOy5_tPm=_58yp-mvV973Sq3dwJrej=89g@mail.gmail.com>
- <314a3582-0103-40e1-a7a3-274897f5950d@gmail.com> <CA+iibzDc=45P+U-xd6gxQBCqrEtb4ENFewFfzof91a9cU8OErA@mail.gmail.com>
- <4bcf6591-168a-446c-b6ff-b8ba5f7efedb@gmail.com> <CA+iibzDAZ0QSH9yXBgNd_CrOA3Z69z3yhbZMaiPjMUE8ZG8u0w@mail.gmail.com>
- <CAPv5Ue71TT7dDpe6TZQSimCztT3iQew30C7i0syZb=5JhiYCOw@mail.gmail.com>
- <CA+iibzB3j__Xe2VtpEr-5BH+kcJRM06UxcxWVmVZxHVyNMWsyg@mail.gmail.com>
- <CAPv5Ue6n1BF5E=c3u_cwcHZd+L++v4X8waqKmpW9sgQNvHVSxQ@mail.gmail.com>
- <CA+iibzCRmWL9H2smcsW31744i6AVc2Y68Juw9dEA2BV8AsKK+Q@mail.gmail.com>
- <6e9698e9-8dfd-4819-99d0-0a75c20c3778@gmail.com> <36c33cc4-9c69-41ea-856d-e47be1dbe486@gmail.com>
-In-Reply-To: <36c33cc4-9c69-41ea-856d-e47be1dbe486@gmail.com>
-From: daniel antoine <univac55@gmail.com>
-Date: Thu, 29 Aug 2024 14:29:09 +0200
-Message-ID: <CA+iibzCjefoUENuWXXJPfowFXRrZxwD+hYM+KuPvLGv2r2rzOg@mail.gmail.com>
-Subject: Re: IWD CMD_SET_CQM failed: Operation not supported
-To: James Prestwood <prestwoj@gmail.com>
-Cc: iwd@lists.linux.dev
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: Build failure with GCC 14
+To: bbhtt <bbhtt.zn0i8@slmail.me>, iwd@lists.linux.dev
+References: <520f3ed2-79fe-4b91-9442-b219cb00732a@slmail.me>
+ <eaa91b3f-b8af-4c6a-bf40-6613d80d4ff5@gmail.com>
+ <172493751485.7.2131554893827444665.418884701@slmail.me>
+Content-Language: en-US
+From: James Prestwood <prestwoj@gmail.com>
+In-Reply-To: <172493751485.7.2131554893827444665.418884701@slmail.me>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-Hi James
+Hi,
 
-I have installed the patches and the error has gone
-
-during the compilation the installation of the patches is successful
-
-HEAD is now at 1ac39156 Release 2.20
-+ patch -Np1 -i /tmp/work/src/npatch1.patch
-patching file src/wiphy.c
-patching file src/wiphy.h
-+ patch -Np1 -i /tmp/work/src/npatch2.patch
-patching file src/station.c
-+ patch -Np1 -i /tmp/work/src/npatch3.patch
-patching file src/netdev.c
-
-and the journalctl gives this
-
-ao=C3=BBt 29 14:22:46 grat-os1 iwd[534]: udev interface=3Dwlan0 ifindex=3D4
-ao=C3=BBt 29 14:22:47 grat-os1 iwd[534]: event: state, old: disconnected,
-new: autoconnect_quick
-ao=C3=BBt 29 14:22:47 grat-os1 iwd[534]: udev interface=3Dwlan0 ifindex=3D5
-ao=C3=BBt 29 14:22:47 grat-os1 iwd[534]: event: state, old:
-autoconnect_quick, new: autoconnect_full
-ao=C3=BBt 29 14:22:47 grat-os1 iwd[534]: event: connect-info, ssid:
-Livebox-xxxx, bss; xx xx xx, signal: -49, load: 1/255
-ao=C3=BBt 29 14:22:47 grat-os1 iwd[534]: event: state, old:
-autoconnect_full, new: connecting
-ao=C3=BBt 29 14:22:52 grat-os1 iwd[534]: event: state, old: connecting,
-new: connected
-
-Thank you a lot
-
-Best regards
-
-Daniel
-
-Le jeu. 29 ao=C3=BBt 2024 =C3=A0 13:50, James Prestwood <prestwoj@gmail.com=
-> a =C3=A9crit :
+On 8/29/24 6:18 AM, bbhtt wrote:
+> On 29/08/24 17:15, James Prestwood - prestwoj at gmail.com wrote:
+>> Hi,
+>>
+>> On 8/28/24 9:13 PM, bbhtt wrote:
+>>> Hello I'm seeing a few build failures when building with GCC 14. Not 
+>>> sure what would be the place to report these.
+>>>
+>>> ```
+>>> monitor/main.c: In function ‘genl_lookup’:
+>>> monitor/main.c:328:30: error: passing argument 2 of ‘l_netlink_send’ 
+>>> makes pointer from integer without a cast [-Wint-conversion]
+>>>   328 |         l_netlink_send(genl, GENL_ID_CTRL, 0, buf, sizeof(buf),
+>>>       |                              ^~~~~~~~~~~~
+>>>       |                              |
+>>>       |                              int
+>>> In file included from ./ell/ell.h:17,
+>>>                  from monitor/main.c:43:
+>>> ./ell/netlink.h:34:59: note: expected ‘struct l_netlink_message *’ 
+>>> but argument is of type ‘int’
+>>>    34 |                                 struct l_netlink_message 
+>>> *message,
+>>>       | ~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~
+>>> monitor/main.c:328:52: error: passing argument 5 of ‘l_netlink_send’ 
+>>> makes pointer from integer without a cast [-Wint-conversion]
+>>>   328 |         l_netlink_send(genl, GENL_ID_CTRL, 0, buf, sizeof(buf),
+>>>       | ^~~~~~~~~~~
+>>>       |                                                    |
+>>>       | long unsigned int
+>>> ./ell/netlink.h:37:58: note: expected ‘l_netlink_destroy_func_t’ 
+>>> {aka ‘void (*)(void *)’} but argument is of type ‘long unsigned int’
+>>>    37 | l_netlink_destroy_func_t destroy);
+>>>       | ~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~
+>>> monitor/main.c:328:9: error: too many arguments to function 
+>>> ‘l_netlink_send’
+>>>   328 |         l_netlink_send(genl, GENL_ID_CTRL, 0, buf, sizeof(buf),
+>>>       |         ^~~~~~~~~~~~~~
+>>> ./ell/netlink.h:33:14: note: declared here
+>>>    33 | unsigned int l_netlink_send(struct l_netlink *netlink,
+>>> ```
+>>>
+>>> Thanks!
+>>
+>> Looks like you just need to use a compatible ELL and IWD version. 
+>> When APIs change or are added in ELL and IWD depends on that we do a 
+>> new release for both. We don't really have a table explaining 
+>> compatible version, which we probably should.
+>>
+>> Thanks,
+>>
+>> James
+>>
+>>
 >
-> Hi Daniel,
+> Ok, thank you. I was trying to build iwd 2.19 with ell 0.68 since that 
+> had a new
+> release. I did pick up 3 patches regarding l_netlink_send API from iwd 
+> main
+> but hit the above issue with those 3 patches applied.
 >
-> On 8/28/24 4:56 AM, James Prestwood wrote:
-> > Hi Daniel,
-> >
-> > On 8/28/24 3:41 AM, daniel antoine wrote:
-> >> Hi James
-> >>
-> >> The last commits on netdev have made the patches for the CQM problem
-> >> incompatible. I got the errors when I tried to compile with the
-> >> patches
-> >>
-> > Yep looks like those patches never got merged, and I forgot about
-> > them. I'll send a rebased v4 update and we can see about getting those
-> > upstreamed.
-> A new patch set has been sent to the list (actually v3, not v4). I
-> verified it works with my mediatek card with the same failure but if you
-> could as well that would be appreciated.
-> >
-> > Thanks,
-> >
-> > James
-> >
+> I'll wait for a new iwd release.
+
+As of 5 hours ago, we have IWD 2.20
+
+https://git.kernel.org/pub/scm/network/wireless/iwd.git/commit/?id=1ac3915641c9fc986cf71fc8de2740104da6a96a
+
