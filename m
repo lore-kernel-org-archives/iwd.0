@@ -1,92 +1,82 @@
-Received: from mail-pl1-f194.google.com (mail-pl1-f194.google.com [209.85.214.194])
+Received: from mail-yw1-f170.google.com (mail-yw1-f170.google.com [209.85.128.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77C5B1B012B
-	for <iwd@lists.linux.dev>; Thu, 29 Aug 2024 14:40:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.194
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73F4C13BAE2
+	for <iwd@lists.linux.dev>; Fri, 30 Aug 2024 16:37:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724942447; cv=none; b=IvLMXU9ITPAkBOw097HgbwHUw1CNNbnoFBxnuqB6lhtUYdMf3Rz2epUPqZUYVFOy6g4hasEQ097Jd5QXX+bGvLRSIQkjLut1NVy2WAR+lG+vTLnghC8W40vFSSvqs7kId7LgmEdinzJ3w4iSgkLob3fTnEGqZ4AjLhSTrMEfCTY=
+	t=1725035841; cv=none; b=VKd94qepkFieYxuNq8w/Nd8UN9xNeBFRPTLc43HM9stPNVLQ0YS0x32jB3LPBarX+Q3e8YCfS1GL3vnptmi9/Yjujm/UTRP4pw3oUe/SYuztGYdeORgKoPELVnY21nNWhvnaBEOAXK7pTg3fmhQtPJcTQ+T9y2dhECicXT3xvPM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724942447; c=relaxed/simple;
-	bh=gPDVDZJ9g4lh4JFijGaOo4IB3/gOaGXtaT3xES4FVw8=;
-	h=From:Message-ID:Date:MIME-Version:Subject:To:References:
-	 In-Reply-To:Content-Type; b=pbWRh+FFyN5YaQkHVldmX6KC8mV2SgBbZh6f/Cdih+o+fCb4g2kIYoubq2DlRMO3qvCQmdL79SvYDOXPKv0+ljjq/Ly+EM1PvnYtNauvRVuwPEZBDNWUPUZa1IuSE60DLWg5xTmzGz/+aRQQXHzEs6qV3JW2X3GgDncy+su9jys=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=L7t4Br+F; arc=none smtp.client-ip=209.85.214.194
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+	s=arc-20240116; t=1725035841; c=relaxed/simple;
+	bh=bcX++iNvt2B6f7j6pzzD95Q9mgrJ/gCwaFrhYFcdqbU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Content-Type; b=qKnLZoQO2IQowrVNhubZQMHkXGAgLYCTx1lSe5+y8A4Q7MxBHIOJ0R7ZTPv+s6BughsjKVKNYJQdbuqvGjkAEm8HThmDYej2OdTLqXvFvU3xY8W5XECg4t48+N6Qz54f7GybycFCY+UoyoS5KrhGyPobYkud6gOH9oikmbcmdP0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=redpinelabs.com; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.128.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=redpinelabs.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="L7t4Br+F"
-Received: by mail-pl1-f194.google.com with SMTP id d9443c01a7336-202089e57d8so5592465ad.0
-        for <iwd@lists.linux.dev>; Thu, 29 Aug 2024 07:40:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1724942446; x=1725547246; darn=lists.linux.dev;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :to:subject:reply-to:user-agent:mime-version:date:message-id:from
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=/pMUjD9XkAbJVRH6gLYyFYhzWWCcAfGJMPCJpXwc+DI=;
-        b=L7t4Br+F9enPoIbQeyvTlk34DJrfNfdCDc65nIokY0ySSJYl0sRCb2zyJ+nejcYwQY
-         34kSgsvAvlO5K10l9hBc2Bivh3b9AclsYmxeshxSbZBLPktyr/J9/s/tGGmck38rgpyM
-         BVmKmARsvrcqlUPPNfqeAqsIL7LByB0WbJWFsmWyhwB3I55dy44EbUHaPD98Y4jVbyTM
-         6vCYCl8jK8C13zVtckGe1my1QhxXxka8SL92+DjBPh2mVARzRlY2qtSykKdeRHpUXYYA
-         9svqMD067/z2q8hghUlci1nTH1gx54BILI+vQTv4pHD9Jh3WvJPgIZa31c8WEKlr2Zwu
-         0tXA==
+Received: by mail-yw1-f170.google.com with SMTP id 00721157ae682-69483a97848so18800747b3.2
+        for <iwd@lists.linux.dev>; Fri, 30 Aug 2024 09:37:19 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724942446; x=1725547246;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :to:subject:reply-to:user-agent:mime-version:date:message-id:from
+        d=1e100.net; s=20230601; t=1725035838; x=1725640638;
+        h=to:subject:message-id:date:from:in-reply-to:references:mime-version
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=/pMUjD9XkAbJVRH6gLYyFYhzWWCcAfGJMPCJpXwc+DI=;
-        b=r2jsPCl8GxnqlKVwSTuIxYMxf7f0wPzOEZHvpomO2piyO+5CQOTuPE4FydgTUxRpPK
-         nAVIomVvTKVe0AWK2W/AVxXdGZIAjnQCM2UAsfJ2aq9tGP0AqWaUfZeBC2HEHmiIgReD
-         N2UlE5LqSvCum2NkxYEtQWfLJHF74o3yP5hPjwn2lqeWosmsUBjlaKRbWqMe5bUNZ1rY
-         u/CFa/KN4lXJnFFPnuysman9rH8pqHHELmOEzUlLgzjrBhScOl064uz5yKGgR633Cd1l
-         esq2CfI351YCzmXEXXw5nyOEQnjjlmonB4eXEt605OglxI/zFm/Zsvk90uA4XYDqcOI9
-         igYA==
-X-Forwarded-Encrypted: i=1; AJvYcCXLOsn6RRd+YN0sD66A8sdFkCHdOVgRy5IDVCCxCee53n7b/Hmh3b6WYAZA6D3bRXC41aU=@lists.linux.dev
-X-Gm-Message-State: AOJu0YxB1krmAmI3TRpDMh/VMRMQDYv6yGHWicR8hEQKphtQxNTSfDyn
-	5TWrXWnHMwiC6SKxDh/MafH96Qsmq6QmNCd+fyikZ9lXAr2uHJQ4
-X-Google-Smtp-Source: AGHT+IF64wcgcQctErLR0SVa6+cOGZvqEZX1V0f7lOuYfMPlHG9xKEsJd3nyNkXqWjgAV4wAOWS8Ww==
-X-Received: by 2002:a17:902:e952:b0:1fc:4acb:3670 with SMTP id d9443c01a7336-20516734701mr26025205ad.12.1724942445412;
-        Thu, 29 Aug 2024 07:40:45 -0700 (PDT)
-Received: from [192.168.0.154] ([115.187.48.81])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-205152b13c9sm12122225ad.62.2024.08.29.07.40.44
+        bh=C/z1iB6hAJHB8yCJwYt4zNv+5/K1NJxOa9jcH3GKvbg=;
+        b=YC7ARw9nr1TrjlvOQg1AKH77KIOdDRHb9OFbr5BhnGIDPa0vZNxWVipT9PEX0gqr1S
+         K6WZDTfzbxI97iPHMJTrZmn63L77ODZo6YkTzfBDhPsZhVTSQ0i3RE03tfWAiFzb0ir5
+         0QJkjZVu93nrT7uRWdquxvU1VhuDtZV7BaADDHvgTWZVyM+8h3fmms9aJ5X0SHvL5FBq
+         5Yq83ShhyeL9XuerPTn+BY1doUqNFE96ngz2bwEZb+tgeHp9rc200LTWnPnmQoV3402p
+         RzQRXz9QwBJ2Gn3qPfGqjnnOTKMGtD7UGRKvz00M0mBDNXuK9Bwi8VEcnOYVXu1L//Dl
+         /ONQ==
+X-Gm-Message-State: AOJu0YzdUAzmDrsElCdat0s9CXpXtaVHvFNPw5QM51Ivx248dI79v+jU
+	iOFljAjERL9QQHyflTNCCiIndXxi7Sd+U2XJ68VggkOWMyBTtE9yEIqdkPhm
+X-Google-Smtp-Source: AGHT+IEVt96DSpIMLl8x1e9gPSW+9Vkhk6UeUTUeli62mK9cAzL+SYXmj+SOsocgwKaWXNPwuiYZ4w==
+X-Received: by 2002:a05:690c:dc6:b0:64b:7500:2e9 with SMTP id 00721157ae682-6d40d987abamr34742397b3.9.1725035838212;
+        Fri, 30 Aug 2024 09:37:18 -0700 (PDT)
+Received: from mail-yb1-f178.google.com (mail-yb1-f178.google.com. [209.85.219.178])
+        by smtp.gmail.com with ESMTPSA id 00721157ae682-6d2d5daebd6sm6737877b3.105.2024.08.30.09.37.17
+        for <iwd@lists.linux.dev>
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 29 Aug 2024 07:40:45 -0700 (PDT)
-From: bbhtt <bbhtt.zn0i8@gmail.com>
-X-Google-Original-From: bbhtt <bbhtt.zn0i8@slmail.me>
-Message-ID: <b247da3d-ce86-497f-94ab-bcd5d2d2cf70@slmail.me>
-Date: Thu, 29 Aug 2024 20:10:42 +0530
+        Fri, 30 Aug 2024 09:37:17 -0700 (PDT)
+Received: by mail-yb1-f178.google.com with SMTP id 3f1490d57ef6-e13cda45037so2060145276.3
+        for <iwd@lists.linux.dev>; Fri, 30 Aug 2024 09:37:17 -0700 (PDT)
+X-Received: by 2002:a05:6902:2502:b0:e13:cd7b:1da9 with SMTP id
+ 3f1490d57ef6-e1a7a018ea3mr3292615276.33.1725035837103; Fri, 30 Aug 2024
+ 09:37:17 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Reply-To: bbhtt.zn0i8@slmail.me
-Subject: Re: Build failure with GCC 14
-To: "James Prestwood - prestwoj at gmail.com"
- <prestwoj_at_gmail_com_gebvfb@simplelogin.co>, iwd@lists.linux.dev
-References: <520f3ed2-79fe-4b91-9442-b219cb00732a@slmail.me>
- <eaa91b3f-b8af-4c6a-bf40-6613d80d4ff5@gmail.com>
- <de9ff462-582a-4a62-a669-7cf49e53fb27@slmail.me>
- <d10b9c12-25fd-4e58-9ab1-061af4a3b09f@gmail.com>
-Content-Language: en-GB
-In-Reply-To: <d10b9c12-25fd-4e58-9ab1-061af4a3b09f@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <CAG17S_N+Hjt2c8t8hN4VMx79QsQ3hiiE_cwOErg6fKoyHkr67A@mail.gmail.com>
+ <ef38aa12-634e-4870-888c-219c961f301c@gmail.com> <b0ef10a2-c30b-4b6c-8370-66f9e0ace7b1@gmail.com>
+ <CAG17S_P_MO4_BZYTCp4WDkJ_q4j=0s_s3azCOWrsvqmLD0ravw@mail.gmail.com>
+ <de951e97-547f-4c14-841c-267f64b0020b@gmail.com> <CAG17S_Oh_1NS9SUSadAJkMXtJ3s_AjMhnUDSqrKMzEiO69jBPA@mail.gmail.com>
+ <cf5ba208-58d9-44e8-bd91-0639ea062d5d@gmail.com>
+In-Reply-To: <cf5ba208-58d9-44e8-bd91-0639ea062d5d@gmail.com>
+From: Bryce Johnson <bryce@redpinelabs.com>
+Date: Fri, 30 Aug 2024 10:37:05 -0600
+X-Gmail-Original-Message-ID: <CADXxVSLa+DF9CRWy0Yin7cShrwauQw0=EC-i+MuGnxVcB+2n3w@mail.gmail.com>
+Message-ID: <CADXxVSLa+DF9CRWy0Yin7cShrwauQw0=EC-i+MuGnxVcB+2n3w@mail.gmail.com>
+Subject: Any recent wifi certifications with IWD?
+To: iwd@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
 
-On 29/08/24 18:56, James Prestwood - prestwoj at gmail.com wrote:
-> As of 5 hours ago, we have IWD 2.20
-> 
-> https://git.kernel.org/pub/scm/network/wireless/iwd.git/commit/? 
-> id=1ac3915641c9fc986cf71fc8de2740104da6a96a
-> 
-> 
+Hi All,
+I was wondering if anyone had recent wifi certification experience.
+We are working on a new product that will get certificated in the next
+6-12 months.  Last time (about a year ago), we had to switch back to
+wpa_supplicant last minute because of one failed test around PMKSA
+caching. IMO it was a pretty ambiguous test, but couldn't get the wifi
+alliance to let us skip that test.
 
-Thank you, that seems to have fixed the issue for me.
+There was some discussion at the end of this thread:
+https://lore.kernel.org/all/504042cf-1704-a590-391c-009b500cf505@gmail.com/T/
 
--- 
-- bbhtt
+We got our testing in last time just before some additional wifi
+certification requirements.  So there are probably some stricter tests
+now.
 
-https://bbhtt.github.io/
+If anyone successfully got certification with IWD I'd love to know!
+
+Bryce
