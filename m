@@ -1,82 +1,95 @@
-Received: from mail-yw1-f170.google.com (mail-yw1-f170.google.com [209.85.128.170])
+Received: from mail-ej1-f48.google.com (mail-ej1-f48.google.com [209.85.218.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73F4C13BAE2
-	for <iwd@lists.linux.dev>; Fri, 30 Aug 2024 16:37:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4B6E156993
+	for <iwd@lists.linux.dev>; Mon,  2 Sep 2024 06:34:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725035841; cv=none; b=VKd94qepkFieYxuNq8w/Nd8UN9xNeBFRPTLc43HM9stPNVLQ0YS0x32jB3LPBarX+Q3e8YCfS1GL3vnptmi9/Yjujm/UTRP4pw3oUe/SYuztGYdeORgKoPELVnY21nNWhvnaBEOAXK7pTg3fmhQtPJcTQ+T9y2dhECicXT3xvPM=
+	t=1725258872; cv=none; b=mdMbZ01IlBx3BeAOhT58R8YbsZXhkkTiIDmhWLvnhsNjq/LJMFHB6R2fzGCnOUBUBVd04geferLyQeXXVhmpVj5jQ5P5Ol16we3dL2TA9UAsPkv5lw5WqTD+aJfuqGSGVVSmXN6WulslQVlKcPmxsJxPQOKukifBxI5W0rg+KY8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725035841; c=relaxed/simple;
-	bh=bcX++iNvt2B6f7j6pzzD95Q9mgrJ/gCwaFrhYFcdqbU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Content-Type; b=qKnLZoQO2IQowrVNhubZQMHkXGAgLYCTx1lSe5+y8A4Q7MxBHIOJ0R7ZTPv+s6BughsjKVKNYJQdbuqvGjkAEm8HThmDYej2OdTLqXvFvU3xY8W5XECg4t48+N6Qz54f7GybycFCY+UoyoS5KrhGyPobYkud6gOH9oikmbcmdP0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=redpinelabs.com; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.128.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=redpinelabs.com
+	s=arc-20240116; t=1725258872; c=relaxed/simple;
+	bh=PxDTYs2cmF97tMiiln6+GaHlGA35PNvkarsSDGf1KQE=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=chfqiituaaFmGyw9eFY7yB7KpGfclAnLW0Y8CKy7dc2w/TXOCZfkToWeVEiirWRgS8JPNaUD2jZU3rVLIXhHhHAowFCr4+Yk6xOmkBFH1nNUFkaB+SStHTbmMDsdnRkJZ1ILh2qvlj0oCQ7tNuuSyGCIs1Ba5zLBLN9fQEymCfo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dTqLyCO8; arc=none smtp.client-ip=209.85.218.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f170.google.com with SMTP id 00721157ae682-69483a97848so18800747b3.2
-        for <iwd@lists.linux.dev>; Fri, 30 Aug 2024 09:37:19 -0700 (PDT)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dTqLyCO8"
+Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-a86c476f679so443580166b.1
+        for <iwd@lists.linux.dev>; Sun, 01 Sep 2024 23:34:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1725258869; x=1725863669; darn=lists.linux.dev;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=jmXtyhiNZsWz6D5DzJXwIrA9h3mB00/xlVN2YaZFU0I=;
+        b=dTqLyCO8dz+UIl3DLXSIB9j0XbWzTDSBBvul/fPuMT2f2DIXeWYIxc5u9R9ACZo/ll
+         ctOlrB33IU2AAUgNnuPIccBKMtNLFFpf3xje+j4jUjVdr7mI1YiZu/QqVUsi2opbeh08
+         WZUo+m4pEx/ycmn7loV85c4m2+fHun3ye/qA08QbeS69JGjfn3mT7BzhqqIIZp3n4pNg
+         7aZgVIUFZ3mHgKbBVvgu+YRhwH/hs7qkXZMmuPHBuFcnRfuqvx/lyZ/WRl8Ym7Uv1vmm
+         2BWltLU26E2L38O6orHupC0Ni8TLz/R7iu5q7BEnz2YBXpB0XwqCBW7T1Bzw2usVEV68
+         FOXQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725035838; x=1725640638;
-        h=to:subject:message-id:date:from:in-reply-to:references:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=C/z1iB6hAJHB8yCJwYt4zNv+5/K1NJxOa9jcH3GKvbg=;
-        b=YC7ARw9nr1TrjlvOQg1AKH77KIOdDRHb9OFbr5BhnGIDPa0vZNxWVipT9PEX0gqr1S
-         K6WZDTfzbxI97iPHMJTrZmn63L77ODZo6YkTzfBDhPsZhVTSQ0i3RE03tfWAiFzb0ir5
-         0QJkjZVu93nrT7uRWdquxvU1VhuDtZV7BaADDHvgTWZVyM+8h3fmms9aJ5X0SHvL5FBq
-         5Yq83ShhyeL9XuerPTn+BY1doUqNFE96ngz2bwEZb+tgeHp9rc200LTWnPnmQoV3402p
-         RzQRXz9QwBJ2Gn3qPfGqjnnOTKMGtD7UGRKvz00M0mBDNXuK9Bwi8VEcnOYVXu1L//Dl
-         /ONQ==
-X-Gm-Message-State: AOJu0YzdUAzmDrsElCdat0s9CXpXtaVHvFNPw5QM51Ivx248dI79v+jU
-	iOFljAjERL9QQHyflTNCCiIndXxi7Sd+U2XJ68VggkOWMyBTtE9yEIqdkPhm
-X-Google-Smtp-Source: AGHT+IEVt96DSpIMLl8x1e9gPSW+9Vkhk6UeUTUeli62mK9cAzL+SYXmj+SOsocgwKaWXNPwuiYZ4w==
-X-Received: by 2002:a05:690c:dc6:b0:64b:7500:2e9 with SMTP id 00721157ae682-6d40d987abamr34742397b3.9.1725035838212;
-        Fri, 30 Aug 2024 09:37:18 -0700 (PDT)
-Received: from mail-yb1-f178.google.com (mail-yb1-f178.google.com. [209.85.219.178])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-6d2d5daebd6sm6737877b3.105.2024.08.30.09.37.17
-        for <iwd@lists.linux.dev>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 30 Aug 2024 09:37:17 -0700 (PDT)
-Received: by mail-yb1-f178.google.com with SMTP id 3f1490d57ef6-e13cda45037so2060145276.3
-        for <iwd@lists.linux.dev>; Fri, 30 Aug 2024 09:37:17 -0700 (PDT)
-X-Received: by 2002:a05:6902:2502:b0:e13:cd7b:1da9 with SMTP id
- 3f1490d57ef6-e1a7a018ea3mr3292615276.33.1725035837103; Fri, 30 Aug 2024
- 09:37:17 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1725258869; x=1725863669;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=jmXtyhiNZsWz6D5DzJXwIrA9h3mB00/xlVN2YaZFU0I=;
+        b=Qp4Vq7x1c4FHrF8QCGVicXRTKv90uUx1WY3P+dqZ8+74WYpWgs9awFYlwDM0CsUX6v
+         AbOYMBSQlFxfy0xahEspNvJghcLPLe3ma4mLIxP7VZjfa+MJOCtdDO0JWhCMQCKAkGBV
+         jfXQLAgB9oyDC2IsHLJ8DvRUoDQdC9ZjqvaEAf+nOSA+g+tlprZuW2vfYY5v6Mok4DOE
+         zzGGAvj+gbpEiu0Rt8uMCT0hhnuD3CrTK2OUeWXFAQ56BdPSLtUO1MRwJ5J2NUfI0RPs
+         g7Wl5mVb8HxyKPrkt1pKDhl3SHo2LbnmUeCrbIEULWrdzSvz9JHLNS5n/CSRJ5SdeMwC
+         3TkQ==
+X-Gm-Message-State: AOJu0YzpAo0LF+aAyUMyAAgqbqbIJMiWvUsz1X2aalJGyy7OlMms/BYn
+	I23RCxn7A2vgz+iwXFyYls9/I/tBZjee7HNjouubdc1gwOmy3YnFD21DdeP6DzgrJD4PklqibKK
+	JwC94pOYC7gmemzwrva9EtFR7mlgrt+99
+X-Google-Smtp-Source: AGHT+IHlcv/1UoH6eKxF9JX9SeLJXvdTBXHcsmvY6TaJfirqWP/Bpqcnlrt1Ofpuy7N7+twLLmujHfi9AHzH+ftjzTM=
+X-Received: by 2002:a17:906:c10c:b0:a7a:a46e:dc3c with SMTP id
+ a640c23a62f3a-a89b94a9cd9mr406530666b.15.1725258868223; Sun, 01 Sep 2024
+ 23:34:28 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <CAG17S_N+Hjt2c8t8hN4VMx79QsQ3hiiE_cwOErg6fKoyHkr67A@mail.gmail.com>
- <ef38aa12-634e-4870-888c-219c961f301c@gmail.com> <b0ef10a2-c30b-4b6c-8370-66f9e0ace7b1@gmail.com>
- <CAG17S_P_MO4_BZYTCp4WDkJ_q4j=0s_s3azCOWrsvqmLD0ravw@mail.gmail.com>
- <de951e97-547f-4c14-841c-267f64b0020b@gmail.com> <CAG17S_Oh_1NS9SUSadAJkMXtJ3s_AjMhnUDSqrKMzEiO69jBPA@mail.gmail.com>
- <cf5ba208-58d9-44e8-bd91-0639ea062d5d@gmail.com>
-In-Reply-To: <cf5ba208-58d9-44e8-bd91-0639ea062d5d@gmail.com>
-From: Bryce Johnson <bryce@redpinelabs.com>
-Date: Fri, 30 Aug 2024 10:37:05 -0600
-X-Gmail-Original-Message-ID: <CADXxVSLa+DF9CRWy0Yin7cShrwauQw0=EC-i+MuGnxVcB+2n3w@mail.gmail.com>
-Message-ID: <CADXxVSLa+DF9CRWy0Yin7cShrwauQw0=EC-i+MuGnxVcB+2n3w@mail.gmail.com>
-Subject: Any recent wifi certifications with IWD?
-To: iwd@lists.linux.dev
+From: Daniel Bond <danielbondno@gmail.com>
+Date: Mon, 2 Sep 2024 08:34:00 +0200
+Message-ID: <CAO=WXSdnr7q2uJwEBvmrsfu+qpVCSTj0WVkKeRmPZi=TgTfYcw@mail.gmail.com>
+Subject: Re: [PATCH 1/2] scan: fix invalid read when canceling an ongoing scan
+To: prestwoj@gmail.com
+Cc: iwd@lists.linux.dev
 Content-Type: text/plain; charset="UTF-8"
 
-Hi All,
-I was wondering if anyone had recent wifi certification experience.
-We are working on a new product that will get certificated in the next
-6-12 months.  Last time (about a year ago), we had to switch back to
-wpa_supplicant last minute because of one failed test around PMKSA
-caching. IMO it was a pretty ambiguous test, but couldn't get the wifi
-alliance to let us skip that test.
+Hi,
 
-There was some discussion at the end of this thread:
-https://lore.kernel.org/all/504042cf-1704-a590-391c-009b500cf505@gmail.com/T/
+There was reported an issue reported in the Arch Linux issue tracker,
+which I also experienced on my hardware after upgrading iwd to version
+2.20. What happens is that iwd constantly segfaults with messages like
+this:
 
-We got our testing in last time just before some additional wifi
-certification requirements.  So there are probably some stricter tests
-now.
+[  279.974994] Code: 00 00 00 00 f3 0f 1e fa 55 48 89 e5 41 57 41 56
+41 55 41 54 53 48 83 ec 18 48 89 4d c8 4c 89 45 c0 48 85 ff 0f 84 f3
+ 00 00 00 <80> 7e 20 00 49 89 f5 0f 85 e6 00 00 00 48 83 fa 01 48 89 fb 49 89
+[  280.685109] iwd[1648]: segfault at 32 ip 0000788413f05de6 sp
+00007ffeb3d023d0 error 4 in libell.so.0.0.2[1ade6,788413efb000+57000]
+lik
+ely on CPU 1 (core 1, socket 0)
+[  280.685125] Code: 00 00 00 00 f3 0f 1e fa 55 48 89 e5 41 57 41 56
+41 55 41 54 53 48 83 ec 18 48 89 4d c8 4c 89 45 c0 48 85 ff 0f 84 f3
+ 00 00 00 <80> 7e 20 00 49 89 f5 0f 85 e6 00 00 00 48 83 fa 01 48 89 fb 49 89
+[  290.573368] iwd[1686]: segfault at 32 ip 00007c0b35d49de6 sp
+00007fff86c509d0 error 4 in libell.so.0.0.2[1ade6,7c0b35d3f000+57000]
+lik
+ely on CPU 2 (core 0, socket 0)
 
-If anyone successfully got certification with IWD I'd love to know!
+The issue seems to be resolved by checking that results->sr is set:
 
-Bryce
+- if (!results->sr->canceled)
++ if (results->sr && !results->sr->canceled)
+
+More information reported in the arch linux gitlab issuetracker, under
+gitlab archlinux org /archlinux/packaging/packages/iwd/-/issues/5 .
+
+In advance, thanks.
+
+Br, Daniel Bond
