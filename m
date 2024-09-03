@@ -1,59 +1,59 @@
-Received: from mail-oo1-f50.google.com (mail-oo1-f50.google.com [209.85.161.50])
+Received: from mail-oa1-f42.google.com (mail-oa1-f42.google.com [209.85.160.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A48C61CA6B5
-	for <iwd@lists.linux.dev>; Tue,  3 Sep 2024 15:18:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3712918BBB4
+	for <iwd@lists.linux.dev>; Tue,  3 Sep 2024 15:25:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725376716; cv=none; b=d7YaPKcbvMmKbJy9n5JQ67E7/Lb4lvFfSWXy376jKXpEGM225y+RH8TWnQcQHqJCrV8AIPE18hECgPLP+G3Tegg09y8cpnexx9o/yppq2pjJ9k7eraHH5E59VvsfQB7WOUiI4Iu8esiYebAh/J/pJMy6PdsqWLxNXQWbgXQ4inw=
+	t=1725377159; cv=none; b=Jr9yz2hCn7U39uoCK7IfSyYSVL1esAjvK4Ghx6F/y4AUMbMBXgt3+4DogZEvD1tLRHkIV9ag4LMTPtYjbN9zrkM5e+vq2OuKUgkGiElO4FValhZO4U+iVWMFGSbbj/J/scORJ3IdANyOUPrt7gLQRX7oA3Tfz7o5eDLf29cFtb0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725376716; c=relaxed/simple;
-	bh=RXVFO/DXlfV94jwrtQziv1F0VK734H8ZCg4Wqx3Ao0o=;
+	s=arc-20240116; t=1725377159; c=relaxed/simple;
+	bh=NTXDWY6W7HhbFF0r5L+ThJssk1e/xcO7KMeGFhBx2os=;
 	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=aoC35bhNsZBciIm0RfqoHo33yGdy1WhPCx1VJ2wsZPGclhCnbycG0orGPAKKCfigRUMx9kPOL/ll0asJ7AbFNLKZYWRHybpegHzwUFqIH3lLhWR0zvNJcTLL77mPG1yn5G/lPdIRuEO9Ev3T8V4znCY+xkGKaugMT0f5sfiR7zA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GYDgt9eR; arc=none smtp.client-ip=209.85.161.50
+	 In-Reply-To:Content-Type; b=GXusjqBmHZWv4t4XNOnJ0xepdVmUCma4tG1RJ03Yi7Ggymi1Ox9/2eCMIlAS7XhiVLis5/jH4b3bXPgN4vxB4tHQtx8+CbVxhk19SFBsltnegGW7Vig+jFUFoIqGLTM4a0LQ96cqERh2KWRztGibBxbzPmrmbahiF00sN0rENaM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Nh8g9lWg; arc=none smtp.client-ip=209.85.160.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GYDgt9eR"
-Received: by mail-oo1-f50.google.com with SMTP id 006d021491bc7-5d5c7f23f22so3148745eaf.0
-        for <iwd@lists.linux.dev>; Tue, 03 Sep 2024 08:18:34 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Nh8g9lWg"
+Received: by mail-oa1-f42.google.com with SMTP id 586e51a60fabf-277cfd3f07aso1408282fac.3
+        for <iwd@lists.linux.dev>; Tue, 03 Sep 2024 08:25:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1725376713; x=1725981513; darn=lists.linux.dev;
+        d=gmail.com; s=20230601; t=1725377157; x=1725981957; darn=lists.linux.dev;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:to:subject:user-agent:mime-version:date:message-id:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=gqYNp8ISxkdacQrKlZvktjh6GlMZukAuFPU7lmc35qE=;
-        b=GYDgt9eRu7Qq/+xbaDXGLVZV1Um+FptVA3VuZ+GSVpk/Q2xJjB7+iV9pEo0K5irlKJ
-         g5zKif8Dy+9eHRvSS/xo8xTuSamMtdvPdYCXf4TM3LT6nPE8GyYKvY+sX3xtCLkGGbIS
-         K0VQN11/laVe+SCtod42l4RRVUIk9xDMIGNIXE03BJpBjI+CH+Jo6N0T6C+fhBNADUxP
-         zdcHxAOC5rzGBNgAm/wc+eOpfutiB18PkTtCmUfuvqxUq/xLfoakLP8ptuZ1bi3RAN9P
-         9rvPaoksArvwEpzSYvrROnbHzXRLfTvIUlzCtSM5zi03/lnkgtDXZQlgmry3z0twzjyZ
-         ydsA==
+        bh=zoIJ1hg5e31iL0n5JLWVVqKgB6j6TCPhFDcVaERYch8=;
+        b=Nh8g9lWgROQI7bCxaUxT7zZfJDeUr/f/9sDc8jEUEP2v5B3NK6SX3MVqKtbA2vitjW
+         Eqk3a7FNPYe5zTN8X/4Wv2lSTUBp1XYBhQXHZvjcsoua3mdees6C0r1JAsduoIbRmflj
+         iVbJYqYLTxqRyVjXVYAMzD4HIXu45ibc6aSXflqcllZb7TWQ8urLrs1D7L0gduq3Hmkl
+         QqyNwKuQXjZjEIujldFuCNk42ftOsxoor3jcy5Cm+BrkY9t7TQDgr0c+NVnhNX6+FPmk
+         MPwBKIMvOqh8+RpSLgE+5ZJvMThwmllq+o865WEd/fHvUylqVJDeS4xuygM3hrkJUFTJ
+         6ikg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725376713; x=1725981513;
+        d=1e100.net; s=20230601; t=1725377157; x=1725981957;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=gqYNp8ISxkdacQrKlZvktjh6GlMZukAuFPU7lmc35qE=;
-        b=UKe+bKfU0MUmeaovNlgVmT1Nu9JB4QoVQEkuWkWhTxkH+1cfuJt/ptfIMJFKLdDjuY
-         8vNDzUq/J9EG+fmvapygQhRe6fPCXkqr4sf+yaslUOBMhfXPadfk/BLUvNde728tsQLs
-         eoKjsWnA9EvcmBUq9us8eG8qylkyBNeZddyHYsNVtcVKqsZbcEvaQuH38oGty0g4frhK
-         rSl+lX5HnEneHA4fA7br83HLXappU/9+YvUgvs1+D1abs/94lmplTgRmEoWqGkV6vyaz
-         ftRheeJDpjik6UkIG6U+isYncv50e1Y40joY0jxDcHgn1Fz1LJIfpa/3tzU2Hnkgn/G8
-         TqQw==
-X-Forwarded-Encrypted: i=1; AJvYcCXXWC9UVwR9Gl3d29GyYrmuNeinE5rFJrrEmfPtD7C9FhAEtc9QUBno6fb68nc/Um0Nh5A=@lists.linux.dev
-X-Gm-Message-State: AOJu0YxnYmhOiLAR8dKbY5ah5gwEBZftzgJLLBuDWTAQMJu1L7UEXJaq
-	7RO3tC3qYNnzUyQpS0dhANies4bo14PcCY+x5ZbHKvJLu/sWNxde/yRvjg==
-X-Google-Smtp-Source: AGHT+IGe+nAGpDmpI+sV7LshJHKJ5t98VLEZ9v8kYzqQ5MFbTtwOEFTlaowB0sagoetI1XFfEcN9sg==
-X-Received: by 2002:a05:6870:6b07:b0:270:7a7:eaa5 with SMTP id 586e51a60fabf-277ccb06678mr1852221fac.10.1725376713575;
-        Tue, 03 Sep 2024 08:18:33 -0700 (PDT)
+        bh=zoIJ1hg5e31iL0n5JLWVVqKgB6j6TCPhFDcVaERYch8=;
+        b=E6GLYNeLhswJNjd6HZGIL7GCXrS7BfwxCyBL7hHyKhEO8gfOaJPCEfYplCn0v3bTUI
+         O+aWAJijZZTotr6Kv0TvdZjJR7rU8RCQMJvvlFVbj5AMXN4t/mXRm+WykjaFZ1O5cwuQ
+         TSF8cHpPCPvPPRcDxUahUCSoqFiQsQ9jczijyzVvVH/9XhZAwEModnNg6uMVwekToobH
+         YdqgouQAM2cV2bTHa/eZ2ZnwwsAjxodwk5NXDKD1LL61xAIPUBY74l9MrIsqhrmV5oBA
+         9EBW7E4xHZ0Sq2DlDlzsaq0jG3UdaE551sWMdRtYkSx4XRaV23ypQJvUcTjc4f6XH1Ed
+         e9+w==
+X-Forwarded-Encrypted: i=1; AJvYcCVhDgyV9MF038XA2lgL5jMEOKF8b/x/sCgD4Wzo6JMISmBk0kmWCVkMk01iRgxdvW5w8GY=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yx7WiAGhm22D5iGuIaExrrFTbee6xL+1v3gDSWaovRvQ6pw4Kgm
+	0nKDrqqkmJZaE9Z5la+cnZzdVNw5OeEduO1fUr1Nafpts+XZWRhegTeChg==
+X-Google-Smtp-Source: AGHT+IH6fygRpDu8Viot7F7uPqKhP/WC8RreLf2bW1Jt/PVc6GHodqkhtYTlAKfRZPbxQcOYXPDdcQ==
+X-Received: by 2002:a05:6870:b413:b0:260:e36f:ef50 with SMTP id 586e51a60fabf-2779006e97cmr20190140fac.2.1725377157232;
+        Tue, 03 Sep 2024 08:25:57 -0700 (PDT)
 Received: from [192.168.1.22] (syn-070-114-247-242.res.spectrum.com. [70.114.247.242])
-        by smtp.googlemail.com with ESMTPSA id 586e51a60fabf-277abb61927sm2953870fac.22.2024.09.03.08.18.32
+        by smtp.googlemail.com with ESMTPSA id 586e51a60fabf-2782b9355cdsm72006fac.39.2024.09.03.08.25.56
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 03 Sep 2024 08:18:33 -0700 (PDT)
-Message-ID: <538945e8-2ecd-4d65-94b9-a2839d5052cc@gmail.com>
-Date: Tue, 3 Sep 2024 10:18:31 -0500
+        Tue, 03 Sep 2024 08:25:57 -0700 (PDT)
+Message-ID: <3c32953c-aa70-4b14-a8e3-7b950fb15250@gmail.com>
+Date: Tue, 3 Sep 2024 10:25:56 -0500
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
@@ -61,45 +61,41 @@ List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] station: check for roam timeout before rearming
+Subject: Re: [PATCH v5 1/6] doc: Document station Affinities property
 To: James Prestwood <prestwoj@gmail.com>, iwd@lists.linux.dev
-References: <20240829112758.35494-1-prestwoj@gmail.com>
+References: <20240828192428.902761-1-prestwoj@gmail.com>
 Content-Language: en-US
 From: Denis Kenzior <denkenz@gmail.com>
-In-Reply-To: <20240829112758.35494-1-prestwoj@gmail.com>
+In-Reply-To: <20240828192428.902761-1-prestwoj@gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 Hi James,
 
-On 8/29/24 6:27 AM, James Prestwood wrote:
-> A user reported a crash which was due to the roam trigger timeout
-> being overwritten, followed by a disconnect. Post-disconnect the
-> timer would fire and result in a crash. Its not clear exactly where
-> the overwrite was happening but upon code inspection it could
-> happen in the following scenario:
+On 8/28/24 2:24 PM, James Prestwood wrote:
+> This documents new DBus property that expose a bit more control to
+> how IWD roams.
 > 
-> 1. Beacon loss event, start roam timeout
-> 2. Signal low event, no check if timeout is running and the timeout
->     gets overwritten.
+> Setting the affinity on the connected BSS effectively "locks" IWD to
+> that BSS (except at critical RSSI levels, explained below). This can
+> be useful for clients that have access to more information about the
+> environment than IWD. For example, if a client is stationary there
+> is likely no point in trying to roam until it has moved elsewhere.
 > 
-> The reported crash actually didn't appear to be from the above
-> scenario but something else, so this logic is being hardened and
-> improved
+> A new main.conf option would also be added:
 > 
-> Now if a roam timeout already exists and trying to be rearmed IWD
-> will check the time remaining on the current timer and either keep
-> the active timer or reschedule it to the lesser of the two values
-> (current or new rearm time). This will avoid cases such as a long
-> roam timer being active (e.g. 60 seconds) followed by a beacon or
-> packet loss event which should trigger a more agressive roam
-> schedule.
+> [General].CriticalRoamThreshold
+> 
+> This would be the new roam threshold set if the currently connected
+> BSS is in the Affinities list. If the RSSI continues to drop below
+> this level IWD will still attempt to roam.
 > ---
->   src/station.c | 48 +++++++++++++++++++++++++++++-------------------
->   1 file changed, 29 insertions(+), 19 deletions(-)
+>   doc/station-api.txt | 17 +++++++++++++++++
+>   src/iwd.config.rst  | 16 ++++++++++++++++
+>   2 files changed, 33 insertions(+)
 > 
 
-Applied, thanks.
+All applied, thanks.
 
 Regards,
 -Denis
