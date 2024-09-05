@@ -1,124 +1,125 @@
-Received: from mail-yw1-f173.google.com (mail-yw1-f173.google.com [209.85.128.173])
+Received: from mail-oa1-f54.google.com (mail-oa1-f54.google.com [209.85.160.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F6431DDF5
-	for <iwd@lists.linux.dev>; Thu,  5 Sep 2024 14:26:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA34319E7E3
+	for <iwd@lists.linux.dev>; Thu,  5 Sep 2024 14:37:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725546403; cv=none; b=Wiwu/GvyzOsQq8JDmjBQkz7NgV64F8hE+80MO9RZKuWyHi7Bx7VdkASUaX5pgEKoLYW3iDEmSKQuU4bOTzIuiwD1aH7bMo7RsHYUaEtVRRg+oLMuKKCh28BtwTcl449zOj95ylJfOi4gN6t/HOFvI3w1FuRSFJtlU6z4xtoklmg=
+	t=1725547047; cv=none; b=bQwXtK+x8uFSLqGpNWk5ovAnHJkrUoyuINWQWC2LPfNdafepcODx410Kco/5kWsHd8kbRdjZy5kTNiHwcqZd7HZthNPImdEyHwo6PxZMTl3HFY8t5BlGBNbBijN9N3NKUGhpr/ew7Pn6aN2luWKzjXuc3P8w9zAyiyqUx4FG8DU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725546403; c=relaxed/simple;
-	bh=PDTqTmB3eRHF03IygIYmDXj5OL1+nuH5oybVkaERZMM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=n0md4EhiDm+4BO5aEwAISk5Bqhz5SQMTiWNb8G2vUBrFv8FPHx1cGIxFnIqMQotc9SKMo3bgMB+o/8IDmEKQbUDiOhbzvtm0AH9Fnp4gnyERr48SbQffEfN1OcHm1N8zMNM9weGUVh7sEEEgAdRvH4z3uDn4dAAM8eNJFC+Hoek=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=redpinelabs.com; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.128.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=redpinelabs.com
+	s=arc-20240116; t=1725547047; c=relaxed/simple;
+	bh=8it3SyryxSeCK4B/WQpaCrzY4x2XC4xVZhvQPzEDtUI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=OggjuGsj+e1kGiaA/I321ShE8PHunxcW6ZRzXW8+iDgNMyRd3Kmb/Jt2agnCME7M8pwAheplaS/bHR+Dw3O0eNSCTAxICz64GDdhC/E3ERMcMO8ElfJAWbqlSNfgkHh0pzhVGVo0EVfAVqZqb4Xf/UMGpNg/n/Pq6s3VGmd4bnw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QWPbv0dI; arc=none smtp.client-ip=209.85.160.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f173.google.com with SMTP id 00721157ae682-6d49cec2a5dso7925917b3.3
-        for <iwd@lists.linux.dev>; Thu, 05 Sep 2024 07:26:41 -0700 (PDT)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QWPbv0dI"
+Received: by mail-oa1-f54.google.com with SMTP id 586e51a60fabf-277f35c01f5so498587fac.0
+        for <iwd@lists.linux.dev>; Thu, 05 Sep 2024 07:37:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1725547044; x=1726151844; darn=lists.linux.dev;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=n55iOaxcph92Xk0f6Xo6IRzNk/a9yAnUR/62hGA4l8c=;
+        b=QWPbv0dIklCb2QYDJx109z9hM8NLB8mJu9EbfkDW9vAzQfX5yXHP+AqTAbJ7+iiJW/
+         lc4PKJ3bEmW2CENbt/5xAi+KAoBS0K0B8akM5oQevyoKYl/V+3MrhKKMS1WYO6XB5TiU
+         DsKD0xGiwJKAS5z+3ZMApKm1gD/jjT273ng/iBYT63deRCtdBt0k0x/6gjxidVK9Ay8E
+         GSREtCNm2KXC70Hj18cj52+/JEOPLuKuI9elHK5c9Finw1S3IDGhXJhBIC0VPBmV4g82
+         o+DWpzWTmOp/zRGORz17+vU0QISnJDQoYtBve/oi98XAxXfZBEl9VvbnkLQEKOaPLa25
+         MnLA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725546401; x=1726151201;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=CnJ0UASIuicqm488W3Y1dWAqUiAEhZCOqztKDJ15MTk=;
-        b=csdD4j2sZ1TB66li/2K34BknvXoVWI6SimB3eB6HuIWVqp0sAHBzItWRKo586tPZRh
-         DRWytRo1qODLjtnH29tOnCjP0gyzbVJar2GFSXXYt22YdMTb2hQmVRsFSe4xPD2K3jAJ
-         713NWzwoyPTwSN0kvbE5YS+1HL7kYioiArmFYEUww3cZZGJKEp0vNK0TGzGW74AhVxKc
-         9Q7UuajIeYWQwCgiVgneUko12d0XBGBnpdRK6siBmaG3HbVYv0loD6xD1w8pCpmtBctq
-         IsWDh/Pp7Nv3UgT3CP7fkgSCurOnKDUmBoZfNKwGIKyPmT3G9EWUUjiO1UTuazzYVdEZ
-         gYqQ==
-X-Gm-Message-State: AOJu0YwOLJU1K165P1oa07/qUuCcYSoj0H4QRzDl5E56bT2gdrlZS5qp
-	25BekHILiW02aI+c20uWbWiDafDulFBtur5Ge/eaiX93rYlnd4mYokjhSw==
-X-Google-Smtp-Source: AGHT+IHpNUvyLAEHbdghUXFcoL8sQdeWA5fKhea3h7V3JE6BKbJ6qrFmoChuRwF9NCiMqyR+oidK7Q==
-X-Received: by 2002:a05:690c:3109:b0:6d3:a447:24c7 with SMTP id 00721157ae682-6d4114808dfmr190295347b3.44.1725546400688;
-        Thu, 05 Sep 2024 07:26:40 -0700 (PDT)
-Received: from mail-yb1-f179.google.com (mail-yb1-f179.google.com. [209.85.219.179])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-6d2d438e169sm28671667b3.61.2024.09.05.07.26.40
-        for <iwd@lists.linux.dev>
+        d=1e100.net; s=20230601; t=1725547044; x=1726151844;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=n55iOaxcph92Xk0f6Xo6IRzNk/a9yAnUR/62hGA4l8c=;
+        b=RSTn8E04EFfE75aFpFF1XmQmIoBZ6ZCPs3X/sL+3byM3LFPjkh1P507FlRbMDuSHsG
+         nvw1x8sb7PHsIKaEnvxlJgVqllX7o98F+3gpIv35/IWRaLe2nCW7V/1e46dPEuVCQxQ7
+         X/LHFRrLHxYQqh+OqGTmqLmSeFW9OC/WWhk2KvLU1iFstMnn4ltBK1rKHiGJCfCunQDP
+         JYkYQi1czXqpvPwvTCgPJtipii7ufNABVXpyj2VsS7DsA3viHjYuCMSdpXrdpW5Z5xBt
+         Vr8/vJMu2Ck4wzqRr01mg2OjhPzFtCsQNdkpeNwUNJAuZ1lWwoIT4EhJ1RP8Vb12IS0W
+         oj2Q==
+X-Forwarded-Encrypted: i=1; AJvYcCXFgOkgFoQlk/gXnKxmIwKgREGCBSw45ePCVliVe5FtOWQJWqnz6+eXspBqD/WzObh+90E=@lists.linux.dev
+X-Gm-Message-State: AOJu0YxrhhGp7VbdLbOHBtg+jjy9UBk689/GqQIF0RNBormyyvk5qAxw
+	/3tKRwg0gv3DHJwGuEbIcZ2E76YS7Vb0kUAdDw5YrqiLzEbmfxUY
+X-Google-Smtp-Source: AGHT+IF9rwygpT5TzGyFj20SPJrPmfagYiUZPXsJsQMWBG7d6bWQ5a657K+yQ+exRv2ia2XpLQsNrg==
+X-Received: by 2002:a05:6870:55d2:b0:278:2c82:e056 with SMTP id 586e51a60fabf-2782c82e203mr8748149fac.23.1725547043582;
+        Thu, 05 Sep 2024 07:37:23 -0700 (PDT)
+Received: from [192.168.1.22] (syn-070-114-247-242.res.spectrum.com. [70.114.247.242])
+        by smtp.googlemail.com with ESMTPSA id 586e51a60fabf-279dc3ce194sm903892fac.12.2024.09.05.07.37.22
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 05 Sep 2024 07:26:40 -0700 (PDT)
-Received: by mail-yb1-f179.google.com with SMTP id 3f1490d57ef6-e02b79c6f21so1017001276.2
-        for <iwd@lists.linux.dev>; Thu, 05 Sep 2024 07:26:40 -0700 (PDT)
-X-Received: by 2002:a05:6902:154c:b0:e11:6348:5d86 with SMTP id
- 3f1490d57ef6-e1a79ff65e9mr26087905276.11.1725546400053; Thu, 05 Sep 2024
- 07:26:40 -0700 (PDT)
+        Thu, 05 Sep 2024 07:37:22 -0700 (PDT)
+Message-ID: <fb4b3b86-e659-448b-bfb9-cfba35c2b87b@gmail.com>
+Date: Thu, 5 Sep 2024 09:37:21 -0500
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <CAG17S_N+Hjt2c8t8hN4VMx79QsQ3hiiE_cwOErg6fKoyHkr67A@mail.gmail.com>
- <ef38aa12-634e-4870-888c-219c961f301c@gmail.com> <b0ef10a2-c30b-4b6c-8370-66f9e0ace7b1@gmail.com>
- <CAG17S_P_MO4_BZYTCp4WDkJ_q4j=0s_s3azCOWrsvqmLD0ravw@mail.gmail.com>
- <de951e97-547f-4c14-841c-267f64b0020b@gmail.com> <CAG17S_Oh_1NS9SUSadAJkMXtJ3s_AjMhnUDSqrKMzEiO69jBPA@mail.gmail.com>
- <cf5ba208-58d9-44e8-bd91-0639ea062d5d@gmail.com> <CADXxVSLa+DF9CRWy0Yin7cShrwauQw0=EC-i+MuGnxVcB+2n3w@mail.gmail.com>
- <5b8e4908-a41b-407c-a767-a3bb9f7ea017@gmail.com>
-In-Reply-To: <5b8e4908-a41b-407c-a767-a3bb9f7ea017@gmail.com>
-From: Bryce Johnson <bryce@redpinelabs.com>
-Date: Thu, 5 Sep 2024 08:26:28 -0600
-X-Gmail-Original-Message-ID: <CADXxVSL42J5fzzfmOPOgtY-soDQS3s=RbOL26ThLNs63as+A=Q@mail.gmail.com>
-Message-ID: <CADXxVSL42J5fzzfmOPOgtY-soDQS3s=RbOL26ThLNs63as+A=Q@mail.gmail.com>
-Subject: Re: Any recent wifi certifications with IWD?
-To: James Prestwood <prestwoj@gmail.com>
-Cc: iwd@lists.linux.dev
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/2] scan: check scan request in get_survey_done before
+ deref
+To: James Prestwood <prestwoj@gmail.com>, iwd@lists.linux.dev
+Cc: Daniel Bond <danielbondno@gmail.com>
+References: <20240905134315.374800-1-prestwoj@gmail.com>
+Content-Language: en-US
+From: Denis Kenzior <denkenz@gmail.com>
+In-Reply-To: <20240905134315.374800-1-prestwoj@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Hi James
-At the time that was the only issue.  Although apparently there are
-some new requirements now.
+Hi James,
 
-Looking back through my emails it was
-SAE-5.2.1 test case.  In the end they claimed the Security R3 MRD v1.3
-document required it(6.3.1, 'SAE Hash-to-Element).  Honestly it was
-about a month of going back and forth and they did not want to explain
-much, just saying it was needed
+On 9/5/24 8:43 AM, James Prestwood wrote:
+> Due to the possibility of external scans the scan request pointer
 
-"
-Dear member,
-Pls read the subject/objective of this test case and you should be
-aware of that the feature of PMK cache is necessary.
-Btw, this functionality is very basic and useful. I didn=E2=80=99t see any
-other vendors not support this feature ever.
-"
+Do we know why external scans are happening?  I can understand a one off because 
+someone triggered iw scan, but from the bug report it sounded like it was 
+crashing iwd repeatedly?
 
-I can forward you the Security R3 MRD v1.3 document directly
-Bryce
+> could be NULL. Prior to surveys IWD would still get the results in
+> order for periodic scans to utilize them. This behavior can be
+> retained by checking both if we don't have a request or if the
+> request was canceled. This check is identical to the one in
+> get_scan_done.
+> 
+> This fixes a crash when checking if the NULL scan request has been
+> canceled:
+> 
+> 0x00005ffa6a0376de in get_survey_done (user_data=0x5ffa783a3f90) at src/scan.c:2059
+> 0x0000749646a29bbd in ?? () from /usr/lib/libell.so.0
+> 0x0000749646a243cb in ?? () from /usr/lib/libell.so.0
+> 0x0000749646a24655 in l_main_iterate () from /usr/lib/libell.so.0
+> 0x0000749646a24ace in l_main_run () from /usr/lib/libell.so.0
+> 0x0000749646a263a4 in l_main_run_with_signal () from /usr/lib/libell.so.0
+> 0x00005ffa6a00d642 in main (argc=<optimized out>, argv=<optimized out>) at src/main.c:614
+> 
+> Reported-by: Daniel Bond <danielbondno@gmail.com>
+> ---
+>   src/scan.c | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/src/scan.c b/src/scan.c
+> index debdeb1f..205365cd 100644
+> --- a/src/scan.c
+> +++ b/src/scan.c
+> @@ -2056,7 +2056,7 @@ static void get_survey_done(void *user_data)
+>   
+>   	sc->get_survey_cmd_id = 0;
+>   
+> -	if (!results->sr->canceled)
+> +	if (!results->sr || !results->sr->canceled)
 
-On Wed, Sep 4, 2024 at 12:59=E2=80=AFPM James Prestwood <prestwoj@gmail.com=
-> wrote:
->
-> Hi Bryce,
->
-> On 8/30/24 9:37 AM, Bryce Johnson wrote:
-> > Hi All,
-> > I was wondering if anyone had recent wifi certification experience.
-> > We are working on a new product that will get certificated in the next
-> > 6-12 months.  Last time (about a year ago), we had to switch back to
-> > wpa_supplicant last minute because of one failed test around PMKSA
-> > caching. IMO it was a pretty ambiguous test, but couldn't get the wifi
-> > alliance to let us skip that test.
-> >
-> > There was some discussion at the end of this thread:
-> > https://lore.kernel.org/all/504042cf-1704-a590-391c-009b500cf505@gmail.=
-com/T/
-> >
-> > We got our testing in last time just before some additional wifi
-> > certification requirements.  So there are probably some stricter tests
-> > now.
-> >
-> > If anyone successfully got certification with IWD I'd love to know!
-> >
-> > Bryce
-> >
-> Just to remind me, was the only issue you know of PMKSA support? I'm
-> having a really hard time finding any actual requirements on the
-> wifi-alliance web page. In that thread you had sent some of the
-> requirements, how did you get those?
->
-> Thanks,
->
-> James
->
+I still don't understand why we're even bothering requesting a survey for a scan 
+we didn't trigger?  In other words, we shouldn't even be in this function.
+
+>   		get_results(results);
+>   	else
+>   		get_scan_done(user_data);
+
+Regards,
+-Denis
