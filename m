@@ -1,104 +1,106 @@
-Received: from mail-qk1-f172.google.com (mail-qk1-f172.google.com [209.85.222.172])
+Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D00D1991B0
-	for <iwd@lists.linux.dev>; Thu,  5 Sep 2024 11:55:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7B0C1E481
+	for <iwd@lists.linux.dev>; Thu,  5 Sep 2024 13:43:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725537323; cv=none; b=XzjkEjKMaqfKZPptT2mER0+7c2Z7UECHQRT5i14ZyAkHBdl4C/KBAF3wQD+2QB33vZk7o0TTqhSpF4rwpQtRoZXHD1GFmYZLBN2OUU6IW2+PrdwyRah3gtINzz+TvHUa+cfZLJN0wg+ZtcyIpEo3EESn2v49n8V+/cQv+o9IrxA=
+	t=1725543804; cv=none; b=T5Jdf+iAN8yxuhrZuZVxDOZuYdWE3E0O93DuMDvDeV9CZ8U0X8ZQDx85kh/B1JGYrHGG8GVTTrBlGSnKnFuPGI3MoT2fv5nK7mai1oMpgz393T0BO4Gce6/VzqPp9GCMmRPnyeMREen8U9MXPQrhf2CxlOl60M/iAB1KgEdET+M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725537323; c=relaxed/simple;
-	bh=8RX5iIVBKhIBMO9TX38EbsmaLO9W385rTW8YYqetu30=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=he3G/RsqMkLDbLj0l9LZshmEGR9ilr3Ct88uE3B/chOqqL1QUaYlL6P2+YxuKk2hUY+D7ZlibfbP1X8nIS7jtM2zG+0IVnF+1AEel9/+iRf4dNwt/8t5N59mAMovxSJvCN94SFsPREQyrZIyc2geTJTl839bHnUKbWhOUgoricc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kasf9CpV; arc=none smtp.client-ip=209.85.222.172
+	s=arc-20240116; t=1725543804; c=relaxed/simple;
+	bh=L4kCd+mRYxncaGhRe6IsG5pTyQBc5X0+5Gy1mOv3gPE=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=NmUY4HhssqjCgdQlbcFSTzyp4z34ZrmaKk8Fq4jSHN8J3fD9iEe+k8gtopLISjYPC3IMj5ZhDRHyFtSNpwsabO6lzx4aCUDH3oE9U54L/jbOVD84zdVDJp+Fo1hNikH8ZpD0eW3b/O/b4PGcz77TVcnjjgU66HdfrDRKK13ZFiI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DHsLnHCr; arc=none smtp.client-ip=209.85.214.179
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kasf9CpV"
-Received: by mail-qk1-f172.google.com with SMTP id af79cd13be357-7a8160a7239so44072185a.3
-        for <iwd@lists.linux.dev>; Thu, 05 Sep 2024 04:55:21 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DHsLnHCr"
+Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-20551eeba95so7934165ad.2
+        for <iwd@lists.linux.dev>; Thu, 05 Sep 2024 06:43:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1725537321; x=1726142121; darn=lists.linux.dev;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=9UekhmUKCv2GMk0ed+CLDwYVtDw2y+Pib3IXdhyDFO4=;
-        b=kasf9CpV0+D5Ssn+yjBoBxD/OaOdXb7q/ky4NoFGDcWnwaoBglghMNb957oicVDpU1
-         82spMercYzRuD5gZ5yFsQZGCUYCmwpVijJuMRhLATbVWcUCi1fYNwbzmjgxl1faYQc5t
-         A0S5QKCML0APog0HcKhSQ58tRUej8drYRbgd50wr9lVivPwehBITM+kWg3+ITaNjrYhv
-         PjDSuOBWI4j6N1IctYYBz8xNLUm5hymvju1yBmgNs3v4RM34cLJO78GNiknNubPSQPqk
-         u7EYbTDfnpUTBpnLf52LGQ5/VQYFhbsKEbluLtvl9FiB5CklRT6+vldl+beHPatRO2pw
-         qa8Q==
+        d=gmail.com; s=20230601; t=1725543802; x=1726148602; darn=lists.linux.dev;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=v4xu/ZPnb3qD7cfWEiehIy8y0efyircGovEgpw5rl9w=;
+        b=DHsLnHCr8EJMVFyzjpdSeq4ansK8L/LzP94vJrwK04YaxH4A8pGlTRue6S8Vdl4ZeX
+         0SxS7Zzps2OrWbgO40GAOuNPA8XG6HbiNoJdTP7aE+MHEzO7i7XUv03wuB1hUwmu5Rs8
+         7QB226G0Jemr234IDNpTX4RV/GJd6T9hps4TjV/xpbdmjSgvOvEaxSdBLFk7dK3p2iht
+         hl9/ADhVAd9kaduzvvD+dd99TAGtFdhdf3OFKg2yU2amckW1ZaULXKbrWlAFWu9fh1+4
+         qZmNR2yWl6o0p9hTpz029nsC1HGBXS+mU/FLbY6JK0+R7/HkQUlxmA0u9eyUTr04UQOb
+         m9uQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725537321; x=1726142121;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=9UekhmUKCv2GMk0ed+CLDwYVtDw2y+Pib3IXdhyDFO4=;
-        b=ngWwS6WnBiIQ0xfwC4wmEwhQIGqyj4dWSRrBqKP2spZkLy/CPhErJKg9yPbSOKZ/ul
-         2QNTpGN/D2K1xHyE+JMvter7gWFSeiFq7PX5VjxmTOj9HF00OgUrhPnyFr81C5yAO+rD
-         GRLf5V7EIVuBzZRSXULtq1Og9xAUHi9FyKn9tMgiYA2uoInWZ7NDneirRxsQcAJATXpn
-         z3EQE3d3vcZFHjg7kDNFtG4gMNYSviwX8nQqbIW+sHikAv+AFVWVnLPwItsWCMimnieG
-         2valMwJPK1Q9AdoQJskOsI5EYlqFHO8Qb/grpfEblxSK/EzXtzjG9hd3mlKMYmbS+xpj
-         SSuw==
-X-Gm-Message-State: AOJu0YzVrRZMijkYfJeFn7m3nlltdSVUnt19Elvuhu1TR7J5z5wb5Wkk
-	f+RoKG8beQbKmBvonZZ8PCpoYChNgL41PzicCO8V4OH49/v6tH2pLtV6xQ==
-X-Google-Smtp-Source: AGHT+IE8ugblFB3VNiu9jehWdUKgYNOBBw18b1zSmrc4Sx7QvHKyD3vOR8YijFEnLmTwVwQwaB11Qw==
-X-Received: by 2002:a05:620a:1909:b0:79f:1873:5463 with SMTP id af79cd13be357-7a80418699dmr2742217485a.6.1725537320804;
-        Thu, 05 Sep 2024 04:55:20 -0700 (PDT)
-Received: from [10.100.121.195] ([152.193.78.90])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7a98ef4d588sm68299785a.62.2024.09.05.04.55.19
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 05 Sep 2024 04:55:20 -0700 (PDT)
-Message-ID: <8eb5e60f-19ec-4ec7-8175-600f077d5a2d@gmail.com>
-Date: Thu, 5 Sep 2024 04:55:18 -0700
+        d=1e100.net; s=20230601; t=1725543802; x=1726148602;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=v4xu/ZPnb3qD7cfWEiehIy8y0efyircGovEgpw5rl9w=;
+        b=uMCmarGAH/3sh7Oq5lVfBtO6HQVEZO3kiliMnMM4ly8kCbqXdre3bUJfpjWlkxntRZ
+         4YI5yMVDyPqhPgMcgyESuKXYh84L9+EESeUYWinUjm0pgju1Zs/xVUDsVyZVMYxHw8Zp
+         BZSVf8/0GsIIhgl4Cd6TsG6hLWoOxiGFGJgF6Hkyca1MkzyzZOr8qQO6+0AEccrT2Dif
+         cTsTl7ZuZzm1QgcOVc+nozBK7GF5P/CnG05wHy1t9Dli5mrVyry7AGt6aZG0HlvUTPtb
+         LGub0BDFKCTklluCvG7bU3gt1c2Ol6opjbLlSKERucDDj/Dfgwg7MPVrFNjNIoXTzT4w
+         Y+hg==
+X-Gm-Message-State: AOJu0Yx/gEyBkASUVUS6VizpD9Vcqz1DiSKaJ+iptQWgblZ0++Ua63EG
+	ZjBgG1e0zoZ6YADtTI7r05bgbCgFJnidzSVhY0bwyctfFgAP+lgijshm7Q==
+X-Google-Smtp-Source: AGHT+IHYRnOvKl6iYkziRxlfSqi3uM1tLnmOfKlFsfA0mCJuHDsaD2MKPnndm0q1y21+SCGABI4tyg==
+X-Received: by 2002:a17:902:db05:b0:206:ae39:9f4 with SMTP id d9443c01a7336-206ae390d5emr92532765ad.20.1725543801569;
+        Thu, 05 Sep 2024 06:43:21 -0700 (PDT)
+Received: from LOCLAP699.localdomain (h69-130-12-20.bendor.broadband.dynamic.tds.net. [69.130.12.20])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-206aea54f06sm28788405ad.207.2024.09.05.06.43.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 05 Sep 2024 06:43:21 -0700 (PDT)
+From: James Prestwood <prestwoj@gmail.com>
+To: iwd@lists.linux.dev
+Cc: James Prestwood <prestwoj@gmail.com>,
+	Daniel Bond <danielbondno@gmail.com>
+Subject: [PATCH 1/2] scan: check scan request in get_survey_done before deref
+Date: Thu,  5 Sep 2024 06:43:14 -0700
+Message-Id: <20240905134315.374800-1-prestwoj@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/2] scan: fix invalid read when canceling an ongoing scan
-To: Denis Kenzior <denkenz@gmail.com>, Daniel Bond <danielbondno@gmail.com>
-Cc: iwd@lists.linux.dev
-References: <CAO=WXSdnr7q2uJwEBvmrsfu+qpVCSTj0WVkKeRmPZi=TgTfYcw@mail.gmail.com>
- <4083bf62-20d2-46e6-bfae-c926c2acbfe9@gmail.com>
- <7b6f85d6-136f-4b4e-9b67-f71879191cd1@gmail.com>
-Content-Language: en-US
-From: James Prestwood <prestwoj@gmail.com>
-In-Reply-To: <7b6f85d6-136f-4b4e-9b67-f71879191cd1@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-Hi Denis,
+Due to the possibility of external scans the scan request pointer
+could be NULL. Prior to surveys IWD would still get the results in
+order for periodic scans to utilize them. This behavior can be
+retained by checking both if we don't have a request or if the
+request was canceled. This check is identical to the one in
+get_scan_done.
 
-On 9/4/24 8:23 PM, Denis Kenzior wrote:
-> Hi James,
->
->>>
->>> The issue seems to be resolved by checking that results->sr is set:
->>>
->>> - if (!results->sr->canceled)
->>> + if (results->sr && !results->sr->canceled)
->> The patch on the arch issue report looks good to me. Can we go ahead 
->> and just send that patch with git send-email?
->
-> Why is results->sr NULL?
->
-> Is it caused by the cancellation path introduced by:
-> 64d68b4f080c ("scan: fix invalid read when canceling an ongoing scan")
-> ?
->
-> Or is this caused by calling scan_get_results with a NULL sr like in 
-> scan_notify()?  If sr is NULL, perhaps we shouldn't be invoking the 
-> survey path in the first place?
-I'm looking more into this. Its related to an external scan which I can 
-now reproduce if I just remove my network profile and let IWD periodic 
-scan then issue an external one. Worse though is I see more invalid 
-reads related to the survey code path (when periodic scanning) so there 
-is more to it than I originally thought.
->
-> Regards,
-> -Denis
+This fixes a crash when checking if the NULL scan request has been
+canceled:
+
+0x00005ffa6a0376de in get_survey_done (user_data=0x5ffa783a3f90) at src/scan.c:2059
+0x0000749646a29bbd in ?? () from /usr/lib/libell.so.0
+0x0000749646a243cb in ?? () from /usr/lib/libell.so.0
+0x0000749646a24655 in l_main_iterate () from /usr/lib/libell.so.0
+0x0000749646a24ace in l_main_run () from /usr/lib/libell.so.0
+0x0000749646a263a4 in l_main_run_with_signal () from /usr/lib/libell.so.0
+0x00005ffa6a00d642 in main (argc=<optimized out>, argv=<optimized out>) at src/main.c:614
+
+Reported-by: Daniel Bond <danielbondno@gmail.com>
+---
+ src/scan.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/scan.c b/src/scan.c
+index debdeb1f..205365cd 100644
+--- a/src/scan.c
++++ b/src/scan.c
+@@ -2056,7 +2056,7 @@ static void get_survey_done(void *user_data)
+ 
+ 	sc->get_survey_cmd_id = 0;
+ 
+-	if (!results->sr->canceled)
++	if (!results->sr || !results->sr->canceled)
+ 		get_results(results);
+ 	else
+ 		get_scan_done(user_data);
+-- 
+2.34.1
+
