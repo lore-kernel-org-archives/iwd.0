@@ -1,129 +1,123 @@
-Received: from mail-pg1-f178.google.com (mail-pg1-f178.google.com [209.85.215.178])
+Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 873E819925B
-	for <iwd@lists.linux.dev>; Thu,  5 Sep 2024 13:43:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18E4019CCFC
+	for <iwd@lists.linux.dev>; Thu,  5 Sep 2024 13:56:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725543804; cv=none; b=t7fREtUQD9jNcMAHQ88FqWr4eYRkj5nUg07WalAQn1YvknJzqYs3SuhAO6veOBrCP/0fO9/DbikjAcuA84SW+VCuIdPR5nz9LIoxHme90N2OG51fDqCa1IsxcUV3mvBd+wzJDyPPoIJw91ez+cS2fotn5UfuUNpY2OvfFgpalkA=
+	t=1725544588; cv=none; b=hosJXwhvouAgKa9arb6xfvDe8NoxI6pNPEdXakbGqU4SYhIWoXU9HW/l6HvRxpUkqR55yXuH9vIhgJgeYQ0MHZUrfoyPOPpDL9o4w3fG8qO8FJp8Dtbc/oW12GDnNsr4v3z1luV8Va+8IWfp6UA1ET35EXb1/nFezhojE8qS7eE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725543804; c=relaxed/simple;
-	bh=Y7GJzVHuwca83pD8rQ/RZjFvQdAejg1vBvapTdZkaVg=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=ThaGVDw6PaemcOhIvmZPWhWRJ6TRcoNtenkD7nUby108TlwxymwIpVa/NnCxliBcCS+3hO1ggryJkB9u5+BZC6kM5JiXgKuAiaQUF6Bn/dP5ZJUs1cuFmTbZkE7Ty0VInBcCuatSZbz33s2oygEea/9jCiKkIjwjQI2R87qe8vk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dtLKINsI; arc=none smtp.client-ip=209.85.215.178
+	s=arc-20240116; t=1725544588; c=relaxed/simple;
+	bh=NceeuCoZfo6l2nFmGxjL1FWZKi3NCeFJmXpNBuSUzQc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=l+NcCrFJvXfQmV+qYEFwS2r8RrMg62kSncdOGDfDeQ9NOtrbEywQCBMGd70Sta+9p+1/mJ2g0FQ4UHTZF9gLayifabAdFQL670Bvwwsxn92bYBLkn37svLFnNj9dwmIdHHeupNbgZU09ozRstVfI7TTCa1wTXbtbVAyRYGAQGJs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=X0UOxucC; arc=none smtp.client-ip=209.85.214.169
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dtLKINsI"
-Received: by mail-pg1-f178.google.com with SMTP id 41be03b00d2f7-7d50532d335so370364a12.1
-        for <iwd@lists.linux.dev>; Thu, 05 Sep 2024 06:43:23 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="X0UOxucC"
+Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-20536dcc6e9so6022565ad.2
+        for <iwd@lists.linux.dev>; Thu, 05 Sep 2024 06:56:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1725543802; x=1726148602; darn=lists.linux.dev;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=b4I745+poCmNkPOdjr9jKm1qGaTAxHRXfYXC/52Yulk=;
-        b=dtLKINsIdIVYV3SNmRVd1LpcAiDtc2z1HIiT0em0eNJplVCLxb5u1TvKa9Nbd0UXyT
-         +gXYApDA1PzVj19tIO3HzxuyqP0/fen8ZyrZ1wZYBEo35HP+uUiBZo6gqA4V1tTbmOnw
-         910HCq8jMYwvNLxjmNFjGEbTIUFkUDDQ1u6cUl8+D0iiGOfKQYg0WgKKJyoHlhbUlJiR
-         s8XOXj2+Kj8CYHX+rLP6FPzBatTwVmDzm2y0rbQxMLadUXACgEYtgviVsV7aUQ+iv6JP
-         6gdTkawoklKVw8vwyPRot6Nxr8TFrqcZi8F5hTzNzhSlWEeZfyOwVL5SXNKbn8ZcVQv8
-         pUrg==
+        d=gmail.com; s=20230601; t=1725544586; x=1726149386; darn=lists.linux.dev;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=qz2HF6wOYftNENHsph9UDNmc6CxVKlvO7McPcN6Kr6U=;
+        b=X0UOxucCTrK0Vq5HdrNnA2VnOxGMd74lS5IitaqPs6/V++RsIsSuwvdHw1PNBWaeuf
+         xaxWi3tdB+8bHHNcpgzaNphlT5QF3Cwk3dv1V5XiDWyJiXgqR14WP2BILDHX33a8zYP6
+         k3OIm8KU/vPbbJUlRbhckWPAAIHheO5mwSUokE2+b+cowHq/OeM26WBKaC0KmZg3eatS
+         Z4sF3eatnB4ROcIko4Z8y+Qe6dvDC96FGwNMvTeftdEhFOkKhEJPso9N0QZbUARn+zkd
+         zSGD3yRQLuKbozB0jeAwesjM+/bZGvnZEWrqcOGVr6Fj0+Ob0FGXfdLhv1IYuGpFHgHb
+         JTkw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725543802; x=1726148602;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=b4I745+poCmNkPOdjr9jKm1qGaTAxHRXfYXC/52Yulk=;
-        b=EfqMM9/4MoQJOesDhmC0UJzikIsg9vB6qShvh4reN9bcGLSn7u6J4UlINNI/m2rxEJ
-         4C6gUaY4X9ofAW4D9KdMP4JWlt2zQgqyOoLOrKL0GnY4H9nvpw1vavp0vkP2Ea5xptlz
-         1XI7ZFSClbZ4/LEsMcke8BxuQKTRYD6NAdnwPXlcD1YBDShhgB0ANqZRKlkd5IY6wxIo
-         ScBiygpsngvIN1JRJFCAMegtkiPzOY5yYLAeQqokCpIbpLC7+g3LgX66Zl0pyQMnm+ol
-         IryfC3zi2MAKHp4szDKy8OUUlv8wuBfGHKd8Mny7gsA8lIDGi3HWWoQHmK+Y7Q8OdF/e
-         35gg==
-X-Gm-Message-State: AOJu0YyIYCZ30V9jr6u4Ma2Ke7X5SQyISO8nCwFEnZc7dw3IvJ/feuXO
-	X5KlhK5qMuCuAXOV6vfqeb7dTULdx4eRI3IuxnUJpBpGDg2ypzXcO1pFww==
-X-Google-Smtp-Source: AGHT+IFeUn3VyoblFkgf15sBKXUT/g9Oqh/d98enB+Qce7F8tgt3Qc3BwpGbaHlUwHQEPWYuCTQUJg==
-X-Received: by 2002:a05:6a20:e617:b0:1c6:ed16:30e4 with SMTP id adf61e73a8af0-1cce0ff0eddmr24943848637.7.1725543802340;
-        Thu, 05 Sep 2024 06:43:22 -0700 (PDT)
-Received: from LOCLAP699.localdomain (h69-130-12-20.bendor.broadband.dynamic.tds.net. [69.130.12.20])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-206aea54f06sm28788405ad.207.2024.09.05.06.43.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 05 Sep 2024 06:43:21 -0700 (PDT)
-From: James Prestwood <prestwoj@gmail.com>
-To: iwd@lists.linux.dev
-Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 2/2] scan: check pending requests after regdom update
-Date: Thu,  5 Sep 2024 06:43:15 -0700
-Message-Id: <20240905134315.374800-2-prestwoj@gmail.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240905134315.374800-1-prestwoj@gmail.com>
-References: <20240905134315.374800-1-prestwoj@gmail.com>
+        d=1e100.net; s=20230601; t=1725544586; x=1726149386;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=qz2HF6wOYftNENHsph9UDNmc6CxVKlvO7McPcN6Kr6U=;
+        b=gb1OddheQYhO0j4//oYqojyDJFVUD+KnVsmFVSyyeMuoHcHy023oEqpqHwJDnAtC+Q
+         Us8SrBxyoDAQ2VOUk7QqKSPoRPRNeAIZNXh13hdFEw+v9dBqWLaFe7Djyk/gtedZeBbG
+         UpPI0p6begjok/sLNbg7sDnk4keliDwxlnKLj0arQSw4uswFYpC+nukwEBIMRHIQpMRa
+         gF11zw32qgSFC+WpHvRrJkwShzpfrqhxbQq+pcWZcfWwloT7Ah6/bMk8ihZat420psDt
+         pTDz5SSZ/Wwk59SZZKkf7VtURtGgsfP8q8RGaxrxDoMIjMYDM9gPHTldya0eRpKwn7FR
+         G8tw==
+X-Gm-Message-State: AOJu0YxpjpsTfoh9Y7rF+027TLorYOp/h7b8bUsII1lap4pnFauTUUkh
+	f/Lm6ZwZ8eh18IIXJ3YmqCe0rEMmxx9Jz9+7cntxzHdJYstoqsSPvOxGPw==
+X-Google-Smtp-Source: AGHT+IESZs5MGJ9jvOI/V5DSfCPHUcrAr4x5VXShqndsT3+deUk8GlBeyIbMZKsINMu1tzXUjNDohg==
+X-Received: by 2002:a17:903:18e:b0:205:5427:2231 with SMTP id d9443c01a7336-20554272500mr143136115ad.47.1725544585958;
+        Thu, 05 Sep 2024 06:56:25 -0700 (PDT)
+Received: from [192.168.1.164] (h69-130-12-20.bendor.broadband.dynamic.tds.net. [69.130.12.20])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-206aea55816sm29049105ad.190.2024.09.05.06.56.25
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 05 Sep 2024 06:56:25 -0700 (PDT)
+Message-ID: <f11971b9-f1dd-4055-953f-9fbb76691031@gmail.com>
+Date: Thu, 5 Sep 2024 06:56:24 -0700
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/2] scan: check scan request in get_survey_done before
+ deref
+To: iwd@lists.linux.dev
+Cc: Daniel Bond <danielbondno@gmail.com>
+References: <20240905134315.374800-1-prestwoj@gmail.com>
+Content-Language: en-US
+From: James Prestwood <prestwoj@gmail.com>
+In-Reply-To: <20240905134315.374800-1-prestwoj@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-While there is proper handling for a regdom update during a
-TRIGGER_SCAN scan, prior to NEW_SCAN_RESULTS there is no such
-handling if the regdom update comes in during a GET_SCAN or
-GET_SURVEY.
+Daniel,
 
-In both the 6ghz and non-6ghz code paths we have some issues:
-  - For non-6ghz devices, or regdom updates that did not enable
-    6ghz the wiphy state watch callback will automatically issues
-    another GET_SURVEY/GET_SCAN without checking if there was
-    already one pending. It does this using the current scan request
-    which gets freed by the prior GET_SCAN/GET_SURVEY calls when
-    they complete, causing invalid reads when the subsequent calls
-    finish.
- - If 6ghz was enabled by the update we actually append another
-   trigger command to the list and potentially run it if its the
-   current request. This also will end up in the same situation as
-   the request is freed by the pending GET_SURVEY/GET_SCAN calls.
+On 9/5/24 6:43 AM, James Prestwood wrote:
+> Due to the possibility of external scans the scan request pointer
+> could be NULL. Prior to surveys IWD would still get the results in
+> order for periodic scans to utilize them. This behavior can be
+> retained by checking both if we don't have a request or if the
+> request was canceled. This check is identical to the one in
+> get_scan_done.
+>
+> This fixes a crash when checking if the NULL scan request has been
+> canceled:
+>
+> 0x00005ffa6a0376de in get_survey_done (user_data=0x5ffa783a3f90) at src/scan.c:2059
+> 0x0000749646a29bbd in ?? () from /usr/lib/libell.so.0
+> 0x0000749646a243cb in ?? () from /usr/lib/libell.so.0
+> 0x0000749646a24655 in l_main_iterate () from /usr/lib/libell.so.0
+> 0x0000749646a24ace in l_main_run () from /usr/lib/libell.so.0
+> 0x0000749646a263a4 in l_main_run_with_signal () from /usr/lib/libell.so.0
+> 0x00005ffa6a00d642 in main (argc=<optimized out>, argv=<optimized out>) at src/main.c:614
+>
+> Reported-by: Daniel Bond <danielbondno@gmail.com>
+> ---
+>   src/scan.c | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/src/scan.c b/src/scan.c
+> index debdeb1f..205365cd 100644
+> --- a/src/scan.c
+> +++ b/src/scan.c
+> @@ -2056,7 +2056,7 @@ static void get_survey_done(void *user_data)
+>   
+>   	sc->get_survey_cmd_id = 0;
+>   
+> -	if (!results->sr->canceled)
+> +	if (!results->sr || !results->sr->canceled)
+>   		get_results(results);
+>   	else
+>   		get_scan_done(user_data);
 
-For the non-6ghz case there is little to no harm in ignoring the
-regdom update because its very unlikely it changed the allowed
-frequencies.
+Feel free to re-submit under your name as this is nearly the same as 
+your patch, but the difference in logic change is important.
 
-For the 6ghz case we could potentially handle the new trigger scan
-within get_scan_done, but thats beyond the scope of this change
-and is likely quite intrusive.
----
- src/scan.c | 16 ++++++++++++++++
- 1 file changed, 16 insertions(+)
+I also forgot about Co-authored-by, which maybe is more fitting for this 
+case. I can send that in v2, or maybe it could be added before merging.
 
-diff --git a/src/scan.c b/src/scan.c
-index 205365cd..ccd1e9e1 100644
---- a/src/scan.c
-+++ b/src/scan.c
-@@ -2120,6 +2120,22 @@ static void scan_wiphy_watch(struct wiphy *wiphy,
- 	if (!sr)
- 		return;
- 
-+	/*
-+	 * If the regdom update finished with GET_SCAN/GET_SURVEY in flight
-+	 * don't try and get the results again and allow those calls to finish.
-+	 * For the non-6ghz case this has no downside as the results should not
-+	 * differ.
-+	 *
-+	 * If 6ghz was enabled by this regdom update there is still not much we
-+	 * can do since the scan itself is already completed. Appending to the
-+	 * command list won't do anything.
-+	 *
-+	 * TODO: Handle the 6ghz case by checking for this case in get_scan_done
-+	 *       and continuing to iterate the sr->cmds array.
-+	 */
-+	if (sc->get_scan_cmd_id || sc->get_survey_cmd_id)
-+		return;
-+
- 	/*
- 	 * This update did not allow 6GHz, or the original request was
- 	 * not expecting 6GHz. The periodic scan should now be ended.
--- 
-2.34.1
+Thanks,
+
+James
 
