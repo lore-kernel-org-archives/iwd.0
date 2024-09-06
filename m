@@ -1,106 +1,116 @@
-Received: from mail-oa1-f47.google.com (mail-oa1-f47.google.com [209.85.160.47])
+Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE8681B85C9
-	for <iwd@lists.linux.dev>; Fri,  6 Sep 2024 19:01:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 640C43FB8B
+	for <iwd@lists.linux.dev>; Fri,  6 Sep 2024 19:05:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725649264; cv=none; b=uIxiBqUxgpOEa4LYestSpJTNODarAtfmaNlzSJuF2mbfQOZdDQO20u3VOSZNvKSEMY8ZqCRy5f8Gw6O3pTCm/4gxERdRcTDPegjrUPcwfLzdoTKghTMoeLrNZJluI6KaIlYpsELLIHKpF++ykUeMKpp62WW71ezIMNudASBdV6E=
+	t=1725649522; cv=none; b=SMekbz3IVR2x9AdqAf207cZcm6gQVslF/Zo2iA7X3zlAHEiAfzCyDdi3zky/AdzczkyUsis+Oqhv2JPhIWqdBEzXcNk1Obec22cRMGLkycdocfH+hQugw0N+4DNLjh1Mh5BARv0hwD3yjyzAL9BIhpLWDYCLjVzlzTp+JJvQQ2M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725649264; c=relaxed/simple;
-	bh=LUH8XQwITNd3QFm5W/WUTE25or/kGAaeLNkGSnMUZCc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=RXCGTAEjy6MYfnNYmEYKyhOfNwa5BvdkZ+jaVwMAC6W/so1hLKxWFHdtZREXlsfixJOiwq40+mjYAg6jtWAsAvPYXdymm3rgWYef5CPDkOo45RSeDvP2/bO8PAI0u8t24JxgOxUadeMHLBacpwMDC2/VcbJXAb+MWukiA83GL+s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VxEA4J/v; arc=none smtp.client-ip=209.85.160.47
+	s=arc-20240116; t=1725649522; c=relaxed/simple;
+	bh=VHPsuxI0kBm+dyg9Yv8051CLlBBidCVZpVvgdHB+ZnI=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=fYDPpVvJ++VYekwXsb5+0XNryGVBTEE3DQvcQORM+58Q/2IMdyKDdbNQK6ixAvG4L9Rt3yD2BtxOJqCDDDFgVuOpYP838H6y8T55AEaEardvaDoalkYJ+9CSUGj5nBTb2LVvX4DscAzkiT1+KK37Hgs3ezFrSx6JaXJsWv7NWOA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hh3q4J4X; arc=none smtp.client-ip=209.85.214.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VxEA4J/v"
-Received: by mail-oa1-f47.google.com with SMTP id 586e51a60fabf-2781cb281abso1472807fac.1
-        for <iwd@lists.linux.dev>; Fri, 06 Sep 2024 12:01:02 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hh3q4J4X"
+Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-2068acc8b98so22475785ad.3
+        for <iwd@lists.linux.dev>; Fri, 06 Sep 2024 12:05:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1725649262; x=1726254062; darn=lists.linux.dev;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=eXbpc+iX2gICpKjUNsP+8Q2xraA+p7QCWCoisqe3knM=;
-        b=VxEA4J/vvH1yuMxJY8sn3erIIHvGZ6DIDcIA0hjdxKa7f307pwKCwLIUjtpn0NDtmy
-         CZpdEKf5J+KapBABBCeWgfjrdEO8LdnlSCYON1tWIoudU2DmiYOibfh7KtDftgcL3Agx
-         JkMLoaCZXBLA5xD6X8gsY3CM3qJxuQlcfcoH5NynD2vJvh/pdDuAh5yZdXBQobET8A0y
-         11ToBaPU5FDud/S1HsD+ax/dMLHedUAExEo42ekms8Y5uGXs8/1u60sv03wSYIaZba6l
-         D//gaz3XlS/ZFk9mqUCmRixBKBhV5MvbCLtn+9gd1i2eXHH9MSX0E/B/dkJkQfEQae1I
-         +h9A==
+        d=gmail.com; s=20230601; t=1725649520; x=1726254320; darn=lists.linux.dev;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=AOBoKjN1onfAMV4CCLLkVQ+aeGk3/rLe9nsAUQ6cy0A=;
+        b=hh3q4J4Xws5zS6LzZ05ypYnYv/MuQDlTkh8YV4B0ME7XIkiEFAgjLD6Rl79CbUc2Tg
+         TBIpVVwlryxLKc7pQuuiO0QJFI+ERRhsJAkzxSOXAXfn1KUOaI3KTAQAx2zqrTL3QlV7
+         sQqIznzf8Tof9ruhUBxbRarphvmUV+J2UomDT5orSIbVH2QGeqnQ+uzGzvgiPbUcEG/h
+         r/nLzdAobw5q4v/rBbLAeWe0kZiiLVWMHD/bN7Zd7YTyvKbnwJ2Cz8j+bUG84BKhFgOE
+         Dc5hGXba4aWc+iXvMi5pmh5UspL0tbYx4JZa6A7c5FEHHoARYkJHbjCvspIG4sPs3/qf
+         Z1kg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725649262; x=1726254062;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=eXbpc+iX2gICpKjUNsP+8Q2xraA+p7QCWCoisqe3knM=;
-        b=a+VitziKPoVF12WMJ+j4kU/XU4Loz2YS+NrUdZpYJZ4Ng4Rc3Esv87P0+64jVxa6h9
-         NNEB+xkqyX4qOsBydziUmLXF1z8Uw2ESfZg6LlSqjQ1+GWX3y6JXIenXJRWJJaJogtE9
-         bB0X+Nh+qJMtj/9/nUA/7IrUGObEWcrmFC3noox+myHA6c6+nSXMOuYb9Zz8GBOPSe6x
-         S9DIGm4cfrQd3hXukmDXP/Up14uSm8RMS9ohevjuFuWz0kQlGWbfUU7cPKNIeG00bnD/
-         +BZntteoW0Evuvyovaoa+6xQPxGaAl9QRWn2GXy1evMYOxXqr06DeNz+uT99YK91B/98
-         apqw==
-X-Forwarded-Encrypted: i=1; AJvYcCXhjb13ix37T98DUwLdMLE3dUvQ8Ba4GgDphmYr/qZijenwhmdGmOSBPXwv0Qcpe4uLqAw=@lists.linux.dev
-X-Gm-Message-State: AOJu0YyBQqVvcYkF2UCbpgCcPU7TmJZQawxcC99CP5BRNR7Mez2f/Uzb
-	2eer9QSJlSVtbkiHLO30lsOlgVFen3WULCaMpjIxLy3GtQ2+OoX4
-X-Google-Smtp-Source: AGHT+IGg6Qj4CJmEY1uwlysf6lo8wnzlkV45gyXb8QCF/df2qrpMQqeRFmfQ4+L44RbaIvj9nkI1Yg==
-X-Received: by 2002:a05:6870:702b:b0:277:c3e6:7889 with SMTP id 586e51a60fabf-27b9d95eacdmr367913fac.30.1725649261651;
-        Fri, 06 Sep 2024 12:01:01 -0700 (PDT)
-Received: from [192.168.1.22] (syn-070-114-247-242.res.spectrum.com. [70.114.247.242])
-        by smtp.googlemail.com with ESMTPSA id 586e51a60fabf-277abb43db3sm4727071fac.15.2024.09.06.12.01.01
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 06 Sep 2024 12:01:01 -0700 (PDT)
-Message-ID: <4a5d7ca4-bd66-4f7d-8d2f-db7d86514d8a@gmail.com>
-Date: Fri, 6 Sep 2024 14:01:00 -0500
+        d=1e100.net; s=20230601; t=1725649520; x=1726254320;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=AOBoKjN1onfAMV4CCLLkVQ+aeGk3/rLe9nsAUQ6cy0A=;
+        b=QLo6P5XH2QL6xjRhZ5fONyMuMPH3whKW+F4tb2VE1O45vxaw6Y6e9mrxMt+kQlIuaS
+         cBJK+DcHhzAc5cO+gDY476yTZ/OZHo9N+jPZpRnKrEVmPjdP3BisXD/XU+7pqir85HdP
+         ae1Igc3Fi1rBIVS2iyL/1+IhQXuUIaLTj3uN9k3h4zMJEIjVSeGTvgn5YbUCT1jNJBJf
+         4izu5Sps4G4iYClQdSHeV3c9Uaz7wp/1laAUwfP+AmEvIjm1L1W+Hh5+a1gSsHFL/YfZ
+         lb6662pdc1zlU7fScn4t5X9lKLDl9XoI11x7j4ls5A43K9sRuK/VRAbMFXKc0nQf0U30
+         2zdg==
+X-Gm-Message-State: AOJu0YyOJqIU8VwEWZc14APR3DPzoHTcWnKFYtwX1Q67WlfOa/7wBDll
+	PdM78eA+2T7GWsMmPoQbPSsleZUcKae2YuE7YWAa3ataQckshGVNiyV13w==
+X-Google-Smtp-Source: AGHT+IE3SvlP6EAy7he8Mfj62cJOTRlUh8o6YBfPWiWeFt4sQwKW+BriQ/bdnDe+r4OeKaJq63hUYQ==
+X-Received: by 2002:a17:903:283:b0:206:94f5:c2e6 with SMTP id d9443c01a7336-2070c074abbmr2393635ad.7.1725649520132;
+        Fri, 06 Sep 2024 12:05:20 -0700 (PDT)
+Received: from LOCLAP699.localdomain ([152.193.78.90])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-206aea384cbsm46454115ad.170.2024.09.06.12.05.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 06 Sep 2024 12:05:19 -0700 (PDT)
+From: James Prestwood <prestwoj@gmail.com>
+To: iwd@lists.linux.dev
+Cc: James Prestwood <prestwoj@gmail.com>
+Subject: [PATCH] dpp: set cap on the PKEX timeout, and reduce once PKEX finishes
+Date: Fri,  6 Sep 2024 12:05:14 -0700
+Message-Id: <20240906190514.620603-1-prestwoj@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 1/2] scan: don't survey on external scans
-To: James Prestwood <prestwoj@gmail.com>, iwd@lists.linux.dev
-Cc: Daniel Bond <danielbondno@gmail.com>
-References: <20240905152658.380237-1-prestwoj@gmail.com>
-Content-Language: en-US
-From: Denis Kenzior <denkenz@gmail.com>
-In-Reply-To: <20240905152658.380237-1-prestwoj@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-Hi James,
+If we scan a huge number of frequencies the PKEX timeout can get
+rather large. This was overlooked in a prior patch who's intent
+was to reduce the PKEX time, but in these cases it increased it.
+Now the timeout will be capped at 2 minutes, but will still be
+as low as 10 seconds for a single frequency.
 
-On 9/5/24 10:26 AM, James Prestwood wrote:
-> Since surveys end up making driver calls in the kernel its not
-> entirely known how they are implemented or how long they will
-> take. For this reason the survey will be skipped if getting the
-> results from an external scan.
-> 
-> Doing this also fixes a crash caused by external scans where the
-> scan request pointer is not checked and dereferenced:
-> 
-> 0x00005ffa6a0376de in get_survey_done (user_data=0x5ffa783a3f90) at src/scan.c:2059
-> 0x0000749646a29bbd in ?? () from /usr/lib/libell.so.0
-> 0x0000749646a243cb in ?? () from /usr/lib/libell.so.0
-> 0x0000749646a24655 in l_main_iterate () from /usr/lib/libell.so.0
-> 0x0000749646a24ace in l_main_run () from /usr/lib/libell.so.0
-> 0x0000749646a263a4 in l_main_run_with_signal () from /usr/lib/libell.so.0
-> 0x00005ffa6a00d642 in main (argc=<optimized out>, argv=<optimized out>) at src/main.c:614
-> 
-> Reported-by: Daniel Bond <danielbondno@gmail.com>
-> ---
->   src/scan.c | 5 +++--
->   1 file changed, 3 insertions(+), 2 deletions(-)
-> 
-> v2:
->   * Disabled scan surveys rather than allowing a NULL scan request
-> 
+In addition there was no timer reset once PKEX was completed.
+This could cause excessive waits if, for example, the peer left
+the channel mid-authentication. IWD would just wait until the
+long PKEX timeout to eventually reset DPP. Once PKEX completes
+we can assume that this peer will complete authentication quickly
+and if not, we can fail.
+---
+ src/dpp.c | 11 +++++++++--
+ 1 file changed, 9 insertions(+), 2 deletions(-)
 
-Both applied, thanks.
-
-Regards,
--Denis
+diff --git a/src/dpp.c b/src/dpp.c
+index 6f2d45c2..03e2a7a6 100644
+--- a/src/dpp.c
++++ b/src/dpp.c
+@@ -2831,6 +2831,12 @@ static bool dpp_pkex_start_authentication(struct dpp_sm *dpp)
+ 
+ 	dpp_property_changed_notify(dpp);
+ 
++	/*
++	 * No longer waiting for an arbitrary peer to respond, reduce the
++	 * timeout now that we are proceeding to authentication
++	 */
++	dpp_reset_protocol_timer(dpp, DPP_AUTH_PROTO_TIMEOUT);
++
+ 	if (dpp->role == DPP_CAPABILITY_ENROLLEE) {
+ 		dpp->new_freq = dpp->current_freq;
+ 
+@@ -4283,10 +4289,11 @@ static uint32_t *dpp_default_freqs(struct dpp_sm *dpp, size_t *out_len)
+ 
+ static void __dpp_pkex_start_enrollee(struct dpp_sm *dpp)
+ {
++	uint32_t timeout = minsize(DPP_PKEX_PROTO_TIMEOUT,
++			dpp->freqs_len * DPP_PKEX_PROTO_PER_FREQ_TIMEOUT);
+ 	dpp->current_freq = dpp->freqs[0];
+ 
+-	dpp_reset_protocol_timer(dpp,
+-			dpp->freqs_len * DPP_PKEX_PROTO_PER_FREQ_TIMEOUT);
++	dpp_reset_protocol_timer(dpp, timeout);
+ 
+ 	l_debug("PKEX start enrollee (id=%s)", dpp->pkex_id ?: "unset");
+ 
+-- 
+2.34.1
 
