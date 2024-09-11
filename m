@@ -1,88 +1,102 @@
-Received: from mail-oo1-f54.google.com (mail-oo1-f54.google.com [209.85.161.54])
+Received: from mail-qv1-f43.google.com (mail-qv1-f43.google.com [209.85.219.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61CC11CF92
-	for <iwd@lists.linux.dev>; Wed, 11 Sep 2024 00:42:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5D6C7E583
+	for <iwd@lists.linux.dev>; Wed, 11 Sep 2024 14:00:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726015366; cv=none; b=nrJ2x20Fqdj2DUnlrgdTW5yT1TIFlGcWqct3ziz60aPjwisKjYVoNSrrSxGIe14vFwQSygOe8Cf9WWF4v0l7jtvRej3LCj1FjvjT4S7WnYZ3PXT5B0c6Z/8AQ4mv39jeKBOqIpAi3sAMp9stUEXDCiW6TXsIwrmXAQDSnJL1qg0=
+	t=1726063251; cv=none; b=eZnAAMAHyNC7qNZV2vlrZOCRmouB3FzWGBWALvIGYSEXFJOGGR79Zqvb/2Q4O2laigOoauwJpEJo01DdUgAsge/3NkFWwV9WpwV0slGfh6HLL/kJBFnqp4fsKmhr299Fdguu3vKHS+fym+lwjyzUZcbvckcwgIg47/5Erfh+zp0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726015366; c=relaxed/simple;
-	bh=cOYttNyzk2yP5Jx8wpBiSU2U4QU0ml5fhmIPcYgVdPo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=XxOTLTbYqYPk8WxYJTPIG8Lolr89Zn+l03z78u4JXVVP0tfA6SO2SQq8nEhFOEmRQd+l6MCz2EtcDjAo76PIF32jWfb4A+GhXswEVWrxIE1OIyokiNbVsw8lJDBVq/Z1A28/VWTQF2J4GdcveP7fPBZ9a+r25ZX2A5/RahocS7M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hfy27ebe; arc=none smtp.client-ip=209.85.161.54
+	s=arc-20240116; t=1726063251; c=relaxed/simple;
+	bh=OoNwOOO2TYIJtKIlSKe+BUefJQYyDXGs8+Mze5IOea4=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=pUe6dCLiwuT+UP/XlUKczSPGc/E0v2NzDYz5rU7JLeUUJJVSUh9cWFY883ZZAtJhuzIEPLLFE4MAIXRteo7SiBpvU7MQqFzSqNf7VdabY2Fm14ViTSJMab3bvM1FRzDSzgaZkwXA5mkQoSURhz3IChkt3RTrgYxvW9wcVQ26EPk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cEEcRIap; arc=none smtp.client-ip=209.85.219.43
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hfy27ebe"
-Received: by mail-oo1-f54.google.com with SMTP id 006d021491bc7-5daa93677e1so3664031eaf.3
-        for <iwd@lists.linux.dev>; Tue, 10 Sep 2024 17:42:45 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cEEcRIap"
+Received: by mail-qv1-f43.google.com with SMTP id 6a1803df08f44-6c34fb4f65eso39955526d6.0
+        for <iwd@lists.linux.dev>; Wed, 11 Sep 2024 07:00:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1726015364; x=1726620164; darn=lists.linux.dev;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=ToZRvH9MeiGhnYUk+0GT9GEThpLcA1BteIGHUYdcoIg=;
-        b=hfy27ebefW3Ba9aD/LvVxqfqe2xwQWUo0QMKEU6txBspAIo/Wdk9Zlul2QGmyNvSDB
-         aXXvIurTfz2Qmsz1IRzeSMvRtMpAX30woiELjWp8T9WHB9stJLgATulMbJrwXsnoGXgY
-         ZW8W0GBzhJXj0XCjM0sL5o2vylwMShf9ii2UZjp7A01qJ7nUBy3bkNQRn5fmdQ1fpqXk
-         S1V8k0f1xmt/eN4ff9CbmNpfiAIsVj8FbIVCSarxV8DdU+RezDjie/010b/sFf8mK7jj
-         nZ/5vCpppW07z08Oww2vXqv/i55nf0KH3ROxAgkDa6wyP8fCXQoOkOyCoMeOInqoILy1
-         RnIw==
+        d=gmail.com; s=20230601; t=1726063248; x=1726668048; darn=lists.linux.dev;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=tto3Xp5/opbUWvPqsjPoU8ua+g1i/buPvEx6MZSssJE=;
+        b=cEEcRIapE1VMS5rBHq0xipka6nel/b9+hgmwEIzm+OCyar1XvK1Iex5pRFbiAVCygj
+         6oV/eFNyPjDoXQ0tJVMpAYfAOh+QTP+TLFvyuunU9i+PJkfuYWWmCVFFMjLlnAOzOwEb
+         3nTP/O7LuNCDPKhd/XyCYgmDrDOOPfa9zXc/D7kFIb1C9Oua4Nne7RS2T1JZyKylPVtf
+         17vlxoSPyubsFo8QBSjzei8ouTw0/mau76k4KwPd77o5LFJcDttPqpQUbg4vfDCJJgbo
+         k5w2pcGBNoKcb/IN8tAMtjSd9KEZnu7ftoqB364eKzkrw0eBqAk0CPthg4kuJ6eMZmoH
+         ACcQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726015364; x=1726620164;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ToZRvH9MeiGhnYUk+0GT9GEThpLcA1BteIGHUYdcoIg=;
-        b=AZp+T8bgRX/ns5+BteIftV8Xy67CbUH0wai9SOdZCpJjr6oWZDPtF1Q6DCA4eOAG7c
-         soMLY6X9zggAIu4xX0hFHK4DX4uam2o4UdI0k1199yc2MVi3mr9y07a36PCkEq2mGc2C
-         2yWW0O9oaPNgpoIAn7SEVzpBcnEnfbnGZ/7VO7sdeKDvn7aNn5H1IitVtE0UTO72Ji8H
-         N8xu0//50kraVce25sX8exqZWZbx7/KIFAKi/rIeYsdrbB/HtJF3z4soXL460/Hryuir
-         rj+TfddznAlelFP7H9HMsGB2I364n2nt418haupi0TW9eBYsYrpieisX3BGGvb0oOcXA
-         h0HA==
-X-Forwarded-Encrypted: i=1; AJvYcCVvbU4msM5urU37DmvdtIV05rnc9+kwQHC9jcUKP4mnIbxRFjEggd+pjOB51JsHAQqtZMI=@lists.linux.dev
-X-Gm-Message-State: AOJu0YzqVOO2nSBo9/ixDvcuogk3DE1uqJa8H54crAewXxKk1Bkmv+w1
-	wjJrv2lCKwpv6jtDFasWF27Q1In7g14ta9ixcw8/n4N8rI/kgPM1
-X-Google-Smtp-Source: AGHT+IEfMVDyLWmvg/bN6YqsT0SndX6yJReLdAki14lOreNLyj4jbdkx+250vmipvIgKFG/soaDnLg==
-X-Received: by 2002:a05:6820:38f:b0:5e1:bc6e:52e8 with SMTP id 006d021491bc7-5e1bc6e5543mr4728996eaf.1.1726015364446;
-        Tue, 10 Sep 2024 17:42:44 -0700 (PDT)
-Received: from [192.168.1.22] (syn-070-114-247-242.res.spectrum.com. [70.114.247.242])
-        by smtp.googlemail.com with ESMTPSA id 006d021491bc7-5e1bf12561dsm1906208eaf.16.2024.09.10.17.42.43
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 10 Sep 2024 17:42:43 -0700 (PDT)
-Message-ID: <bb75914f-b8d0-453b-8c88-8143b61f7678@gmail.com>
-Date: Tue, 10 Sep 2024 19:42:43 -0500
+        d=1e100.net; s=20230601; t=1726063248; x=1726668048;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=tto3Xp5/opbUWvPqsjPoU8ua+g1i/buPvEx6MZSssJE=;
+        b=NeyAubW27AGylaBJfKFuNW2rT4N3FSagJ5kE2w6fiseSqnFu69JHNU2YtdWyWvI6vj
+         35F8LhxTSEPGCtwl/TP2HPlrXH+4HBrqPogSq42HHOznT/iaNmtd49aB5nhhxIJ1HPEt
+         GsudKmOQ/ijfqJQ+2/DKrt0DTBexY51BlJ4tFJhh0NIw/2zySIleHY9lRcKXm1qL7qSC
+         wjfT/91mBEk0I4vnosMyISCmgERUupBd+1o70RDXp1ZSMpHCsKzutUeZis8WB8J7AjkV
+         Q6wHaceII4ey9+qtXfXQAv9jmDNmqV9z4tqIISd4ceMS/soesaIsAiBhRt0ieoEpRhvZ
+         Gznw==
+X-Gm-Message-State: AOJu0YwV74Vw7kYmMYeg9ZucCmfQJ5HS6FlZ6zYyq5zZ+Xdkw7jCdNUk
+	TZ8FwA7+ZGkKAz/VacyClUHyK0mTey6fo5SFxpd7umjopaGPlnRdIyaIrw==
+X-Google-Smtp-Source: AGHT+IEI/x8dyvCqxe1a+B9YumTZew9mc/xe1Vq14W6tGMKQ2ykEq8/FUASCGi3qCdfbxGoChu2QzA==
+X-Received: by 2002:ad4:42c2:0:b0:6c5:5081:1491 with SMTP id 6a1803df08f44-6c550811d4amr101821626d6.12.1726063248263;
+        Wed, 11 Sep 2024 07:00:48 -0700 (PDT)
+Received: from LOCLAP699.locus-rst-dev-locuspark.locus ([152.193.78.90])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6c534347113sm41613156d6.65.2024.09.11.07.00.47
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 11 Sep 2024 07:00:47 -0700 (PDT)
+From: James Prestwood <prestwoj@gmail.com>
+To: iwd@lists.linux.dev
+Cc: James Prestwood <prestwoj@gmail.com>
+Subject: [PATCH] station: fix printing uint64_t by using PRIx64
+Date: Wed, 11 Sep 2024 07:00:44 -0700
+Message-Id: <20240911140044.164855-1-prestwoj@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] station: emit property changed for connected AP on
- roaming
-To: James Prestwood <prestwoj@gmail.com>, iwd@lists.linux.dev
-References: <20240910190334.128166-1-prestwoj@gmail.com>
-Content-Language: en-US
-From: Denis Kenzior <denkenz@gmail.com>
-In-Reply-To: <20240910190334.128166-1-prestwoj@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-Hi James,
+This fixed non 64-bit builds. In addition the formatting for the
+seconds integer was changed to %d, since its an int.
+---
+ src/station.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-On 9/10/24 2:03 PM, James Prestwood wrote:
-> This was only done for connecting states, but needs to also be done
-> for roaming.
-> ---
->   src/station.c | 3 +++
->   1 file changed, 3 insertions(+)
-> 
-
-Applied, thanks.
-
-Regards,
--Denis
+diff --git a/src/station.c b/src/station.c
+index 550ef745..9ebed8e2 100644
+--- a/src/station.c
++++ b/src/station.c
+@@ -3094,19 +3094,19 @@ static void station_roam_timeout_rearm(struct station *station, int seconds)
+ 
+ 	/* Our current timeout is less than the rearm, keep current */
+ 	if (l_time_before(remaining, seconds * L_USEC_PER_SEC)) {
+-		l_debug("Keeping current roam timeout of %lu seconds",
++		l_debug("Keeping current roam timeout of %" PRIx64 " seconds",
+ 				l_time_to_secs(remaining));
+ 		return;
+ 	}
+ 
+-	l_debug("Rescheduling roam timeout from %lu to %u seconds",
++	l_debug("Rescheduling roam timeout from %" PRIx64" to %d seconds",
+ 			l_time_to_secs(remaining), seconds);
+ 	l_timeout_modify(station->roam_trigger_timeout, seconds);
+ 
+ 	return;
+ 
+ new_timeout:
+-	l_debug("Arming new roam timer for %u seconds", seconds);
++	l_debug("Arming new roam timer for %d seconds", seconds);
+ 
+ 	station->roam_trigger_timeout =
+ 		l_timeout_create(seconds, station_roam_trigger_cb,
+-- 
+2.34.1
 
