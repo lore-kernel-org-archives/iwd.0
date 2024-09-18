@@ -1,61 +1,65 @@
-Received: from mail-ot1-f50.google.com (mail-ot1-f50.google.com [209.85.210.50])
+Received: from mail-qk1-f172.google.com (mail-qk1-f172.google.com [209.85.222.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E7391ACE0F
-	for <iwd@lists.linux.dev>; Wed, 18 Sep 2024 17:40:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF5401C7B83
+	for <iwd@lists.linux.dev>; Wed, 18 Sep 2024 17:40:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726681213; cv=none; b=D+5muzlZ70A5abx0Vq1HxoDuZ9ioXR+LzEXOjd7L5jq9vhACdXyLdpAHPLqQXFLybLVjrLnNw4KzfK5VIYU960ZzfZHErBfVI8qsXek5vOdW1gvZXqg4hWIiuJPfu1+5qaGkMEya3o+o8Y3ISVXgfB23A6OReVjM+YDK5s3Rc1s=
+	t=1726681214; cv=none; b=FbjO1cC+1wNrCPS3yLCeUBHmZQMRVIEl69LFtJJrGH9ozpUPQNDLumvbS7OS6OvCKcZxsWSuSKMkQApcEnqnhhy9DEWlAYt1TfT2WcA3vwIiR6U+UOYJq1v8iPxCWlm4tnWXrcJG2WLrC268Qkz5maE4ifFGX4FM4pQHWjJnmi0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726681213; c=relaxed/simple;
-	bh=i7w0B/6WnO6X2xLc0h0/5DoKSNyV+y8CAbvck+W1YSE=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Zmp/1K5KWhStZbQrU249Z5Gbhcos5Ph7giKbAMCEr3Vk4zslrVKnqdXkFLxzCdFRD64/6979KNxf+OpyvDdxbd19h2tFbDnOLa+QrvdCZKGXwg8qZSukRGyJ6uB9qUvMD58rflFWDsv+STWfGQ5tWbfVZpAPTRkHg6fKAN0F/HI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=g7NdvjU7; arc=none smtp.client-ip=209.85.210.50
+	s=arc-20240116; t=1726681214; c=relaxed/simple;
+	bh=pv8rAzQRzFE3tHMD7xmfkmf8XBESUbSXk2gZ0gX+z+0=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=dYB8KIJfXPNGzuR5dYUrwks16vGBfzd+j5+CzswmcRUszsa+mBhvRCV+JYBRtLgpBBY+yXco6/gmJcW7wprhNOou+cbbaqfeNOvzlSajBwa9S1Tlt0tCi14QfvM/7U/+QJV+O9J0oCRUTTqtctZ6Upv6XSmOIpCP2gHCHFw1nFs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=P7ruHhaa; arc=none smtp.client-ip=209.85.222.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="g7NdvjU7"
-Received: by mail-ot1-f50.google.com with SMTP id 46e09a7af769-710e01dd554so3559530a34.3
-        for <iwd@lists.linux.dev>; Wed, 18 Sep 2024 10:40:11 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="P7ruHhaa"
+Received: by mail-qk1-f172.google.com with SMTP id af79cd13be357-7a9ac2d50ffso99274285a.1
+        for <iwd@lists.linux.dev>; Wed, 18 Sep 2024 10:40:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1726681210; x=1727286010; darn=lists.linux.dev;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=0J8P4RgxRYZ7Mlr0x+7QWQwV65rxUCRHTrbwWT65h20=;
-        b=g7NdvjU73BnVlEI0NGf0jrj8l7AfuTyVITm+sHT9E01TUWOvEDp34M/DODAa9ByVmn
-         IUwjmL6i2wqOIgxO841BzY8QrqCcl17u3JKea2WkeitDyD7nPS+1nR8nhYCNJ+KXfxaS
-         yfraP+vs0YkojdZyWrBnU1ZPGEqrV5upr7a0XB4UOiganIuVhJQiLLHqlHxM2XUIeGS+
-         wJJu9JMBIZ/wEYDPYT970yAxl3iNoDBfHg8wnUAZFaaaD3AOJ1kq2e1iZjeKjPGEU9/j
-         SlInaIE7/5fxozqgLtl0VRfNMEkUubt5FTj/dpG12hkmjC5McAXzwDAwohyYws2VdQzW
-         kmQQ==
+        d=gmail.com; s=20230601; t=1726681211; x=1727286011; darn=lists.linux.dev;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=rKttVFH/1xr4T6pkKau7KMdURXt3Qem6qQ/IEzTnx+E=;
+        b=P7ruHhaaqRNz+sttWBVoAgUgCQiGI3VME91UTIsMRUgNW89+r6AX1blmz+2oivghRh
+         YPRJD2b78c6YyMymsO2uqeixE0u6Osow2cr6dOELHNjEsCb9hxe4zC8OxqSxBs5ebobN
+         t2Ab8TShjjG3tnmA2CYKt3rXHF6AdT22nCXDBiaZ1u7clVTd8YUAArI357PyIjMmh2sx
+         /Yqj1qAARyQilABrkZSIg04PKd5Ryj4nNQ5K1iMlix4XY5wDmNI4Rh1T1jL+Vgpd3qxZ
+         KxoPPWxy/B0IxYHqz/M6FXkatK+1rVxHfGKII2bqYWc7adVn3pjK/nT6nt/LyvLE2WWP
+         zmiQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726681210; x=1727286010;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=0J8P4RgxRYZ7Mlr0x+7QWQwV65rxUCRHTrbwWT65h20=;
-        b=njiwXzmE/b7N3fne91b2paCtdAQx5rFsHp9v2YW0pypjURWCincmGeEbwKCWVboYQX
-         85NLCgGgBGjQMizddCyv5EvY76hFxGkW2EHEbIXphmU8ieNwPunNxi8TcISZD0UdV8/o
-         UWDKt/FoL82FS5At9a17U0KlWsMvLSTVYwlERFEW047ftf1laMq9Tu45ryMeHH2sTKrM
-         9VYw7t0Jn49B3Q4Y4OmDdadQPp462bAl5i/mRssQ+nAhRpcpSbF47ndnuZTZJestL6AX
-         /ShPggOZ1FT2/CU8Vb8Tib3lb2BOfeMVYnaanUmt4CuJxxzTDFJ5bN/WgMXw9L6yUlD7
-         szMA==
-X-Gm-Message-State: AOJu0YzUs3zHUmFLZaP+RjhElafngFjjuWNmn98PBfgs+bULBN4KjMca
-	vCILt0Q3QG2Uc68IVyYvayj+q0exMSxk4NamDhpv7QUkP+1Xmfr5sAQ0tQ==
-X-Google-Smtp-Source: AGHT+IEM3gAVvPig4AFs5J3hB3xxix0IAab2Zr/qLKJ5GfO1GlAhgJeAkNv+phMii14VHrJDclAvOg==
-X-Received: by 2002:a05:6358:7e54:b0:1b5:ecc9:1e48 with SMTP id e5c5f4694b2df-1bb23e0410fmr637344955d.25.1726681210046;
-        Wed, 18 Sep 2024 10:40:10 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1726681211; x=1727286011;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=rKttVFH/1xr4T6pkKau7KMdURXt3Qem6qQ/IEzTnx+E=;
+        b=PZCCbOjzWanQSBvWLFqaxzQHOVu4r1TpCWLmveH938Cls/UQGB4k5Hlid/yeoh17Qc
+         uAFYsmJXlwpGN4T7fd3gxcsItrAQyn3lr/cwDp2bZX+RuuCUDCQ27kLiAR0uAqRhpY7d
+         RkwK6HExkQwolSjYGERfIa7eZtin0kyr3diIVZrMA1bC2MADw5HDE79HvVB5QTSB+h11
+         xIqcN5lIRgWx3A6aBTr93/Nigs7kXKN9Xb4u54msjkguiAG8q0kE/YZza1O+6ByNKjT+
+         DZS8gfmMln45RAlJY4DaLFmBWRzN8lXMQUN3JDaLkRECd433l8INl4jQB4SdtvePgNkF
+         h35g==
+X-Gm-Message-State: AOJu0Yz57UEGAoIWotU8PkAmhFyQ0hzHboC0oLr8pLiz5VuU3m/+CID9
+	gAiIMjnruyOfaeS6tyyLmBbFZqLAeacBRQPOr0IGA+F/61lk3oHPeoczfw==
+X-Google-Smtp-Source: AGHT+IHmg+qoD9ir+1KCIaMFCzeeqDpM8kWkiLh1sNr1ZDnHbn9L3ZJL67lt72UsLXgWJxP7ZqKVTA==
+X-Received: by 2002:a05:620a:1907:b0:7a9:a356:a5dd with SMTP id af79cd13be357-7acaf5786a6mr60449985a.20.1726681211252;
+        Wed, 18 Sep 2024 10:40:11 -0700 (PDT)
 Received: from LOCLAP699.locus-rst-dev-locuspark.locus ([152.193.78.90])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7ab3e95bbc6sm477375185a.7.2024.09.18.10.40.09
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7ab3e95bbc6sm477375185a.7.2024.09.18.10.40.10
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 18 Sep 2024 10:40:09 -0700 (PDT)
+        Wed, 18 Sep 2024 10:40:10 -0700 (PDT)
 From: James Prestwood <prestwoj@gmail.com>
 To: iwd@lists.linux.dev
 Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [RFC 1/2] doc: Document new DeviceProvisioningAgent
-Date: Wed, 18 Sep 2024 10:40:01 -0700
-Message-Id: <20240918174002.68663-1-prestwoj@gmail.com>
+Subject: [RFC 2/2] doc: introduce DPP 802.1x agent APIs
+Date: Wed, 18 Sep 2024 10:40:02 -0700
+Message-Id: <20240918174002.68663-2-prestwoj@gmail.com>
 X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20240918174002.68663-1-prestwoj@gmail.com>
+References: <20240918174002.68663-1-prestwoj@gmail.com>
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
@@ -64,149 +68,140 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This moves the SharedCodeAgent docs into the AgentManager interface
-and renames it to DeviceProvisioningAgent. The agent path parameter
-was also removed from the StartConfigurator() method.
+Introduces agent DBus APIs to support 802.1x provisioning via
+DPP. Much of the 802.1x configuration process relies on
+concepts that are out of IWD's scope to implement, hence an
+agent can be used to enable that functionality.
+
+There are 3 operations being offloaded from IWD into the
+DeviceProvisioningAgent:
+
+1. Generating a Certificate Signing Request (CSR):
+
+  The CSR's themselves can use arbitrary OID's that contain
+  device specific details. These details may be required
+  by a CA server in order to issue client certificates. Trying
+  to support this within IWD is not possible to do in a way
+  that would work for all use-cases.
+
+2. Sending the CSR to a CA server:
+
+  Besides the fact that IWD should not be doing any TCP/IP
+  communications directly, there are a number of protocols that
+  wrap CSR's which CA servers can use.
+
+3. Generating the 8021x network profile.
+
+  There are two reasons for this. One is that the CSR generation
+  is signed by a private key which IWD does not have access to.
+  Since the agent signed the CSR it knows where the private key is
+  and potentially what the password is if its encrypted.
+
+  Second, offloading 802.1x profile generation is consistent with
+  how IWD treats 802.1x profiles i.e. it does not modify or
+  generate them.
 ---
- doc/agent-api.txt               | 56 +++++++++++++++++++++++++++++++++
- doc/device-provisioning-api.txt | 48 ++++------------------------
- 2 files changed, 62 insertions(+), 42 deletions(-)
+ doc/agent-api.txt | 90 +++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 90 insertions(+)
 
 diff --git a/doc/agent-api.txt b/doc/agent-api.txt
-index e9bb95ca..dc5529f3 100644
+index dc5529f3..338d4df0 100644
 --- a/doc/agent-api.txt
 +++ b/doc/agent-api.txt
-@@ -67,6 +67,31 @@ Methods		void RegisterAgent(object path)
- 					 [service].NotFound
- 					 [service].NotAvailable
+@@ -319,3 +319,93 @@ Methods		void Release() [noreply]
  
-+		void RegisterDeviceProvisioningAgent(object path)
+ 			Possible Errors:	[service].Error.Canceled
+ 						[service].Error.NotFound
 +
-+			Register an agent for handling Device Provisioning (DPP)
-+			specific requests.
++		string GenerateCertificateSigningRequest(void)
 +
-+			This includes:
-+			 - Requests for shared codes when using shared code
-+			   device provisioning.
-+			 - Requests for certificate signing requests
-+			 - Requests to send a certificate signing request
++			This is used by enrollees to request client certificates
++			for the network. When called the agent should generate a
++			CSR containing any fields required for the network (this
++			is all dependent on the network/infrastructure). The
++			agent should then return the CSR from this method,
++			base64-encoded in PKCS10 format.
 +
-+			The details of these are explained in the DBus method
-+			docs below for the
-+			net.connman.iwd.DeviceProvisioningAgent interface.
++			To support enrolling to enterprise networks through
++			device provisioning an agent must implement this method.
 +
++		void GenerateEnterpriseProfile(string ssid, dict creds)
 +
-+			Possible Errors: [service].InvalidArguments
-+					 [service].AlreadyExists
++			This is used by enrollees being provisioned for an
++			802.1x network. This is the last step after the DPP
++			protocol has completed and IWD obtained client
++			certificates (following the CSR).
 +
-+		void UnregisterDeviceProvisioningAgent(object path)
++			Requests that the agent generate an enterprise network
++			profile for the SSID, given some credentials obtained
++			via DPP. The contents of the credentials dictionary are
++			parsed from the DPP configuration response:
 +
-+			Unregisters an existing Device Provisioning agent
++			"EAPMethod" :	String value of the EAP method being
++					configured. Note: DPP only supports
++					EAP-TLS currently.
 +
-+			Possible Errors: [service].InvalidArguments
-+					 [service].NotFound
- 
- Agent hierarchy
- ===============
-@@ -263,3 +288,34 @@ Methods		void Release() [noreply]
- 		void CancelIPv6(object device, string reason) [noreply]
- 
- 			Same as CancelIPv4 above but for IPv6.
++			"ClientCert" :	A base64 DER-encoded certificate (or
++					list) for the client. This should be in
++					PKCS7 format. This is a mandatory
++					value.
 +
-+DeviceProvisioningAgent hierarchy
-+=================================
++			"CACert" :	A base64 DER-encoded CA Certificate
++					(or list). This should be in PKCS7
++					format. This is an optional value.
 +
-+Service		unique name
-+Interface	net.connman.iwd.DeviceProvisioningAgent [Experimental]
-+Object path	freely definable
++			"ServerDomainMask" :	Domain name contained in the
++						servers certificate, used to
++						validate the authenticity of the
++						server. This is an optional
++						value.
 +
-+Methods		void Release() [noreply]
++			The agent is responsible for generating the enterprise
++			profile and placing it in IWD's profile directory.
 +
-+			This method gets called when the service daemon
-+			unregisteres the agent
++			To support enrolling to enterprise networks through
++			device provisioning an agent must implement this method.
 +
-+		void Cancel(string reason) [noreply]
++		a{sv} SendCertificateSigningRequest(string csr)
 +
-+			This method gets called to indicate that the agent
-+			request failed before a reply was returned. The
-+			argument will indicate why the request is being
-+			cancelled and may be "user-canceled", "timed-out" or
-+			"shutdown".
++			Requests that the agent send the certificate signing
++			request to the CA server. How this is done is entirely
++			up to the agent as there are many protocols/wrappers
++			around CSRs to accomplish this. Once the CA server
++			responds with the client certificates they should be
++			returned to IWD as the method return value.
 +
-+		string RequestSharedCode(string identifier)
++			The return value should contain a dictionary of
++			representing the enterprise credentials. This ultimately
++			gets converted into an "Enterprise Credentials" JSON
++			object (defined in the DPP spec 4.3.5.9) but for
++			API convenience/consistency the dictionary keys are
++			similar to what an IWD 8021x profile expects:
 +
-+			This method gets called when a shared code is requested
-+			for a particular enrollee, distingushed by the
-+			identifier. The shared code agent should lookup the
-+			identifier and return the shared code, or return an
-+			error if not found.
++			"ClientCert" :	A base64 DER-encoded certificate (or
++					list) for the client. This should be in
++					PKCS7 format. This is a mandatory
++					value.
 +
-+			Possible Errors:	[service].Error.Canceled
-+						[service].Error.NotFound
-diff --git a/doc/device-provisioning-api.txt b/doc/device-provisioning-api.txt
-index 6cf16fb8..37d8f67e 100644
---- a/doc/device-provisioning-api.txt
-+++ b/doc/device-provisioning-api.txt
-@@ -132,14 +132,13 @@ Object path	/net/connman/iwd/{phy0,phy1,...}/{1,2,...}
- 			Possible errors:	net.connman.iwd.Busy
- 						net.connman.iwd.InvalidArguments
- 
--		void StartConfigurator(object agent_path)
-+		void StartConfigurator(void)
- 
--			Start a shared code configurator using an agent
--			(distingushed by 'agent_path') to obtain the shared
--			code. This method is meant for an automated use case
--			where a configurator is capable of configuring multiple
--			enrollees, and distinguishing between them by their
--			identifier.
-+			Start a shared code configurator which depends on an
-+			agent (registered via AgentManager). This method is
-+			meant for an automated use case where a configurator is
-+			capable of configuring multiple enrollees, and
-+			distinguishing between them by their identifier.
- 
- 			If the agent service disappears during the shared code
- 			exchange it will be stopped, and the protocol will fail.
-@@ -180,38 +179,3 @@ Properties	boolean Started [readonly]
- 			Indicates the DPP role. Possible values are "enrollee"
- 			or "configurator". This property is only available when
- 			Started is true.
--
--SharedCodeAgent hierarchy
--=========================
--
--Service		unique name
--Interface	net.connman.iwd.SharedCodeAgent [Experimental]
--Object path	freely definable
--
--Methods		void Release() [noreply]
--
--			This method gets called when the service daemon
--			unregisters the agent.
--
--		string RequestSharedCode(string identifier)
--
--			This method gets called when a shared code is requested
--			for a particular enrollee, distingushed by the
--			identifier. The shared code agent should lookup the
--			identifier and return the shared code, or return an
--			error if not found.
--
--			Possible Errors:	[service].Error.Canceled
--						[service].Error.NotFound
--
--		void Cancel(string reason) [noreply]
--
--			This method gets called to indicate that the agent
--			request failed before a reply was returned. The
--			argument will indicate why the request is being
--			cancelled and may be "user-canceled", "timed-out" or
--			"shutdown".
--
--Examples	Requesting a shared code for an enrollee identified by "foo"
--
--			RequestSharedCode("foo") ==> "super_secret_code"
++			"CACert" :	A base64 DER-encoded CA Certificate
++					(or list). This should be in PKCS7
++					format. This is an optional value.
++
++			"ServerDomainMask" :	Domain name contained in the
++						servers certificate, used to
++						validate the authenticity of the
++						server. This is an optional
++						value.
++
++			The EAP method is assumed to be the same as the current
++			connection the configurator is using. For this reason
++			the EAP method is not required.
++
++			To support configuring clients to an enterprise networks
++			through device provisioning an agent must implement this
++			method.
++
++			Possible Errors:	[service].Error.Failed
 -- 
 2.34.1
 
