@@ -1,60 +1,60 @@
-Received: from mail-qv1-f43.google.com (mail-qv1-f43.google.com [209.85.219.43])
+Received: from mail-ot1-f50.google.com (mail-ot1-f50.google.com [209.85.210.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5D6C7E583
-	for <iwd@lists.linux.dev>; Wed, 11 Sep 2024 14:00:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E7391ACE0F
+	for <iwd@lists.linux.dev>; Wed, 18 Sep 2024 17:40:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726063251; cv=none; b=eZnAAMAHyNC7qNZV2vlrZOCRmouB3FzWGBWALvIGYSEXFJOGGR79Zqvb/2Q4O2laigOoauwJpEJo01DdUgAsge/3NkFWwV9WpwV0slGfh6HLL/kJBFnqp4fsKmhr299Fdguu3vKHS+fym+lwjyzUZcbvckcwgIg47/5Erfh+zp0=
+	t=1726681213; cv=none; b=D+5muzlZ70A5abx0Vq1HxoDuZ9ioXR+LzEXOjd7L5jq9vhACdXyLdpAHPLqQXFLybLVjrLnNw4KzfK5VIYU960ZzfZHErBfVI8qsXek5vOdW1gvZXqg4hWIiuJPfu1+5qaGkMEya3o+o8Y3ISVXgfB23A6OReVjM+YDK5s3Rc1s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726063251; c=relaxed/simple;
-	bh=OoNwOOO2TYIJtKIlSKe+BUefJQYyDXGs8+Mze5IOea4=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=pUe6dCLiwuT+UP/XlUKczSPGc/E0v2NzDYz5rU7JLeUUJJVSUh9cWFY883ZZAtJhuzIEPLLFE4MAIXRteo7SiBpvU7MQqFzSqNf7VdabY2Fm14ViTSJMab3bvM1FRzDSzgaZkwXA5mkQoSURhz3IChkt3RTrgYxvW9wcVQ26EPk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cEEcRIap; arc=none smtp.client-ip=209.85.219.43
+	s=arc-20240116; t=1726681213; c=relaxed/simple;
+	bh=i7w0B/6WnO6X2xLc0h0/5DoKSNyV+y8CAbvck+W1YSE=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Zmp/1K5KWhStZbQrU249Z5Gbhcos5Ph7giKbAMCEr3Vk4zslrVKnqdXkFLxzCdFRD64/6979KNxf+OpyvDdxbd19h2tFbDnOLa+QrvdCZKGXwg8qZSukRGyJ6uB9qUvMD58rflFWDsv+STWfGQ5tWbfVZpAPTRkHg6fKAN0F/HI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=g7NdvjU7; arc=none smtp.client-ip=209.85.210.50
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cEEcRIap"
-Received: by mail-qv1-f43.google.com with SMTP id 6a1803df08f44-6c34fb4f65eso39955526d6.0
-        for <iwd@lists.linux.dev>; Wed, 11 Sep 2024 07:00:49 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="g7NdvjU7"
+Received: by mail-ot1-f50.google.com with SMTP id 46e09a7af769-710e01dd554so3559530a34.3
+        for <iwd@lists.linux.dev>; Wed, 18 Sep 2024 10:40:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1726063248; x=1726668048; darn=lists.linux.dev;
+        d=gmail.com; s=20230601; t=1726681210; x=1727286010; darn=lists.linux.dev;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=tto3Xp5/opbUWvPqsjPoU8ua+g1i/buPvEx6MZSssJE=;
-        b=cEEcRIapE1VMS5rBHq0xipka6nel/b9+hgmwEIzm+OCyar1XvK1Iex5pRFbiAVCygj
-         6oV/eFNyPjDoXQ0tJVMpAYfAOh+QTP+TLFvyuunU9i+PJkfuYWWmCVFFMjLlnAOzOwEb
-         3nTP/O7LuNCDPKhd/XyCYgmDrDOOPfa9zXc/D7kFIb1C9Oua4Nne7RS2T1JZyKylPVtf
-         17vlxoSPyubsFo8QBSjzei8ouTw0/mau76k4KwPd77o5LFJcDttPqpQUbg4vfDCJJgbo
-         k5w2pcGBNoKcb/IN8tAMtjSd9KEZnu7ftoqB364eKzkrw0eBqAk0CPthg4kuJ6eMZmoH
-         ACcQ==
+        bh=0J8P4RgxRYZ7Mlr0x+7QWQwV65rxUCRHTrbwWT65h20=;
+        b=g7NdvjU73BnVlEI0NGf0jrj8l7AfuTyVITm+sHT9E01TUWOvEDp34M/DODAa9ByVmn
+         IUwjmL6i2wqOIgxO841BzY8QrqCcl17u3JKea2WkeitDyD7nPS+1nR8nhYCNJ+KXfxaS
+         yfraP+vs0YkojdZyWrBnU1ZPGEqrV5upr7a0XB4UOiganIuVhJQiLLHqlHxM2XUIeGS+
+         wJJu9JMBIZ/wEYDPYT970yAxl3iNoDBfHg8wnUAZFaaaD3AOJ1kq2e1iZjeKjPGEU9/j
+         SlInaIE7/5fxozqgLtl0VRfNMEkUubt5FTj/dpG12hkmjC5McAXzwDAwohyYws2VdQzW
+         kmQQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726063248; x=1726668048;
+        d=1e100.net; s=20230601; t=1726681210; x=1727286010;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=tto3Xp5/opbUWvPqsjPoU8ua+g1i/buPvEx6MZSssJE=;
-        b=NeyAubW27AGylaBJfKFuNW2rT4N3FSagJ5kE2w6fiseSqnFu69JHNU2YtdWyWvI6vj
-         35F8LhxTSEPGCtwl/TP2HPlrXH+4HBrqPogSq42HHOznT/iaNmtd49aB5nhhxIJ1HPEt
-         GsudKmOQ/ijfqJQ+2/DKrt0DTBexY51BlJ4tFJhh0NIw/2zySIleHY9lRcKXm1qL7qSC
-         wjfT/91mBEk0I4vnosMyISCmgERUupBd+1o70RDXp1ZSMpHCsKzutUeZis8WB8J7AjkV
-         Q6wHaceII4ey9+qtXfXQAv9jmDNmqV9z4tqIISd4ceMS/soesaIsAiBhRt0ieoEpRhvZ
-         Gznw==
-X-Gm-Message-State: AOJu0YwV74Vw7kYmMYeg9ZucCmfQJ5HS6FlZ6zYyq5zZ+Xdkw7jCdNUk
-	TZ8FwA7+ZGkKAz/VacyClUHyK0mTey6fo5SFxpd7umjopaGPlnRdIyaIrw==
-X-Google-Smtp-Source: AGHT+IEI/x8dyvCqxe1a+B9YumTZew9mc/xe1Vq14W6tGMKQ2ykEq8/FUASCGi3qCdfbxGoChu2QzA==
-X-Received: by 2002:ad4:42c2:0:b0:6c5:5081:1491 with SMTP id 6a1803df08f44-6c550811d4amr101821626d6.12.1726063248263;
-        Wed, 11 Sep 2024 07:00:48 -0700 (PDT)
+        bh=0J8P4RgxRYZ7Mlr0x+7QWQwV65rxUCRHTrbwWT65h20=;
+        b=njiwXzmE/b7N3fne91b2paCtdAQx5rFsHp9v2YW0pypjURWCincmGeEbwKCWVboYQX
+         85NLCgGgBGjQMizddCyv5EvY76hFxGkW2EHEbIXphmU8ieNwPunNxi8TcISZD0UdV8/o
+         UWDKt/FoL82FS5At9a17U0KlWsMvLSTVYwlERFEW047ftf1laMq9Tu45ryMeHH2sTKrM
+         9VYw7t0Jn49B3Q4Y4OmDdadQPp462bAl5i/mRssQ+nAhRpcpSbF47ndnuZTZJestL6AX
+         /ShPggOZ1FT2/CU8Vb8Tib3lb2BOfeMVYnaanUmt4CuJxxzTDFJ5bN/WgMXw9L6yUlD7
+         szMA==
+X-Gm-Message-State: AOJu0YzUs3zHUmFLZaP+RjhElafngFjjuWNmn98PBfgs+bULBN4KjMca
+	vCILt0Q3QG2Uc68IVyYvayj+q0exMSxk4NamDhpv7QUkP+1Xmfr5sAQ0tQ==
+X-Google-Smtp-Source: AGHT+IEM3gAVvPig4AFs5J3hB3xxix0IAab2Zr/qLKJ5GfO1GlAhgJeAkNv+phMii14VHrJDclAvOg==
+X-Received: by 2002:a05:6358:7e54:b0:1b5:ecc9:1e48 with SMTP id e5c5f4694b2df-1bb23e0410fmr637344955d.25.1726681210046;
+        Wed, 18 Sep 2024 10:40:10 -0700 (PDT)
 Received: from LOCLAP699.locus-rst-dev-locuspark.locus ([152.193.78.90])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6c534347113sm41613156d6.65.2024.09.11.07.00.47
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7ab3e95bbc6sm477375185a.7.2024.09.18.10.40.09
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 11 Sep 2024 07:00:47 -0700 (PDT)
+        Wed, 18 Sep 2024 10:40:09 -0700 (PDT)
 From: James Prestwood <prestwoj@gmail.com>
 To: iwd@lists.linux.dev
 Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH] station: fix printing uint64_t by using PRIx64
-Date: Wed, 11 Sep 2024 07:00:44 -0700
-Message-Id: <20240911140044.164855-1-prestwoj@gmail.com>
+Subject: [RFC 1/2] doc: Document new DeviceProvisioningAgent
+Date: Wed, 18 Sep 2024 10:40:01 -0700
+Message-Id: <20240918174002.68663-1-prestwoj@gmail.com>
 X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
@@ -64,39 +64,149 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This fixed non 64-bit builds. In addition the formatting for the
-seconds integer was changed to %d, since its an int.
+This moves the SharedCodeAgent docs into the AgentManager interface
+and renames it to DeviceProvisioningAgent. The agent path parameter
+was also removed from the StartConfigurator() method.
 ---
- src/station.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ doc/agent-api.txt               | 56 +++++++++++++++++++++++++++++++++
+ doc/device-provisioning-api.txt | 48 ++++------------------------
+ 2 files changed, 62 insertions(+), 42 deletions(-)
 
-diff --git a/src/station.c b/src/station.c
-index 550ef745..9ebed8e2 100644
---- a/src/station.c
-+++ b/src/station.c
-@@ -3094,19 +3094,19 @@ static void station_roam_timeout_rearm(struct station *station, int seconds)
+diff --git a/doc/agent-api.txt b/doc/agent-api.txt
+index e9bb95ca..dc5529f3 100644
+--- a/doc/agent-api.txt
++++ b/doc/agent-api.txt
+@@ -67,6 +67,31 @@ Methods		void RegisterAgent(object path)
+ 					 [service].NotFound
+ 					 [service].NotAvailable
  
- 	/* Our current timeout is less than the rearm, keep current */
- 	if (l_time_before(remaining, seconds * L_USEC_PER_SEC)) {
--		l_debug("Keeping current roam timeout of %lu seconds",
-+		l_debug("Keeping current roam timeout of %" PRIx64 " seconds",
- 				l_time_to_secs(remaining));
- 		return;
- 	}
++		void RegisterDeviceProvisioningAgent(object path)
++
++			Register an agent for handling Device Provisioning (DPP)
++			specific requests.
++
++			This includes:
++			 - Requests for shared codes when using shared code
++			   device provisioning.
++			 - Requests for certificate signing requests
++			 - Requests to send a certificate signing request
++
++			The details of these are explained in the DBus method
++			docs below for the
++			net.connman.iwd.DeviceProvisioningAgent interface.
++
++
++			Possible Errors: [service].InvalidArguments
++					 [service].AlreadyExists
++
++		void UnregisterDeviceProvisioningAgent(object path)
++
++			Unregisters an existing Device Provisioning agent
++
++			Possible Errors: [service].InvalidArguments
++					 [service].NotFound
  
--	l_debug("Rescheduling roam timeout from %lu to %u seconds",
-+	l_debug("Rescheduling roam timeout from %" PRIx64" to %d seconds",
- 			l_time_to_secs(remaining), seconds);
- 	l_timeout_modify(station->roam_trigger_timeout, seconds);
+ Agent hierarchy
+ ===============
+@@ -263,3 +288,34 @@ Methods		void Release() [noreply]
+ 		void CancelIPv6(object device, string reason) [noreply]
  
- 	return;
+ 			Same as CancelIPv4 above but for IPv6.
++
++DeviceProvisioningAgent hierarchy
++=================================
++
++Service		unique name
++Interface	net.connman.iwd.DeviceProvisioningAgent [Experimental]
++Object path	freely definable
++
++Methods		void Release() [noreply]
++
++			This method gets called when the service daemon
++			unregisteres the agent
++
++		void Cancel(string reason) [noreply]
++
++			This method gets called to indicate that the agent
++			request failed before a reply was returned. The
++			argument will indicate why the request is being
++			cancelled and may be "user-canceled", "timed-out" or
++			"shutdown".
++
++		string RequestSharedCode(string identifier)
++
++			This method gets called when a shared code is requested
++			for a particular enrollee, distingushed by the
++			identifier. The shared code agent should lookup the
++			identifier and return the shared code, or return an
++			error if not found.
++
++			Possible Errors:	[service].Error.Canceled
++						[service].Error.NotFound
+diff --git a/doc/device-provisioning-api.txt b/doc/device-provisioning-api.txt
+index 6cf16fb8..37d8f67e 100644
+--- a/doc/device-provisioning-api.txt
++++ b/doc/device-provisioning-api.txt
+@@ -132,14 +132,13 @@ Object path	/net/connman/iwd/{phy0,phy1,...}/{1,2,...}
+ 			Possible errors:	net.connman.iwd.Busy
+ 						net.connman.iwd.InvalidArguments
  
- new_timeout:
--	l_debug("Arming new roam timer for %u seconds", seconds);
-+	l_debug("Arming new roam timer for %d seconds", seconds);
+-		void StartConfigurator(object agent_path)
++		void StartConfigurator(void)
  
- 	station->roam_trigger_timeout =
- 		l_timeout_create(seconds, station_roam_trigger_cb,
+-			Start a shared code configurator using an agent
+-			(distingushed by 'agent_path') to obtain the shared
+-			code. This method is meant for an automated use case
+-			where a configurator is capable of configuring multiple
+-			enrollees, and distinguishing between them by their
+-			identifier.
++			Start a shared code configurator which depends on an
++			agent (registered via AgentManager). This method is
++			meant for an automated use case where a configurator is
++			capable of configuring multiple enrollees, and
++			distinguishing between them by their identifier.
+ 
+ 			If the agent service disappears during the shared code
+ 			exchange it will be stopped, and the protocol will fail.
+@@ -180,38 +179,3 @@ Properties	boolean Started [readonly]
+ 			Indicates the DPP role. Possible values are "enrollee"
+ 			or "configurator". This property is only available when
+ 			Started is true.
+-
+-SharedCodeAgent hierarchy
+-=========================
+-
+-Service		unique name
+-Interface	net.connman.iwd.SharedCodeAgent [Experimental]
+-Object path	freely definable
+-
+-Methods		void Release() [noreply]
+-
+-			This method gets called when the service daemon
+-			unregisters the agent.
+-
+-		string RequestSharedCode(string identifier)
+-
+-			This method gets called when a shared code is requested
+-			for a particular enrollee, distingushed by the
+-			identifier. The shared code agent should lookup the
+-			identifier and return the shared code, or return an
+-			error if not found.
+-
+-			Possible Errors:	[service].Error.Canceled
+-						[service].Error.NotFound
+-
+-		void Cancel(string reason) [noreply]
+-
+-			This method gets called to indicate that the agent
+-			request failed before a reply was returned. The
+-			argument will indicate why the request is being
+-			cancelled and may be "user-canceled", "timed-out" or
+-			"shutdown".
+-
+-Examples	Requesting a shared code for an enrollee identified by "foo"
+-
+-			RequestSharedCode("foo") ==> "super_secret_code"
 -- 
 2.34.1
 
