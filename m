@@ -1,95 +1,94 @@
-Received: from mail-ot1-f52.google.com (mail-ot1-f52.google.com [209.85.210.52])
+Received: from mail-qk1-f178.google.com (mail-qk1-f178.google.com [209.85.222.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E798B17BB38
-	for <iwd@lists.linux.dev>; Fri, 20 Sep 2024 15:27:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFF061E517
+	for <iwd@lists.linux.dev>; Fri, 20 Sep 2024 16:36:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726846052; cv=none; b=sZ7nMjJaRxYFCwyfKgl7ZMWh/mCdToiZD08og/4VuFKBvEu4ZZ1+4EaguHpKAgscCuUVpSrAW0JwKwHTh6yFTwv3a8sCQcgQyFokJEZgrb0dGwy2N03q7pSUqtCYzFgxq7uBmMxknbg2OAm5XJnwd5AMXNvKe/amYZnnP3QYv8U=
+	t=1726850181; cv=none; b=bP8MpOhV8R4MP6RgI/1v+aU6WSW55QMk8hljgrHn0WI1Tvw8R1Um6I81YOEKaYa5IjnayihZUnvHgYqzh85f0U8CAcqhrzc8Rq75ETLx7Nr63To3LGiuRXC5APoodZB+8JvJMXT6d35PU0C34PLmBvvxue1TNI58zrq1HtUGMxw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726846052; c=relaxed/simple;
-	bh=8D8bx4BQe7UnV9FrwZw7KtCAA0d9JtxYWmD60UM8MbQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=vFuwroZ5lv7fsW8Uq/9ESJpcjdk/jxWAxm9fbE9CO/fFbh6Qq4D75QahtK3H7zJs8IxG1kXCvkQ/Acg+ihXH/ZsQYF4WPPGd9wsbnQMCzYtQQSQpburpsbey8X0Nm0+l5BNYP/GrTjO/P/qX9LOI2//dgSidwvJzsvmwd54vdyY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fAUYPigV; arc=none smtp.client-ip=209.85.210.52
+	s=arc-20240116; t=1726850181; c=relaxed/simple;
+	bh=FQD2IXKJcqCT5Jjgi9b5hTY//bIHixb3wpDzt0WFMdM=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=fLOVLzGvNWcsOPKjc0eM9SQzxv6dFyqR7ydB3Iv4api8w/IFabTkc0wbz9f4ZdP5BGv5gUJmsv+HrWHjOV5Z0qGFNInJv8bl7Z4jTFhb2uR5nEeIFXg8HKnGJanFcTE9jEm0K/qMDjIx1Ww3RYKJhkVkyTzf6JJAzKs9fjtjP6c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FBKBE7y2; arc=none smtp.client-ip=209.85.222.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fAUYPigV"
-Received: by mail-ot1-f52.google.com with SMTP id 46e09a7af769-712422564aaso1527094a34.0
-        for <iwd@lists.linux.dev>; Fri, 20 Sep 2024 08:27:30 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FBKBE7y2"
+Received: by mail-qk1-f178.google.com with SMTP id af79cd13be357-7a9aec89347so151971685a.0
+        for <iwd@lists.linux.dev>; Fri, 20 Sep 2024 09:36:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1726846050; x=1727450850; darn=lists.linux.dev;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=I56OU/gN4W9zeuNeRJJ1NNtnO0vRPKOKe6lTqFgYxzY=;
-        b=fAUYPigVl4sY6+ED756jxteF4h5qH+2cwRa2wJTlODE/sSM7zlETpmzheDp0lS/3Yn
-         5SzYgL3Vvh1/X3Hp6NPoQZiXzOPyw569TqVwc+OWCJTpff0YWU5DmmUc4JYwmJavVwsP
-         9Q8RlYwL+aSH3vT+hR0kfU6kpv6s3/r/HCKvi1NNA+DjmYt6C7dx5aqyOSlGFc7qDkYL
-         Ju5wv42jwyIoYuSh1QCwFZVSjFsJBeXM4/K6gDAVDvsXlXs+NJsM0gQ+44IpaLZWH2QE
-         mSbejltxTpN5jgQ6OEarGij2AXiIZ/KC3wgMJAlyyokAKkgJLP6fTwA0ZdtroypP1Dm5
-         uvHg==
+        d=gmail.com; s=20230601; t=1726850178; x=1727454978; darn=lists.linux.dev;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=TQet0YO2AXyxAr8Dmlb+pXxsxbRR4AbREgvU1NjNX4A=;
+        b=FBKBE7y2dJt1fUrn2gDL7wb5ojrPzzWHnyBaEaov8uTd7nQDsboxfG+vGrmsos18tZ
+         fXln1Z2bHpvy1au6ZPfBDkV1hi4tE2RxlC38+iEBN4Ps7kDtS/5AGLCfCK4T17uRYvGV
+         xHQkxXi39eWEbpwBpvFvhpgIEACR3eI3Kl8XHY0pI2flzj8XQOfAFBxK2GXDf2UMn73y
+         +dh8Db9dVg1pI8+HOVrfvGv3f9XnYCYormdYWcy8sk83j1AKOjd2imniY7PaXJ/DXH0O
+         PRKG39+r7U7EGPfP4uynF4Z/Gbj/dWm0K5Y2spla894dtOiNNv1O6FD7KXLxAspu4gRh
+         QrRA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726846050; x=1727450850;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=I56OU/gN4W9zeuNeRJJ1NNtnO0vRPKOKe6lTqFgYxzY=;
-        b=EMTBgNNttSCs/tbvutDgVEL2WBrp0fwQ4QLXT1HhulGZVhnVC+iQcqwVyMXCm+x/XN
-         RfxhybP2hoc1DawLX9mY34HgD0DydWgfXzq+uu+iyGSqX7QIPHNWGr9VJxVGa998vMj4
-         1egS22F1dbpBt7LSPfg90iOwke4VI+FjZzpiCj9TIyuJa5xb5cgWBJxnZNUmpPiGFZua
-         31dtXuRHeHJZHDtHVBTuoAUkbMfu1owwU3oHZq+24EzuHn7L6A2l6VLugx0u8ue+gEqo
-         +IhG8ST7WHGGKK/ReXKb0ipXw4DeJAVIK3mqIBdP65xpzThnUnz6poutSNF6m/jMmMLo
-         iM9Q==
-X-Forwarded-Encrypted: i=1; AJvYcCWOPmDDEADiRJUQDM1JODb3eD7XKgj7jrRxLFdKvXuliodYk9D51e2nk2Jkc035m/vWunc=@lists.linux.dev
-X-Gm-Message-State: AOJu0YzcAZPF+z8K7I1gp5pl5JidvCOeWDtIgcjwGX6PJ88CyWb968Ld
-	XjtnABuqjD1ZsTDNHFSh+YIa2KrytygmF0C+UkJgWuZSMyt82QDd
-X-Google-Smtp-Source: AGHT+IF+flmeTs9NiCBa+7NgMmFzxrfV8Hgdgg3foNfhQnn4X2wrCJxlF9nM+YHQRj2YKQZQ7N13mQ==
-X-Received: by 2002:a05:6870:64a3:b0:278:a71:2659 with SMTP id 586e51a60fabf-28038b9ab61mr1813230fac.14.1726846049843;
-        Fri, 20 Sep 2024 08:27:29 -0700 (PDT)
-Received: from [192.168.1.22] (syn-070-114-247-242.res.spectrum.com. [70.114.247.242])
-        by smtp.googlemail.com with ESMTPSA id 586e51a60fabf-27d0b45f210sm1057636fac.29.2024.09.20.08.27.28
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 20 Sep 2024 08:27:29 -0700 (PDT)
-Message-ID: <c3863d99-9e7c-4232-8d5d-39034b8ab5ae@gmail.com>
-Date: Fri, 20 Sep 2024 10:27:27 -0500
+        d=1e100.net; s=20230601; t=1726850178; x=1727454978;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=TQet0YO2AXyxAr8Dmlb+pXxsxbRR4AbREgvU1NjNX4A=;
+        b=IxJO9u0xHtXu+rlXSqpJUsdxarnAOpN/dMNUAd6a4zbZOonEyy2R/7IiA3H9GEi+rJ
+         4UpJMs+V6oLd7ZA6CpuBDtBbPv7d3gz0OTbwEJg1/k7FJp7675a3t2kckbkdMmHGwhv0
+         BCN1b0Xjn6SzdBZvQEBue9GiOjziboKpW/TZhOHbZUREmKNh4Ijna7pxjs0+LCPlhVnL
+         GUa8D99O6m7XTtWafmfvK+mpsgSwYVQx5f8P8+oW2vl+owdrlNIAO9e8Y5MpDP3DBK+K
+         Iiz+6gKl57pn5yCGY4b9ZjGQ0BiBsVAUWaDhojvIiORlmfNpvCjReqm2yzERI5nQ3uw5
+         RLKQ==
+X-Gm-Message-State: AOJu0YyYZwxnbLHwryIedVjZNUi1L5Bbd9S1NkhW3/opn2Eo0N9+Gn/H
+	01ncNJ0D+Q+iOE8TQfYMNBy/c9gi3oNhEmTGvG6kU9T4XQ3FYRXxFVFPwQ==
+X-Google-Smtp-Source: AGHT+IG3Zsmp2COyAr4vZ0V5qpCiBXAG0e1Fx0pdCpM9zhYn/IN5xLAELJ0wrmycCmjm43lqS33Q+w==
+X-Received: by 2002:a05:620a:45a9:b0:7a9:b425:6 with SMTP id af79cd13be357-7acb8d8fb70mr416697185a.24.1726850178399;
+        Fri, 20 Sep 2024 09:36:18 -0700 (PDT)
+Received: from LOCLAP699.localdomain ([152.193.78.90])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7acb08d51c9sm196943685a.99.2024.09.20.09.36.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 20 Sep 2024 09:36:17 -0700 (PDT)
+From: James Prestwood <prestwoj@gmail.com>
+To: iwd@lists.linux.dev
+Cc: James Prestwood <prestwoj@gmail.com>
+Subject: [PATCH] manager: fix UseDefaultInterface warning
+Date: Fri, 20 Sep 2024 09:36:14 -0700
+Message-Id: <20240920163614.207001-1-prestwoj@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2] netdev: allow empty TX/RX bitrate attributes
-To: James Prestwood <prestwoj@gmail.com>, iwd@lists.linux.dev
-References: <20240920135536.203657-1-prestwoj@gmail.com>
-Content-Language: en-US
-From: Denis Kenzior <denkenz@gmail.com>
-In-Reply-To: <20240920135536.203657-1-prestwoj@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-Hi James,
+This logic was incorrect here, we only want to print if the option
+is used, not if its unset.
+---
+ src/manager.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-On 9/20/24 8:55 AM, James Prestwood wrote:
-> The TX or RX bitrate attributes can contain zero nested attributes.
-> This causes netdev_parse_bitrate() to fail, but this shouldn't then
-> cause the overall parsing to fail (we just don't have those values).
-> 
-> Fix this by continuing to parse attributes if either the TX/RX
-> bitrates fail to parse.
-> ---
->   src/netdev.c | 4 ++--
->   1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> v2:
->   * Retain the other "return false" lines as these do indicate some
->     kind of kernel bug if the lengths don't match up to expected.
-> 
-
-Applied, thanks.
-
-Regards,
--Denis
+diff --git a/src/manager.c b/src/manager.c
+index 5bedfcc5..436daa56 100644
+--- a/src/manager.c
++++ b/src/manager.c
+@@ -894,11 +894,11 @@ static int manager_init(void)
+ 	}
+ 
+ 	if (!l_settings_get_bool(config, "General",
+-				"UseDefaultInterface", &use_default)) {
++				"UseDefaultInterface", &use_default))
++		use_default = false;
++	else
+ 		l_warn("[General].UseDefaultInterface is deprecated, please "
+ 			"use [DriverQuirks].DefaultInterface instead");
+-		use_default = false;
+-	}
+ 
+ 	return 0;
+ 
+-- 
+2.34.1
 
