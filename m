@@ -1,154 +1,183 @@
-Received: from mail-ej1-f41.google.com (mail-ej1-f41.google.com [209.85.218.41])
+Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4B512CA7
-	for <iwd@lists.linux.dev>; Sun, 22 Sep 2024 16:20:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 911CB173
+	for <iwd@lists.linux.dev>; Sun, 22 Sep 2024 16:29:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727022051; cv=none; b=n8C+T8zNStpdXAP6URthkryE10fuTrdXL2Bm51FwclvSODeI8rnwPuhxYoJUp2HDQ6EaaOpTIEfr1T0LeMAyqi3pnJGH5D92FiagOwyus31cEyOMF0r6p1udBaZx2bHMVLz0oS4X2+tvlnJqeEVu/FEWXkaPOMZLkUQobMYPp54=
+	t=1727022556; cv=none; b=LP9n8q5KEL3MZbjTW9RZN4EarZ7EnCiGmgwZ920pZS2E2B41CqaF3LiOi6rxZXRMFQb1AQzpx1WSVDXX0Q/hkwtOYu0ojZw/65mGoov1/ut5PoUlOp2RfY+42jRJMpNuawaGZ6R7Jzg60+9Mms8Y6khB7BWflrqpN5kgj2f3YGk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727022051; c=relaxed/simple;
-	bh=s2fGC15RUknATNi7jpf7aIswEVVC9gsUWSiFw0BczWI=;
-	h=From:To:CC:Date:Message-ID:In-Reply-To:References:Subject:
-	 MIME-Version:Content-Type; b=AYqW7mUfq8+iQumptJRT/vzr/Y/m1TXN81F+S4cOk5nSbqsq9dMRhoDYeYNR0hg8d/i7yZAwN6irWBg3ave/B5ww8l9nnUo7moxv3vK/I/VAH/ejzrj/VjMvZRcnFcciS/0dhGuLUu8HExV3A6LiC0ZHz0ruv9m8Bh5FH+orUMY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=AVr1VJsy; arc=none smtp.client-ip=209.85.218.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+	s=arc-20240116; t=1727022556; c=relaxed/simple;
+	bh=McMQNYijdEO3msDa8Vcxae+pkf6fhPdKt0ejAKf9qhQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=pUTn39WGTeoGAZQoXt9G4FH9CiPL/9Ez+sKcFXF8lab8po+YIRhQJLa0YvcpVYp0IhIzD4hHHgZyv1N18/wP64YK/hom8SUhL0c1//D+FYr7pglZFN+ouE+zd4Rk7jDdfUJ3/DyOpN7MtYZWcVZQ3evgqvLZNl4rkPTFUan65VA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mTAatAer; arc=none smtp.client-ip=209.85.214.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="AVr1VJsy"
-Received: by mail-ej1-f41.google.com with SMTP id a640c23a62f3a-a90188ae58eso441058066b.1
-        for <iwd@lists.linux.dev>; Sun, 22 Sep 2024 09:20:49 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mTAatAer"
+Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-2054feabfc3so31784135ad.1
+        for <iwd@lists.linux.dev>; Sun, 22 Sep 2024 09:29:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1727022048; x=1727626848; darn=lists.linux.dev;
-        h=content-transfer-encoding:mime-version:subject:user-agent
-         :references:in-reply-to:message-id:date:cc:to:from:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Iak9VTmzQvXYxMIhQkc/TbGFykHE2xxWZfaa/92dd40=;
-        b=AVr1VJsysPBrCfpmlug+PYO3uMoE7zGX2z2hnqZc5ZSnjcjAHvnXYpZcbHO717bz41
-         jeF03P38rmykO9rvO63OO4xo5OwlUc1QnTWMyUd2df/5LLYYuUe7KSbdBLnZ7PjJhQDI
-         WH3DAO4ST3k7AKHgi35ecJ7lsLnxcl8tgQ3gc=
+        d=gmail.com; s=20230601; t=1727022554; x=1727627354; darn=lists.linux.dev;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=t5Px4zClkwBilGwHdFcDQyJmRuSxgNbH0eh051HMwqA=;
+        b=mTAatAerJwhfR7gg+3aah0CYKeiZtgegE6nOjDdG07EMzO4m9LZxQKlNX/s3Yjgzwb
+         A424iUbKLWGZrsbwbCRrWGL6gaMOhfH+qbKJurX06LJudIfpBTjivAgUj5xysBUE2JvD
+         hUa8KAgD2d0QIWtBCt+bKdqs5EPAa8TIR7KIEJcnYmaMANW4mcoMeSjyt0UzuRqZ4XZr
+         RmupVMzsiKLlnOXDWX10HK3E7ww4wDeUJvXjl5OuMABlnWyjZhsaiASSvpsCe5DpziWV
+         c4dQrrSKUz0meidVOxZMtWMgAoSqXFs06PJsNClGMhM1+21OdDuCIMzkUhuA88qEmkvG
+         HSjg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727022048; x=1727626848;
-        h=content-transfer-encoding:mime-version:subject:user-agent
-         :references:in-reply-to:message-id:date:cc:to:from
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Iak9VTmzQvXYxMIhQkc/TbGFykHE2xxWZfaa/92dd40=;
-        b=K/8KEH6o4SaRW+XmMpE0K7TLiqzmvGQpqBQSzVU+6D8Wws3TXNyN00PboIW9b6dc3O
-         E8Gljpt9Eu6VSU01jnU8H5S6qf890kYoBzjLkCa6h8S3WhEffUbD2WaVDOjsRIRdDhTd
-         g1fQGIuRMUz+EwuV+aVOLL2+rMDOLUjLuedIfoeUtPDMizBSlUJ6CP5UNWTJQqQoHKxs
-         4tNKNIP/pHUXEUqqkYv+V46VvP5Z6vUEDZGt7sdjYws2CAmgKS6gsOI0WL3wu5otAnqK
-         R+fRAMoPltvjOZJt9sKtp1ZPF5LpyaVkU9F1UIbADcOflljsGnwS8acqkRUm81akDjGs
-         VPsw==
-X-Forwarded-Encrypted: i=1; AJvYcCVGVnarmFO5zZC1/txOKohpmmsr2+WwNL5FO/03Uphg7ownntc/nELGN4XY3vjC56JaLNg=@lists.linux.dev
-X-Gm-Message-State: AOJu0YzirZLQa9wtHFG75KXFF7Ci9pcNje0HC2h4q6aL3qtU9wxuyeex
-	h2nvzw1FrIkE5AidEoXqKKsU6Ym8gVJ4bQx2hqKGySKcF5z9SM8xH8a9my1sLw==
-X-Google-Smtp-Source: AGHT+IEYhWLvPKW13MNwsAji63yaK/MWzGeD1O+Kjh8G0DjBJlgXIK8g/s1HEWaU3C9+zMZSqLw1Ug==
-X-Received: by 2002:a17:907:3e20:b0:a86:8f8f:4761 with SMTP id a640c23a62f3a-a90d56dffb1mr966303266b.25.1727022047948;
-        Sun, 22 Sep 2024 09:20:47 -0700 (PDT)
-Received: from [192.168.178.38] (f215227.upc-f.chello.nl. [80.56.215.227])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a906111aa91sm1099601066b.97.2024.09.22.09.20.46
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Sun, 22 Sep 2024 09:20:47 -0700 (PDT)
-From: Arend Van Spriel <arend.vanspriel@broadcom.com>
-To: KeithG <ys3al35l@gmail.com>
-CC: Denis Kenzior <denkenz@gmail.com>, Yuxuan Shui <yshuiv7@gmail.com>, <iwd@lists.linux.dev>, <prestwoj@gmail.com>
-Date: Sun, 22 Sep 2024 18:20:47 +0200
-Message-ID: <1921a891f18.279b.9b12b7fc0a3841636cfb5e919b41b954@broadcom.com>
-In-Reply-To: <CAG17S_PAm0NsA+oRho5Qt-Y8MowB4nkeOnugzaE==pWLSpGYpg@mail.gmail.com>
-References: <20240823174220.498594-1-denkenz@gmail.com>
- <20240921185902.170612-1-yshuiv7@gmail.com>
- <ba78a253-de77-4427-85c3-d876ef9fdd8a@gmail.com>
- <1921859cb98.279b.9b12b7fc0a3841636cfb5e919b41b954@broadcom.com>
- <CAG17S_PAm0NsA+oRho5Qt-Y8MowB4nkeOnugzaE==pWLSpGYpg@mail.gmail.com>
-User-Agent: AquaMail/1.52.0 (build: 105200518)
-Subject: Re: [RFC PATCH v1 0/2] External Auth support
+        d=1e100.net; s=20230601; t=1727022554; x=1727627354;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=t5Px4zClkwBilGwHdFcDQyJmRuSxgNbH0eh051HMwqA=;
+        b=oYJSq5D/SDefRwGzNvH/INi3lXoxhcfVXy2eM/NXAFNG/tWkGASjjIbiGQ5Rlzj8Ll
+         QeNMOdxwfmmwukMMPDVZxsZXe8WCBe/Uq6RAPOO101RRKx1gbvkQHkFzxkg1U0SjVqsC
+         5QNAR7tisRmiRd9olIrFMraG6KXWIoOGuTi7o9mw9Ui/lWiSY+PhE+1ZnvCzKDCJypBy
+         yZh+J+WrQ6CgJqeV698wpEdIxR5vuNL0qPz6bbxMUK5fDinXyluA1lLggeLksjqCsF9T
+         bW1bHjry5/pPF/T5/V6KnCP0mGaUED+cOV1HaNQcj08dOTtLCvBhWRb7VJdDe60Byp4f
+         AhHw==
+X-Forwarded-Encrypted: i=1; AJvYcCVfgM/Q9nlAIrySGOYz8KZeGh1hhfDZG1q+5y/8IFUlDA7TQgX2RU2rgCi1S7Jpg/gBY/Y=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yxd6j/1OHQzobERNz0tP2ZTqmRhW7n64yxofCq7Gt2++m4jCihZ
+	59Q3A3yoHdP6zi602fgl4/p5ublyRvDL6JVqZh4xAcbU/k9Y9tuBo03tYavW56aLXV+XYsziwjh
+	pyRqmSPpgrhkuDUCvZq92T90hG7I=
+X-Google-Smtp-Source: AGHT+IEOcW2ue3OM/xocdbtPLvGwDoapmzo9es4fiFo9oYaF88cw1tzLd+gBJ365tyjtlxHiBAYQ4KmtIW0pKo2+88c=
+X-Received: by 2002:a17:902:eccc:b0:206:a162:e19e with SMTP id
+ d9443c01a7336-208d986a74dmr128921035ad.37.1727022553636; Sun, 22 Sep 2024
+ 09:29:13 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; format=flowed; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
+References: <20240823174220.498594-1-denkenz@gmail.com> <20240921185902.170612-1-yshuiv7@gmail.com>
+ <ba78a253-de77-4427-85c3-d876ef9fdd8a@gmail.com> <1921859cb98.279b.9b12b7fc0a3841636cfb5e919b41b954@broadcom.com>
+ <CAG17S_PAm0NsA+oRho5Qt-Y8MowB4nkeOnugzaE==pWLSpGYpg@mail.gmail.com> <1921a891f18.279b.9b12b7fc0a3841636cfb5e919b41b954@broadcom.com>
+In-Reply-To: <1921a891f18.279b.9b12b7fc0a3841636cfb5e919b41b954@broadcom.com>
+From: KeithG <ys3al35l@gmail.com>
+Date: Sun, 22 Sep 2024 11:29:02 -0500
+Message-ID: <CAG17S_O1njCdiFaWUSh8N11DhiRBKhvnigCpLiNfkCp+JwuGJA@mail.gmail.com>
+Subject: Re: [RFC PATCH v1 0/2] External Auth support
+To: Arend Van Spriel <arend.vanspriel@broadcom.com>
+Cc: Denis Kenzior <denkenz@gmail.com>, Yuxuan Shui <yshuiv7@gmail.com>, iwd@lists.linux.dev, 
+	prestwoj@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On September 22, 2024 5:36:53 PM KeithG <ys3al35l@gmail.com> wrote:
-
-> On Sun, Sep 22, 2024 at 1:09 AM Arend Van Spriel
-> <arend.vanspriel@broadcom.com> wrote:
->>
->> On September 22, 2024 5:35:03 AM Denis Kenzior <denkenz@gmail.com> wrote:
->>
->>> Hi Yuxuan Shui,
->>>
->>>>
->>>> I tested this on an RPi5 too, and indeed I am having the same problem as KeithG
->>>> as well. However I managed to get some debug information from brcmfmac when
->>>> running wpa_supplicant. Interestingly wpa_supplicant gets the same -52 error as
->>>> well, which it reports as an authentication timeout. But if I ask it to try
->>>> again, it will connect successfully, and there is no external auth related log
->>>> the second time around.
->>>
->>> Yep.  It looks like wpa_s puts the resulting PMKSA into the kernel cache even
->>> though the initial connection using external auth fails.  I've only seen
->>> 2.10 do
->>> this, not 2.11.  Either way, it is a bug / lucky coincidence.
->>>
->>>>
->>>> So I suspect this is a firmware bug, but it should be relatively easy to
->>>> workaround I think? Basically we also add a timeout and retry.
->>>
->>> It would be far nicer if the brcmfmac firmware + driver combination worked
->>> properly :)
->>
->> Indeed it would. So what's in the mix? What kernel is used? Upstream or RPi
->> kernel? What firmware capabilities are listed in debugfs?
->>
->> Recently I submitted patches upstream to add external auth support. As I
->> ported downstream patch the results you see do not make me optimistic that
->> my patch is ready. Maybe you could help testing it?
->>
->> https://patchwork.kernel.org/project/linux-wireless/list/?series=891248&state=*
->>
->> Regards,
->> Arend
-> Arend,
+On Sun, Sep 22, 2024 at 11:20=E2=80=AFAM Arend Van Spriel
+<arend.vanspriel@broadcom.com> wrote:
 >
-> I tried to apply the patch set to kernel 6.6.44-v8 and was unable to patch it:
+> On September 22, 2024 5:36:53 PM KeithG <ys3al35l@gmail.com> wrote:
 >
-> $ patch -p1 < 
-> RFT-v2-1-3-wifi-brcmfmac-support-per-vendor-cfg80211-callbacks-and-firmware-events.patch
-> patching file drivers/net/wireless/broadcom/brcm80211/brcmfmac/cfg80211.c
-> Hunk #1 FAILED at 6752.
-> 1 out of 1 hunk FAILED -- saving rejects to file
-> drivers/net/wireless/broadcom/brcm80211/brcmfmac/cfg80211.c.rej
-> patching file drivers/net/wireless/broadcom/brcm80211/brcmfmac/common.c
-> Hunk #1 succeeded at 524 (offset 33 lines).
-> patching file drivers/net/wireless/broadcom/brcm80211/brcmfmac/core.c
-> Hunk #1 FAILED at 1359.
-> 1 out of 1 hunk FAILED -- saving rejects to file
-> drivers/net/wireless/broadcom/brcm80211/brcmfmac/core.c.rej
-> patching file drivers/net/wireless/broadcom/brcm80211/brcmfmac/fweh.c
-> Hunk #1 succeeded at 74 (offset -1 lines).
-> Hunk #2 succeeded at 336 (offset -70 lines).
-> patching file drivers/net/wireless/broadcom/brcm80211/brcmfmac/fwvid.h
-> Hunk #1 FAILED at 15.
-> Hunk #2 succeeded at 47 with fuzz 1 (offset -9 lines).
-> 1 out of 2 hunks FAILED -- saving rejects to file
-> drivers/net/wireless/broadcom/brcm80211/brcmfmac/fwvid.h.rej
+> > On Sun, Sep 22, 2024 at 1:09=E2=80=AFAM Arend Van Spriel
+> > <arend.vanspriel@broadcom.com> wrote:
+> >>
+> >> On September 22, 2024 5:35:03 AM Denis Kenzior <denkenz@gmail.com> wro=
+te:
+> >>
+> >>> Hi Yuxuan Shui,
+> >>>
+> >>>>
+> >>>> I tested this on an RPi5 too, and indeed I am having the same proble=
+m as KeithG
+> >>>> as well. However I managed to get some debug information from brcmfm=
+ac when
+> >>>> running wpa_supplicant. Interestingly wpa_supplicant gets the same -=
+52 error as
+> >>>> well, which it reports as an authentication timeout. But if I ask it=
+ to try
+> >>>> again, it will connect successfully, and there is no external auth r=
+elated log
+> >>>> the second time around.
+> >>>
+> >>> Yep.  It looks like wpa_s puts the resulting PMKSA into the kernel ca=
+che even
+> >>> though the initial connection using external auth fails.  I've only s=
+een
+> >>> 2.10 do
+> >>> this, not 2.11.  Either way, it is a bug / lucky coincidence.
+> >>>
+> >>>>
+> >>>> So I suspect this is a firmware bug, but it should be relatively eas=
+y to
+> >>>> workaround I think? Basically we also add a timeout and retry.
+> >>>
+> >>> It would be far nicer if the brcmfmac firmware + driver combination w=
+orked
+> >>> properly :)
+> >>
+> >> Indeed it would. So what's in the mix? What kernel is used? Upstream o=
+r RPi
+> >> kernel? What firmware capabilities are listed in debugfs?
+> >>
+> >> Recently I submitted patches upstream to add external auth support. As=
+ I
+> >> ported downstream patch the results you see do not make me optimistic =
+that
+> >> my patch is ready. Maybe you could help testing it?
+> >>
+> >> https://patchwork.kernel.org/project/linux-wireless/list/?series=3D891=
+248&state=3D*
+> >>
+> >> Regards,
+> >> Arend
+> > Arend,
+> >
+> > I tried to apply the patch set to kernel 6.6.44-v8 and was unable to pa=
+tch it:
+> >
+> > $ patch -p1 <
+> > RFT-v2-1-3-wifi-brcmfmac-support-per-vendor-cfg80211-callbacks-and-firm=
+ware-events.patch
+> > patching file drivers/net/wireless/broadcom/brcm80211/brcmfmac/cfg80211=
+.c
+> > Hunk #1 FAILED at 6752.
+> > 1 out of 1 hunk FAILED -- saving rejects to file
+> > drivers/net/wireless/broadcom/brcm80211/brcmfmac/cfg80211.c.rej
+> > patching file drivers/net/wireless/broadcom/brcm80211/brcmfmac/common.c
+> > Hunk #1 succeeded at 524 (offset 33 lines).
+> > patching file drivers/net/wireless/broadcom/brcm80211/brcmfmac/core.c
+> > Hunk #1 FAILED at 1359.
+> > 1 out of 1 hunk FAILED -- saving rejects to file
+> > drivers/net/wireless/broadcom/brcm80211/brcmfmac/core.c.rej
+> > patching file drivers/net/wireless/broadcom/brcm80211/brcmfmac/fweh.c
+> > Hunk #1 succeeded at 74 (offset -1 lines).
+> > Hunk #2 succeeded at 336 (offset -70 lines).
+> > patching file drivers/net/wireless/broadcom/brcm80211/brcmfmac/fwvid.h
+> > Hunk #1 FAILED at 15.
+> > Hunk #2 succeeded at 47 with fuzz 1 (offset -9 lines).
+> > 1 out of 2 hunks FAILED -- saving rejects to file
+> > drivers/net/wireless/broadcom/brcm80211/brcmfmac/fwvid.h.rej
+> >
+> > I did not try the other patches as this attempt failed. Do I need to
+> > use a newer kernel? The latest kernel from RPiOS is 6.6.47.
 >
-> I did not try the other patches as this attempt failed. Do I need to
-> use a newer kernel? The latest kernel from RPiOS is 6.6.47.
+> I did major rework to support multiple vendors with differing firmware
+> APIs. So I can imagine you would need other patches that were submitted
+> earlier. Easiest would be to use the backports project which allows runni=
+ng
+> latest driver like wireless-next on older kernels.
+>
+> I can try. Do you have a URL of the RPiOS kernel repo?
+>
+> Regards,
+> Arend
+> > Keith
+>
+>
 
-I did major rework to support multiple vendors with differing firmware 
-APIs. So I can imagine you would need other patches that were submitted 
-earlier. Easiest would be to use the backports project which allows running 
-latest driver like wireless-next on older kernels.
+Arend,
+It is either here as a git clone:
+git clone --depth=3D1 https://github.com/raspberrypi/linux
 
-I can try. Do you have a URL of the RPiOS kernel repo?
+or here as a gzip:
+https://github.com/raspberrypi/linux/archive/refs/tags/stable_20240529.tar.=
+gz
 
-Regards,
-Arend
-> Keith
-
-
-
+Keith
