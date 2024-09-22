@@ -1,141 +1,87 @@
-Received: from mail-oi1-f181.google.com (mail-oi1-f181.google.com [209.85.167.181])
+Received: from mail-oo1-f54.google.com (mail-oo1-f54.google.com [209.85.161.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA2728C07
-	for <iwd@lists.linux.dev>; Sun, 22 Sep 2024 21:00:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F63B8C07
+	for <iwd@lists.linux.dev>; Sun, 22 Sep 2024 21:01:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727038846; cv=none; b=I8RZDM5pR2aMd5qe1TQkegnfmQyDlRlaftZU00GGn7f0DAPpq5lIavLKkpV9cvyx6SOdPB/QuhV87Nhe0e5v2Dr08SXcHHoA3SRiJ3WY75oz3oCqqpd8FCSGcnXZlaWACbPUr5pO/oRW4WiNo8LDtiADT2FdyILr2KhLCufqs6M=
+	t=1727038915; cv=none; b=uB/GCLchEa2KFPJeK7s9+c2iK0nr/8xr7/y3A8t9KlHnJmdAg84bJXII25PsUUXcQhi5Z+NqL36pJP/Je7FWDtdLigo1NFKeEzdEaw4du+aXtwIT4awhMgeBETQnJqWNTTbyHd38LMhPdA+A3TLZ7kCP/IGpTul0IRLbYQR6tKc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727038846; c=relaxed/simple;
-	bh=D+ommAxliR+lu+7BCL9AGKCfGsUoDXxKtEao6+h35DM=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=mpCWJfMp7Pwdr2wY7pAofBmNb7oUn02iNMhUX9KPXlKki215iG4H8CxbkZzO+c0VnLCOAL8Y/0+0rl2vGz+D/uIXHtEcM5g5cExVecJ6AurcOZMWy+p6NYMsW+9eokumBeRRcRQz2GFabArqqO6C8acZ2Q/+NNgfXKT50d1Ws8c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=S+QB24YK; arc=none smtp.client-ip=209.85.167.181
+	s=arc-20240116; t=1727038915; c=relaxed/simple;
+	bh=P0Dh2nuU2bMC7HDPuxS42MuZy7eIpA4NB27wnadwF5w=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=X3jh2etP/S9uCrKzXwOHx6ZbSmDimTZtHsOLJNrJ2TWjemPr9mpe41juVBbzb7oIYhIOoZC75V29jpeKjQt5ivUkhkCxsPh1wcu/kp50C5qlG1f3BA08VI4bVk7LM7Ar1JjYtPzX4tV4ZpNCrrsc7HeRS7zE11zAO6HvVYxzHDc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cCDEKsp5; arc=none smtp.client-ip=209.85.161.54
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="S+QB24YK"
-Received: by mail-oi1-f181.google.com with SMTP id 5614622812f47-3e03e9d1f8dso2048357b6e.2
-        for <iwd@lists.linux.dev>; Sun, 22 Sep 2024 14:00:44 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cCDEKsp5"
+Received: by mail-oo1-f54.google.com with SMTP id 006d021491bc7-5d5eec95a74so1737908eaf.1
+        for <iwd@lists.linux.dev>; Sun, 22 Sep 2024 14:01:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1727038843; x=1727643643; darn=lists.linux.dev;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=xt6ViLxkX8c1OyDOR0PdD/JHcP0hdIHIkF/+txuwAJA=;
-        b=S+QB24YKRZMk2YGNYsumgYA8AF+7jFtmXOjL7SmbDDBisjuDaW/wJi0FLnvZUbeNxx
-         RbSn1FybunJ5J+qoKoOBLiLQSpacSRY4Xr4nOmkuhCWalq3RpAfCffF5RQKbfANgK4fE
-         Wqe7pOGYkHSjKjifV+w3Y6kLqRIDKE+kdABMg1zVg8RaIGa9d325cB2+Up1t8M0ePa7r
-         aAQ6Gv4CokJxQuJT0hpZTTvei9+K86BrYNTI97dCsHHdV8esIkMgABV4vpoE78HRC7vf
-         hYtCvFv5vjXsMJ6mZEYSIAMxIgs7DftZtpMQ21fePmfDpIPgevl4e6ZUl1YIlMFOXWo8
-         mtSQ==
+        d=gmail.com; s=20230601; t=1727038913; x=1727643713; darn=lists.linux.dev;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=eTlKfBFqwzoqtwyhGkOa2yGoEFu9lvoxmKJahRSQcAM=;
+        b=cCDEKsp5Qz659O7+MeTvi3mt6reD1DUZcxgFy08HSIU1ghuYNsN0Aj9tc2mHHZg/UQ
+         ex4BgwO7GmxGKoQ6I+zT8W6VrDNdRgyvoOPsJhqQX3nycMMJq0NEAv4lxw3j13OShDVN
+         9tLAyrPp6PChE3KXvhzb37PI09Y1a3otBLl5S8Z5OlZzqe2TUFFPQiWjrJzgHRlzBBvR
+         289NPKclSo5K0LOH07qBlCnHav7BkA67nVaryIfU/pp8rKXFFBqrEP02kvISQbHF3XG4
+         D96S5eNB87Ft5Uo6YXxPbnUW20qaVwELn7/rmWM4re45YFgHjS9E8/6PLmhCPch5sTDj
+         sq4g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727038843; x=1727643643;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=xt6ViLxkX8c1OyDOR0PdD/JHcP0hdIHIkF/+txuwAJA=;
-        b=xLRMozgUZW6buZpj7vtiNlhJQ4RH7UIfqUuQg2QyGxICtUSLrLOqyVOhtQS0V3Uv9l
-         O/YwsoNlE8CocwI8bmjtVDlKrYXc8eJiLZ09f+SV+v2/w3jZdvh/qmEpOGzIrk2NSNyE
-         chJHkoLoPNn03B8x6b4G+dW7saG8aF+ivHbZx1pgI4Ib+gRuj4oV5ozSJwHI28EI/jst
-         q8aWfCFJv97bXhnQGMNPIUyBwR5Osqk7fI4IAR/BqNoqJYRWtRUg6nsMT+YRw+gbTWYN
-         WukIR+6f8VAWlX8ObL5haEd8xLomgyP+LcP2LrQvodg34NIGZbPZ48sA5F62vJwmiit5
-         qcYQ==
-X-Gm-Message-State: AOJu0YxFPT2Cxhb7lEHJ+sA9h6MFngKM3/yNczc4uETYsD5c2mAN5ECy
-	wqshSW2SXkwcYjDvPSAJn90sS8RvapBwKo9M6cWtv9ndxVp5RFFWhZOT+A==
-X-Google-Smtp-Source: AGHT+IFbRwzV5pMOhLNPpKD3QcA/zfqcDi6ntcTxb8VoKAO1IlKsnEDthQ3ikffnUREjo3da/t3YUg==
-X-Received: by 2002:a05:6808:1a07:b0:3d9:27f5:5251 with SMTP id 5614622812f47-3e271b5f515mr6356664b6e.5.1727038843667;
-        Sun, 22 Sep 2024 14:00:43 -0700 (PDT)
-Received: from localhost.localdomain (syn-070-114-247-242.res.spectrum.com. [70.114.247.242])
-        by smtp.gmail.com with ESMTPSA id 006d021491bc7-5e580778e8dsm1413438eaf.29.2024.09.22.14.00.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 22 Sep 2024 14:00:43 -0700 (PDT)
-From: Denis Kenzior <denkenz@gmail.com>
-To: iwd@lists.linux.dev
-Cc: Denis Kenzior <denkenz@gmail.com>
-Subject: [PATCH v2 2/2] sae: Allow ability to force Group 19 / Hunt and Peck
-Date: Sun, 22 Sep 2024 16:00:12 -0500
-Message-ID: <20240922210040.1073989-2-denkenz@gmail.com>
-X-Mailer: git-send-email 2.45.2
-In-Reply-To: <20240922210040.1073989-1-denkenz@gmail.com>
-References: <20240922210040.1073989-1-denkenz@gmail.com>
+        d=1e100.net; s=20230601; t=1727038913; x=1727643713;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=eTlKfBFqwzoqtwyhGkOa2yGoEFu9lvoxmKJahRSQcAM=;
+        b=XPwfvaQDAiRHYQWlrxdjAwUfAWgvLe3r1A0ZSCL3bd6EK48jpEhS6c2Lih+IG7+rEr
+         jgnmIrj4McZDr0fevQccbF5wQGEE6eSef4LrNVhxxDjrqyo48Bx4B79TihPjlntFmTbN
+         pK9fvsyefDdYMdeQvZKYSn3RII6e6W8+2UKLp+X0ym62MQjpOUTNVcnEvQ1UnmfgCMyh
+         K6gqd3W/00TtC85GEsZl/NPANX3fE4oHlp8xirVLXMAJsbHAK/G8eLQQbENam+hkzxA+
+         4XDJ9Yvu4CB7o/A12NzDuZplmvzk3/z7MgrHoCM+25TnyRML99fuiX6a0dWLxDX0UQCz
+         beZA==
+X-Forwarded-Encrypted: i=1; AJvYcCU3IQ26oijyiFMaJAIy2m1O/iZjiMaXIhkpGyW0MmKurpkWpqoaxMwCJYW9K84zAmPNp9A=@lists.linux.dev
+X-Gm-Message-State: AOJu0YxH4B67N3Zy+eIzyNWhRdAziibLflPYy4iKkPGF5AlBpZ1yx7jm
+	zfSeMT1oOE+qv2gTyg2QGKyp0BXyEHSUEtcpQ9Xcn5LbGGJ6JtLjUpqb6A==
+X-Google-Smtp-Source: AGHT+IFzcVUhpzBo/uwQOdo04kxBTb5d7V8DDY8yFAnQga0DuSyFwSZhOe84+LNo7v1SRO1XVn0e9Q==
+X-Received: by 2002:a05:6830:71a1:b0:70c:9c66:af53 with SMTP id 46e09a7af769-71392474eb1mr5760355a34.25.1727038913265;
+        Sun, 22 Sep 2024 14:01:53 -0700 (PDT)
+Received: from [192.168.1.22] (syn-070-114-247-242.res.spectrum.com. [70.114.247.242])
+        by smtp.googlemail.com with ESMTPSA id 46e09a7af769-71389b48addsm1821673a34.11.2024.09.22.14.01.52
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 22 Sep 2024 14:01:52 -0700 (PDT)
+Message-ID: <02720419-d2c8-4773-a226-603a46295a1a@gmail.com>
+Date: Sun, 22 Sep 2024 16:01:51 -0500
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH v1 0/2] External Auth support
+To: KeithG <ys3al35l@gmail.com>, iwd@lists.linux.dev
+Cc: James Prestwood <prestwoj@gmail.com>
+References: <20240823174220.498594-1-denkenz@gmail.com>
+ <CAG17S_PDy_WnhEqD0+EG1zoo99+Y4+2xEzZg2Q=7nPA9Tb9TTw@mail.gmail.com>
+Content-Language: en-US
+From: Denis Kenzior <denkenz@gmail.com>
+In-Reply-To: <CAG17S_PDy_WnhEqD0+EG1zoo99+Y4+2xEzZg2Q=7nPA9Tb9TTw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
----
- src/netdev.c |  5 ++++-
- src/sae.c    | 20 ++++++++++++++++++++
- src/sae.h    |  3 +++
- 3 files changed, 27 insertions(+), 1 deletion(-)
+Hi Keith,
 
-diff --git a/src/netdev.c b/src/netdev.c
-index 1b50a540d8ca..d298977a1964 100644
---- a/src/netdev.c
-+++ b/src/netdev.c
-@@ -4033,11 +4033,14 @@ static void netdev_connect_common(struct netdev *netdev,
- 		netdev->ap = sae_sm_new(hs, netdev_sae_tx_authenticate,
- 					netdev_sae_tx_associate,
- 					netdev);
--	else
-+	else {
- 		netdev->ap =
- 			sae_sm_new(hs, netdev_external_auth_sae_tx_authenticate,
- 					netdev_external_auth_sae_tx_associate,
- 					netdev);
-+		sae_sm_force_default_group(netdev->ap);
-+		sae_sm_force_hunt_and_peck(netdev->ap);
-+	}
- 
- 	if (sae_sm_is_h2e(netdev->ap)) {
- 		uint8_t own_rsnxe[20];
-diff --git a/src/sae.c b/src/sae.c
-index 97c0af052f14..eb4634848afa 100644
---- a/src/sae.c
-+++ b/src/sae.c
-@@ -1550,6 +1550,26 @@ struct auth_proto *sae_sm_new(struct handshake_state *hs,
- 	return &sm->ap;
- }
- 
-+bool sae_sm_force_hunt_and_peck(struct auth_proto *ap)
-+{
-+	struct sae_sm *sm = l_container_of(ap, struct sae_sm, ap);
-+
-+	sae_debug("Forcing SAE Hunting and Pecking");
-+	sm->sae_type = CRYPTO_SAE_LOOPING;
-+
-+	return true;
-+}
-+
-+bool sae_sm_force_default_group(struct auth_proto *ap)
-+{
-+	struct sae_sm *sm = l_container_of(ap, struct sae_sm, ap);
-+
-+	sae_debug("Forcing Default Group");
-+	sm->force_default_group = true;
-+
-+	return true;
-+}
-+
- static int sae_init(void)
- {
- 	if (getenv("IWD_SAE_DEBUG"))
-diff --git a/src/sae.h b/src/sae.h
-index 668d084f3402..4a59999bfba0 100644
---- a/src/sae.h
-+++ b/src/sae.h
-@@ -34,3 +34,6 @@ struct auth_proto *sae_sm_new(struct handshake_state *hs,
- 				sae_tx_authenticate_func_t tx_auth,
- 				sae_tx_associate_func_t tx_assoc,
- 				void *user_data);
-+
-+bool sae_sm_force_hunt_and_peck(struct auth_proto *ap);
-+bool sae_sm_force_default_group(struct auth_proto *ap);
--- 
-2.45.2
+On 9/22/24 1:56 PM, KeithG wrote:
+> It appears that this patch series no longer applies to the current
+> git. Is it implemented in iwd or does it need to be refactored to
+> apply to the current repo?
+> 
+
+I just rebased and resent this series on top of git HEAD.
+
+Regards,
+-Denis
 
