@@ -1,98 +1,107 @@
-Received: from mail-oo1-f54.google.com (mail-oo1-f54.google.com [209.85.161.54])
+Received: from mail-ed1-f44.google.com (mail-ed1-f44.google.com [209.85.208.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D36E374F6
-	for <iwd@lists.linux.dev>; Sun, 22 Sep 2024 04:23:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4C4E11712
+	for <iwd@lists.linux.dev>; Sun, 22 Sep 2024 06:09:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726979001; cv=none; b=E2TMkTpZNe4IPZS8Mfok9w+Dp10xwKzv6lNUOXstmNUGPo4T2KML/8oJ+aWzh6n/l/QvRcuhwjB3PNYUE/WxwrPc+1MwqdeIutigb0YAaIDcTSV7ADpbXpva983fMVhwZaJcz8MYU4VcaqUf+0CVNz42Y189MBO9HutgwhR9m0M=
+	t=1726985396; cv=none; b=H0ojSO8b8EIGVc21u40Sjh0i2Pve4V9WTsN0tdgYdzKKuolLZNzxKBLao5Dl6Vz8TMOmPo2/YLV36vvq/p4eD/iEKIWEFL2aQpil1mD9fu8f+oDUNbt70Bv6CTu7taTqg5vwgMr7ELFhr7lEoEZv5/ZYPMriov2rpAdMsrfEkaw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726979001; c=relaxed/simple;
-	bh=0KXNVXkSupFaqIPhG9LZPA6idTfWj/m/xNnNSyBdVVw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ad9QqD1Ky9CALQ3+lujBRfS0GdhKcrqHjkXKyGCAlbarw9ZzaG9C+h5ho15Uxo7lzecMtLTtXX1h+pzyINhsBzbxNOb+JBLWdLT57RucorQvTsD7GQTo/tOFeiGKokOwp5qrTCeOx8fFai/q+YNuD5ErqZX06cTi4Kw4hdm2FCg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kALfuCQI; arc=none smtp.client-ip=209.85.161.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1726985396; c=relaxed/simple;
+	bh=NeJvGiWHG5DhJY+KQ3AjbAgA9WJ7aL+lX3oMyFaMDCs=;
+	h=From:To:CC:Date:Message-ID:In-Reply-To:References:Subject:
+	 MIME-Version:Content-Type; b=qyWhm7Ifa3k+5YMnSZZ76VJVlWFv2bdf5UcdYyYnS+mZtsNjcNcUmrj5t8vccLZWxxqnF7PrKgP+hKx1LF+h5F9OMeB+3Nj5JnaALikWHKMwsaa6t4Sa934fcpFIKtK9djsAu8oAtRTPDGAEeDtchEAwlbO/fq2qKzC0CakSM34=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=XWMrzvFh; arc=none smtp.client-ip=209.85.208.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kALfuCQI"
-Received: by mail-oo1-f54.google.com with SMTP id 006d021491bc7-5da686531d3so1941736eaf.3
-        for <iwd@lists.linux.dev>; Sat, 21 Sep 2024 21:23:20 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="XWMrzvFh"
+Received: by mail-ed1-f44.google.com with SMTP id 4fb4d7f45d1cf-5c245c62362so4147767a12.0
+        for <iwd@lists.linux.dev>; Sat, 21 Sep 2024 23:09:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1726978999; x=1727583799; darn=lists.linux.dev;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=8VRQJEfXRrNoz15zW+H0jGtrZkf7vfk5Jg5uYKEnHUY=;
-        b=kALfuCQIHCICb3Ed+wnNaJHr0QzeVVGR+yd2wdR76ubtGD3bC/4XW1Y6s1B6OQvFx/
-         rm6mG+2u9i5NYvp74uDuhTc+s+nK0XDol6RbAO681BDBUw6JUAjX/LeJ3DE32kFYDzFB
-         uQfgLIoQBn/0gEvI+CuLGPYM13ngomUxUUPhU6G140GKihOQEjucs8GFxM2UuR2sWnp9
-         yiIJpA3a4pMay5q1BzhM+K05F0uV1xftD0KsG8Oec+RwYPdBwDD6GmNob3hZk0GnUQ6K
-         SIyDSQXlQtKwJKIIy5/ggsFn9NKRu6oEh5OhhZXyJcwYOim7vCltVUH1Vr501wwW0J9Q
-         fY6w==
+        d=broadcom.com; s=google; t=1726985393; x=1727590193; darn=lists.linux.dev;
+        h=content-transfer-encoding:mime-version:subject:user-agent
+         :references:in-reply-to:message-id:date:cc:to:from:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=CI27S9lhSFCvOWoe6//QkN7zhI/MeSzE7HNJJ9dU3EI=;
+        b=XWMrzvFh7wafWSsc3PY63PTpqYu8ynlTc4rivkQepBTuc9z/A+uK9zXobVs4sVIB+8
+         Uo/E+Bk9SDv581ZXb/6yz0/8/9ViSn1SLnItRi1c5K/XWrKMakw3E6U/QlikzWjzGIBK
+         cA1I7Y13WmUXwKnJd5gXbwazWgh1cmqHP2X/Y=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726978999; x=1727583799;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
+        d=1e100.net; s=20230601; t=1726985393; x=1727590193;
+        h=content-transfer-encoding:mime-version:subject:user-agent
+         :references:in-reply-to:message-id:date:cc:to:from
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=8VRQJEfXRrNoz15zW+H0jGtrZkf7vfk5Jg5uYKEnHUY=;
-        b=MvQDnBXCFGQz+S+b3gzAwCPxOHgpElyA+VvoEngIdtuFhqgO9aIgv0nTh0vs92mnQu
-         51IEgAS1lxSGEokG93Xn1B9PMBHJcP9EL2AOKLApL1WuSVZxMNKTcCJu2cLHJVH/L1Ji
-         e4sNi/yCdE40gJAww53fLwzQ/Kf7bk69GeaibjHFo1GrRlypt0Yi/I0xL/MNHIE+ejX1
-         8YHsK9+olv8DANuuM04oqp9nFk8dX3dMMtGuzyJ8LvZIG9zSYDLYUsZfIfkNI8Vqao7a
-         r1bmEzCAh2KJKXuqafwoitvAELClyFMEd5Abyw+KwMxmzkPmkx5+I4Tk4zN8wp5v0NXz
-         w8Gg==
-X-Forwarded-Encrypted: i=1; AJvYcCVquzDUmEOLxN7jhz+4MGTMx4by6d+B6+DLVkIv+52jT8skxCXTX3L/HkDG9fPoqc6lKFY=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yxz/asBg+Fjy/bMDl1Sni2lARy4zpT/KpdHwnW3qvV7MXwyKjGE
-	HPNJasPimtRGhDcln552mW86FhGzofvqDOkSldKRRCkkVgTd2fYU
-X-Google-Smtp-Source: AGHT+IGm25mWmbwNYUisUyJ1o425yEjSQ5NWOmOuVU3b84C9CXQzVgosE1bpXtbxxlg/hmouJ7ySTQ==
-X-Received: by 2002:a05:6870:470a:b0:26c:5312:a145 with SMTP id 586e51a60fabf-2803a5edeb3mr4915956fac.16.1726978999244;
-        Sat, 21 Sep 2024 21:23:19 -0700 (PDT)
-Received: from [192.168.1.22] (syn-070-114-247-242.res.spectrum.com. [70.114.247.242])
-        by smtp.googlemail.com with ESMTPSA id 586e51a60fabf-27d0b395427sm2144244fac.10.2024.09.21.21.23.18
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 21 Sep 2024 21:23:18 -0700 (PDT)
-Message-ID: <490a625e-a204-4505-877c-27494413a55e@gmail.com>
-Date: Sat, 21 Sep 2024 23:23:17 -0500
+        bh=CI27S9lhSFCvOWoe6//QkN7zhI/MeSzE7HNJJ9dU3EI=;
+        b=fT4P2JgQ3fuFrvzxR+IBhjhz80M69B7DUQJ/yU/tahaj1EfPoaqU9yZEDsyqxa76ln
+         NiFqT64ZzKq4efgRk0H54qguSTUEKmpevZMnQfBCf+eEoVUGPSgsjRg7We1HfcDccuNm
+         yLmbq60Qy+ucSmUIgGGLMTan591H55xF1yT1goJkdtiYLicm45JWkXI/MbuZAg1wMqBQ
+         6RQatH6bdYKrmw9pVcEHf0Mibm95pgjEkVf9boNhi+u6kjrKzAFgmuTlEqujbEbP+L+q
+         KfhWPtUdLF5xGmx5Hu47j2XvfFctd7u8DV3tHueJ+Y5wh9326q++kBpvPQnNmVKAiLUb
+         tzxA==
+X-Gm-Message-State: AOJu0YytOWYkoGPkAjUfx9NMSB6gldH2h0rXlA47feS7I9JhMaSGUyCI
+	DhDQP65mRcvAU33DSFPk2DhFChqpOmWaUpcDYxIwhvgzkRi/KhSZlrSwKHmKrg==
+X-Google-Smtp-Source: AGHT+IH8qXBsJNQGi7pNpqnuIE0Nysk713Y3D4rrJsHnnPOUvg/JRJdVO4+Jyag4FG51JFv9cgWZNA==
+X-Received: by 2002:a05:6402:234e:b0:5c4:2b0f:fef7 with SMTP id 4fb4d7f45d1cf-5c464daabfdmr7319310a12.4.1726985392941;
+        Sat, 21 Sep 2024 23:09:52 -0700 (PDT)
+Received: from [192.168.178.38] (f215227.upc-f.chello.nl. [80.56.215.227])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5c42bb94a01sm8816260a12.91.2024.09.21.23.09.51
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Sat, 21 Sep 2024 23:09:51 -0700 (PDT)
+From: Arend Van Spriel <arend.vanspriel@broadcom.com>
+To: Denis Kenzior <denkenz@gmail.com>, Yuxuan Shui <yshuiv7@gmail.com>, <ys3al35l@gmail.com>
+CC: <iwd@lists.linux.dev>, <prestwoj@gmail.com>
+Date: Sun, 22 Sep 2024 08:09:51 +0200
+Message-ID: <1921859cb98.279b.9b12b7fc0a3841636cfb5e919b41b954@broadcom.com>
+In-Reply-To: <ba78a253-de77-4427-85c3-d876ef9fdd8a@gmail.com>
+References: <20240823174220.498594-1-denkenz@gmail.com>
+ <20240921185902.170612-1-yshuiv7@gmail.com>
+ <ba78a253-de77-4427-85c3-d876ef9fdd8a@gmail.com>
+User-Agent: AquaMail/1.52.0 (build: 105200518)
+Subject: Re: [RFC PATCH v1 0/2] External Auth support
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH v1 0/2] External Auth support
-To: KeithG <ys3al35l@gmail.com>
-Cc: Yuxuan Shui <yshuiv7@gmail.com>, iwd@lists.linux.dev,
- Arend Van Spriel <arend.vanspriel@broadcom.com>,
- James Prestwood <prestwoj@gmail.com>
-References: <20240823174220.498594-1-denkenz@gmail.com>
- <20240921185902.170612-1-yshuiv7@gmail.com>
- <ba78a253-de77-4427-85c3-d876ef9fdd8a@gmail.com>
- <CAG17S_NOs=rdUFsFRk4ZPsC=GER2J7nHikGEw=3AW0SBYHUEfg@mail.gmail.com>
-Content-Language: en-US
-From: Denis Kenzior <denkenz@gmail.com>
-In-Reply-To: <CAG17S_NOs=rdUFsFRk4ZPsC=GER2J7nHikGEw=3AW0SBYHUEfg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; format=flowed; charset="us-ascii"
+Content-Transfer-Encoding: 8bit
 
-Hi Keith,
+On September 22, 2024 5:35:03 AM Denis Kenzior <denkenz@gmail.com> wrote:
 
-> 
-> Just to be sure... Are you saying that both wpa_supplicant and iwd fail the same 
-> way, but wpa_supplicant ignores the failure and still connects?
+> Hi Yuxuan Shui,
+>
+>>
+>> I tested this on an RPi5 too, and indeed I am having the same problem as KeithG
+>> as well. However I managed to get some debug information from brcmfmac when
+>> running wpa_supplicant. Interestingly wpa_supplicant gets the same -52 error as
+>> well, which it reports as an authentication timeout. But if I ask it to try
+>> again, it will connect successfully, and there is no external auth related log
+>> the second time around.
+>
+> Yep.  It looks like wpa_s puts the resulting PMKSA into the kernel cache even
+> though the initial connection using external auth fails.  I've only seen 
+> 2.10 do
+> this, not 2.11.  Either way, it is a bug / lucky coincidence.
+>
+>>
+>> So I suspect this is a firmware bug, but it should be relatively easy to
+>> workaround I think? Basically we also add a timeout and retry.
+>
+> It would be far nicer if the brcmfmac firmware + driver combination worked
+> properly :)
 
-Pretty much.  But really more by accident than design.
+Indeed it would. So what's in the mix? What kernel is used? Upstream or RPi 
+kernel? What firmware capabilities are listed in debugfs?
 
-What happens is:
-   1. wpa_s completes the SAE handshake via external auth
-   2. It then (without waiting for the connection succeeded event) uploads
-      the resulting PMKSA into the kernel
-   3. Tells the firmware that the handshake succeeded
-   4. The firmware nopes out with error -52.
-   5. wpa_s then times out / fails the current connection attempt
-   6. Re-tries.  On the retry attempt the firmware picks the PMKSA cache
-      entry and uses that, skipping SAE step entirely.
+Recently I submitted patches upstream to add external auth support. As I 
+ported downstream patch the results you see do not make me optimistic that 
+my patch is ready. Maybe you could help testing it?
+
+https://patchwork.kernel.org/project/linux-wireless/list/?series=891248&state=*
 
 Regards,
--Denis
+Arend
+
+
