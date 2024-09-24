@@ -1,62 +1,62 @@
-Received: from mail-qv1-f53.google.com (mail-qv1-f53.google.com [209.85.219.53])
+Received: from mail-qk1-f173.google.com (mail-qk1-f173.google.com [209.85.222.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3C901A707F
-	for <iwd@lists.linux.dev>; Tue, 24 Sep 2024 12:05:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA4C91A7079
+	for <iwd@lists.linux.dev>; Tue, 24 Sep 2024 12:05:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727179511; cv=none; b=uVxTp4pdFtuIRY67Ig+E3P9lq4V7tcFl9ObqoC+PQFgweZ/zLTtGBqS7Lpxn/U3GJwreYIIxIhJR1qUVBn7O4NNkbR6mgU2GD5Mpa/Ybg8FsY4gWCNfryO5n0IoN/RSog5b1y6YiKpb0+Xfc94jeaVFBB/qZXtNSfwlGCo+MQnk=
+	t=1727179512; cv=none; b=tQM++W1WXVmlHT+sF6RCte0SJwRIrR20jLbFTO0PCPXNL4vEbrIJEBW9fdVSOfNVb30I19OeJueAih/hQxglZw3TiOttmGVSxrKVJ3a514r4bxmuku8GJ9A/C1GEXZgNJDD55OEsxK1IUujYFSazlCmZVn50fyPNUuEnA7EGSKk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727179511; c=relaxed/simple;
-	bh=GtViNlQFKwvuLX4mnn8PIBFpPm+0UeD9yTz6Exjz3Sk=;
+	s=arc-20240116; t=1727179512; c=relaxed/simple;
+	bh=2JhI08P+zLYT3hOvvS7aWYftpTpekdhMaNBNh9PbhnM=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=ea3jQYochf8d0lHd/VQEX+25dGz3M4iS/v7vJG1lxG3ZdtRJGOlKaTJLUpkcR72GuYNSA71BOQ/fNHB+xPbNGZNT3HNt2NA0bWLTGcxhCXwQN0inHEIGt7P1wU+SRkSWmjqwAd+efF7Gtqn4nS1trEqiUu447ddZZKXW//rOZA4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lNyqmM0s; arc=none smtp.client-ip=209.85.219.53
+	 MIME-Version; b=i61E7hlDg5xR8itV2+IGQKWf3p9ssh4sumjjJW2bmFxS795vJuau0dHMeHs7HG7oRMV2izv43sAfY6h6LBEsMYBZG88ZLECZ1e3mA1so/1V4j/4C/+ZFJajjfKv38txIKi70heePsGX3HOEzIGHfQqTQ7/6slLH2h5vs6iR2UDU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TKhIqivC; arc=none smtp.client-ip=209.85.222.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lNyqmM0s"
-Received: by mail-qv1-f53.google.com with SMTP id 6a1803df08f44-6c56eec7fccso37924926d6.3
-        for <iwd@lists.linux.dev>; Tue, 24 Sep 2024 05:05:09 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TKhIqivC"
+Received: by mail-qk1-f173.google.com with SMTP id af79cd13be357-7a9ab8e5f96so91853685a.1
+        for <iwd@lists.linux.dev>; Tue, 24 Sep 2024 05:05:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1727179508; x=1727784308; darn=lists.linux.dev;
+        d=gmail.com; s=20230601; t=1727179509; x=1727784309; darn=lists.linux.dev;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=JnTArKTL+e0C2Y6q/FbHwZZp+7nEAeSnKbzJj5QJ0II=;
-        b=lNyqmM0spci247urh9p41cNl89LtJdWPmWQ+al+z+QzgWypT3bLzc2+GjNlV8EXkfD
-         ctgqY++Ul5/ktKfEi5iZJni2F4VJk9GreHG+XMuqwvYVhG4RxBOu53TpB5XQ3AtRNyuo
-         Suptwszxyq9pWG+r9HzZCa6Si16puXawn3OU+ame5nff/+N8aF4h63iknOhfhOl35cyC
-         Iy3u6HuBqPQcs5djt4Qe4zxVvwM47XN5mg9tSfzZd4WtkYykSlcaR3rMOq4+vsTgDN2C
-         31Sy5piPVTcoqHFJPcHUUsoG6u1vmkmeR3y4LjDRZH6HfsxxD5zuxGWM1xwYKbdQZPd8
-         hgNA==
+        bh=lm5fjf5QqtpMS5z1VGpk7shoL8IDoIhH6mMTqGyKoE0=;
+        b=TKhIqivCL96GHKEkCDylylrR+ldE9HLihjpnBcKXsVcVcfHzOHlqiyT8XjQpfV3slo
+         qpKaGvAAoJE3cF9XO0dZ60+5Gn/X0CjgjyfkQKCxMmQsC66ydQTF85otoCzsWmd3iKB+
+         IV7Qa9ABTJ/fNi04pi5w6ZO5CdoYy4A8LJPVWTimqP216ipugJfMC4Wy7Jbkmiu3IHQI
+         Xd0Imhs2YuMsSYedCP97XNGN/pV66zt7Qpx1hqdxjXiTHUqzTVk3FGEslCB+nmXw0nQG
+         7NZbqHK9IPVI/DfEYbi9c+yzA1dwOQ1khEbw+CygE3ckIZUSS+M5qzvky76IYSVQ0XvP
+         Ym2w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727179508; x=1727784308;
+        d=1e100.net; s=20230601; t=1727179509; x=1727784309;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=JnTArKTL+e0C2Y6q/FbHwZZp+7nEAeSnKbzJj5QJ0II=;
-        b=A4FFc41QzRJQZ9kMW8xOZIwl5mUhFSICzB7F3lWQr/+0k3u3NSFjEBNMdf76bl6xBQ
-         3ZZg2Lxm2eibaxJGMFdRTYJxrK3awFPYZ7FXsNRWhwjW3Tvet2/ZZ180CmXsZv4NhW3V
-         JtUIbed1rUmfVaHbBMXk5nXaQuyaZCNoyIkopzmDFh2U2gyAETY2+Dsh5RwO4gwP+z3f
-         HQugtQPIGQFReuCEytJyPgp6h8RgeUYG6h3kfXN0hdfZlzx22bLhsLiD7FeLix6jucrM
-         sIOkBMbqlHwR4lKcrRSh8WN9sYwFfG8v3Nus19NOgX+vbb/kY7An90cQu4C5W1AmaqWx
-         Xjiw==
-X-Gm-Message-State: AOJu0Yy4zWtGQswceT0OPutbOfLi+bfg0nA/1dtv5KNKul1dqC91WESg
-	AmGD+x+oThhdIuvgkSvINSCfxYD07GMS5GofKNGpqTRYl7M5qEcK7cSKYg==
-X-Google-Smtp-Source: AGHT+IFw9RuD0k/UiSOk9vlbq2GRMFx+PQ3ivzYkAb2G8mayAM0JVotOeFlN+Uy1JeT8MoZrOHVizg==
-X-Received: by 2002:a05:6214:4383:b0:6c5:aae1:6442 with SMTP id 6a1803df08f44-6c7bc67fc87mr184395136d6.15.1727179508232;
-        Tue, 24 Sep 2024 05:05:08 -0700 (PDT)
+        bh=lm5fjf5QqtpMS5z1VGpk7shoL8IDoIhH6mMTqGyKoE0=;
+        b=a0s9ZJrth8IRzmrSrfqUPPOG0ovoW7hFUm+63MlSt5O0025vz90L6nO/UK8SQCYxKi
+         n8MqAFwXlszf6GEGIkxZy9y/RuXVf87eDpTmaGqWW2R6IJjRao0X+SsX4hhu9nZLNl2K
+         1t6JqvhbXZ8u5mQ5rm/S6xCjaHcJ/6KQcgC5c1fbVleQujIqO4dqjDYVfzjlqhrdniI8
+         QJtIzlPtjv5kpoQCrs1AQTIzcLDgOuU/KhZ1XgAXbbYr8UA0RtoEASIDA+1bNKyHbGeo
+         aX+uws9klP9yx6pe9hER4KIXo5qJgmYNi5iKbSa4Pxg53EoprEgKUzUt3IkeB2xn2vW2
+         z8vw==
+X-Gm-Message-State: AOJu0YyMnvDERASIMr9YxL/ZIveCDiWoNoQ0abpaI+H09FpiDDlU4ty+
+	e4GryFwlD3pB7CAlLgvQGyadRQDGnpipZdbSsLdYDrLR6Cf5lykCxjsYmw==
+X-Google-Smtp-Source: AGHT+IHtBurul/8zvn6HVp2d+jATqd+5Vx8320LEVcPcJ/7ync9RuZxBufg6br37SX5q8CHO9U0hKA==
+X-Received: by 2002:a05:6214:460f:b0:6c7:cc6b:f0f5 with SMTP id 6a1803df08f44-6c7cc6bf13emr191948286d6.13.1727179509554;
+        Tue, 24 Sep 2024 05:05:09 -0700 (PDT)
 Received: from LOCLAP699.locus-rst-dev-locuspark.locus ([152.193.78.90])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6cb0f4a6178sm5948056d6.7.2024.09.24.05.05.07
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6cb0f4a6178sm5948056d6.7.2024.09.24.05.05.08
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 24 Sep 2024 05:05:07 -0700 (PDT)
+        Tue, 24 Sep 2024 05:05:09 -0700 (PDT)
 From: James Prestwood <prestwoj@gmail.com>
 To: iwd@lists.linux.dev
 Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 10/16] dpp: replace PKEX agent with generic DPP agent
-Date: Tue, 24 Sep 2024 05:04:41 -0700
-Message-Id: <20240924120447.251761-10-prestwoj@gmail.com>
+Subject: [PATCH 11/16] agent: add APIs for DeviceProvisioningAgent
+Date: Tue, 24 Sep 2024 05:04:42 -0700
+Message-Id: <20240924120447.251761-11-prestwoj@gmail.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240924120447.251761-1-prestwoj@gmail.com>
 References: <20240924120447.251761-1-prestwoj@gmail.com>
@@ -68,279 +68,96 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This is one of two commits which replaces the existing shared code
-agent with a generic DPP agent. This commit alone breaks DPP PKEX
-but the next will fully remove the PKEX agent in place of the new
-generic agent.
-
-This is being done to prepare for enterprise DPP configuration where
-additional agent APIs will be needed. Rather than invent a new
-agent type it makes sense to bundle both into one and just define
-separate methods, PKEX/Enterprise.
+This adds {Register,Unregister}DeviceProvisioningAgent to the
+AgentManager interface. These are simple wrappers which just call
+into DPP.
 ---
- src/dpp.c | 168 +++++++++++++++++++++++++++++++++++-------------------
- src/dpp.h |  24 ++++++++
- 2 files changed, 133 insertions(+), 59 deletions(-)
- create mode 100644 src/dpp.h
+ src/agent.c | 58 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 58 insertions(+)
 
-diff --git a/src/dpp.c b/src/dpp.c
-index 3ad60188..7b700018 100644
---- a/src/dpp.c
-+++ b/src/dpp.c
-@@ -54,6 +54,7 @@
- #include "src/handshake.h"
- #include "src/nl80211util.h"
- #include "src/knownnetworks.h"
+diff --git a/src/agent.c b/src/agent.c
+index 0f718b87..bf0a88ea 100644
+--- a/src/agent.c
++++ b/src/agent.c
+@@ -32,6 +32,7 @@
+ #include "src/agent.h"
+ #include "src/iwd.h"
+ #include "src/module.h"
 +#include "src/dpp.h"
  
- #define DPP_FRAME_MAX_RETRIES 5
- #define DPP_FRAME_RETRY_TIMEOUT 1
-@@ -81,6 +82,10 @@ static uint32_t unicast_watch;
+ static unsigned int next_request_id = 0;
  
- static uint8_t dpp_prefix[] = { 0x04, 0x09, 0x50, 0x6f, 0x9a, 0x1a, 0x01 };
- 
-+static char *dpp_agent_name;
-+static char *dpp_agent_path;
-+static unsigned int dpp_agent_watch;
-+
- enum dpp_state {
- 	DPP_STATE_NOTHING,
- 	DPP_STATE_PRESENCE,
-@@ -134,6 +139,7 @@ struct dpp_sm {
- 	enum dpp_state state;
- 	enum dpp_interface interface;
- 
-+	uint32_t agent_request_id;
- 	struct pkex_agent *agent;
- 
- 	/*
-@@ -373,64 +379,6 @@ static void dpp_free_pending_pkex_data(struct dpp_sm *dpp)
- 	}
+@@ -639,6 +640,54 @@ static struct l_dbus_message *netconfig_agent_unregister(struct l_dbus *dbus,
+ 	return reply;
  }
  
--static void pkex_agent_free(void *data)
--{
--	struct pkex_agent *agent = data;
--
--	l_free(agent->owner);
--	l_free(agent->path);
--	l_dbus_remove_watch(dbus_get_bus(), agent->disconnect_watch);
--	l_free(agent);
--}
--
--static void dpp_agent_cancel(struct dpp_sm *dpp)
--{
--	struct l_dbus_message *msg;
--
--	const char *reason = "shutdown";
--
--	msg = l_dbus_message_new_method_call(dbus_get_bus(),
--						dpp->agent->owner,
--						dpp->agent->path,
--						IWD_SHARED_CODE_AGENT_INTERFACE,
--						"Cancel");
--	l_dbus_message_set_arguments(msg, "s", reason);
--	l_dbus_message_set_no_reply(msg, true);
--	l_dbus_send(dbus_get_bus(), msg);
--}
--
--static void dpp_agent_release(struct dpp_sm *dpp)
--{
--	struct l_dbus_message *msg;
--
--	msg = l_dbus_message_new_method_call(dbus_get_bus(),
--						dpp->agent->owner,
--						dpp->agent->path,
--						IWD_SHARED_CODE_AGENT_INTERFACE,
--						"Release");
--	l_dbus_message_set_arguments(msg, "");
--	l_dbus_message_set_no_reply(msg, true);
--	l_dbus_send(dbus_get_bus(), msg);
--}
--
--static void dpp_destroy_agent(struct dpp_sm *dpp)
--{
--	if (!dpp->agent)
--		return;
--
--	if (dpp->agent->pending_id) {
--		dpp_agent_cancel(dpp);
--		l_dbus_cancel(dbus_get_bus(), dpp->agent->pending_id);
--	}
--
--	dpp_agent_release(dpp);
--
--	l_debug("Released SharedCodeAgent on path %s", dpp->agent->path);
--
--	pkex_agent_free(dpp->agent);
--	dpp->agent = NULL;
--}
--
- static void dpp_free_auth_data(struct dpp_sm *dpp)
++static struct l_dbus_message *device_provisioning_agent_register(
++						struct l_dbus *dbus,
++						struct l_dbus_message *message,
++						void *user_data)
++{
++	struct l_dbus_message *reply;
++	const char *path;
++	int r;
++
++	l_debug("");
++
++	if (!l_dbus_message_get_arguments(message, "o", &path))
++		return dbus_error_invalid_args(message);
++
++	r = dpp_register_agent(l_dbus_message_get_sender(message), path);
++	if (r)
++		return dbus_error_from_errno(r, message);
++
++	l_debug("device provisioning agent %s path %s",
++		l_dbus_message_get_sender(message), path);
++
++	reply = l_dbus_message_new_method_return(message);
++	l_dbus_message_set_arguments(reply, "");
++	return reply;
++}
++
++static struct l_dbus_message *device_provisioning_agent_unregister(struct l_dbus *dbus,
++						struct l_dbus_message *message,
++					void *user_data)
++{
++	struct l_dbus_message *reply;
++	const char *path;
++	int r;
++
++	l_debug("");
++
++	if (!l_dbus_message_get_arguments(message, "o", &path))
++		return dbus_error_invalid_args(message);
++
++	r = dpp_unregister_agent(l_dbus_message_get_sender(message), path);
++	if (r)
++		return dbus_error_from_errno(r, message);
++
++	reply = l_dbus_message_new_method_return(message);
++	l_dbus_message_set_arguments(reply, "");
++	return reply;
++}
++
+ static void setup_agent_interface(struct l_dbus_interface *interface)
  {
- 	if (dpp->own_proto_public) {
-@@ -480,6 +428,47 @@ static void dpp_free_auth_data(struct dpp_sm *dpp)
- 
+ 	l_dbus_interface_method(interface, "RegisterAgent", 0,
+@@ -654,6 +703,15 @@ static void setup_agent_interface(struct l_dbus_interface *interface)
+ 	l_dbus_interface_method(interface,
+ 				"UnregisterNetworkConfigurationAgent", 0,
+ 				netconfig_agent_unregister, "", "o", "path");
++
++	l_dbus_interface_method(interface,
++				"RegisterDeviceProvisioningAgent", 0,
++				device_provisioning_agent_register,
++				"", "o", "path");
++	l_dbus_interface_method(interface,
++				"UnregisterDeviceProvisioningAgent", 0,
++				device_provisioning_agent_unregister,
++				"", "o", "path");
  }
  
-+static void dpp_agent_cancel(struct dpp_sm *dpp)
-+{
-+	struct l_dbus_message *msg;
-+	const char *reason = "shutdown";
-+
-+	if (L_WARN_ON(!dpp_agent_name))
-+		return;
-+
-+	msg = l_dbus_message_new_method_call(dbus_get_bus(),
-+						dpp_agent_name,
-+						dpp_agent_path,
-+						IWD_DPP_AGENT_INTERFACE,
-+						"CancelSharedCode");
-+	l_dbus_message_set_arguments(msg, "s", reason);
-+	l_dbus_message_set_no_reply(msg, true);
-+	l_dbus_send(dbus_get_bus(), msg);
-+
-+	l_dbus_cancel(dbus_get_bus(), dpp->agent_request_id);
-+	dpp->agent_request_id = 0;
-+}
-+
-+static void dpp_agent_release(void)
-+{
-+	struct l_dbus_message *msg;
-+
-+	if (L_WARN_ON(!dpp_agent_name))
-+		return;
-+
-+	msg = l_dbus_message_new_method_call(dbus_get_bus(),
-+						dpp_agent_name,
-+						dpp_agent_path,
-+						IWD_DPP_AGENT_INTERFACE,
-+						"Release");
-+	l_dbus_message_set_arguments(msg, "");
-+	l_dbus_message_set_no_reply(msg, true);
-+	l_dbus_send(dbus_get_bus(), msg);
-+
-+	l_dbus_remove_watch(dbus_get_bus(), dpp_agent_watch);
-+}
-+
-+
- static void dpp_reset(struct dpp_sm *dpp)
- {
- 	struct station *station = station_find(netdev_get_ifindex(dpp->netdev));
-@@ -555,7 +544,8 @@ static void dpp_reset(struct dpp_sm *dpp)
- 	explicit_bzero(dpp->z, dpp->key_len);
- 	explicit_bzero(dpp->u, dpp->u_len);
- 
--	dpp_destroy_agent(dpp);
-+	if (dpp->agent_request_id)
-+		dpp_agent_cancel(dpp);
- 
- 	dpp_free_pending_pkex_data(dpp);
- 
-@@ -599,6 +589,63 @@ static void dpp_free(struct dpp_sm *dpp)
- 	l_free(dpp);
- }
- 
-+static void dpp_agent_disconnect_cb(struct l_dbus *dbus, void *user_data)
-+{
-+	const struct l_queue_entry *e;
-+
-+	l_debug("DPP agent disconnected");
-+
-+	for (e = l_queue_get_entries(dpp_list); e; e = e->next) {
-+		struct dpp_sm *dpp = e->data;
-+
-+		/*
-+		 * If this DPP SM was in the process of making an agent request
-+		 * this protocol run won't complete, reset
-+		 */
-+		if (dpp->agent_request_id)
-+			dpp_reset(dpp);
-+	}
-+
-+	l_dbus_remove_watch(dbus, dpp_agent_watch);
-+}
-+
-+static void dpp_agent_watch_destroy(void *user_data)
-+{
-+	dpp_agent_watch = 0;
-+
-+	l_free(dpp_agent_name);
-+	dpp_agent_name = NULL;
-+	l_free(dpp_agent_path);
-+	dpp_agent_path = NULL;
-+}
-+
-+int dpp_register_agent(const char *name, const char *path)
-+{
-+	if (dpp_agent_path)
-+		return -EEXIST;
-+
-+	dpp_agent_name = l_strdup(name);
-+	dpp_agent_path = l_strdup(path);
-+	dpp_agent_watch = l_dbus_add_disconnect_watch(dbus_get_bus(),
-+						name,
-+						dpp_agent_disconnect_cb,
-+						NULL, dpp_agent_watch_destroy);
-+	return 0;
-+}
-+
-+int dpp_unregister_agent(const char *name, const char *path)
-+{
-+	if (!dpp_agent_path || strcmp(dpp_agent_path, path))
-+		return -ENOENT;
-+
-+	if (strcmp(dpp_agent_name, name))
-+		return -EPERM;
-+
-+	l_dbus_remove_watch(dbus_get_bus(), dpp_agent_watch);
-+
-+	return 0;
-+}
-+
- static void dpp_send_frame_cb(struct l_genl_msg *msg, void *user_data)
- {
- 	struct dpp_sm *dpp = user_data;
-@@ -4832,6 +4879,9 @@ static void dpp_exit(void)
- 	nl80211 = NULL;
- 
- 	l_queue_destroy(dpp_list, (l_queue_destroy_func_t) dpp_free);
-+
-+	if (dpp_agent_name)
-+		dpp_agent_release();
- }
- 
- IWD_MODULE(dpp, dpp_init, dpp_exit);
-diff --git a/src/dpp.h b/src/dpp.h
-new file mode 100644
-index 00000000..d66deb52
---- /dev/null
-+++ b/src/dpp.h
-@@ -0,0 +1,24 @@
-+/*
-+ *
-+ *  Wireless daemon for Linux
-+ *
-+ *  Copyright (C) 2024  Locus Robotics. All rights reserved.
-+ *
-+ *  This library is free software; you can redistribute it and/or
-+ *  modify it under the terms of the GNU Lesser General Public
-+ *  License as published by the Free Software Foundation; either
-+ *  version 2.1 of the License, or (at your option) any later version.
-+ *
-+ *  This library is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ *  Lesser General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU Lesser General Public
-+ *  License along with this library; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-+ *
-+ */
-+
-+int dpp_register_agent(const char *name, const char *path);
-+int dpp_unregister_agent(const char *name, const char *path);
+ static bool release_agent(void *data, void *user_data)
 -- 
 2.34.1
 
