@@ -1,62 +1,62 @@
 Received: from mail-qv1-f43.google.com (mail-qv1-f43.google.com [209.85.219.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 919CD1A7070
-	for <iwd@lists.linux.dev>; Tue, 24 Sep 2024 12:05:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03B5419F461
+	for <iwd@lists.linux.dev>; Tue, 24 Sep 2024 12:05:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727179507; cv=none; b=D1HB2DftCMuA+DiB1dH0rPagHbPKNW8LWJxVr35D9YtXsKn2QexMu51Iaante53NkzDwdxnJMUMJsTGs9eZ+ASL9BTA29SO/+eTji/L+PsXweyN7yeMWN+IXN9KW9004Yl15Y9iMLtwduFUzjiA4Jj2tAeAcEbjjlPH6RhJaAmU=
+	t=1727179508; cv=none; b=DhAiery0S0ycEl7g9yeLD1Qw7NUJpHKhy5arZoiuQLMEAOBjVHfVYCRB7ixypROZp6oN84X1Zn5VE9FA29zKBLB7A1hKgKpXnmOVuOu66d1BaIPLk1vNYWMLThptNS8dKdfDiGbeDguu+MHY8wApGJC2mqpcPsO3WJJuvhXI5eo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727179507; c=relaxed/simple;
-	bh=iUtGnNKS63XYfg0fZ60XqNv1LJGS5KM6yz1RxGdgZ00=;
+	s=arc-20240116; t=1727179508; c=relaxed/simple;
+	bh=G+L82sQPPxrEqHgqh5jXmNuPooVV+zU+PCd3EsCfQdA=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=WiFmbinqPUYImHrI35vLVvDV+mWQ66bOpolHBiaZcnJu/3tTnylfJdr1/Mlc9NWy7y4nAn6uADkikDruQ0zFXHz/7cqsrG4sLSCOcSaSNNcsxfxVF5L5mtjvOS6nKBUXo+jCaWhYbT8/OjR+1tR0lYUcjZjCKRgi58MtPCS/qvI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fNnBf+eu; arc=none smtp.client-ip=209.85.219.43
+	 MIME-Version; b=IKTISB/SmPAelCdIVgaU3hi8S5SxU8NFkm4hXmzHhn0/U16tACQmWM6J96VJmajA7yxKlFjc2s0hNUFTixJibh4tpInA2v3bSeQ05XIGQQty+IdsxXgt85G1GS0P5v853BNFQEX/IkghyDfa/424Tw0xRfXnsTUlAMjqSZ41tZw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=S3e28qnw; arc=none smtp.client-ip=209.85.219.43
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fNnBf+eu"
-Received: by mail-qv1-f43.google.com with SMTP id 6a1803df08f44-6c579748bf4so51763046d6.1
-        for <iwd@lists.linux.dev>; Tue, 24 Sep 2024 05:05:05 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="S3e28qnw"
+Received: by mail-qv1-f43.google.com with SMTP id 6a1803df08f44-6c3567a143eso44528196d6.2
+        for <iwd@lists.linux.dev>; Tue, 24 Sep 2024 05:05:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1727179504; x=1727784304; darn=lists.linux.dev;
+        d=gmail.com; s=20230601; t=1727179505; x=1727784305; darn=lists.linux.dev;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=L7J33SePf1FjwXDV3HEwxL7tGP9jtud0nYWTRHN10jk=;
-        b=fNnBf+euOBUo+q/uPNYU6m2AprYmIU6THOnkhYdoobbwMxFkAjirLbrv3L2xajJ6be
-         qRmNS3W3VVef50Wpp32HKbaPI9j5UJarvF1S3jWnB8QCez5mrgL+7G65G/bg+EeeTC9F
-         nbEhYemylk7Hx9PhmGSn1tu1XKMdMrAn4alkcz/5/d3rY1n6kXePD3z4dYLMZ1CifxnL
-         h1fUA6VcR9UFOYLNmTjKNBfT0wuxmzlqSwZVxJl7JlVi3VSrf1Y9xRK1H/QEDll5SYQg
-         vdGIZv48qQS7nmbu+Z+aTtHPvP+FnN2qoa9QvmRozMiZJoym0QpSffzq+CJbmgzI3Rds
-         GmPg==
+        bh=az0dXyE+Pl03OZ00DQO15WEsqalnygBrkTisyrdcAH4=;
+        b=S3e28qnwiZgmsDk1KOObIFl9T4E4JC3DgPWIYyAmFof9NnpullihLiJeLMHavbpEcx
+         DJgyRXN3xn+a9rMCeJ4bY+m+nvd3W95xSpGuGoLKz/jZVW8rUwmqcEfcYApe+PgZpL5g
+         crLfzR9P5zUBY9uG/U8Nu/BkZKsr6zT9gF4g5GtEMh1Vtvf9W11mPM7DVCwxEwtJ5KcP
+         +7r+Sot5LGc7W3dtG9H4Mf347zFsdbLOIBkbCHAZNXSKEsz1Me+6N9+ZPOEaMY3ESSSP
+         qSwQzogQ5b6K/+GRaIFjmwA8UYFw2g6TVE0gDknyaWks0NTtvezo7Pub+Q1iBTeIffZT
+         TqGA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727179504; x=1727784304;
+        d=1e100.net; s=20230601; t=1727179505; x=1727784305;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=L7J33SePf1FjwXDV3HEwxL7tGP9jtud0nYWTRHN10jk=;
-        b=VUe8bkR+4XcxmHW6mv2H4J46sLqJ8x0oT1k85LJJ8vt5x9UWJJfKQqx9nZMyWNfndX
-         IzWOfXHk1sQz7vfOY8O0D7RlsP8qPQA3GSz/dRDrMPT5CURot3GgxXNpHO1TOAIBseJo
-         DnCPJVunFBE7+oOADWZQPW5W61TsfhQXjJhBU3GbEX/OqcpRq4RxyyFgsP61OOmsM2Hf
-         3Nk9vup6Esw88JcoW81ZASKsSyTmWajR6fGppQrnRHAgvmXk6Q83TNSxCMmvmteSXkRd
-         HPXU5RUhW2JedFIVFEa8gI2w3JsOSBv2Pdf1bJHgvYxHlbQn/tQGT6joIHEQc44LaWtc
-         PYUA==
-X-Gm-Message-State: AOJu0Yzu1+z90w2f6vNitQgS8Fy6NelaKoyUSmxR86RJTfmLQQ/KoeaN
-	xbDt+czRiq04JG91Ifx1V7uBC+FjcCZKQSJy4Kq4qidaT0rtzQ5xdLFoNg==
-X-Google-Smtp-Source: AGHT+IFktp0np/oagE3nZQdmuCm/DwNPDu8EJtKHhouuK+zU/quTAA0wCUU7o0bg3LF3BhObTUMZTg==
-X-Received: by 2002:a05:6214:498d:b0:6c5:55bc:2705 with SMTP id 6a1803df08f44-6c7bc67b631mr248413336d6.6.1727179503869;
-        Tue, 24 Sep 2024 05:05:03 -0700 (PDT)
+        bh=az0dXyE+Pl03OZ00DQO15WEsqalnygBrkTisyrdcAH4=;
+        b=OLYQLRrcOaKNek3wN5BLcYMY8gSSm31P0IFgOjHi1OttQzI8iVvhEnefA4K/fjBkOJ
+         VOM6pZjVf5dxV64ZCI23udOkC42vH0zD8CRxLhnKK9oDPiOWKW+D85IaXnbiyS55dMai
+         lrLN7d8oVkolLQp3I2l09JLa05Wj9/XzjeeKpxZfLCCkzCjQ8OyeO/2Xa9zR5jqdb8yI
+         kaUlE7UYfP4FHz+yh/hse+NEX48lI7fbQlT/TVfoPnORNvkNyYsEdQJNhURR1CRT3qqG
+         4QEmV+Gsx92qrl/V46P6pi+R9qSwQ4swLQkBOHuEkh48b0D0IQ38YGscyPOQ355GA+U/
+         4+TA==
+X-Gm-Message-State: AOJu0Yxa4j8IUaOeRnkLKrvVAWwjMICP6s8Q3p7fgwkpo2TFIEHvCoW0
+	k3tMoJbH5K42/p7VRQluj0Rneb6xIZRhU1SG9ncqVJKxbvtMoFAf6d2e/Q==
+X-Google-Smtp-Source: AGHT+IHVpe1CyPTb9Up0xhn4Dcoaobz1WzdbF6ehulwbjGcUtGmEVlE63oPtBpc03Dhvdt6neR9SlQ==
+X-Received: by 2002:a05:6214:448b:b0:6c3:657a:cbb9 with SMTP id 6a1803df08f44-6c7bd59bb2cmr270423066d6.34.1727179505174;
+        Tue, 24 Sep 2024 05:05:05 -0700 (PDT)
 Received: from LOCLAP699.locus-rst-dev-locuspark.locus ([152.193.78.90])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6cb0f4a6178sm5948056d6.7.2024.09.24.05.05.02
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6cb0f4a6178sm5948056d6.7.2024.09.24.05.05.04
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 24 Sep 2024 05:05:03 -0700 (PDT)
+        Tue, 24 Sep 2024 05:05:04 -0700 (PDT)
 From: James Prestwood <prestwoj@gmail.com>
 To: iwd@lists.linux.dev
 Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 07/16] dpp: refactor config writing, add checks for PSK
-Date: Tue, 24 Sep 2024 05:04:38 -0700
-Message-Id: <20240924120447.251761-7-prestwoj@gmail.com>
+Subject: [PATCH 08/16] dpp-util: check the AKM is "psk" before further parsing the object
+Date: Tue, 24 Sep 2024 05:04:39 -0700
+Message-Id: <20240924120447.251761-8-prestwoj@gmail.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240924120447.251761-1-prestwoj@gmail.com>
 References: <20240924120447.251761-1-prestwoj@gmail.com>
@@ -68,114 +68,60 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-When writing the config object ensure the network security of the
-scanned network is PSK, and matches the config object recieved.
 ---
- src/dpp.c | 60 ++++++++++++++++++++++++++++++++++++++++++++-----------
- 1 file changed, 48 insertions(+), 12 deletions(-)
+ src/dpp-util.c | 24 +++++++++++++++---------
+ 1 file changed, 15 insertions(+), 9 deletions(-)
 
-diff --git a/src/dpp.c b/src/dpp.c
-index 16d0a711..3ad60188 100644
---- a/src/dpp.c
-+++ b/src/dpp.c
-@@ -832,25 +832,57 @@ static void send_config_result(struct dpp_sm *dpp, const uint8_t *to)
- 	dpp_send_frame(dpp, iov, 2, dpp->current_freq);
- }
+diff --git a/src/dpp-util.c b/src/dpp-util.c
+index 62db2081..2e4b181b 100644
+--- a/src/dpp-util.c
++++ b/src/dpp-util.c
+@@ -196,6 +196,7 @@ struct dpp_configuration *dpp_parse_configuration_object(const char *json,
+ 	_auto_(l_free) char *akm = NULL;
+ 	_auto_(l_free) char *pass = NULL;
+ 	_auto_(l_free) char *psk = NULL;
++	uint32_t akm_suites;
  
--static void dpp_write_config(struct dpp_configuration *config,
-+static void dpp_write_psk_config(struct dpp_configuration *config,
-+					struct l_settings *settings)
-+{
-+	if (config->passphrase)
-+		l_settings_set_string(settings, "Security", "Passphrase",
-+				config->passphrase);
-+	else if (config->psk)
-+		l_settings_set_string(settings, "Security", "PreSharedKey",
-+				config->psk);
-+}
+ 	c = json_contents_new(json, json_len);
+ 	if (!c)
+@@ -229,23 +230,28 @@ struct dpp_configuration *dpp_parse_configuration_object(const char *json,
+ 			JSON_UNDEFINED))
+ 		goto free_contents;
+ 
+-	if (!pass && (!psk || strlen(psk) != 64))
++	akm_suites = dpp_parse_akm(akm);
 +
-+static bool dpp_write_config(struct dpp_configuration *config,
- 				struct network *network)
- {
- 	_auto_(l_settings_free) struct l_settings *settings = l_settings_new();
--	_auto_(l_free) char *path;
-+	_auto_(l_free) char *path = NULL;
-+	enum security security;
++	if (!akm_suites)
+ 		goto free_contents;
+ 
+ 	config = l_new(struct dpp_configuration, 1);
++	config->akm_suites = akm_suites;
+ 
+-	if (pass)
+-		config->passphrase = l_steal_ptr(pass);
+-	else
+-		config->psk = l_steal_ptr(psk);
++	if (IE_AKM_IS_PSK(akm_suites)) {
++		if (!pass && (!psk || strlen(psk) != 64))
++			goto free_config;
 +
-+	if (!network) {
-+		l_warn("Network not seen in results, can't validate security");
-+
-+		if (IE_AKM_IS_PSK(config->akm_suites))
-+			security = SECURITY_PSK;
++		if (pass)
++			config->passphrase = l_steal_ptr(pass);
 +		else
-+			return false;
-+
-+		goto write_config;
++			config->psk = l_steal_ptr(psk);
 +	} else
-+		security = network_get_security(network);
- 
--	path = storage_get_network_file_path(SECURITY_PSK, config->ssid);
-+	if (security == SECURITY_PSK) {
-+		if (!IE_AKM_IS_PSK(config->akm_suites)) {
-+			l_warn("Network is PSK but DPP config is not!");
-+			return false;
-+		}
-+	} else {
-+		l_warn("Unsupported network security %s",
-+				security_to_str(security));
-+		return false;
-+	}
-+
-+write_config:
-+	path = storage_get_network_file_path(security, config->ssid);
- 
- 	if (l_settings_load_from_file(settings, path)) {
- 		/* Remove any existing Security keys */
- 		l_settings_remove_group(settings, "Security");
- 	}
- 
--	if (config->passphrase)
--		l_settings_set_string(settings, "Security", "Passphrase",
--				config->passphrase);
--	else if (config->psk)
--		l_settings_set_string(settings, "Security", "PreSharedKey",
--				config->psk);
-+	if (security == SECURITY_PSK)
-+		dpp_write_psk_config(config, settings);
- 
- 	if (config->send_hostname)
- 		l_settings_set_bool(settings, "IPv4", "SendHostname", true);
-@@ -859,8 +891,10 @@ static void dpp_write_config(struct dpp_configuration *config,
- 		l_settings_set_bool(settings, "Settings", "Hidden", true);
- 
- 	l_debug("Storing credential for '%s(%s)'", config->ssid,
--						security_to_str(SECURITY_PSK));
--	storage_network_sync(SECURITY_PSK, config->ssid, settings);
-+						security_to_str(security));
-+	storage_network_sync(security, config->ssid, settings);
-+
-+	return true;
- }
- 
- static void dpp_scan_triggered(int err, void *user_data)
-@@ -1141,7 +1175,8 @@ static void dpp_handle_config_response_frame(const struct mmpdu_header *frame,
- 			bss = network_bss_select(network, true);
- 	}
- 
--	dpp_write_config(config, network);
-+	if (!dpp_write_config(config, network))
 +		goto free_config;
  
- 	send_config_result(dpp, dpp->peer_addr);
+ 	memcpy(config->ssid, ssid, strlen(ssid));
+ 	config->ssid_len = strlen(ssid);
  
-@@ -1169,6 +1204,7 @@ static void dpp_handle_config_response_frame(const struct mmpdu_header *frame,
- 		}
- 	}
- 
-+free_config:
- 	dpp_configuration_free(config);
- 	dpp_reset(dpp);
- }
+-	config->akm_suites = dpp_parse_akm(akm);
+-	if (!config->akm_suites)
+-		goto free_config;
+-
+ 	if (json_iter_is_valid(&extra)) {
+ 		if (!dpp_parse_extra_options(config, &extra))
+ 			l_warn("Extra settings failed to parse!");
 -- 
 2.34.1
 
