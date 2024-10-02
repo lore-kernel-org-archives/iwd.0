@@ -1,59 +1,40 @@
-Received: from mail-oo1-f42.google.com (mail-oo1-f42.google.com [209.85.161.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F21F1DA610
-	for <iwd@lists.linux.dev>; Wed,  2 Oct 2024 18:14:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB8FE1D131B
+	for <iwd@lists.linux.dev>; Wed,  2 Oct 2024 21:41:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727892867; cv=none; b=iduaSGqa/mnFxEQXOOTjWHmy31mlt494SbB7DSihRb3CAGzuZ/6xjgp9U2nlc5q2oFg5M/0YrdukIF7+tqpKVlKSTqXb5zG6wslbj+l28if/yCpoRauAliCTQDf2hJAiITugIixG1UvIncSUQLQ3YZiHkrMzFM2lhmJlJEZqbsU=
+	t=1727905318; cv=none; b=kRmAhW4HzVMO/xgAa4bXRnC2VAnaOPQt80NCu9u0KwJmRb21AKXBxHfPLpXQvl5wTaTw6LFuHm9pokVmY9O2VMmMZ6Kt6S/+XgihIRDzDg1xA10mi6GgVcLCOQLtyJN6ikcVMdi4zr7d6mKALeoUGSq38blgBzXozs5Nj0hQu/U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727892867; c=relaxed/simple;
-	bh=+vQhIGTnDfbdQsjcwkxoGqV/CkwEoA6ESkEVKgMDcUw=;
+	s=arc-20240116; t=1727905318; c=relaxed/simple;
+	bh=vtS6CsOgWVgrSNwyaVGVHM3fEiGEav2V8SHQuWIhoG4=;
 	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=Yn/ZC1BrUd3+Ilk+75rnm+UU4jYCW8GHu0O1wHzODMTyPLW2skGOJUCkzPsCBkyTNZtAUiy70H93zPlpq5rNSeaapRXMRJ0Z37V96dd1WPXS2Nxbpb83LelDN3VlIBg4iJR+Ljq4YK9eIbSVavhPuxr2bR1W1rYiXXa+xcqDq8c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Cd/3hH8t; arc=none smtp.client-ip=209.85.161.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	 In-Reply-To:Content-Type; b=PAoR8wClz8onoOdTSz+p3qgOp7SFKmmN5iutBspznAfPR+N9rB+Xf0FLmCn9y3Akjo7amVGh2HgUKGgPBLAbh0urib6zbCJhP4/zimax9jh6+K02IeELQtpejdme8G36cqFQWH7KFgM5X8phf9KnuPalgR17IdDWHGuXOfLzw/E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=YkM4iV/P; arc=none smtp.client-ip=148.251.105.195
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Cd/3hH8t"
-Received: by mail-oo1-f42.google.com with SMTP id 006d021491bc7-5e5568f1baaso70589eaf.2
-        for <iwd@lists.linux.dev>; Wed, 02 Oct 2024 11:14:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1727892865; x=1728497665; darn=lists.linux.dev;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=wpVrjEtRQDrtR3h9QSoM+IYitfAMv3SJO3YmYW1jqEg=;
-        b=Cd/3hH8tdLhgbY+t8Jb4dvoEeqm/gHirrQ4xo8YcGvS8HPOCtpnPiTe64NrqIg//Do
-         s6/e4/YDLTxNPvkJre+n4gWzqDvKNQYvQNuqCqzgiwnGFK6ng9q3Nmjhux3IIiRORobY
-         u6SlwSvtE3FZ3XwlkLRaBToahGNYxLkev7bvp5UyVjawehS/zB3TGSHilKa+o+8Z3Clf
-         yvkXN3xIsLOWB0FdnC7hqJFetT9EdbNMFCh5SyfEAjteq323FNCLyu8EsFOJjGvqLG1G
-         LxN560r1UM/P7LgXIT6q1wq2+rJTUMO7crt9NocrMkqHC9xk7I3lLkg1PI1eE9VPnOz6
-         exyg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727892865; x=1728497665;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=wpVrjEtRQDrtR3h9QSoM+IYitfAMv3SJO3YmYW1jqEg=;
-        b=hfzN9YSEcxUKFaJJmLwO+dvxU8qNRhKZPe8pw3RBJqS98UdV8BzV7pr6Jye6uqZrp8
-         EVdU+9W0iGvlG/n4FhppcWDiavOnqeSm1AGnSqDgBU/fMrmM5uKfIV2fN+FhLyBMUfyi
-         6VRCUNmPqgTWdSJm6ZXO5vBiLoq/MOnusHw4IBDm/9I7h18OgoK3NWm/jmj4gQGv9RNe
-         DCCq5DWaab+1RmbLhT52hnxMRkBKOVPJIFfD4aszFroAqFjr5Vfr9S/VN8qOpexrSw+2
-         yg9tLyUhlXRzJ05w/1iD7FTXgux+a+QtFL5fy3lmZ4QIQR2U9J68b6jSODTbHGxBQ0kZ
-         r4mA==
-X-Forwarded-Encrypted: i=1; AJvYcCXFn/uyWr2AqBVUXbOwK+Z+P92z10MccQ5ODPIfKwwL+H1DD/xNR0/KQVer4Y7BmjO7OD8=@lists.linux.dev
-X-Gm-Message-State: AOJu0YxWvfnlc/f1FQo5ZIrvXoOXs2Zq8e7g7ipzNjJjvjVCBeow8qjz
-	KvBy+5N7nuRigU+562h6C4Hpm3tw9qM2EvDqAP0g5VFySrL6T/u1
-X-Google-Smtp-Source: AGHT+IGq9rmu/Sfx5nJ4TzksHkWBxhwmeKnB07oYQ/Lx3GxgTmjKd4l90oy8a7ieIS3F3PMCXVs9uQ==
-X-Received: by 2002:a05:6820:2901:b0:5e1:cd24:c19c with SMTP id 006d021491bc7-5e7b1bb9e39mr3891612eaf.0.1727892865151;
-        Wed, 02 Oct 2024 11:14:25 -0700 (PDT)
-Received: from [192.168.1.22] (syn-070-114-247-242.res.spectrum.com. [70.114.247.242])
-        by smtp.googlemail.com with ESMTPSA id 006d021491bc7-5e770dc460asm3471893eaf.16.2024.10.02.11.14.23
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 02 Oct 2024 11:14:24 -0700 (PDT)
-Message-ID: <f234b143-63f6-4184-b97a-bfaa082d8cf6@gmail.com>
-Date: Wed, 2 Oct 2024 13:14:22 -0500
+	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="YkM4iV/P"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
+	s=mail; t=1727905315;
+	bh=vtS6CsOgWVgrSNwyaVGVHM3fEiGEav2V8SHQuWIhoG4=;
+	h=Date:Subject:To:References:From:In-Reply-To:From;
+	b=YkM4iV/P5RkMTtZ/d5BCVSZfG3vrInXfR3Lx+xXTqXgYzb4bxAojUF9Sn25Z2D4x2
+	 U0Onhi9CmuhOPzGPq6aknOykeFZZNTJp7pixwB2xPhuLEuHIyZpYv2R9BkTQnnKArQ
+	 STior+TB0Ozkda4nEaKEnsfVS6dffhMQW+PWR5OLeB7aXPoJxUMzAr72HJ6tQ1II1z
+	 TcrtJ1aYMfG5pYG2gpnCG7J4BpZ8XfUrq9imDI4radJ0D/XHML/fGv1JHRV3us0J8o
+	 Ij0muhDlJTJqwjH5YInmJv2ax1JpHDMudi+3/JppZmIcdLOR7Hyaoi9texzWNFWLnW
+	 tr6vvV0Q6NpfA==
+Received: from [IPV6:2001:4d48:ad5d:8e00::197] (unknown [IPv6:2001:4d48:ad5d:8e00::197])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: vivek)
+	by bali.collaboradmins.com (Postfix) with ESMTPSA id E38AA17E36BE;
+	Wed,  2 Oct 2024 23:41:54 +0200 (CEST)
+Message-ID: <f8703c80-14fd-42b8-bf8a-d06919b0db6e@collabora.com>
+Date: Wed, 2 Oct 2024 22:41:54 +0100
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
@@ -63,58 +44,75 @@ MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 Subject: Re: Interop problem with Quantum Fiber WiFi7 pods (duplicate RSNXE
  IE)
-To: Vivek Das Mohapatra <vivek@collabora.com>, iwd@lists.linux.dev
+To: Denis Kenzior <denkenz@gmail.com>, iwd@lists.linux.dev
 References: <26febdbb-1184-46be-989b-45aace86f104@collabora.com>
-Content-Language: en-US
-From: Denis Kenzior <denkenz@gmail.com>
-In-Reply-To: <26febdbb-1184-46be-989b-45aace86f104@collabora.com>
+ <f234b143-63f6-4184-b97a-bfaa082d8cf6@gmail.com>
+Content-Language: en-GB
+From: Vivek Das Mohapatra <vivek@collabora.com>
+Autocrypt: addr=vivek@collabora.com; keydata=
+ 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 Rdk=
+Organization: Collabora
+In-Reply-To: <f234b143-63f6-4184-b97a-bfaa082d8cf6@gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-Hi Vivek,
+On 02/10/2024 19:14, Denis Kenzior wrote:
 
-On 10/2/24 12:08 PM, Vivek Das Mohapatra wrote:
-> Hi - we've had reports of an incompatibility between network manager and
-> the wifi7 hardware mentioned when using iwd as the backend.
+> IEs that allow duplication are explicitly called out:
+> "Vendor Specific
+> One or more Vendor Specific elements are optionally present. These 
+> elements follow all other elements."
 > 
->  From what we've been able to tell:
-> 
-> validate_mgmt_ies() fails
-> cause: disallowed duplicate IEs in the AssocResponse frame
-> 
-> We appear to have two dupes:
-> 
-> 221 - IE_TYPE_VENDOR_SPECIFIC - allowed
-> 244 - IE_TYPE_RSNX - not allowed as a dup.
-> 
-> We checked IEEE 80211-2020.pdf couldn't find specific details about IEs
-> that can be duplicated vs the ones that can’t.
-> [ Sections 9.4.2.1 and 9.4.2.241 ]
+> Why are the elements duplicated?  Are they the same or different?  If 
+> different, which one would iwd use?
 
-Refer to section 9.3.3.1:
-"The frame body consists of fields and elements as defined for each management 
-frame subtype. All fields and elements are mandatory unless stated otherwise. 
-Fields and elements appear in the specified, relative order, skipping fields or 
-elements that are not present. STAs that encounter an element ID they do not 
-recognize in the frame body of a received Management frame ignore that element 
-and continue to parse the remainder of the management frame body (if any) for 
-additional elements with recognizable element IDs."
+Looking at the OTA capture it looks like it's a genuine repeat, the 
+contents are the same.
 
-IEs that allow duplication are explicitly called out:
-"Vendor Specific
-One or more Vendor Specific elements are optionally present. These elements 
-follow all other elements."
+> How about fixing the firmware?
 
-Why are the elements duplicated?  Are they the same or different?  If different, 
-which one would iwd use?
+To be clear: We're not the people preparing the firmware. We support
+a distro that uses iwd. So fixing the firmware would be great, but
+we don't have any way to make that happen.
 
-> 
-> We've tried various devices and software combinations (linux and non)
-> and it seems to be an interop problem with iwd specifically - we think adding 
-> IE_TYPE_RSNX to the allowed dups list in validate_mgmt_ies should
-> do the trick.
 
-How about fixing the firmware?
-
-Regards,
--Denis
