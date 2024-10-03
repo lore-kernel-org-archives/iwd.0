@@ -1,124 +1,108 @@
-Received: from zdiv.net (xvm-107-148.dc0.ghst.net [46.226.107.148])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E2441552F5
-	for <iwd@lists.linux.dev>; Thu,  3 Oct 2024 12:01:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.226.107.148
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDB5816F8E9
+	for <iwd@lists.linux.dev>; Thu,  3 Oct 2024 12:17:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727956911; cv=none; b=g0Xju3M/ydrwLg8JxI4BT7am3ed+eGyCpvIHfuDAMRx4comV/PW8gjbu/4uL4ytSY2JKbiHCNZUgftSfgM5AdVluDXw6y/GbQlnhQNb3OIyfzzjQ91gMDBBZBgkmKQoJJi5qIkrQ+A8t9oq1qbEvwX04g69p/cgMRHY6mngyDUI=
+	t=1727957841; cv=none; b=GRMcCS24zyC/4XD0QeCJyEJYn4zSMhPt2gl102PGpKLZjG+CExO0eLKcs4E74l+1oXEW73gEOtfstjFJ9Kdr8hegaLNNezuWXODK/O9BvMA9JOmehgnUUGdA3IKIuIOBlWXiWFghAiyMcsjBq31RIm9at/p2yrgsUyF0KCmwjdA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727956911; c=relaxed/simple;
-	bh=Su3Xn6mxXTISOqu3zgwu4lENoSGr/SFxqewuRdaw5iI=;
-	h=Mime-Version:Content-Type:Date:Message-Id:Subject:From:To; b=Zxxet8TJRpjTTRCITZS0qBWRQetKXHj7/n/L5GdHRWm31X+ZLXuIHTGKXMwuEDK4Aun4UIr+TpAr7m+zsGF08g/xoP080U1ZuRRnqsyFx/HvcX57oFh1hDt1j4kjeBwdqDJQ4v1drjOzLqL/cbJj2VT8njgpS2G4hh9HYB36spY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zdiv.net; spf=pass smtp.mailfrom=zdiv.net; dkim=pass (2048-bit key) header.d=zdiv.net header.i=@zdiv.net header.b=b3ZnUBvC; arc=none smtp.client-ip=46.226.107.148
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zdiv.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zdiv.net
+	s=arc-20240116; t=1727957841; c=relaxed/simple;
+	bh=sgddDUiO/ZHG5hgLxiZcD8NaSFZUITQuTlL18w6YWmk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=WtYh54Jf6QqVJn4BBRS/HA+QDVe00kjh/FUjaZE3wSLWqb3X/W2vB6RV9CZBf/v7kESh7CmhttsQVdh0lawdSBpxIs8Dtr1tnJrek2ERsL8Xxhxo1s9vcLtf8tuGz/SEkN4MwNL02Y8NjT2eOe6xXpyYHvS3y0+76XxyM5WgBVA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Mpw4WTPH; arc=none smtp.client-ip=209.85.128.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=zdiv.net header.i=@zdiv.net header.b="b3ZnUBvC"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zdiv.net; s=23;
-	t=1727956907;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=RUlDUpGXoZOpwOP/ck0vQYOd7q0k2r6nOcKNj2KFLG0=;
-	b=b3ZnUBvCqhFFHz3/3iQ/YyvGnv3/1Ht3k90rT/GBncv9E+C4EV9EHH3wkaKB4BjvtzTLBw
-	gjQ+4Ff69YWZryUU0YcIBKErQN0xo9rTAhWWH6/tN7f6Cesuq6oGGmjHGvjYEfSrZOSiw6
-	8CdVaFrkUVcodKQLqbQvOXB9BpUG2JAd4RvN5KqBEp3SgOg+sVMbXKzh3JYw0etjmEazwq
-	B7jnWCR3sk/InSyllUNmiIhItYYsshCKJATWcLyJ3Yp+oOr+hcBfJcOaQneCJbnTzA8V2S
-	wRn3Er4R4OujTd4m+LjArX5/MmVmFYDooPCazzE2hx9gxNj3q+aktOOf/DgfCg==
-Received: from localhost (91-160-75-97.subs.proxad.net [91.160.75.97])
-	by zdiv.net (OpenSMTPD) with ESMTPSA id 759ab955 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO)
-	for <iwd@lists.linux.dev>;
-	Thu, 3 Oct 2024 12:01:47 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Mpw4WTPH"
+Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-42cb806623eso7154115e9.2
+        for <iwd@lists.linux.dev>; Thu, 03 Oct 2024 05:17:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1727957838; x=1728562638; darn=lists.linux.dev;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:to:subject:user-agent:mime-version:date:message-id:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=tBFo/iI3DdgZe7XW0yB2kkvmFK+QmYO3z7pIwYmvT9A=;
+        b=Mpw4WTPHfYQCCw7mV2nLHEawqYdVzA9nUp476t/HcxLqm9kv3Yc9021yuyz2IIV96m
+         IcC+hbGWG4hEdC8PdZTRIQWE3C4ijvC8yjJdiCLPAQfL4zFQZfYJvVQBr6zZL8bhenrL
+         2k1693C+cM261YTdd4baNjNwJM6j0lbPTEsoRagOmCvnjejYvsdxdHCG/dSYSdua1L9p
+         00lp5Z3hy8aVQADmLYKb5NQGo8dq7RH0m6XdYhpLvdeoM+rvEUYRj7doElrdytX2ldxH
+         CXZZrAiY9sCwWceN1oMuEratVghvWnUEUWkj/CzNRU5UtX28cAds5z03hxWnNDPKv1d1
+         c6Iw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1727957838; x=1728562638;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=tBFo/iI3DdgZe7XW0yB2kkvmFK+QmYO3z7pIwYmvT9A=;
+        b=PJJfbdZ7alGodv/lLV9V90meaXmPSqttrQPCif18zDkpLISSaf9rZ8yOfZzrRUaFq/
+         hNEl3Za5o0ojBA9IQvk26aYpXuZ2UkW7wt2Z66A7+Xsyxoe3ou/7qgcYeUH6GXl6JiTP
+         tQYdjPhqPwo4C5p0Tl5OzcaY8zQcXb3YxzvUVFFAXkEaQIylk/g8uSRU1M4N7xpaSlY8
+         gEQcu/tUs5Ejmuoy/brvnHaCURBQ+Acf/jKWnnzPCXlQVeSLqPfO2iDMhxS4MhDt+9Cb
+         v/Qu1kFDBeraD/4vqaFj+LtSlL3xbV5flr6x8Z2NGIH/3Lt0B5fW+QBAY3vLkjU4+qLK
+         723A==
+X-Forwarded-Encrypted: i=1; AJvYcCXnNTmhhv51CxK0hLe4Bsac5TPe7/CyVymoYptnYFVB4x/CFmA9/Us8J1+Lvim+l5bP074=@lists.linux.dev
+X-Gm-Message-State: AOJu0YzbWQmHJnqyA0lHEHaqUG2/KxeRtuhpzCwBeI0B9LwSn3v6GH2u
+	wjryNFDUF4WQy9qXgnQaimb0QpswNVyrhNx2Zz4sZvMuY+2axRsS
+X-Google-Smtp-Source: AGHT+IE4nofDRxIITFa9O01Mk+ZGWPPU9CKjlwk1LpIekDQkK/tPgpwsBSe6uvMfOR5/EdGyLVuUxg==
+X-Received: by 2002:a05:600c:358e:b0:42c:b1f0:f67 with SMTP id 5b1f17b1804b1-42f777ed42emr42616425e9.27.1727957838021;
+        Thu, 03 Oct 2024 05:17:18 -0700 (PDT)
+Received: from [10.168.3.25] ([81.145.46.166])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42f802a0134sm14302015e9.31.2024.10.03.05.17.16
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 03 Oct 2024 05:17:17 -0700 (PDT)
+Message-ID: <a6e3a5c8-2f6a-4af4-9433-2e3a3c74c1e8@gmail.com>
+Date: Thu, 3 Oct 2024 05:17:14 -0700
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Thu, 03 Oct 2024 14:01:47 +0200
-Message-Id: <D4M5LOG8MPW1.SYF1VD48Y3YH@zdiv.net>
-Subject: iwd 2.22 segfault
-From: "Jules Maselbas" <jmaselbas@zdiv.net>
-To: <iwd@lists.linux.dev>
-X-Mailer: aerc 0.18.2
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: Interop problem with Quantum Fiber WiFi7 pods (duplicate RSNXE
+ IE)
+To: Vivek Das Mohapatra <vivek@collabora.com>,
+ Denis Kenzior <denkenz@gmail.com>, iwd@lists.linux.dev
+References: <26febdbb-1184-46be-989b-45aace86f104@collabora.com>
+ <f234b143-63f6-4184-b97a-bfaa082d8cf6@gmail.com>
+ <f8703c80-14fd-42b8-bf8a-d06919b0db6e@collabora.com>
+ <c400002b-ce76-4cfa-b5f0-c51be00eb9cb@collabora.com>
+Content-Language: en-US
+From: James Prestwood <prestwoj@gmail.com>
+In-Reply-To: <c400002b-ce76-4cfa-b5f0-c51be00eb9cb@collabora.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-Hi,
+Hi Vivek,
 
-I am having a segfault in iwd 2.22, running on Alpine Linux (on edge).
+On 10/2/24 2:55 PM, Vivek Das Mohapatra wrote:
+> On 02/10/2024 22:41, Vivek Das Mohapatra wrote:
+>> On 02/10/2024 19:14, Denis Kenzior wrote:
+>>>
+>>> Why are the elements duplicated?  Are they the same or different?  
+>>> If different, which one would iwd use?
+>
+> OTA capture:
+>
+> I've linked 1 file to this email:
+>
+>   * 0926_qfiber.tar.xz
+>     Size: 5.2 MB
+>     Link:
+>
+> https://www.dropbox.com/scl/fi/i573yehaenpvkgy29smwb/0926_qfiber.tar.xz?rlkey=sxhhiwhmqppyic5wsc446h88r&dl=0 
+>
+>
+>
+So not only is it duplicating the IE, but its also violating the IE 
+ordering which is actually a spec violation (Table 9-35—Association 
+Response frame body). So I suspect even if you allow RSNXE duplicates 
+you may still run into a failure with the ordering. Is there some route 
+to reporting this to the vendor?
 
-I can reproduce the segfault by doing `rc-service networking restart`,
-dmesg gives this information:
+Thanks,
 
-iwd[4229]: segfault at a ip 00007f027ca94c6b sp 00007fffd6c75858 error 4 in=
- ld-musl-x86_64.so.1[7f027ca44000+57000] likely on CPU 4 (core 2, socket 0)
-Code: f8 48 83 fa 08 72 14 f7 c7 07 00 00 00 74 0c a4 48 ff ca f7 c7 07 00 =
-00 00 75 f4 48 89 d1 48 c1 e9 03 f3 48 a5 83 e2 07 74 05 <a4> ff ca 75 fb c=
-3 48 89 f8 48 29 f0 48 39 d0 0f 83 bf ff ff ff 48
-...
-iwd[24403]: segfault at a ip 00007fa91633ac6b sp 00007ffd1faaa028 error 4 i=
-n ld-musl-x86_64.so.1[7fa9162ea000+57000] likely on CPU 6 (core 3, socket 0=
-)
-Code: f8 48 83 fa 08 72 14 f7 c7 07 00 00 00 74 0c a4 48 ff ca f7 c7 07 00 =
-00 00 75 f4 48 89 d1 48 c1 e9 03 f3 48 a5 83 e2 07 74 05 <a4> ff ca 75 fb c=
-3 48 89 f8 48 29 f0 48 39 d0 0f 83 bf ff ff ff 48
-
-This is not an issue in musl-libc, but a call to memcpy with a bad address,
-we can see that the source address is 0xa (10) which is also the offset of =
-`aa` field in the `netdev->handshake` struct
-which makes me think that handshake is null when netdev_rssi_poll is called=
-.
-
-Here is a backtrace when iwd segfault:
-(gdb) bt
-#0  memcpy () at src/string/x86_64/memcpy.s:22
-#1  0x00005555555fc0dc in memcpy (__od=3D<optimized out>, __os=3D0xa, __n=
-=3D6) at /usr/include/fortify/string.h:55
-#2  l_netlink_message_append (message=3D0x7ffff7f34050, type=3Dtype@entry=
-=3D6, data=3D0xa, len=3Dlen@entry=3D6) at ell/netlink.c:841
-#3  0x00005555555fd78f in l_genl_msg_append_attr (msg=3Dmsg@entry=3D0x7ffff=
-7f34020, type=3Dtype@entry=3D6, len=3Dlen@entry=3D6, data=3D<optimized out>=
-) at ell/genl.c:1518
-#4  0x0000555555559080 in netdev_rssi_poll (timeout=3D<optimized out>, user=
-_data=3D0x7ffff7f38dc0) at src/netdev.c:760
-#5  0x00005555555f959e in timeout_callback (fd=3D<optimized out>, events=3D=
-<optimized out>, user_data=3D0x7ffff7f363b0) at ell/timeout.c:69
-#6  timeout_callback (fd=3D<optimized out>, events=3D<optimized out>, user_=
-data=3D0x7ffff7f363b0) at ell/timeout.c:58
-#7  0x00005555555f8a75 in l_main_iterate (timeout=3D<optimized out>) at ell=
-/main.c:461
-#8  0x00005555555f8b4e in l_main_run () at ell/main.c:508
-#9  l_main_run () at ell/main.c:490
-#10 0x00005555555f8d7f in l_main_run_with_signal (callback=3Dcallback@entry=
-=3D0x5555555587f0 <signal_handler>, user_data=3Duser_data@entry=3D0x0) at e=
-ll/main.c:630
-#11 0x0000555555557bd0 in main (argc=3D<optimized out>, argv=3D<optimized o=
-ut>) at src/main.c:614
-
-
-I've also ran a git bisect which points to
-154a29be0552f5a39e34301ebaf24623d64073da netdev: fall back to RSSI polling =
-if SET_CQM fails
-as the first bad commit. I noticed the "rssi" word is also present in the s=
-tacktrace.
-
-I am using the following wifi card:
-03:00.0 Network controller: MEDIATEK Corp. MT7922 802.11ax PCI Express Wire=
-less Network Adapter
-driver: mt7921e
-version: 6.6.53-0-lts
-firmware-version: ____000000-20240716163327
-expansion-rom-version:
-bus-info: 0000:03:00.0
-supports-statistics: yes
-supports-test: no
-supports-eeprom-access: no
-supports-register-dump: no
-supports-priv-flags: no
-
-
-Cheers,
-Jules
+James
 
