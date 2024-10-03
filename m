@@ -1,59 +1,40 @@
-Received: from mail-wr1-f47.google.com (mail-wr1-f47.google.com [209.85.221.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E02D11547FB
-	for <iwd@lists.linux.dev>; Thu,  3 Oct 2024 12:26:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9A08189B8F
+	for <iwd@lists.linux.dev>; Thu,  3 Oct 2024 12:49:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727958408; cv=none; b=hsy4yqcy0JWvnxhYzjcpargmfwzmmfvndyAZLke6t/0QVIC1rZN1ZKdTafDh8CxiZf13MrWtPGj2yzNhsQU2LY7YrzazmBfdcpQhdhUGXU5mjxtVDKwiUiSapPu0ypUlgSeZG07MwQLF2NpO7e3KFwpkv/Xj/UgFG+DbC96wzxw=
+	t=1727959787; cv=none; b=JrrNbgKqP00qTgu9meHtzik+G9Qd6X0IxOq1mYjcXdciZCrS7zXRmCz76F2YRQMakonyP6L8c265p2+bcfaXCZAyJLkO98Qj6GW7pGmQZJ4f5wAtPbdlsVFmDbfpxKHDbEixk71C+eMBcBe9SkTnFEAAlzfsWDpwF7RFQze83Fc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727958408; c=relaxed/simple;
-	bh=tq8T/VvZSU+ULhe4E/HkSek1CPv+U4fj+9suEd/KQnI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=f3G099XA+QthQlm1/leSLHC1nvZ0MiDkvyvQzAWnCqlLtn37c/IpnE5B92XuDTVbtJrI3dR4RPfy6u9V4OXLWE9q/3fBUOBAhzgKRfum36TQOECi6exaLXHXvf95mcHLIBg4w1P7WShLJdr5axRHm0NR4kNAB2uV+ERRyC6kijk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=e7bSRBBp; arc=none smtp.client-ip=209.85.221.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1727959787; c=relaxed/simple;
+	bh=9DzWjajrP2zgKqhwfBQi7iF5pC8Lzte0b1/E3IDWVn4=;
+	h=Message-ID:Date:MIME-Version:From:Subject:References:To:
+	 In-Reply-To:Content-Type; b=rjX47TTI1oB1FxPVfAlDD78emKX7W+UnGLmdHZs2pKsk/rSITIVpmpO1Jj2gY9k8aXRjWrHmbESvdre76sI4RPZg66sxEY8FNu5wvqlZNIZewmp7ylbAn6dTZBMfK8e1xgrdLPI+MneVrWjDtdqtg1Gd7ZKp9I3+0JH04DgOgBU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=csejHxjW; arc=none smtp.client-ip=148.251.105.195
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="e7bSRBBp"
-Received: by mail-wr1-f47.google.com with SMTP id ffacd0b85a97d-37ccc600466so534934f8f.1
-        for <iwd@lists.linux.dev>; Thu, 03 Oct 2024 05:26:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1727958405; x=1728563205; darn=lists.linux.dev;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=rlsQKm0imu6j8HZbpnZSwyNkSgJdlzGTzNhMrYDB2go=;
-        b=e7bSRBBppUYADF3QTutUUh07eFAg6gwGKgdlEPJO1D7l+2dklnWUmBkPMfrOzNqQLI
-         2Prx1qTbirgS6glm9GptdGkmYacnzpNq3zndJJr+W/0cH6pxAV8E55shFLwj1MWhzKyX
-         K+5PSF1/aEC1oJfcgJIptcQMfBcmQ9tT0s/JUXiPIAObtWHRFdYX6ND/RF1Q7XlxFldS
-         atgn2XWDXtWCcT7UHwRqm/aBd6u3F+P2wJEAiIAAfCBBZBn1PWtggtNWIErVO3AnL8VV
-         CWF2UcD8jnxQBtie/e04jE1i9gjGZryBzGWsqwdzRVFz2tlacJRMxRG77nifFm4GXreq
-         MtXw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727958405; x=1728563205;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=rlsQKm0imu6j8HZbpnZSwyNkSgJdlzGTzNhMrYDB2go=;
-        b=RKVuuPRY7sSJf8wxRxK687DfqHNI7D3uJD1PLwP5ojHX6GPnmPl4+wQl+63BHrM6mc
-         3kMLHMSoAP0SdqbKI+qxUeIE1jpdYbqrDoNTjeGGCPEVCujFc3DUOk/tRA5BN6tfjdsU
-         EDUTuhMJ+MP4BaqUVlfmiuUZg1usNEd3AiB+zU1xdMJOlpZzZhCGX+BsfAmHPCh1UNlb
-         J1lWtz/b+CIK2iJe86qslUmlRwKgMcO3tif0N5N3MXybLtSKTwcg1bJs6fAUQYEws6tJ
-         TwJHDtvIAtMCxXt4MU8DiWQUwdw/OVbOlSFyg3CidDwXGOrecGI2VUFoSiwctnDKF0vn
-         aWVg==
-X-Forwarded-Encrypted: i=1; AJvYcCWbqt4JdNYvhKkE3TBAls5ZYoezpiOMix5cREqzW+5Ew8exk27SsiOhFNFvXou/neKEkgk=@lists.linux.dev
-X-Gm-Message-State: AOJu0YzJQwFFSZHSaOwgvKa6rPNjH0vNbOmOzbU4Im3OVZPQ0w/gMNvl
-	LbJ0uebbailj52dUqZH6vE43QrMHl/C/dWaWWqP6X5rmfOLD7ef5r9468AWw
-X-Google-Smtp-Source: AGHT+IHQp7z2H9N96s908zNyIq7V60cDOBGbZUh/WycMq9v3h/hJsoABp2Kyb5PnBpxeKEDrlGr50g==
-X-Received: by 2002:a05:6000:2cb:b0:37c:d507:b44b with SMTP id ffacd0b85a97d-37cfb8cb57emr4892423f8f.26.1727958404952;
-        Thu, 03 Oct 2024 05:26:44 -0700 (PDT)
-Received: from [10.168.3.25] ([81.145.46.166])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-37d08245059sm1176233f8f.55.2024.10.03.05.26.43
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 03 Oct 2024 05:26:44 -0700 (PDT)
-Message-ID: <afdaa1f4-5b24-4d33-962e-3b026b65c626@gmail.com>
-Date: Thu, 3 Oct 2024 05:26:41 -0700
+	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="csejHxjW"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
+	s=mail; t=1727959784;
+	bh=9DzWjajrP2zgKqhwfBQi7iF5pC8Lzte0b1/E3IDWVn4=;
+	h=Date:From:Subject:References:Reply-To:To:In-Reply-To:From;
+	b=csejHxjWLdOujl7yxnutMOxbCE+nCufszsa13IY1gIyXvrlwBOKhJYEyFhqTlEnlb
+	 OBuacxLidot10FA/sed5ik5JDRJZwMaXlQFaP3bCDiBAkhcHJQbNGlVyv3qkWljq2h
+	 RmFEaSEoNEBZlZQ+Py8pYEq4ie6CLTAv/wPMmlKSBwiPEE+IU98MyiJQG0uywZA4e2
+	 YDWBQchXtQQxZzYdESZaDU2BK0TrCRh4qkHG1664cA0MIfktWTp9yV8PlyhT+iNBCf
+	 1HvKCOo2Dw2wESeFqxuZ7TB/Aern4tl0tqY+gvEb2S++4gW5Ehs8gyJzBRmEAtqnRg
+	 zU6+RukLQoTOw==
+Received: from [IPV6:2001:4d48:ad5d:8e00::197] (unknown [IPv6:2001:4d48:ad5d:8e00::197])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits))
+	(No client certificate requested)
+	(Authenticated sender: vivek)
+	by bali.collaboradmins.com (Postfix) with ESMTPSA id E944C17E35DD
+	for <iwd@lists.linux.dev>; Thu,  3 Oct 2024 14:49:43 +0200 (CEST)
+Message-ID: <ef3677b6-172e-43fa-9db8-a30293f2fb55@collabora.com>
+Date: Thu, 3 Oct 2024 13:49:43 +0100
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
@@ -61,81 +42,71 @@ List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: iwd 2.22 segfault
-To: Jules Maselbas <jmaselbas@zdiv.net>, iwd@lists.linux.dev
-References: <D4M5LOG8MPW1.SYF1VD48Y3YH@zdiv.net>
-Content-Language: en-US
-From: James Prestwood <prestwoj@gmail.com>
-In-Reply-To: <D4M5LOG8MPW1.SYF1VD48Y3YH@zdiv.net>
+From: Vivek Das Mohapatra <vivek@collabora.com>
+Subject: Interop problem with Quantum Fiber WiFi7 pods (duplicate RSNXE IE)
+References: <e6936d40-0667-4128-a342-bd65dd553230@collabora.com>
+Content-Language: en-GB
+Reply-To: Vivek Das Mohapatra <vivek@collabora.com>
+To: iwd@lists.linux.dev
+Autocrypt: addr=vivek@collabora.com; keydata=
+ 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 Rdk=
+Organization: Collabora
+In-Reply-To: <e6936d40-0667-4128-a342-bd65dd553230@collabora.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-
-Hi Jules,
-
-On 10/3/24 5:01 AM, Jules Maselbas wrote:
-> Hi,
->
-> I am having a segfault in iwd 2.22, running on Alpine Linux (on edge).
->
-> I can reproduce the segfault by doing `rc-service networking restart`,
-> dmesg gives this information:
->
-> iwd[4229]: segfault at a ip 00007f027ca94c6b sp 00007fffd6c75858 error 4 in ld-musl-x86_64.so.1[7f027ca44000+57000] likely on CPU 4 (core 2, socket 0)
-> Code: f8 48 83 fa 08 72 14 f7 c7 07 00 00 00 74 0c a4 48 ff ca f7 c7 07 00 00 00 75 f4 48 89 d1 48 c1 e9 03 f3 48 a5 83 e2 07 74 05 <a4> ff ca 75 fb c3 48 89 f8 48 29 f0 48 39 d0 0f 83 bf ff ff ff 48
-> ...
-> iwd[24403]: segfault at a ip 00007fa91633ac6b sp 00007ffd1faaa028 error 4 in ld-musl-x86_64.so.1[7fa9162ea000+57000] likely on CPU 6 (core 3, socket 0)
-> Code: f8 48 83 fa 08 72 14 f7 c7 07 00 00 00 74 0c a4 48 ff ca f7 c7 07 00 00 00 75 f4 48 89 d1 48 c1 e9 03 f3 48 a5 83 e2 07 74 05 <a4> ff ca 75 fb c3 48 89 f8 48 29 f0 48 39 d0 0f 83 bf ff ff ff 48
->
-> This is not an issue in musl-libc, but a call to memcpy with a bad address,
-> we can see that the source address is 0xa (10) which is also the offset of `aa` field in the `netdev->handshake` struct
-> which makes me think that handshake is null when netdev_rssi_poll is called.
->
-> Here is a backtrace when iwd segfault:
-> (gdb) bt
-> #0  memcpy () at src/string/x86_64/memcpy.s:22
-> #1  0x00005555555fc0dc in memcpy (__od=<optimized out>, __os=0xa, __n=6) at /usr/include/fortify/string.h:55
-> #2  l_netlink_message_append (message=0x7ffff7f34050, type=type@entry=6, data=0xa, len=len@entry=6) at ell/netlink.c:841
-> #3  0x00005555555fd78f in l_genl_msg_append_attr (msg=msg@entry=0x7ffff7f34020, type=type@entry=6, len=len@entry=6, data=<optimized out>) at ell/genl.c:1518
-> #4  0x0000555555559080 in netdev_rssi_poll (timeout=<optimized out>, user_data=0x7ffff7f38dc0) at src/netdev.c:760
-> #5  0x00005555555f959e in timeout_callback (fd=<optimized out>, events=<optimized out>, user_data=0x7ffff7f363b0) at ell/timeout.c:69
-> #6  timeout_callback (fd=<optimized out>, events=<optimized out>, user_data=0x7ffff7f363b0) at ell/timeout.c:58
-> #7  0x00005555555f8a75 in l_main_iterate (timeout=<optimized out>) at ell/main.c:461
-> #8  0x00005555555f8b4e in l_main_run () at ell/main.c:508
-> #9  l_main_run () at ell/main.c:490
-> #10 0x00005555555f8d7f in l_main_run_with_signal (callback=callback@entry=0x5555555587f0 <signal_handler>, user_data=user_data@entry=0x0) at ell/main.c:630
-> #11 0x0000555555557bd0 in main (argc=<optimized out>, argv=<optimized out>) at src/main.c:614
->
->
-> I've also ran a git bisect which points to
-> 154a29be0552f5a39e34301ebaf24623d64073da netdev: fall back to RSSI polling if SET_CQM fails
-> as the first bad commit. I noticed the "rssi" word is also present in the stacktrace.
-
-Thanks for such detailed info, do you happen to have debug logs when 
-this happens? I'm just trying to see the code path which leads to this. 
-I can't seem to reproduce it but I suspect musl-libc is just different 
-enough that its exposing the bug
+Content-Transfer-Encoding: 8bit
 
 
->
-> I am using the following wifi card:
-> 03:00.0 Network controller: MEDIATEK Corp. MT7922 802.11ax PCI Express Wireless Network Adapter
-> driver: mt7921e
-> version: 6.6.53-0-lts
-> firmware-version: ____000000-20240716163327
-> expansion-rom-version:
-> bus-info: 0000:03:00.0
-> supports-statistics: yes
-> supports-test: no
-> supports-eeprom-access: no
-> supports-register-dump: no
-> supports-priv-flags: no
->
->
-> Cheers,
-> Jules
->
->
-Thanks,
+On 03/10/2024 13:17, James Prestwood wrote:
+> Hi Vivek,
+> 
+> So not only is it duplicating the IE, but its also violating the IE 
+> ordering which is actually a spec violation (Table 9-35—Association 
+> Response frame body). So I suspect even if you allow RSNXE duplicates 
+> you may still run into a failure with the ordering. Is there some route 
+> to reporting this to the vendor?
 
-James
+We're looking into it but we're not even a retail customer of theirs
+so no idea if they'll respond (I mean they might, I don't know,
+I've just never dealt with them before).
+
 
