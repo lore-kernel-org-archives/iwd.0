@@ -1,59 +1,59 @@
-Received: from mail-oi1-f173.google.com (mail-oi1-f173.google.com [209.85.167.173])
+Received: from mail-oo1-f42.google.com (mail-oo1-f42.google.com [209.85.161.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E88111C92
-	for <iwd@lists.linux.dev>; Fri,  4 Oct 2024 02:33:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E89BB1C69C
+	for <iwd@lists.linux.dev>; Fri,  4 Oct 2024 02:58:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728009197; cv=none; b=FZOcKaX40MbdpRzpZnX+zcJVy7Ulpb389pLNGAOivi6XfPv0eGNc/kVFq57PKkTmsfPyW4n9E6BrrdDc2WHpFSWsN1806oCRSi8/xoOodOq1vNwGTOiWV3nUyha5HPLlzUzpxfUxAgAM6MmRoV3Z2xPvG3AsB98ut9OIO4PwPW4=
+	t=1728010741; cv=none; b=rkEoCCwGQaxrCONNfBzeLo1XWfgUjiR7ttRP+2eWgdrA3IFklHhGrEDMf8J7YvBFCIgWARriY9mlGSXjhRcIqolr0QaXY02VvSzyBsIMbmqX5KX1Kx9Yf73EEm6MY9npMhFIlPmYk62Y//vcXKykEToDP7xT8EMYDBS4pHGB7pE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728009197; c=relaxed/simple;
-	bh=xpbDXrL1kAmXLCPKq/ta4iwHK5fnQXshSLcKRqR6izI=;
+	s=arc-20240116; t=1728010741; c=relaxed/simple;
+	bh=mdtQdypsXp798ELnWqMRMGow/4T0iDr6KKlJtQg1d6s=;
 	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=s4ELi6TGoCKyA/lOUw7DdUhX3eC/zU4+pgrrBd9KrHKW2z9+q+YjclZ6PBTkN2ZU82UWS3VePRWsvjBwW4aN1qE2bFvgk58j//kZELp2d+0KnOVmdx4cUsi+MKTcSjW+nNO1S6MK10LqcDP656OOLo8A51ouX6nhaT/ZLFTp2es=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Zn6DTKwp; arc=none smtp.client-ip=209.85.167.173
+	 In-Reply-To:Content-Type; b=PT8Cn3583lnWELLJ5vCtjR15i/dvj4TUXftRwhlvkOA+J6aTK1B1XSUj0zbvHvG15n39JWKnkoo57SCrfxOb4wbnkUpFXNbeAaXZ2LeiOyN/dHST1x1tF92EoWXfbjvg2USQk2Ey3jZOw1k+iDzGMlKtLIUHtPNF3+OYPxA/mTE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mHIctOtd; arc=none smtp.client-ip=209.85.161.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Zn6DTKwp"
-Received: by mail-oi1-f173.google.com with SMTP id 5614622812f47-3e16d974030so833033b6e.1
-        for <iwd@lists.linux.dev>; Thu, 03 Oct 2024 19:33:15 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mHIctOtd"
+Received: by mail-oo1-f42.google.com with SMTP id 006d021491bc7-5e5568f1baaso838502eaf.2
+        for <iwd@lists.linux.dev>; Thu, 03 Oct 2024 19:58:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1728009194; x=1728613994; darn=lists.linux.dev;
+        d=gmail.com; s=20230601; t=1728010739; x=1728615539; darn=lists.linux.dev;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:to:subject:user-agent:mime-version:date:message-id:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=gKiZBxpFJ905cXb1KvPBrplt+UVApTeKwDjVMVDhfGo=;
-        b=Zn6DTKwpm5OZZBJG4+mfELeU/jcdb/Nxbzi4EnCPu2fJQJm5va1yonBk46r79Hv/aZ
-         tHb2dhtXk+j2ExVOtUSGuc0ETK07g4OM/IiJnKnQaoUs1vPqXx1LZqPWpgxteTdEkRcy
-         1qiV1XY+/zGshbnlX5wBUyRCaM7uPp/LCCIn0OfBTvvB9lM9UIjhXksEjpcZpEaf051H
-         AL5N0sI9xj9mrZ4DRamuh6bKCdG/xo1BrXYKuHfmZ/1Y5lbbJlLVPCVks+Q3BcrI5XvC
-         RyE5wPZf2Sl91RpnFyXK5Hi0PLn7vKUO/1E+jwqTdHLpgCLbQnMbKVEUz3Zj4aSltXcA
-         WpYA==
+        bh=hytV5arURx0vcG8QlGLAJWnhWhtvanwCyvbIDtjWNzU=;
+        b=mHIctOtdj4YlJEjN3egAF0zLDWum8COvSAn3rDZu+Iqi6XVBKQWVxedY8ns5Evpbk4
+         R/o7yitVtJwtlvOQdSop9JkMvQqJ2BDt16JUSBfMXm9Ow0BFfrikUKYyxGJWe5Ggx27a
+         O5aKPIZVjSKBhBObK/u73AExzWXzsZC191ynSQgjZ6QlIetZWo+gfY7px3Tad5vh7xDm
+         CGiAcM+Q0EeXn7bAAFWQH17bmqXUWh/MCmESPAY1yKWs9TPfkipzcgQ7nXqWFtj9p1D6
+         RqacZV3UXhWnNapc4oLBOWrnqDJ+CAjVSAvedUHkq/12mpkkA+IMeID5Vb4g73hRP9Yl
+         EkPA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728009194; x=1728613994;
+        d=1e100.net; s=20230601; t=1728010739; x=1728615539;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=gKiZBxpFJ905cXb1KvPBrplt+UVApTeKwDjVMVDhfGo=;
-        b=Z7WUcaJK37+YVg61inNnqnBwo4V+2QzOgDvrwtL8uZxcitC2TkUywmnuJReZfmdPtZ
-         Gckf3XM5jZOv0rYpsecqOtlgYVo+H6Hy8dc451YgdqvtErs7cxW9eOUVlD7kSjk1V1cx
-         BVB7NmJpnh2povG4VtFWp6c73ZiF9cg0DOPsD2tLS6A5rnku8w4EyZQjYaw7naK31DJT
-         16tJkqPYcknRleJNvtbQZcLBbuSoS6nptuZSwQet9aoJaU09Q9AP1qU0kgvWKni9nnxB
-         KdCEQt5NwqtCn8qLTt+SYn4v1laxG69cArka8nmEafryfwDHavD2rUUgEpoOABAnjvx6
-         g6jw==
-X-Forwarded-Encrypted: i=1; AJvYcCXG3c31mYEvtkBmc8dd+8Cl5m5hOcRxY3enlvVVuU7uRcNisD3Y0P6UD177wjabHrisI64=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yyc+GuXWa7VqH14Nbh4YOyRzQc1yZfk64viIpzAmDkDJpw44pAm
-	RJ24lXLe8T+KhpokLT+KpcUyrBqPXHHbQAksE5RwpyxiHadkhAwy
-X-Google-Smtp-Source: AGHT+IEBnywUhTKIGnDAO8yfQ9hZxUbsw4dFoe3ovjrPkNdf25ggAXEWngmgQL0vZrhohx1OPLvcZg==
-X-Received: by 2002:a05:6808:1306:b0:3e0:b64:14f with SMTP id 5614622812f47-3e3ba1bc72fmr3116248b6e.13.1728009194511;
-        Thu, 03 Oct 2024 19:33:14 -0700 (PDT)
+        bh=hytV5arURx0vcG8QlGLAJWnhWhtvanwCyvbIDtjWNzU=;
+        b=UeD+u2z4oBXoSlOqV1T8qHwPKglcNWcKeSjE2xzMkwt/hRUZEJqv1boqhNVsSL25a1
+         ninOYe012RfN/op0tvwkhiVR2VEQZ4YHg7XUSm1Qx9Rt3bPtlyGyLO2JVrXqQAln4WG4
+         KTSl0Px6xStNQDilhHP9l4LoWbyQn4cxkO7CAf6SLzfrB1zRBldtLHZeex5UzDSggsXS
+         LlcPBU0pS92Uc6E/SVc6LJ3i/ftpvB/FQW7jSoCNcoOdZFDCWRyXnnK8LTC3nmglLfMB
+         /0noCkCYo86GUyNcn3qGmWUgL/oZBcVLD3zxpbfoE4xIrVFhbNTtguNYu0E851ffiOVg
+         0kFA==
+X-Forwarded-Encrypted: i=1; AJvYcCUnyq84TXRpHTKq9pZbr5J7HiYVxxI3MszaYSKLvRLfnqMqTlYuvcrBytmy1BGlN3JjuAE=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yx61G9cdkwnKwh2Dx+cTnwnKr6PirQO06fafR3US27UTalz4Z/s
+	aHtNOjatbd4OqzVsvJmfoSrbT2eyS127myVCTKzxyjapr/jsenfI
+X-Google-Smtp-Source: AGHT+IH3lAhCEeZkcaDpeDZHy7Bvmjb+BH8RVob3WwD1WX4Ka5aXbAA7ratbywzeL5CLfDefkiHrcg==
+X-Received: by 2002:a05:6870:7014:b0:277:ef62:e6a7 with SMTP id 586e51a60fabf-287c214cd65mr1113589fac.37.1728010738830;
+        Thu, 03 Oct 2024 19:58:58 -0700 (PDT)
 Received: from [192.168.1.22] (syn-070-114-247-242.res.spectrum.com. [70.114.247.242])
-        by smtp.googlemail.com with ESMTPSA id 5614622812f47-3e3bc3627f9sm749864b6e.8.2024.10.03.19.33.11
+        by smtp.googlemail.com with ESMTPSA id 586e51a60fabf-287abc1bfe1sm901669fac.48.2024.10.03.19.58.57
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 03 Oct 2024 19:33:13 -0700 (PDT)
-Message-ID: <237bd91d-95a9-44d4-b5a3-c1db53b7622f@gmail.com>
-Date: Thu, 3 Oct 2024 21:33:10 -0500
+        Thu, 03 Oct 2024 19:58:58 -0700 (PDT)
+Message-ID: <8da83f6a-a437-4306-875f-b7276da342d6@gmail.com>
+Date: Thu, 3 Oct 2024 21:58:56 -0500
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
@@ -61,52 +61,35 @@ List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] netdev: fix crash in the RSSI polling fallback workaround
-To: James Prestwood <prestwoj@gmail.com>, iwd@lists.linux.dev
-References: <20241003125817.75004-1-prestwoj@gmail.com>
+Subject: Re: Interop problem with Quantum Fiber WiFi7 pods (duplicate RSNXE
+ IE)
+To: James Prestwood <prestwoj@gmail.com>,
+ Vivek Das Mohapatra <vivek@collabora.com>, iwd@lists.linux.dev
+References: <26febdbb-1184-46be-989b-45aace86f104@collabora.com>
+ <f234b143-63f6-4184-b97a-bfaa082d8cf6@gmail.com>
+ <f8703c80-14fd-42b8-bf8a-d06919b0db6e@collabora.com>
+ <c400002b-ce76-4cfa-b5f0-c51be00eb9cb@collabora.com>
+ <a6e3a5c8-2f6a-4af4-9433-2e3a3c74c1e8@gmail.com>
 Content-Language: en-US
 From: Denis Kenzior <denkenz@gmail.com>
-In-Reply-To: <20241003125817.75004-1-prestwoj@gmail.com>
+In-Reply-To: <a6e3a5c8-2f6a-4af4-9433-2e3a3c74c1e8@gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
 Hi James,
 
-On 10/3/24 7:58 AM, James Prestwood wrote:
-> Prior to adding the polling fallback this code path was only used for
-> signal level list notifications and netdev_rssi_polling_update() was
-> structured as such, where if the RSSI list feature existed there was
-> nothing to be done as the kernel handled the notifications.
-> 
-> For certain mediatek cards this is broken, hence why the fallback was
-> added. But netdev_rssi_polling_update() was never changed to take
-> this into account which bypassed the timer cleanup on disconnections
-> resulting in a crash when the timer fired after IWD was disconnected:
-> 
-> iwd: ++++++++ backtrace ++++++++
-> iwd: #0  0x7b5459642520 in /lib/x86_64-linux-gnu/libc.so.6
-> iwd: #1  0x7b54597aedf4 in /lib/x86_64-linux-gnu/libc.so.6
-> iwd: #2  0x49f82d in l_netlink_message_append() at ome/jprestwood/iwd/ell/netlink.c:825
-> iwd: #3  0x4a0c12 in l_genl_msg_append_attr() at ome/jprestwood/iwd/ell/genl.c:1522
-> iwd: #4  0x405c61 in netdev_rssi_poll() at ome/jprestwood/iwd/src/netdev.c:764
-> iwd: #5  0x49cce4 in timeout_callback() at ome/jprestwood/iwd/ell/timeout.c:70
-> iwd: #6  0x49c2ed in l_main_iterate() at ome/jprestwood/iwd/ell/main.c:455 (discriminator 2)
-> iwd: #7  0x49c3bc in l_main_run() at ome/jprestwood/iwd/ell/main.c:504
-> iwd: #8  0x49c5f0 in l_main_run_with_signal() at ome/jprestwood/iwd/ell/main.c:632
-> iwd: #9  0x4049ed in main() at ome/jprestwood/iwd/src/main.c:614
-> iwd: #10 0x7b5459629d90 in /lib/x86_64-linux-gnu/libc.so.6
-> iwd: #11 0x7b5459629e40 in /lib/x86_64-linux-gnu/libc.so.6
-> iwd: +++++++++++++++++++++++++++
-> 
-> To fix this we need to add checks for the cqm_poll_fallback flag in
-> netdev_rssi_polling_update().
-> ---
->   src/netdev.c | 5 +++--
->   1 file changed, 3 insertions(+), 2 deletions(-)
-> 
+> So not only is it duplicating the IE, but its also violating the IE ordering 
+> which is actually a spec violation (Table 9-35—Association Response frame body). 
+> So I suspect even if you allow RSNXE duplicates you may still run into a failure 
+> with the ordering. Is there some route to reporting this to the vendor?
 
-Applied, thanks.
+https://git.kernel.org/pub/scm/network/wireless/iwd.git/commit/?id=8f9ed66bdd4c26e619f0878cc8ef987ce27e4305
+
+We gave up on enforcing the order a long time ago.
+
+Vivek, if you want to submit a patch allowing duplicate IEs as long as they are 
+bit-identical (length, and contents), I think that would be okay.  From what I 
+can see our logic should be only picking up the first occurrence.
 
 Regards,
 -Denis
-
