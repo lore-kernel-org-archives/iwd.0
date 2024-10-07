@@ -1,177 +1,96 @@
-Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oi1-f178.google.com (mail-oi1-f178.google.com [209.85.167.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E6321C6A3
-	for <iwd@lists.linux.dev>; Sat,  5 Oct 2024 02:20:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 605211DD54A
+	for <iwd@lists.linux.dev>; Mon,  7 Oct 2024 18:26:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728094807; cv=none; b=crywnT+UMImH/UfmWiSOxNGDA5iVHOxNdIKCuqbjABGOdoyRlsI2BbUnxKKHJNS3opnrx7RvVW+nAZvMyaO9pkZJ0vIGDONdlxtg91aOPk1EiDst+j3h9b9+Mu4Ca9izoicak0kHupgxtdt397vrTOVewCy0a8lLDGlSCZXLTDA=
+	t=1728325617; cv=none; b=YxWNhtAnrwFlrkpGOW0k8/3ptyxJmhLjH13NUjABDsceECkP8nOJ9x8seZ4PUCULdXJAhxBTVU6XlpUOBu7r1OJZdS0qh+Mbo/HsmW1eEAfo8Lw74BogrcR0u6wXrffNzTnXJLByv7XuJ/i/UP+OQjB5Ohgy0gcZCefOFgXCvbg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728094807; c=relaxed/simple;
-	bh=Wt64LKPFJv4ICsL2TSIOLn760PWd21An+nH0gm5gLh8=;
-	h=From:To:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=FL4nztOmALI+BLuiQh4MVMFH6cL2dRg2YeD7NHTl8Af14RBSshzx6MRq2+GrYfcmZwc1Zuevkdk1oL2iVnDNkoLEx988bMsYA+24OuXa9uDVmLBxKNM2FaUpkwdeKgPWl/6MHyPzEuxzNMfGL0nNBfcz411rZ7BiFeUSiLWH0h0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=qBZL5KIz; arc=none smtp.client-ip=148.251.105.195
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
+	s=arc-20240116; t=1728325617; c=relaxed/simple;
+	bh=nvooIQw5wf9sEwa0o6IK++YsCkWkUKJUambzwvvpn3k=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=Qnnret05FpTiKmHKZ4d/NvtHGIQQiY/O/Bx6bVsENcVwmeKY/Nj/iL9BBXTOT9U2GlVVaClkRlw562Wlu7jZnBVrZnwScCBqlCJajlchtle0haH8SxcDxZeUbYO82yHUJT06s+ff3opgqelMHEHj0DaQUI1USFfbuqT04XMXYfw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kSZGDSbH; arc=none smtp.client-ip=209.85.167.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="qBZL5KIz"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
-	s=mail; t=1728094803;
-	bh=Wt64LKPFJv4ICsL2TSIOLn760PWd21An+nH0gm5gLh8=;
-	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=qBZL5KIzFXyfZKWRf3pZr6OdytgCuPRRiTRwXuMVyu5PDrFB5U92ytECmfFHzOrgq
-	 VJCu9s60jpt8j791NwKE3Y9egWcq8J1rDfqd9Pi7c2tN0S7KzjeloWuLPkJwwW7F+9
-	 LPEConjMTHCq2QVgTjw3g5epUctLitLXuzsSqtaSHnW9HIKhCc3z9c20mj25oppa+Z
-	 L/JNS182m6BH4xk5sQt75H9bwS+/EzmTbEV7ZNWnyuxknotWe0xA4H/3RdD3Hn7aEo
-	 AY18U1A6VaGUzf2C9riU+YjsaYWaw2FW+EWx3DwhN51N66HK5E0/NXIz8tvtzScIEC
-	 HU1aGFIM01GHQ==
-Received: from noise.lan (unknown [IPv6:2001:4d48:ad5d:8e00::197])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: vivek)
-	by bali.collaboradmins.com (Postfix) with ESMTPSA id 1EC3317E0F88
-	for <iwd@lists.linux.dev>; Sat,  5 Oct 2024 04:20:03 +0200 (CEST)
-From: =?UTF-8?q?Vivek=20Das=C2=A0Mohapatra?= <vivek@collabora.com>
-To: iwd@lists.linux.dev
-Subject: [PATCH 1/2] unit: add a test for harmless IE clones
-Date: Sat,  5 Oct 2024 03:19:28 +0100
-Message-Id: <20241005021929.2075817-2-vivek@collabora.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20241005021929.2075817-1-vivek@collabora.com>
-References: <6dbd0686-f054-4c16-bf84-0e383baefdc9@collabora.com>
- <20241005021929.2075817-1-vivek@collabora.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kSZGDSbH"
+Received: by mail-oi1-f178.google.com with SMTP id 5614622812f47-3e16d974030so2384410b6e.1
+        for <iwd@lists.linux.dev>; Mon, 07 Oct 2024 11:26:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1728325615; x=1728930415; darn=lists.linux.dev;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:to:subject:user-agent:mime-version:date:message-id:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=pdFx6ym2O/WVquYBEObOAt6/7at4YjaHcsJ6skeJ8Po=;
+        b=kSZGDSbHFQSus6lI0l9qBRHwMHh4d8lIrTGB0QPjZd8Qgo5F7xiRp6dC4BZcdk+kdM
+         JywUB3W09ddkAcD6/YS7rEbSMKjnXJCFvellWA4YQUXvWF0P9G/FVAaA9uCc/RhSmUeV
+         EqK+07rFcVDtOzodcXWU5tTEAAkr17JqofmvkN6HjTiq5N07MgnNhNI9JgFtvEPw089N
+         UYbOFx5VTWag5OH1iFPvoclYfF2NBOmMy/GfB9NSoqY+PbC+7AFcE2Ezimmq3JdbD2EF
+         fohcfUyTId9EDy8B9FLCxhR1cX6LfupoCROpFW6oAJZl57HyxKjpHnEX88k0IzU2F6Wl
+         ZXhA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1728325615; x=1728930415;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=pdFx6ym2O/WVquYBEObOAt6/7at4YjaHcsJ6skeJ8Po=;
+        b=ucijWPt4piVT7RCN+BcQ4X9FUUeubYHku/1WNnJWDmRGN6X823awmKN2rPoiVmgqis
+         9OyREMmyhvP4M+ss6X11Nbk4eMwRAqDqHoIxwBJ7CgjsCAwvsIISqWiq5pJEaPlvTEQG
+         EVRpZO9Q6VSFw5KEJihlkUBBPqCPLtIdKg/lPguwwfQylFNU2lGxyjl3ULQQ6QBOskXX
+         7Lwp5hWk6fTRSGdG4an1IRSvrOvJKYbSPin2OMpQS5CUPO5noSOZwlyG4B05sExPgQHg
+         wCRJnk9rI3+lIaUgXlathJN0tKBTUtFlaRH85HBUaeiLM2aA8cQvBJ57An3cUccv88Iv
+         ljCw==
+X-Forwarded-Encrypted: i=1; AJvYcCXPI9RlcJEPl0neCw17AOnYJrpKaj1To+tsaoHqdEhO2DkxafG82bezogBtuqKFqdri0i0=@lists.linux.dev
+X-Gm-Message-State: AOJu0YxRN9lz1xBkNEK4x1QpHHG5VgPpHxhiTtDu6J088w+I6MKgtGNC
+	+J5g5fEmb1O0mqfwGB4igs7V56Pa2CTV5l7xvoftZQb7DafHzwmp
+X-Google-Smtp-Source: AGHT+IHx1CUahCx+q0byn77c0Jh4KZ7FNqHlulH/CwEQRt/O8c5ArS21blyWHkkHT8eO2D55dtW2vA==
+X-Received: by 2002:a05:6808:11cc:b0:3e0:4260:7912 with SMTP id 5614622812f47-3e3db5d8d1emr295728b6e.19.1728325615338;
+        Mon, 07 Oct 2024 11:26:55 -0700 (PDT)
+Received: from [192.168.1.22] (syn-070-114-247-242.res.spectrum.com. [70.114.247.242])
+        by smtp.googlemail.com with ESMTPSA id 5614622812f47-3e3c9013386sm1561479b6e.13.2024.10.07.11.26.54
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 07 Oct 2024 11:26:54 -0700 (PDT)
+Message-ID: <74c0fb20-e8ca-4d90-9c9c-592d56d0cad9@gmail.com>
+Date: Mon, 7 Oct 2024 13:26:53 -0500
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/2] unit: add a test for harmless IE clones
+To: Vivek Das Mohapatra <vivek@collabora.com>, iwd@lists.linux.dev
+References: <6dbd0686-f054-4c16-bf84-0e383baefdc9@collabora.com>
+ <20241005021929.2075817-1-vivek@collabora.com>
+ <20241005021929.2075817-2-vivek@collabora.com>
+Content-Language: en-US
+From: Denis Kenzior <denkenz@gmail.com>
+In-Reply-To: <20241005021929.2075817-2-vivek@collabora.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Test handling of technically illegal but harmless cloned IEs.
-Based on real traffic captured from retail APs.
+Hi Vivek,
 
-As cloned IEs are now allowed the
+On 10/4/24 9:19 PM, Vivek Das Mohapatra wrote:
+> Test handling of technically illegal but harmless cloned IEs.
+> Based on real traffic captured from retail APs.
+> 
+> As cloned IEs are now allowed the
+> 
+>    "/IE order/Bad (Duplicate + Out of Order IE) 1"
+> 
+> test payload has been altered to be more-wrong so it still fails
+> verification as expected.
+> ---
+>   unit/test-mpdu.c | 84 +++++++++++++++++++++++++++++++++++++++++++++++-
+>   1 file changed, 83 insertions(+), 1 deletion(-)
+> 
 
-  "/IE order/Bad (Duplicate + Out of Order IE) 1"
+Applied, thanks.
 
-test payload has been altered to be more-wrong so it still fails
-verification as expected.
----
- unit/test-mpdu.c | 84 +++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 83 insertions(+), 1 deletion(-)
-
-diff --git a/unit/test-mpdu.c b/unit/test-mpdu.c
-index 89b5bb0a..416756e9 100644
---- a/unit/test-mpdu.c
-+++ b/unit/test-mpdu.c
-@@ -145,7 +145,7 @@ static const uint8_t probe_req_ie_duplicate1[] = {
- 	0x00, 0x00, 0x03, 0x00, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x50, 0x64,
- 	/* SSID, SSID, Supported Rates, Extended Supported Rates */
- 	0x00, 0x05, 0x74, 0x65, 0x73, 0x74, 0x31, 0x00, 0x05, 0x74, 0x65, 0x73,
--	0x74, 0x31, 0x01, 0x08, 0x02, 0x04, 0x0b, 0x16, 0x0c, 0x12, 0x18, 0x24,
-+	0x74, 0x32, 0x01, 0x08, 0x02, 0x04, 0x0b, 0x16, 0x0c, 0x12, 0x18, 0x24,
- 	0x32, 0x04, 0x30, 0x48, 0x60, 0x6c,
- };
- 
-@@ -168,6 +168,85 @@ static const struct test_frame_data probe_req_ie_out_of_order2_data = {
- 	probe_req_ie_out_of_order2, sizeof(probe_req_ie_out_of_order2), true
- };
- 
-+static const uint8_t assoc_rsp_ie_ooo_tolerated_dup[] = {
-+	/* Association Response Flags (24 bytes)*/
-+	0x10, 0x00, 0x24, 0x00, 0xe8, 0x8d, 0xa6, 0x77, 0xa7, 0x37, 0x0a, 0x58,
-+	0x28, 0x16, 0x65, 0x42, 0x0a, 0x58, 0x28, 0x16, 0x65, 0x42, 0x40, 0x14,
-+	/* Fixed Parameters (6 bytes) */
-+	0x31, 0x19, 0x00, 0x00, 0x08, 0xc0,
-+	/* Tagged parameters: 364 bytes */
-+	/* Support Rates [1] (10 bytes) */
-+	0x01, 0x08, 0x8c, 0x12, 0x98, 0x24, 0xb0, 0x48, 0x60, 0x6c,
-+	/* Vendor Specific [221] (12 bytes) */
-+	0xdd, 0x0a, 0x50, 0x6f, 0x9a, 0x1b, 0x06, 0x01, 0x20, 0x07, 0x01, 0x03,
-+	/* RM Enabled Capabilities [70] (7 bytes) */
-+	0x46, 0x05, 0x02, 0x00, 0x00, 0x00, 0x00,
-+	/* Vendor Specific [221] (26 bytes) */
-+	0xdd, 0x18, 0x00, 0x50, 0xf2, 0x02, 0x01, 0x01, 0x86, 0x00, 0x03, 0xa4,
-+	0x00, 0x00, 0x27, 0xa4, 0x00, 0x00, 0x42, 0x43, 0x5e, 0x00, 0x62, 0x32,
-+	0x2f, 0x00,
-+	/* HT Capabilities [45] (28 bytes) */
-+	0x2d, 0x1a, 0xef, 0x09, 0x03, 0xff, 0xff, 0xff, 0xff, 0x00, 0x00, 0x00,
-+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x18,
-+	0x04, 0x87, 0x19, 0x00,
-+	/* HT Information [61] (24 bytes)*/
-+	0x3d, 0x16, 0x24, 0x05, 0x06, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+	/* Vendor Specific [221] (32 bytes) */
-+	0xdd, 0x1e, 0x00, 0x90, 0x4c, 0x33, 0xef, 0x09, 0x03, 0xff, 0xff, 0xff,
-+	0xff, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+	0x00, 0x00, 0x00, 0x18, 0x04, 0x87, 0x19, 0x00,
-+	/* Vendor Specific [221] (28 bytes) */
-+	0xdd, 0x1a, 0x00, 0x90, 0x4c, 0x34, 0x24, 0x05, 0x06, 0x00, 0x00, 0x00,
-+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+	0x00, 0x00, 0x00, 0x00,
-+	/* BSS Max Idle Period [90] (5 bytes)*/
-+	0x5a, 0x03, 0xe0, 0x01, 0x00,
-+	/* VHT Capabilities [191] (14 bytes)*/
-+	0xbf, 0x0c, 0xf5, 0x39, 0xc3, 0x33, 0x9a, 0xff, 0x30, 0x0c, 0x9a, 0xff,
-+	0x30, 0x2c,
-+	/* VHT Operation [192] (7 bytes) */
-+	0xc0, 0x05, 0x01, 0x2a, 0x00, 0xfc, 0xff,
-+	/* Extended: HE Capabilities 80211ax/D3.0 [256 + 35] (38 bytes) */
-+	0xff, 0x24, 0x23, 0x05, 0x00, 0x08, 0x1a, 0x44, 0x10, 0x0c, 0x20, 0xce,
-+	0x92, 0x6f, 0x1b, 0xaf, 0xd4, 0x11, 0x0c, 0x00, 0xaa, 0xff, 0xaa, 0xff,
-+	0xaa, 0xff, 0xaa, 0xff, 0x3b, 0x1c, 0xc7, 0x71, 0x1c, 0xc7, 0x71, 0x1c,
-+	0xc7, 0x71,
-+	/* Extended: HE Operation 80211ax/D3.0 [256 + 36] (9 bytes) */
-+	0xff, 0x07, 0x24, 0xf4, 0x3f, 0x00, 0x17, 0xfc, 0xff,
-+	/* Extended: Spatial Reuse Parameter Set [256 + 39] (4 bytes) */
-+	0xff, 0x02, 0x27, 0x03,
-+	/* Extended: MU EDCA Parameter Set [256 + 38] (16 bytes) */
-+	0xff, 0x0e, 0x26, 0x06, 0x00, 0xff, 0x00, 0x20, 0xff, 0x00, 0x40, 0xff,
-+	0x00, 0x60, 0xff, 0x00,
-+	/* Extended Capabilities [127] (13 bytes) */
-+	0x7f, 0x0b, 0x00, 0x00, 0x08, 0x80, 0x00, 0x40, 0x00, 0x40, 0x00, 0x40,
-+	0x00,
-+	/* Vendor Specific [221] (9 bytes) */
-+	0xdd, 0x07, 0x00, 0x0c, 0x43, 0x00, 0x00, 0x00, 0x00,
-+	/* Vendor Specific [221] (35 bytes) */
-+	0xdd, 0x21, 0x00, 0x0c, 0xe7, 0x00, 0x00, 0x00, 0x00, 0xbf, 0x0c, 0xb1,
-+	0x01, 0xc0, 0x33, 0x2a, 0xff, 0x92, 0x04, 0x2a, 0xff, 0x92, 0x04, 0xc0,
-+	0x05, 0x00, 0x00, 0x00, 0x2a, 0xff, 0xc3, 0x03, 0x01, 0x02, 0x02,
-+	/* Vendor Specific [221] (9 bytes) */
-+	0xdd, 0x07, 0x50, 0x6f, 0x9a, 0x16, 0x01, 0x01, 0x00,
-+	/* RSN Extension [244] (3 bytes) */
-+	0xf4, 0x01, 0x20,
-+	/* Vendor Specific [221] (9 bytes) */ /* Legal duplicate IE */
-+	0xdd, 0x07, 0x50, 0x6f, 0x9a, 0x16, 0x01, 0x01, 0x00,
-+	/* FILS Indication [240] (4 bytes) */
-+	0xf0, 0x02, 0x00, 0x00,
-+	/* RSN Extension [244] (3 bytes) */ /* TECHNICALLY ILLEGAL cloned ie */
-+	0xf4, 0x01, 0x20,
-+	/* Vendor Specific [221] (19 bytes) */
-+	0xdd, 0x11, 0x00, 0x0c, 0xe7, 0x01, 0x00, 0x00, 0x00, 0x04, 0x08, 0x02,
-+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
-+};
-+
-+static const struct test_frame_data assoc_rsp_ie_ooo_tolerated_dup_data = {
-+	assoc_rsp_ie_ooo_tolerated_dup, sizeof(assoc_rsp_ie_ooo_tolerated_dup), true
-+};
-+
- static void ie_order_test(const void *data)
- {
- 	const struct test_frame_data *frame = data;
-@@ -227,6 +306,9 @@ int main(int argc, char *argv[])
- 	l_test_add("/IE order/Bad (Duplicate + Out of Order IE) 1",
- 				ie_order_test,
- 				&probe_req_ie_duplicate1_data);
-+	l_test_add("/IE order/Ugly (Duplicate + Out of Order IE) 2",
-+				ie_order_test,
-+				&assoc_rsp_ie_ooo_tolerated_dup_data);
- 	l_test_add("/IE order/Good (Out of Order IE) 2", ie_order_test,
- 				&probe_req_ie_out_of_order2_data);
- 
--- 
-2.30.2
+Regards,
+-Denis
 
