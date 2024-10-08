@@ -1,117 +1,94 @@
-Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oo1-f43.google.com (mail-oo1-f43.google.com [209.85.161.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A6F1132111
-	for <iwd@lists.linux.dev>; Mon,  7 Oct 2024 18:29:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 844BD1DF755
+	for <iwd@lists.linux.dev>; Tue,  8 Oct 2024 14:47:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728325752; cv=none; b=R/4TdSjt2MTCvQRwVHy5BhXwXublYjciTITIGKqO86e/i42uBBs7rFB1QNCEjMeE4OQ7thccRw1qx2br6cOkzUyms3hHfRhE/nQS9wdYhA3Bx/+mhy9I/92Owq54TkMIOnyDD3ZKUztNqjkztXFdGOuBhD5s8bnbQjXZYsTZ3DQ=
+	t=1728398839; cv=none; b=OT/xP16J73xmX9MM6SjeBq+22dv0vqeLapL439fvVKCEC680XtzuitU82NXaWEEyt5EBzotjoDkmIR+fbi0BvzW/4c0HhvFDdK30lUyGs+IQSPy5hZqLcjU58OYcwpnf7Ct84AUUYvflZMJ/gZQKipQ0PXzMAk1EkmlWZ5Ogpck=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728325752; c=relaxed/simple;
-	bh=2Rt0UBEz895OqVgljFZP1T1D7spYEUNiytyaKNW68do=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=BiroJ2fku2vDKRpkDIEm9fOq+bq8DIWM7amYamJnaINJBtS18iaEr0/u5zcta9s0EMcix26Hbn4I8ly110iJ8eER4dga6sT/Sn7ewZUyyC+1elvP+dpa8WbClq8g1XJFt4vY47k8EQ7RORfnDXVuzHDWsnuGB6mGHCCACPnANAo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=JdNA3e8a; arc=none smtp.client-ip=148.251.105.195
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
+	s=arc-20240116; t=1728398839; c=relaxed/simple;
+	bh=5+JIbc0aGejNnjSIkl3CtrXgnaUgu/m7XzlGwkfXRXY=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=QgO33qmvLWqhqnRgyMFzcPgxCKyrC2Fy7nlEGzSpkwMCRal7CPjatWNiuwW9iakUMcbFrr7nd/BUt6FQSqLSbwBeBR3qOrxO8mviccc6jArBbgf3XPKRUIo4BZ0viQn8GnAGGXCXz5FYPShSouGsw2jo3OioaR7odDNN83AZYBI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VHXUb0It; arc=none smtp.client-ip=209.85.161.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="JdNA3e8a"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
-	s=mail; t=1728325748;
-	bh=2Rt0UBEz895OqVgljFZP1T1D7spYEUNiytyaKNW68do=;
-	h=Date:Subject:To:References:From:In-Reply-To:From;
-	b=JdNA3e8agnU2eODBv0btKPY3qpstFly2FcnfuGocuU/9x4jzmkq4MLNnFynCmnP/E
-	 icf8sEcT55WZnWBfSQthlNX6mH2EIVYJjn4FkNWtNNTrfL8cwpVxvJbph6jGquUFF7
-	 cNErp1Xjmrerhm9mFB93jN36iKW8eUSHj7xsm3gOtbsbyWPc3jZx7WgOAGp1gj+zYz
-	 jQRvBKuiKvnIiglQRSaWPRsBOupUPknYjY8Icfle9xU0UOxASAHV2PcJWGNdxzd1zm
-	 UVjzXX7V9zcvqsq2HRyLVmDFu1zyGlvQGImUMStosBDFWQKOMRUlTLrxRB/0I1RJue
-	 gc/8rR+Hx0uSw==
-Received: from [IPV6:2001:4d48:ad5d:8e00::197] (unknown [IPv6:2001:4d48:ad5d:8e00::197])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: vivek)
-	by bali.collaboradmins.com (Postfix) with ESMTPSA id 562E217E3661;
-	Mon,  7 Oct 2024 20:29:08 +0200 (CEST)
-Message-ID: <7f7be9a7-e9b9-45db-9989-10a8aec626fb@collabora.com>
-Date: Mon, 7 Oct 2024 19:29:07 +0100
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VHXUb0It"
+Received: by mail-oo1-f43.google.com with SMTP id 006d021491bc7-5e7ffcd95c1so262178eaf.2
+        for <iwd@lists.linux.dev>; Tue, 08 Oct 2024 07:47:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1728398836; x=1729003636; darn=lists.linux.dev;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=3ms6aLNkcVmI+//WZvRwyi+JJbq574QW4iiKHGR+PlQ=;
+        b=VHXUb0It5/xDYVF9P/Zl2oLn87FaInT9u1D/4j6GRtsOBfYR7AF5HbF/zp1eufsS7T
+         pawdCcBhcINEj+XIeVioNJm3LBrtB/VXpr6kYM077IRYsprdIHGMpYGVLgWIjEY2MOCj
+         WaUunyGsxY/thTX/VWyGclzuXwNmVU/84UPmRZINHw7dNBs1V2Z9CqUQjqxCZ4SyDW7I
+         DZ+l5NnO+QSQLQhGkTOo27Oau/JEyk3tbTCxNb/6T9aT94HDkK9ZC4f17fUVDHpfdjFY
+         Z7rjXxSKRLz1MLY+RTG9SuQoUcxI3onS/oqcVzI/i81DoHQRFVAL5OCMDBVzPt0wGKAW
+         /i9g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1728398836; x=1729003636;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=3ms6aLNkcVmI+//WZvRwyi+JJbq574QW4iiKHGR+PlQ=;
+        b=GMNDWSQuF3JGNCoVs7hf1+DGD2j9BiZIU7foH7hixynGc+chlMOHISveWW3bNdE+it
+         7O58W1GYdloTcPBNtzzTPJT2wFnhpA7VstFx+YrIXhO017475X3jK6Xz+KlLuv/OkvKH
+         ZxW+8dQi1FGdM85efjerksdYr5pvnkRMdYCMN+U0jCPe8f2juq841UqkkZKCf33Ps+PY
+         ITZYSSA0nrkrpe3h1xvKkXt0ixtJztRW3NDGm+uKholis3fii8HuMiV+p8RNmo3VCE1p
+         YjPqScFV94tfmgSzCGU82X8QgtBbxLE30VukZJS1Y2PwbAJ7qgEPl6mzRx4D8iC/0ncH
+         j4mg==
+X-Gm-Message-State: AOJu0YzGwpR5uU+5tG0oQdijjpP22pD7UBqL7a64w1RA2deRJ9HU3KTQ
+	e67e+/cDgj05HQrTKKpMy45l5OMQT5DA1NKB86/ZDQvq9A0d9cEs8nRMbQ==
+X-Google-Smtp-Source: AGHT+IEc/guoiy1YTQZFYpvbt60DgE74WdTSm+ssAUYseoxs7G0NKyOA2OinUE8kJUmrn0trWp49tw==
+X-Received: by 2002:a05:6358:5923:b0:1b5:f81c:8768 with SMTP id e5c5f4694b2df-1c2b7f6f20bmr572433055d.9.1728398836212;
+        Tue, 08 Oct 2024 07:47:16 -0700 (PDT)
+Received: from LOCLAP699.locus-rst-dev-locuspark.locus ([152.193.78.90])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6cbc5ba842esm3326236d6.45.2024.10.08.07.47.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 08 Oct 2024 07:47:15 -0700 (PDT)
+From: James Prestwood <prestwoj@gmail.com>
+To: iwd@lists.linux.dev
+Cc: James Prestwood <prestwoj@gmail.com>
+Subject: [PATCH] band: add "GB" as a valid alpha2 code
+Date: Tue,  8 Oct 2024 07:47:12 -0700
+Message-Id: <20241008144712.403893-1-prestwoj@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 2/2] mpdu: tolerate technically illegal but harmless
- cloned IEs
-To: Denis Kenzior <denkenz@gmail.com>, iwd@lists.linux.dev
-References: <6dbd0686-f054-4c16-bf84-0e383baefdc9@collabora.com>
- <20241005021929.2075817-1-vivek@collabora.com>
- <20241005021929.2075817-3-vivek@collabora.com>
- <2852f1d4-c857-49d8-9356-ca0cbb914792@gmail.com>
-Content-Language: en-GB
-From: Vivek Das Mohapatra <vivek@collabora.com>
-Autocrypt: addr=vivek@collabora.com; keydata=
- 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 Rdk=
-Organization: Collabora
-In-Reply-To: <2852f1d4-c857-49d8-9356-ca0cbb914792@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-On 07/10/2024 19:27, Denis Kenzior wrote:
-> Hi Vivek,
-> 
-> On 10/4/24 9:19 PM, Vivek Das Mohapatra wrote:
->> ---
->>   src/ie.h   | 17 +++++++++++++++++
->>   src/mpdu.c | 10 +++++++++-
->>   2 files changed, 26 insertions(+), 1 deletion(-)
+The "UK" alpha2 code is not the official code for the United Kingdom
+but is a "reserved" code for compatibility. The official alpha2 is
+"GB" which is being added to the EU list. This fixes issues parsing
+neighbor reports, for example:
 
-[cut]
+src/station.c:parse_neighbor_report() Neighbor report received for xx:xx:xx:xx:xx:xx: ch 136 (oper class 3), MD not set
+Failed to find band with country string 'GB 32' and oper class 3, trying fallback
+src/station.c:station_add_neighbor_report_freqs() Ignored: unsupported oper class
+---
+ src/band.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-> 
-> No need for {}.  I took these out and applied.  Thanks.
-
-Thanks! I wasn't sure what the house style would be there.
-
+diff --git a/src/band.c b/src/band.c
+index 6891d06c..14daeb37 100644
+--- a/src/band.c
++++ b/src/band.c
+@@ -1426,7 +1426,7 @@ static const char *const oper_class_eu_codes[] = {
+ 	"AL", "AM", "AT", "AZ", "BA", "BE", "BG", "BY", "CH", "CY", "CZ", "DE",
+ 	"DK", "EE", "EL", "ES", "FI", "FR", "GE", "HR", "HU", "IE", "IS", "IT",
+ 	"LI", "LT", "LU", "LV", "MD", "ME", "MK", "MT", "NL", "NO", "PL", "PT",
+-	"RO", "RS", "RU", "SE", "SI", "SK", "TR", "UA", "UK"
++	"RO", "RS", "RU", "SE", "SI", "SK", "TR", "UA", "UK", "GB"
+ };
+ 
+ /* Annex E, table E-1 */
+-- 
+2.34.1
 
