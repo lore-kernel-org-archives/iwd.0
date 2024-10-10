@@ -1,196 +1,100 @@
-Received: from mail-pj1-f46.google.com (mail-pj1-f46.google.com [209.85.216.46])
+Received: from mail-qk1-f180.google.com (mail-qk1-f180.google.com [209.85.222.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A2E3136E23
-	for <iwd@lists.linux.dev>; Thu, 10 Oct 2024 15:38:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05651188CAD
+	for <iwd@lists.linux.dev>; Thu, 10 Oct 2024 15:40:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728574701; cv=none; b=NDJMCcJfDrLje8QhJwCVag9qp0wp1gc0F0u8zTSK6xyF76BUvpB314vFGQR9wFB4Jc5+AriGHj95jK3PFmxX9vEuNrrWV+ohTyjAfpirxPraW+PnT1ZSvqKCG0MoTg7NcO/I/OufSpjFX6ZHhe97IpYRKKdqZkn7xus3Btd+nLE=
+	t=1728574829; cv=none; b=Up2a+WHW8E/Z1/PKoBoc8qSoIw7LEW1ay4As4OxZPPNxuEISGEhgwvpNHHJv+l9C4flXPIqK5OFrMwWg0WmWz+GqxZVcUjBTumVfyhcg0+c/xKpe7yLk7zRzGq/VrQTNBbBYFe+sGxu8/LIREIhC5Q5/OmikG4XQVxm2Jl4Mws8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728574701; c=relaxed/simple;
-	bh=Bzn8ghQPvnosu3MOqlTdTgWHQyBMFxvBZSNzloc4sfs=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=lheKPHLiiRBpUFi4UTNz42AAG+ihepBK0CP6wP79AoCb+Wyx6EK92DoChOP0pfiOK8GFM/P/+HBWoJLTREDzhfohlX8MUD6aOKBvpetgS9CEsCRYlSV6Q4Cel7jLSyzIx/A7/2LWTr624Z0ZpQT6KGzcdLSqXj+Hxj+QNzIpXnk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=f3WKMBPO; arc=none smtp.client-ip=209.85.216.46
+	s=arc-20240116; t=1728574829; c=relaxed/simple;
+	bh=FTrXISFVYgAJu6K/pPtpXe7PX4/hKLOG08KSAqHyXyc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=EDTRzN3GDOk6sJXT+y6UkjEZoW+roRIyGYxQSk8upYCD6lluKDI4pQnHeVqaJjNC79e7j4E+Zq9jwKAIMFJAwEjm5K6IZ5s52nBo/FYNbIQGHWyCrd22/Gzyh0UQWsaFDhzJt4Q5B5RAiKWIanS1KWT2dAHnXiEF5Viutaq59wA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SRIMhsnc; arc=none smtp.client-ip=209.85.222.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="f3WKMBPO"
-Received: by mail-pj1-f46.google.com with SMTP id 98e67ed59e1d1-2e2bb1efe78so758587a91.1
-        for <iwd@lists.linux.dev>; Thu, 10 Oct 2024 08:38:20 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SRIMhsnc"
+Received: by mail-qk1-f180.google.com with SMTP id af79cd13be357-7afe994d519so89734285a.0
+        for <iwd@lists.linux.dev>; Thu, 10 Oct 2024 08:40:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1728574699; x=1729179499; darn=lists.linux.dev;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=alfKCq8gtDrjEWuXUGopQQqUqnGFbqNI1PkfRRufpyc=;
-        b=f3WKMBPOVJo+7K1SDHzaEG01fG6FjXxIk5kmzWQhdaYnx4B0Np0WsehDuJkEs7zB9L
-         2daG/20Cstr6tvaXtRYys345kUVJPswK7vke4UEaqde3KhZTLVoTxCtfalKMqInMqzqx
-         cmDaUA80/NKZ4Jib4qpfnvFYs4tAfIrTD4/kJq5/qmB8DV61gDaNCkVGIlVR3WBrnKpq
-         IYPtHWRmBbeD6YjD3aNYYbEMcvTSWabgehdWhCUZBzDARiyKt0TPiLvSsR6Epo7g19V2
-         x4i+wo0Pypscjy3/4f9+OBxD+cpZvndFSKkfHc/z+UHQE5m9n0xSZtxPw3Ia9kYjp3al
-         1JIg==
+        d=gmail.com; s=20230601; t=1728574827; x=1729179627; darn=lists.linux.dev;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:to:subject:user-agent:mime-version:date:message-id:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=LlZWXEMnEf+tslJvrnVW76DwqH9kMrTjpe4vLK8ax1c=;
+        b=SRIMhsnczqPm2xapnwBaz+nBDZJeibo5tEpxfR9os9/cStHWtGosQIbs59S4YF/Rep
+         9QtuUJ4DAi1QxfoGHXZjrQw513pIios0Q55ubaADToKYPSTTg1F196Ucd5kJ7lqI9t6u
+         yix7dIfu0LRhaZY0/sm3v6vE/2fTfoAXFVxKmAs4GgniuTvZN/C+yFdPpzoaqNWbWW4s
+         +cEtRU6JFuIWoHM6Cy1H8Z1f6dQHUkTMBHmqSjQueZVLDMFXLhL70VkmuWecTRB9kve0
+         eE6pfpHmgdd2uHXNDaFkpIPKC84F+R1HMa0rKbrFnMJayEq+9WKOUhZUrJYSYk29VgyB
+         2Oiw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728574699; x=1729179499;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=alfKCq8gtDrjEWuXUGopQQqUqnGFbqNI1PkfRRufpyc=;
-        b=E6+gapGR3L9SOpkLTsDnzYYltl/hUVk9rmkSQ0nnLeJzVL6MiCHsMaWxH0S4VHAU54
-         bvqaqMF22aGtHbbgU9p4taxthOba0W3DILpiXrFKyD0LPKVDGOexBh5pQX5Hm1J6ucZ4
-         w365lMdzgpQprx2bMF1TIff8SfzCJBz/XpPfzSlWQjhpOMukznRWRsYr7i06dcke0A5o
-         YmK5f9qksJjyXJqXijK+FQzV/Hwd9e07paNxhHKWCX9BQLkEm5vzDzZTexYKjPKzL7Q1
-         3Qq6owZZRvwPI1rWC4MkNrAef6zNieIAW2EVVbkpvM6HM5Tq0ssv030+QPRVv+U9x2vK
-         E+6g==
-X-Forwarded-Encrypted: i=1; AJvYcCV301XKIP+jf34JB63t+ssO1Y/gRMiVIxyTQ+G8XCxgepbA4DhWv1HzDdQXZLghbYsuYOg=@lists.linux.dev
-X-Gm-Message-State: AOJu0YzJQWw2ZASuNdpmyFecx4dLtERYrtuH60m6AbzvAQCYyeW2SwRE
-	Vf/mFeSi7VEznn+EuB/NLiwCrKn5/n3So3HufckElGOGIPNsqU5Gg7UF3+gQqJW2JbGieBkMdkH
-	BYwyzQQxtfDeVAVmmdy6QhtTqlss=
-X-Google-Smtp-Source: AGHT+IE9QnEu/8yQmh9rdCQ8YUZxUClxjQPng8MXtugBeyiOpCE811UjKNF+ec1knDZFhkhbN0qhjwXCotF2GTNBIUs=
-X-Received: by 2002:a17:90a:2dcc:b0:2e2:8f4d:45a with SMTP id
- 98e67ed59e1d1-2e2c81ba3c8mr5753355a91.13.1728574699404; Thu, 10 Oct 2024
- 08:38:19 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1728574827; x=1729179627;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=LlZWXEMnEf+tslJvrnVW76DwqH9kMrTjpe4vLK8ax1c=;
+        b=RE0SO6tylbA3W+uh+yde5k4YaUy42Y0KP29RFrVRM/ejuqkhduEkhphcNT3x4u/G4m
+         M0cY1frpfXxO7Vjj0yqgqC2IK+17Bd5fpBB4qiZxBtcpzFn5WYe4d5l+vNc8lFxdaUYk
+         0XNU5vkkmJcBtrQVHMhNQhBNXs7mhPOQJE51N7pJeHdWP/3HqCZInO9q6z6OensB68Xz
+         HFVJFHqvAYJzEJj8K1aNGXxNpiKs5i+kDB57+S1sOlhkwHdAFKp1H+tUTpiEsgeQ01AX
+         FdHB4Q6so0cwAWiKsXthRbXYjU0P+09oD1T3JuyfDwpBcCnTy8tlqX+J0NR+6k6ptVg8
+         XD+g==
+X-Forwarded-Encrypted: i=1; AJvYcCWrKm8ExOoX0YuwGWiJrwQnxc9V0Aeq2b6dDYheYFzsZEHdFu+GGgu4bq/a3mbGLEb8a8k=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yx8oSU51T2ve7QRlMi2XlYNWQg5S/BAjBuVq79k4FTh2UblpLis
+	jUCHvIb7b0qYDexh+08vSNCprGEFEROV0em1HhengYAOhvAkpOY0
+X-Google-Smtp-Source: AGHT+IEV05rAJMGS975F1ZfyNir2jpHDfQ8NivWstzphbfyM+RkOD+Az9p+tc3APcLpM8jPljanrKQ==
+X-Received: by 2002:a05:620a:40c5:b0:7a9:acd5:1b21 with SMTP id af79cd13be357-7b0795475edmr1090956785a.50.1728574826815;
+        Thu, 10 Oct 2024 08:40:26 -0700 (PDT)
+Received: from [10.100.121.195] ([152.193.78.90])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7b1148c7102sm56141485a.24.2024.10.10.08.40.25
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 10 Oct 2024 08:40:26 -0700 (PDT)
+Message-ID: <45d6f549-a28a-4779-bd87-62610c14251a@gmail.com>
+Date: Thu, 10 Oct 2024 08:40:24 -0700
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20240823174220.498594-1-denkenz@gmail.com> <20240921185902.170612-1-yshuiv7@gmail.com>
- <ba78a253-de77-4427-85c3-d876ef9fdd8a@gmail.com> <1921859cb98.279b.9b12b7fc0a3841636cfb5e919b41b954@broadcom.com>
- <CAG17S_PAm0NsA+oRho5Qt-Y8MowB4nkeOnugzaE==pWLSpGYpg@mail.gmail.com>
- <1921a891f18.279b.9b12b7fc0a3841636cfb5e919b41b954@broadcom.com> <CAG17S_O1njCdiFaWUSh8N11DhiRBKhvnigCpLiNfkCp+JwuGJA@mail.gmail.com>
-In-Reply-To: <CAG17S_O1njCdiFaWUSh8N11DhiRBKhvnigCpLiNfkCp+JwuGJA@mail.gmail.com>
-From: KeithG <ys3al35l@gmail.com>
-Date: Thu, 10 Oct 2024 10:38:07 -0500
-Message-ID: <CAG17S_MVSrnyz_ctW8CU1HMvkzcU2ZYOzpTjKXzXESaSmzeEAw@mail.gmail.com>
-Subject: Re: [RFC PATCH v1 0/2] External Auth support
-To: Arend Van Spriel <arend.vanspriel@broadcom.com>
-Cc: Denis Kenzior <denkenz@gmail.com>, Yuxuan Shui <yshuiv7@gmail.com>, iwd@lists.linux.dev, 
-	prestwoj@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: AW: IWD 2.20 does not support Fast Roaming with NXP 88W9098
+ chipset
+To: Denis Kenzior <denkenz@gmail.com>, Dierk.Modrow@sew-eurodrive.de,
+ iwd@lists.linux.dev
+References: <5c65040719764a49a48846ea11c535a7@sew-eurodrive.de>
+ <c477b2d9-dcc7-4ea7-a6b1-47f6f84e4736@gmail.com>
+ <37712a7a-4e4b-413e-b458-ccd079edfe13@gmail.com>
+Content-Language: en-US
+From: James Prestwood <prestwoj@gmail.com>
+In-Reply-To: <37712a7a-4e4b-413e-b458-ccd079edfe13@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-Arend,
-
-Is there anything I can help with on this effort to get External Auth
-working on a kernel that more of us are using? RPiOS is currently at
-6.6.51.
-
-Keith
-
-On Sun, Sep 22, 2024 at 11:29=E2=80=AFAM KeithG <ys3al35l@gmail.com> wrote:
+On 10/10/24 8:32 AM, Denis Kenzior wrote:
+> Hi James,
 >
-> On Sun, Sep 22, 2024 at 11:20=E2=80=AFAM Arend Van Spriel
-> <arend.vanspriel@broadcom.com> wrote:
-> >
-> > On September 22, 2024 5:36:53 PM KeithG <ys3al35l@gmail.com> wrote:
-> >
-> > > On Sun, Sep 22, 2024 at 1:09=E2=80=AFAM Arend Van Spriel
-> > > <arend.vanspriel@broadcom.com> wrote:
-> > >>
-> > >> On September 22, 2024 5:35:03 AM Denis Kenzior <denkenz@gmail.com> w=
-rote:
-> > >>
-> > >>> Hi Yuxuan Shui,
-> > >>>
-> > >>>>
-> > >>>> I tested this on an RPi5 too, and indeed I am having the same prob=
-lem as KeithG
-> > >>>> as well. However I managed to get some debug information from brcm=
-fmac when
-> > >>>> running wpa_supplicant. Interestingly wpa_supplicant gets the same=
- -52 error as
-> > >>>> well, which it reports as an authentication timeout. But if I ask =
-it to try
-> > >>>> again, it will connect successfully, and there is no external auth=
- related log
-> > >>>> the second time around.
-> > >>>
-> > >>> Yep.  It looks like wpa_s puts the resulting PMKSA into the kernel =
-cache even
-> > >>> though the initial connection using external auth fails.  I've only=
- seen
-> > >>> 2.10 do
-> > >>> this, not 2.11.  Either way, it is a bug / lucky coincidence.
-> > >>>
-> > >>>>
-> > >>>> So I suspect this is a firmware bug, but it should be relatively e=
-asy to
-> > >>>> workaround I think? Basically we also add a timeout and retry.
-> > >>>
-> > >>> It would be far nicer if the brcmfmac firmware + driver combination=
- worked
-> > >>> properly :)
-> > >>
-> > >> Indeed it would. So what's in the mix? What kernel is used? Upstream=
- or RPi
-> > >> kernel? What firmware capabilities are listed in debugfs?
-> > >>
-> > >> Recently I submitted patches upstream to add external auth support. =
-As I
-> > >> ported downstream patch the results you see do not make me optimisti=
-c that
-> > >> my patch is ready. Maybe you could help testing it?
-> > >>
-> > >> https://patchwork.kernel.org/project/linux-wireless/list/?series=3D8=
-91248&state=3D*
-> > >>
-> > >> Regards,
-> > >> Arend
-> > > Arend,
-> > >
-> > > I tried to apply the patch set to kernel 6.6.44-v8 and was unable to =
-patch it:
-> > >
-> > > $ patch -p1 <
-> > > RFT-v2-1-3-wifi-brcmfmac-support-per-vendor-cfg80211-callbacks-and-fi=
-rmware-events.patch
-> > > patching file drivers/net/wireless/broadcom/brcm80211/brcmfmac/cfg802=
-11.c
-> > > Hunk #1 FAILED at 6752.
-> > > 1 out of 1 hunk FAILED -- saving rejects to file
-> > > drivers/net/wireless/broadcom/brcm80211/brcmfmac/cfg80211.c.rej
-> > > patching file drivers/net/wireless/broadcom/brcm80211/brcmfmac/common=
-.c
-> > > Hunk #1 succeeded at 524 (offset 33 lines).
-> > > patching file drivers/net/wireless/broadcom/brcm80211/brcmfmac/core.c
-> > > Hunk #1 FAILED at 1359.
-> > > 1 out of 1 hunk FAILED -- saving rejects to file
-> > > drivers/net/wireless/broadcom/brcm80211/brcmfmac/core.c.rej
-> > > patching file drivers/net/wireless/broadcom/brcm80211/brcmfmac/fweh.c
-> > > Hunk #1 succeeded at 74 (offset -1 lines).
-> > > Hunk #2 succeeded at 336 (offset -70 lines).
-> > > patching file drivers/net/wireless/broadcom/brcm80211/brcmfmac/fwvid.=
-h
-> > > Hunk #1 FAILED at 15.
-> > > Hunk #2 succeeded at 47 with fuzz 1 (offset -9 lines).
-> > > 1 out of 2 hunks FAILED -- saving rejects to file
-> > > drivers/net/wireless/broadcom/brcm80211/brcmfmac/fwvid.h.rej
-> > >
-> > > I did not try the other patches as this attempt failed. Do I need to
-> > > use a newer kernel? The latest kernel from RPiOS is 6.6.47.
-> >
-> > I did major rework to support multiple vendors with differing firmware
-> > APIs. So I can imagine you would need other patches that were submitted
-> > earlier. Easiest would be to use the backports project which allows run=
-ning
-> > latest driver like wireless-next on older kernels.
-> >
-> > I can try. Do you have a URL of the RPiOS kernel repo?
-> >
-> > Regards,
-> > Arend
-> > > Keith
-> >
-> >
+> On 10/10/24 9:23 AM, James Prestwood wrote:
+>> Hi Dierk,
+>>
+>> On 10/10/24 6:49 AM, Dierk.Modrow@sew-eurodrive.de wrote:
+>>> Hello James,
+>>>
+>>> we tried to implement 802.11r roaming with IWD 2.20 using a NXP 
+>>> 88W9098 chipset from H&D Wireless as client (using out of kernel 
+>>> tree driver of NXP moal/mlan -> FULLMAC) and failed.
+>> Are you sure its a fullmac card?
 >
-> Arend,
-> It is either here as a git clone:
-> git clone --depth=3D1 https://github.com/raspberrypi/linux
+> It is.  But they're likely doing something similar to this:
+> https://lore.kernel.org/all/20240704033001.603419-2-yu-hao.lin@nxp.com/
+Ugh, they just can't fully commit to being a "normal" driver, can they.
 >
-> or here as a gzip:
-> https://github.com/raspberrypi/linux/archive/refs/tags/stable_20240529.ta=
-r.gz
+> Perhaps the Marvell / NXP maintainers can be convinced to add support 
+> for CMD_FRAME path as well.
 >
-> Keith
+> Regards,
+> -Denis
+>
