@@ -1,100 +1,153 @@
-Received: from mail-qk1-f180.google.com (mail-qk1-f180.google.com [209.85.222.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mout-b-210.mailbox.org (mout-b-210.mailbox.org [195.10.208.40])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05651188CAD
-	for <iwd@lists.linux.dev>; Thu, 10 Oct 2024 15:40:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76EA6209F3B
+	for <iwd@lists.linux.dev>; Fri, 11 Oct 2024 08:42:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.10.208.40
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728574829; cv=none; b=Up2a+WHW8E/Z1/PKoBoc8qSoIw7LEW1ay4As4OxZPPNxuEISGEhgwvpNHHJv+l9C4flXPIqK5OFrMwWg0WmWz+GqxZVcUjBTumVfyhcg0+c/xKpe7yLk7zRzGq/VrQTNBbBYFe+sGxu8/LIREIhC5Q5/OmikG4XQVxm2Jl4Mws8=
+	t=1728636132; cv=none; b=D7BP1jzaE5AWz1psw8IWB+N45NW0LgCoDFsz/PK4ZpMD8N5Q8dxRWf7EYkjk69Pfk8agzliBjx2gOEBlgFY1EwoH6IeKZ2t92FCqeCqnvV/TKBuRtVQlVOxgedyS5rt1TV5nfT3I9FHP6FxsVfQZva5E4Xq2SHTPoFwY8kKgg5o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728574829; c=relaxed/simple;
-	bh=FTrXISFVYgAJu6K/pPtpXe7PX4/hKLOG08KSAqHyXyc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=EDTRzN3GDOk6sJXT+y6UkjEZoW+roRIyGYxQSk8upYCD6lluKDI4pQnHeVqaJjNC79e7j4E+Zq9jwKAIMFJAwEjm5K6IZ5s52nBo/FYNbIQGHWyCrd22/Gzyh0UQWsaFDhzJt4Q5B5RAiKWIanS1KWT2dAHnXiEF5Viutaq59wA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SRIMhsnc; arc=none smtp.client-ip=209.85.222.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1728636132; c=relaxed/simple;
+	bh=4DLpiyp1nYGFLeoI84d9JXXQ9szksdmtxzeNczeXObw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=LibLwlSHlpv740fBHllql1byBQAukTD4ubr1WDONrMzlq4AsZY2CZfdopRku1QG54jXMnYVIHbKQs/xP5yO99ggkCit1Z4qplF2j82fT0IP4roomovuvavjCwZ7RelUhL7Es5YqPoHV1dBN3amaXvSe1tMDF/t6bs4En3ukTG2Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tavla.de; spf=pass smtp.mailfrom=tavla.de; dkim=pass (2048-bit key) header.d=tavla.de header.i=@tavla.de header.b=jsaT0ZJD; arc=none smtp.client-ip=195.10.208.40
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tavla.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tavla.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SRIMhsnc"
-Received: by mail-qk1-f180.google.com with SMTP id af79cd13be357-7afe994d519so89734285a.0
-        for <iwd@lists.linux.dev>; Thu, 10 Oct 2024 08:40:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1728574827; x=1729179627; darn=lists.linux.dev;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=LlZWXEMnEf+tslJvrnVW76DwqH9kMrTjpe4vLK8ax1c=;
-        b=SRIMhsnczqPm2xapnwBaz+nBDZJeibo5tEpxfR9os9/cStHWtGosQIbs59S4YF/Rep
-         9QtuUJ4DAi1QxfoGHXZjrQw513pIios0Q55ubaADToKYPSTTg1F196Ucd5kJ7lqI9t6u
-         yix7dIfu0LRhaZY0/sm3v6vE/2fTfoAXFVxKmAs4GgniuTvZN/C+yFdPpzoaqNWbWW4s
-         +cEtRU6JFuIWoHM6Cy1H8Z1f6dQHUkTMBHmqSjQueZVLDMFXLhL70VkmuWecTRB9kve0
-         eE6pfpHmgdd2uHXNDaFkpIPKC84F+R1HMa0rKbrFnMJayEq+9WKOUhZUrJYSYk29VgyB
-         2Oiw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728574827; x=1729179627;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=LlZWXEMnEf+tslJvrnVW76DwqH9kMrTjpe4vLK8ax1c=;
-        b=RE0SO6tylbA3W+uh+yde5k4YaUy42Y0KP29RFrVRM/ejuqkhduEkhphcNT3x4u/G4m
-         M0cY1frpfXxO7Vjj0yqgqC2IK+17Bd5fpBB4qiZxBtcpzFn5WYe4d5l+vNc8lFxdaUYk
-         0XNU5vkkmJcBtrQVHMhNQhBNXs7mhPOQJE51N7pJeHdWP/3HqCZInO9q6z6OensB68Xz
-         HFVJFHqvAYJzEJj8K1aNGXxNpiKs5i+kDB57+S1sOlhkwHdAFKp1H+tUTpiEsgeQ01AX
-         FdHB4Q6so0cwAWiKsXthRbXYjU0P+09oD1T3JuyfDwpBcCnTy8tlqX+J0NR+6k6ptVg8
-         XD+g==
-X-Forwarded-Encrypted: i=1; AJvYcCWrKm8ExOoX0YuwGWiJrwQnxc9V0Aeq2b6dDYheYFzsZEHdFu+GGgu4bq/a3mbGLEb8a8k=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yx8oSU51T2ve7QRlMi2XlYNWQg5S/BAjBuVq79k4FTh2UblpLis
-	jUCHvIb7b0qYDexh+08vSNCprGEFEROV0em1HhengYAOhvAkpOY0
-X-Google-Smtp-Source: AGHT+IEV05rAJMGS975F1ZfyNir2jpHDfQ8NivWstzphbfyM+RkOD+Az9p+tc3APcLpM8jPljanrKQ==
-X-Received: by 2002:a05:620a:40c5:b0:7a9:acd5:1b21 with SMTP id af79cd13be357-7b0795475edmr1090956785a.50.1728574826815;
-        Thu, 10 Oct 2024 08:40:26 -0700 (PDT)
-Received: from [10.100.121.195] ([152.193.78.90])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7b1148c7102sm56141485a.24.2024.10.10.08.40.25
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 10 Oct 2024 08:40:26 -0700 (PDT)
-Message-ID: <45d6f549-a28a-4779-bd87-62610c14251a@gmail.com>
-Date: Thu, 10 Oct 2024 08:40:24 -0700
+	dkim=pass (2048-bit key) header.d=tavla.de header.i=@tavla.de header.b="jsaT0ZJD"
+Received: from smtp102.mailbox.org (smtp102.mailbox.org [IPv6:2001:67c:2050:b231:465::102])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mout-b-210.mailbox.org (Postfix) with ESMTPS id 4XQ0MN4ChRzDv6p;
+	Fri, 11 Oct 2024 10:36:00 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tavla.de; s=MBO0001;
+	t=1728635760;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=VxmHGPhE9kHBsi1iFyNsy9I2+3zVzxCDhLMcbma0CAY=;
+	b=jsaT0ZJD5F8/nu2Uk/LOr9MJxLmme7SezueLaV39LA7gIsDxw9CzB8uA1T1mPkcHvEnJGz
+	3/zM90I643bHT7YS1wTGlB7RYKSVbVa7EKlo9zKA8eiqsoJ6rT4mxwrfti1zdFD3hwa8MD
+	i2h3pauKuVkqSBZ60LOlipYN/OdDp6Iye3LQRfXceWgkBVjzB7Uqg3a/4ZUY62yALXP2vW
+	XGTQRveZui2sj9JPGMe8JHyCI2p7/5QGjFyQ3+X+n/DVVcoHwQZbFQR3IJATQlzR/T5cbK
+	+u2g+8p6PigxHLeHxs4Y9bsPqh62JzoxWN3FHeuM4EPqwaZpkCYnUW9vVlXlcA==
+Message-ID: <5ab61b3b-1b31-42e2-8b3b-9c96acfd3c1a@tavla.de>
+Date: Fri, 11 Oct 2024 10:35:59 +0200
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: AW: IWD 2.20 does not support Fast Roaming with NXP 88W9098
- chipset
-To: Denis Kenzior <denkenz@gmail.com>, Dierk.Modrow@sew-eurodrive.de,
- iwd@lists.linux.dev
-References: <5c65040719764a49a48846ea11c535a7@sew-eurodrive.de>
- <c477b2d9-dcc7-4ea7-a6b1-47f6f84e4736@gmail.com>
- <37712a7a-4e4b-413e-b458-ccd079edfe13@gmail.com>
-Content-Language: en-US
-From: James Prestwood <prestwoj@gmail.com>
-In-Reply-To: <37712a7a-4e4b-413e-b458-ccd079edfe13@gmail.com>
+Subject: Re: IWD 1.27 with brcmfmac not working for roaming
+To: James Prestwood <prestwoj@gmail.com>
+Cc: "iwd@lists.linux.dev" <iwd@lists.linux.dev>,
+ Denis Kenzior <denkenz@gmail.com>
+References: <a99e0ef1-8f97-4c1d-9aa5-5a07c87782a5@tavla.de>
+ <d91f33df-e9d7-430a-b1ca-13cd1dee973a@gmail.com>
+ <74af8f9e-b5dc-41be-998c-45bdd5958bbd@tavla.de>
+ <154ebbba-2a3b-4f65-8b21-41dcc93d2107@gmail.com>
+ <1fcf76fd-85ab-4a31-8aaf-9d6922ab3a97@tavla.de>
+ <b6f570d9-c14d-4e71-87a7-3e7d2c2fd6ca@gmail.com>
+Content-Language: en-GB, de-DE
+From: Martin Petzold <martin.petzold@tavla.de>
+Organization: TAVLA Technology GmbH
+In-Reply-To: <b6f570d9-c14d-4e71-87a7-3e7d2c2fd6ca@gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: 4XQ0MN4ChRzDv6p
 
-On 10/10/24 8:32 AM, Denis Kenzior wrote:
-> Hi James,
+Hi James,
+
+Am 10.10.24 um 15:55 schrieb James Prestwood:
+> Hi Martin,
 >
-> On 10/10/24 9:23 AM, James Prestwood wrote:
->> Hi Dierk,
+> On 10/10/24 6:47 AM, Martin Petzold wrote:
+>> Hi James,
 >>
->> On 10/10/24 6:49 AM, Dierk.Modrow@sew-eurodrive.de wrote:
->>> Hello James,
+>> Am 10.10.24 um 15:36 schrieb James Prestwood:
 >>>
->>> we tried to implement 802.11r roaming with IWD 2.20 using a NXP 
->>> 88W9098 chipset from H&D Wireless as client (using out of kernel 
->>> tree driver of NXP moal/mlan -> FULLMAC) and failed.
->> Are you sure its a fullmac card?
+>>> On 10/10/24 6:20 AM, Martin Petzold wrote:
+>>>> Hi Denis,
+>>>>
+>>>> Am 09.10.24 um 18:07 schrieb Denis Kenzior:
+>>>>> [...]
+>>>>>
+>>>>>> 3. Build IWD 2.22 from source (maybe using Debian sid source 
+>>>>>> package?) -> how to do best and will this work with libc6 version 
+>>>>>> 2.36? Missing libreadline8t64?
+>>>>>
+>>>>> I mean this is your only real solution.  There is no 'long term 
+>>>>> support' model for iwd.  You either run the latest or you're on 
+>>>>> your own.  It is highly unlikely that any of the developers will 
+>>>>> look at logs (or attempt to fix) anything but the latest version.
+>>>>>
+>>>>>
+>>>> Why does the following build fail. I did not install 
+>>>> 'python-docutils' package because is is not available for Debian 
+>>>> bookworm (only a source package). How should I proceed? Maybe the 
+>>>> documentation should be fixed then for Debian bookworm.
+>>> You need to use an updated version of ELL. IWD and ELL get released 
+>>> in tandem in case of any API/behavior changes. 
+>>
+>> I used for both git HEAD repository (how can I get both in line?):
 >
-> It is.  But they're likely doing something similar to this:
-> https://lore.kernel.org/all/20240704033001.603419-2-yu-hao.lin@nxp.com/
-Ugh, they just can't fully commit to being a "normal" driver, can they.
->
-> Perhaps the Marvell / NXP maintainers can be convinced to add support 
-> for CMD_FRAME path as well.
->
-> Regards,
-> -Denis
->
+> Sorry, I just glanced over the error and assumed incorrectly. It looks 
+> like -Werror isn't enabled (?) so that warning should be fine. But the 
+> issue, as you said, is docs related. You could try to configure with 
+> --disable-manual-pages
+
+That helps, thanks. Maybe should be added to the documentation.
+
+Now using a cross-build make install does not respect my 
+"--prefix=/scratch/root/usr" for installation of files to "share". It 
+should install to "/scratch/root/usr/share/dbus-1/system-services". 
+Already searching for the correct parameters. But maybe you know why and 
+maybe also should be added to the documentation?
+
+2024/10/10 18:47:08 iwd 'development' 'amd64' | + ./configure 
+--prefix=/scratch/root/usr --localstatedir=/var --sysconfdir=/etc 
+--disable-manual-pages
+2024/10/10 18:47:10 iwd 'development' 'amd64' | checking for a 
+BSD-compatible install... /usr/bin/install -c
+[...]
+2024/10/10 18:53:00 iwd 'development' 'amd64' |   CC 
+tools/iwd-decrypt-profile.o
+2024/10/10 18:53:01 iwd 'development' 'amd64' |   CCLD 
+tools/iwd-decrypt-profile
+2024/10/10 18:53:03 iwd 'development' 'amd64' | + make install
+2024/10/10 18:53:03 iwd 'development' 'amd64' | make 
+--no-print-directory install-am
+2024/10/10 18:53:04 iwd 'development' 'amd64' |  /usr/bin/mkdir -p 
+'/scratch/root/usr/bin'
+2024/10/10 18:53:04 iwd 'development' 'amd64' |   /bin/bash ./libtool   
+--mode=install /usr/bin/install -c client/iwctl monitor/iwmon 
+'/scratch/root/usr/bin'
+2024/10/10 18:53:04 iwd 'development' 'amd64' | libtool: install: 
+/usr/bin/install -c client/iwctl /scratch/root/usr/bin/iwctl
+2024/10/10 18:53:04 iwd 'development' 'amd64' | libtool: install: 
+/usr/bin/install -c monitor/iwmon /scratch/root/usr/bin/iwmon
+2024/10/10 18:53:04 iwd 'development' 'amd64' |  /usr/bin/mkdir -p 
+'/scratch/root/usr/libexec'
+2024/10/10 18:53:04 iwd 'development' 'amd64' |   /bin/bash ./libtool   
+--mode=install /usr/bin/install -c src/iwd '/scratch/root/usr/libexec'
+2024/10/10 18:53:04 iwd 'development' 'amd64' | libtool: install: 
+/usr/bin/install -c src/iwd /scratch/root/usr/libexec/iwd
+2024/10/10 18:53:05 iwd 'development' 'amd64' |  /usr/bin/mkdir -p 
+'/usr/share/dbus-1/system-services'
+2024/10/10 18:53:05 iwd 'development' 'amd64' |  /usr/bin/install -c -m 
+644 src/net.connman.iwd.service '/usr/share/dbus-1/system-services'
+2024/10/10 18:53:05 iwd 'development' 'amd64' | /usr/bin/install: cannot 
+create regular file 
+'/usr/share/dbus-1/system-services/net.connman.iwd.service': Permission 
+denied
+2024/10/10 18:53:05 iwd 'development' 'amd64' | make[2]: *** 
+[Makefile:2798: install-dbus_busDATA] Error 1
+2024/10/10 18:53:05 iwd 'development' 'amd64' | make[1]: *** 
+[Makefile:3466: install-am] Error 2
+2024/10/10 18:53:05 iwd 'development' 'amd64' | make: *** 
+[Makefile:3459: install] Error 2
+
