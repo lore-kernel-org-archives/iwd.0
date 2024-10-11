@@ -1,124 +1,103 @@
-Received: from mail-qk1-f174.google.com (mail-qk1-f174.google.com [209.85.222.174])
+Received: from mail-qk1-f169.google.com (mail-qk1-f169.google.com [209.85.222.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E9FD2E403
-	for <iwd@lists.linux.dev>; Fri, 11 Oct 2024 14:55:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5DDF405FB
+	for <iwd@lists.linux.dev>; Fri, 11 Oct 2024 14:58:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728658511; cv=none; b=M88ffi5mR/pt6Rp4KTupiQoo+I6jMtfEheBro7hiWPHRukShNxTEp24kca1VBEHUq+LRBlqZMrfOw8LgN21xg25oioWrgCa+RvuGsohf7WafuqU/x9oEHUZds2Hw2t6QlzOPELe5Ui8N3OHUmDQgFdE9eoVJ9W//7yKxy7MutVQ=
+	t=1728658689; cv=none; b=OPA28iUTV88Lgjab5UkJ86k54wZ+OxJ4OzC9R/aHhV56QUuqMd7pXNiQUWxhCWk26SI+U+7ZHeFFfZJLIHq5aE3H14gFIghdkvV5SkVjMa7t+oijIz+0O1Y0F7wtT1lUDY9KumS5649fC4JPjlcbEnvA6uZDhuIY0PVWTHNesD4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728658511; c=relaxed/simple;
-	bh=5CDZmbxrVpz9lET0dEhmwoGyc5c7ontzE4IwXNWyMw0=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=Q4OmijwkM1rk9DGb1gPKkaowVQRAd9unt46aBmdxSrUBslK8pwdYUqNecJJPgUXrtQBK7S/4aWqrLn4Q3BO+qPawjgOOnSNuUFPDGh8ab/6ouTgLYvaI+m9spWVA2QfBoSMVBpo90Tm18fZBIwyz4rewolw2/EZLnuH1jV4+8A0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZcfoLr/w; arc=none smtp.client-ip=209.85.222.174
+	s=arc-20240116; t=1728658689; c=relaxed/simple;
+	bh=KMolJLx/p1laRqUVXITkLQXilnyvZG2pS3gKxLv6OyA=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:References:
+	 In-Reply-To:Content-Type; b=sLDjgHiLtkZyo44enDrQNFt/u5mBYUai8XXyy8JSjsQha0trWMjNEwwjm+EvBk0/Z2HYlidg8pJAD74KSPvG+feXl9CV2lXV3lORSrQJwdFPSREfh+RTamYqTDO1oQ8+xOqmI2KzOIQdDQ053IOQpKFXNZJrkAxMB//ySUFDoso=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XujgRj34; arc=none smtp.client-ip=209.85.222.169
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZcfoLr/w"
-Received: by mail-qk1-f174.google.com with SMTP id af79cd13be357-7afcf50e2d0so102181185a.3
-        for <iwd@lists.linux.dev>; Fri, 11 Oct 2024 07:55:09 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XujgRj34"
+Received: by mail-qk1-f169.google.com with SMTP id af79cd13be357-7ac83a98e5eso180669985a.0
+        for <iwd@lists.linux.dev>; Fri, 11 Oct 2024 07:58:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1728658509; x=1729263309; darn=lists.linux.dev;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=GeHSqcYa/f4xVt0Kk/K3O/sTroZ2vwv3x7fDA9BwyYA=;
-        b=ZcfoLr/wUP0JaocEMmWAl/E37m05Z52vxKiqCjV7f8APV+skFpVdBdgKImZ9wBjCWB
-         HOgoGlBlbHy4EBNFy7H44GDIuvp8dEjckuKF3CrjBHMktyKBuGUXVaRQ8IcJZE7S4gXJ
-         fXYAEUbSqQPe8NE+4YxCjNwugTZJLjio1g0vYWnXKD9oZvwuWOgKxWCDJd7gKz0AUoM2
-         Oy0bXGcK2XH4c/vnJXIUqOdkUFBBKTuSxiFreRI8SZSSYMD4hJppjJ9IJ9Jd4853H3Vj
-         tDQ0I8dcjliEbsrs0F/blUkPwwdtwNmlUDu2V28ZoAoohyvLhRNTDWFYvoW8xwhAs4xS
-         NZrQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728658509; x=1729263309;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+        d=gmail.com; s=20230601; t=1728658686; x=1729263486; darn=lists.linux.dev;
+        h=content-transfer-encoding:in-reply-to:content-language:references
+         :to:from:subject:user-agent:mime-version:date:message-id:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=GeHSqcYa/f4xVt0Kk/K3O/sTroZ2vwv3x7fDA9BwyYA=;
-        b=NZGGxCapwSanoTPSx1hRLwPkktT2nXRzP+xCBGi5R1KhUebE72l+26FC2XweUB9e97
-         VGO9p2zMeUY2SgIotX8kz6s0joTx+SRVn16js0UdmRCi8mmhyk0Hn/0xP8VHlSzEBC4/
-         q1tj1ziftgJow/cQ8aOCFiJGDZUgPMPwWEnPHgWnx6+LR15kJ5j4lAUEEZqB48nK3q4a
-         MmTACJ/GQBm/HKBd7EkVQNltNoC3IieHPrDNH+YLW+9q83DjWHbBfFDhntg8BS/iDgs2
-         SRnMKjynF9qJLRNIMfrhT95cz3HkkpjboeY/APd29XE0MBdSj6BU8QCMAODzMn//AsA+
-         rIMg==
-X-Gm-Message-State: AOJu0YwoBrC3N/OKqG1m9GImKY27j5zykfF80+5f+DtlIRm2VfaaZ+X2
-	R7eE7TtxvEJRBdMo1/t7EW2E5c69z9tRq4f6L1JYrhyUXrBgP6krcEBsEQ==
-X-Google-Smtp-Source: AGHT+IFtDUQdafKUhkS7sz+KP6l7+9k/WNLM0+UU5E74kh6rx70cWInjuY4L08cOakFAqZ957AZ/Sg==
-X-Received: by 2002:a05:6214:4a81:b0:6cb:ee7b:7ac4 with SMTP id 6a1803df08f44-6cbeff80f35mr46193076d6.3.1728658508789;
-        Fri, 11 Oct 2024 07:55:08 -0700 (PDT)
-Received: from LOCLAP699.localdomain ([152.193.78.90])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6cbe85b7767sm16157216d6.34.2024.10.11.07.55.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 11 Oct 2024 07:55:08 -0700 (PDT)
-From: James Prestwood <prestwoj@gmail.com>
-To: iwd@lists.linux.dev
-Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 2/2] station: check if authentication is supported via CMD_FRAME
-Date: Fri, 11 Oct 2024 07:55:03 -0700
-Message-Id: <20241011145503.51330-2-prestwoj@gmail.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20241011145503.51330-1-prestwoj@gmail.com>
-References: <20241011145503.51330-1-prestwoj@gmail.com>
+        bh=SX3v/C2mFMVMzIVyhJQ6391Z2O6eREON4ulFxUOxDwk=;
+        b=XujgRj34qrRK/tVvnUa/bXJgTSmnPKKEtEx05Rz5ZTzlnFTOxsoD4ETuAuSm3mvb8F
+         YTzSFHfsBIplguGoeJL1Aukp33iL4gl0R0mXHCr+2FGwGyDitu7ZGgivhpO3aFuXENah
+         dhDXRqZt0mvyjeCCwdVrMbgQBsd4lhJfUzrfKQ/HdHmXmfENfpWhbQdjYnVoEdpsIbNW
+         hPj+gDVKWb3rP4zy/8ycFAMWgPwyLp9o1mEW+3nl9tTstms/BAqIez/6c1lvP3bwzAL5
+         vXEPiJ6vUvUIuZRsfTxLJN2ox7ZBhAklDaBg4eEUOTKXWIJTW5WycOabzg8dWCDv0RhG
+         RDMQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1728658686; x=1729263486;
+        h=content-transfer-encoding:in-reply-to:content-language:references
+         :to:from:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=SX3v/C2mFMVMzIVyhJQ6391Z2O6eREON4ulFxUOxDwk=;
+        b=eNH+xLqI7aPzCfvOT/o2NRYGE92K9ziZoSbeqaZW+zkmZ21swjegM7BO2B5zFmU3WI
+         8efKyhbujnWD455K1xN1cmtAW+36BaKZrvGoFN5vMCFHlRFNMnB2ZY1bYrNvBehUguUL
+         0yFi+glXjhBHbFV5qD6cutgZvo77h9MC/4JwYqABwdfcMZGPC6egdKRy1r+OWNoN+lUd
+         LOIh9PH/9+TSCCYZyST4mkDmi1ma0nfJFbtLxAQ9Tt5ze3pi84AxTxAZgkhVrLlxoLPB
+         1PQNZib3DFBoXc8CAJMrk1Ew1SYEbCy5MYF/MtG6vlhVrVilNqeI9tGzAPRi8ojAYaOd
+         g15Q==
+X-Forwarded-Encrypted: i=1; AJvYcCX9OA20FShVl/wWUKCNjX46gltmfTwrHZY8PeKmshNTPWUWCFwoiAOCxvV3GfUQZkAvjn4=@lists.linux.dev
+X-Gm-Message-State: AOJu0YxfYyG8KLxPO7+BKqLUt3VDTT7E3lKXHNx11OLenJAS0i6FCzpP
+	TaQVjgrmd6Ur72R0ZmSD3YicDUI18da6OzZMWt62GnFXV8+QA9aXL2+Icw==
+X-Google-Smtp-Source: AGHT+IEFxNxFQYqcjiNnsfLjUgtT2G/LAAW3YJg4+s/UU1IqEO47m0yojERhBqC9moejWVnl+sx7dQ==
+X-Received: by 2002:a05:620a:46aa:b0:7a9:a389:c12e with SMTP id af79cd13be357-7b1124c81dbmr1190222085a.16.1728658686453;
+        Fri, 11 Oct 2024 07:58:06 -0700 (PDT)
+Received: from [10.100.121.195] ([152.193.78.90])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7b1148f032asm138993885a.60.2024.10.11.07.58.05
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 11 Oct 2024 07:58:06 -0700 (PDT)
+Message-ID: <1565c790-83d9-4972-b0dc-e9f575bc8d93@gmail.com>
+Date: Fri, 11 Oct 2024 07:58:04 -0700
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: AW: IWD 2.20 does not support Fast Roaming with NXP 88W9098
+ chipset
+From: James Prestwood <prestwoj@gmail.com>
+To: Dierk.Modrow@sew-eurodrive.de, iwd@lists.linux.dev
+References: <5c65040719764a49a48846ea11c535a7@sew-eurodrive.de>
+ <c477b2d9-dcc7-4ea7-a6b1-47f6f84e4736@gmail.com>
+Content-Language: en-US
+In-Reply-To: <c477b2d9-dcc7-4ea7-a6b1-47f6f84e4736@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-If the driver does not support this don't allow FT-over-Air as
-CMD_FRAME will fail. This will downgrade the roam to reassociation.
-In the future IWD could instead use CMD_AUTHENTICATE, but thats a
-larger change. This will at least get these drivers functioning
-better.
----
- src/station.c | 31 +++++++++++++++++++++++--------
- 1 file changed, 23 insertions(+), 8 deletions(-)
+H Dierk,
 
-diff --git a/src/station.c b/src/station.c
-index 9ebed8e2..b7905c4f 100644
---- a/src/station.c
-+++ b/src/station.c
-@@ -2162,14 +2162,29 @@ static bool station_can_fast_transition(struct station *station,
- 			return false;
- 	}
- 
--	/*
--	 * FT-over-Air in its current form relies on CMD_REMAIN_ON_CHANNEL. Some
--	 * drivers do not support this so only allow over-DS if this is the case
--	 */
--	if (!(hs->mde[4] & 1) &&
--			!wiphy_supports_cmd_offchannel(station->wiphy)) {
--		l_debug("FT-over-Air needs offchannel, using reassociation");
--		return false;
-+	if (!(hs->mde[4] & 1)) {
-+		/*
-+		 * FT-over-Air in its current form relies on
-+		 * CMD_REMAIN_ON_CHANNEL. Some drivers do not support this so
-+		 * only allow over-DS if this is the case
-+		 */
-+		if (!wiphy_supports_cmd_offchannel(station->wiphy)) {
-+			l_debug("FT-over-Air needs offchannel, using "
-+				"reassociation");
-+			return false;
-+		}
-+
-+		/*
-+		 * TODO: if drivers don't support TX/RX of auth frames via
-+		 *       CMD_FRAME IWD could choose to use CMD_AUTHENTICATE
-+		 *       instead. For now just avoid FT roaming and let these
-+		 *       drivers roam via reassociation.
-+		 */
-+		if (!wiphy_supports_auth_frame(station->wiphy)) {
-+			l_debug("FT-over-Air needs CMD_FRAME auth, using "
-+				"reassociation");
-+			return false;
-+		}
- 	}
- 
- 	return true;
--- 
-2.34.1
+<snip>
+>> I also added a sorted log file containing iwd traces, iwmon text logs 
+>> and kernel msgs (of the NXP driver): 
+>> resorted_logs_of_iwd_ft_connection_trial#3.txt
+>>
+>>
+>> We would like to use iwd instead of wpa_supplicant so any help would 
+>> be appreciated!
+> At this point in time looking at the above logs it appears IWD isn't 
+> compatible with this out of tree driver due to the requirement to use 
+> CMD_AUTHENTICATE. I've thought about adding this back in for "weird" 
+> drivers that have problems with how IWD works. For the near term we 
+> could try and detect this case, via the CMD_REGISTER failure, and 
+> disable FT entirely for drivers like this. You'd be stuck with only 
+> reassociation but at least the device could roam. I can get you a 
+> patch to try soon.
+
+I just sent a few patches to the mailing list. Would you be able to try 
+these out and verify the device roams? Note, its going to choose 
+reassociation now (if they work as intended), not FT. But any roaming is 
+better than nothing at least. Longer term we can think about using 
+CMD_AUTHENTICATE for drivers like this.
+
+Thanks,
+
+James
 
