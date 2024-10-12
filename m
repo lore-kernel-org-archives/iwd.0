@@ -1,817 +1,217 @@
-Received: from mout-b-210.mailbox.org (mout-b-210.mailbox.org [195.10.208.40])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3EBD946C
-	for <iwd@lists.linux.dev>; Sat, 12 Oct 2024 11:07:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.10.208.40
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 223B11F5FA
+	for <iwd@lists.linux.dev>; Sat, 12 Oct 2024 11:51:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728731225; cv=none; b=uykCnqFDyUchCPr3QNJwJAKjhODVow1oaXQG7Z8dThWRmoWvFnJYVcVO5PGpvO6CyLCsNSfTc3+sg0jFWEZ/+8nSYDrfZYOxDXQt1mKephHz+KOAJ2CN+serJPCVUdKxk9X2BGxZMTIdsJolvUQJXUMG2l0oAXscKL/5ZDNCKsY=
+	t=1728733905; cv=none; b=J4nXcN0wOzesJ3hoRZ7+Ll2Wi566WS01NQ3KJyBrzjvBEpuV9Nn4f1Mr2JlJMx2HpjpXgtMP/u6tnNnMpMM0B/0tfUbNTD2rdVg23snhDuxja1h2KsxEkaSFF4Yop48q/2THshGuGDEJIaVfH4ElDNaD9bZhHVNSGR/UBXZSWQY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728731225; c=relaxed/simple;
-	bh=ZAveBlE2OXoXO2CkAyYPics/6xwbI+yroV6vuak46JQ=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=N0sohkm3yefDNkXqymlyDSxYtdA8ku9LhyNkeucOioZrcGzU41hptiDkGbygiKfU+/itlUWghC3keI+N0w9AIT2v+ofjTUcWwIR17CJzsjJM9bqMFGOEudYCFXb4rJpF+ey6sqnzVG8rPQxpOsM1OwB837QwX7PxN+9XvU3tzIE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tavla.de; spf=pass smtp.mailfrom=tavla.de; dkim=pass (2048-bit key) header.d=tavla.de header.i=@tavla.de header.b=E5qjdrtG; arc=none smtp.client-ip=195.10.208.40
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tavla.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tavla.de
+	s=arc-20240116; t=1728733905; c=relaxed/simple;
+	bh=S9qNqygpnmFEjP5IDqOPwjt36kq2betntRpxb2snp4A=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=iWnctOqpstjqJJtS1Uggf3/J5EsuaIesO3/rjHKz+LpK9/MPwrrNtan/Pyz1HrGOg0Y/PFGfp+jR4R/0lRFDqRFVfy5DRxUue/4XlYbqfKqVrJdhxzqf+qzs/Zic07I+yY3VdLraMBwUTsN0cMj5+cDKFMGh0ksSesQJmhHYpYY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=UdT6IK3+; arc=none smtp.client-ip=209.85.214.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=tavla.de header.i=@tavla.de header.b="E5qjdrtG"
-Received: from smtp1.mailbox.org (smtp1.mailbox.org [10.196.197.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mout-b-210.mailbox.org (Postfix) with ESMTPS id 4XQgfy6w6gzDv41;
-	Sat, 12 Oct 2024 13:06:50 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tavla.de; s=MBO0001;
-	t=1728731211;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=TLzIbRSzuLz2Y27b3uiBROuCjcG3+qFFyNYBWmW+O5Q=;
-	b=E5qjdrtGQKDYqcCjDFjHkOM2RB/M3mP3kF25lN+Sm2J48q1kOKIAGN4xtxXMNZLaPvh1ML
-	tiH4dsSqT/y+nkt9tvPY7t8ZYtrHXrhvgMm7/CuKQQF5OrG0YznAFpjaSpTXd7P3cnCV8e
-	BHjK+Q/+hUSYR6TCHs2cCUZxAhyN9h9kq8ETIiUG5wLVEVviBzAveh+smhyTlqQyeZML4H
-	XvaJcf9Hb0e9GyVxyet8i2M54vKULXQ9bO3qvMVig7daK6hBY3Bcitnx2aEfKlNhGU84X9
-	Tyd4Q4KN8Uh4dWSh81DIAJy8bUu7eR5Mq5CgTR98kohPZzmvsSdG4spUZup6Hw==
-Message-ID: <717feddd-8756-4271-8c05-5ef46ff9e8d2@tavla.de>
-Date: Sat, 12 Oct 2024 13:06:49 +0200
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="UdT6IK3+"
+Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-20c70abba48so19246965ad.0
+        for <iwd@lists.linux.dev>; Sat, 12 Oct 2024 04:51:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=broadcom.com; s=google; t=1728733903; x=1729338703; darn=lists.linux.dev;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=SQlZR2GQqKrdmbs/F4SwP3BjbEWk+MoHNKz1PJor+aw=;
+        b=UdT6IK3+L4IdGSQwz68luTIVRtbpLWfTJZYk+Gmvt9hqJinRC6F2C1IIRNgHTTCvTb
+         iu2iqJM7gCmrxj6m34pi6opgBScUpDbMorRgMcp5b/GXTHDpiqQitLQcK8WcXBODLELs
+         gj6Q/BlecJBoZLMfB1GJ4h/QjrvagJjkT5018=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1728733903; x=1729338703;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=SQlZR2GQqKrdmbs/F4SwP3BjbEWk+MoHNKz1PJor+aw=;
+        b=vyaGB5kuxb/W6pNp/DUj9tiTA5jM/i7CXbDlzCe+sou1KA10Ial21tTxFLKH+Ov8D5
+         LEC9urwqWC451MoOFngibn37ya1O3VA5dYlaTGbo4MRGIAGCB2Hy7CWLAtgi5obZKM1Q
+         8a3+Oa8IrLRrDXVwmmO9npNxCbbPslpssoNiLTyqLM2DGsyjOskR4fh0D2I9WX0NlVro
+         rWsGlLKeSZOr19rjJ5aVnI2MHpUfUNlyCFAhkJUi0wWbbqxnV8Oexp+/7qtfaz2Z/4/A
+         ByX3CRBs54U9s9cmJyT3xnVYiVoTPMkM7ij5FeYu0MxDpqoYj5x9XILQ8hDGOSIXWZvZ
+         c8zg==
+X-Forwarded-Encrypted: i=1; AJvYcCXBYeHE9ndLiMQmeYWnTEB7wOIRe+nceqvqM0fnRgIlQ0YzNNSRuN5kXN5pW85nnIkxHdY=@lists.linux.dev
+X-Gm-Message-State: AOJu0YxisrHqGd7N9g310iDifdDc8/xiSGQp/hHoYdE66AZk2XyxEZFz
+	FChM/NDmb0UGBupXrFx9euzUdceoswmulJRf16LHmPvhKdks4NLLN4IHoKjeFw==
+X-Google-Smtp-Source: AGHT+IGLLxIl4V4J5AnbIuIv7Tf6mEPwiafiOu/MZ2aQM3T6TGqJ91oSL1doEkIzXqbmg09ustZ5cg==
+X-Received: by 2002:a17:903:4410:b0:20c:771c:b5fd with SMTP id d9443c01a7336-20cbb27a7e7mr38838325ad.60.1728733903231;
+        Sat, 12 Oct 2024 04:51:43 -0700 (PDT)
+Received: from [192.168.178.137] (f215227.upc-f.chello.nl. [80.56.215.227])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-20c8bad32d0sm36228465ad.46.2024.10.12.04.51.41
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 12 Oct 2024 04:51:42 -0700 (PDT)
+Message-ID: <e27b082f-15eb-412e-b1a5-292b17080cc4@broadcom.com>
+Date: Sat, 12 Oct 2024 13:51:38 +0200
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
 Subject: Re: IWD 1.27 with brcmfmac not working for roaming
-From: Martin Petzold <martin.petzold@tavla.de>
-To: Arend Van Spriel <arend.vanspriel@broadcom.com>
+To: Martin Petzold <martin.petzold@tavla.de>
 Cc: Denis Kenzior <denkenz@gmail.com>, iwd@lists.linux.dev
 References: <a99e0ef1-8f97-4c1d-9aa5-5a07c87782a5@tavla.de>
  <d91f33df-e9d7-430a-b1ca-13cd1dee973a@gmail.com>
  <19272307f90.279b.9b12b7fc0a3841636cfb5e919b41b954@broadcom.com>
  <69cc8b13-e6b4-43c5-8ba3-7877a75f0581@tavla.de>
-Content-Language: en-GB, de-DE
-Organization: TAVLA Technology GmbH
-In-Reply-To: <69cc8b13-e6b4-43c5-8ba3-7877a75f0581@tavla.de>
+ <717feddd-8756-4271-8c05-5ef46ff9e8d2@tavla.de>
+Content-Language: en-US
+From: Arend van Spriel <arend.vanspriel@broadcom.com>
+Autocrypt: addr=arend.vanspriel@broadcom.com; keydata=
+ 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
+In-Reply-To: <717feddd-8756-4271-8c05-5ef46ff9e8d2@tavla.de>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-Hi Arend,
-
-Am 10.10.24 um 10:06 schrieb Martin Petzold:
+On 10/12/2024 1:06 PM, Martin Petzold wrote:
 > Hi Arend,
->
-> Am 09.10.24 um 18:50 schrieb Arend Van Spriel:
->> On October 9, 2024 6:07:16 PM Denis Kenzior <denkenz@gmail.com> wrote:
+> 
+> Am 10.10.24 um 10:06 schrieb Martin Petzold:
+>> Hi Arend,
 >>
->>> Hi Martin,
+>> Am 09.10.24 um 18:50 schrieb Arend Van Spriel:
+>>> On October 9, 2024 6:07:16 PM Denis Kenzior <denkenz@gmail.com> wrote:
 >>>
->>> On 10/9/24 4:43 AM, Martin Petzold wrote:
->>>> Hi
+>>>> Hi Martin,
 >>>>
->>>> PROBLEM
+>>>> On 10/9/24 4:43 AM, Martin Petzold wrote:
+>>>>> Hi
+>>>>>
+>>>>> PROBLEM
+>>>>>
+>>>>> We (still) have some trouble with IWD together with brcmfmac. We 
+>>>>> updated
+>>>>> firmware for the chip (Infineon CYW43353) to latest version 
+>>>>> 11.171.0.24 and also
 >>>>
->>>> We (still) have some trouble with IWD together with brcmfmac. We 
->>>> updated
->>>> firmware for the chip (Infineon CYW43353) to latest version 
->>>> 11.171.0.24 and also
+>>>> Ugh :)  That stuff is known to be problematic.  You might want to 
+>>>> involve Arend
+>>>> in this discussion.
 >>>
->>> Ugh :)  That stuff is known to be problematic.  You might want to 
->>> involve Arend
->>> in this discussion.
+>>> Is this specifically related to WPA3 or in general? The version does 
+>>> not tell me much and I don't have access to Infineon firmware to 
+>>> examine. I do know there are two variants floating around regarding 
+>>> WPA3-SAE support: 1) supplicant in firmware and 2) using EXT_AUTH. 
+>>> The latter is supported in  downstream repo on github, but it has not 
+>>> been done in upstream linux-wireless. I did post patches for testing 
+>>> last month. 
 >>
->> Is this specifically related to WPA3 or in general? The version does 
->> not tell me much and I don't have access to Infineon firmware to 
->> examine. I do know there are two variants floating around regarding 
->> WPA3-SAE support: 1) supplicant in firmware and 2) using EXT_AUTH. 
->> The latter is supported in  downstream repo on github, but it has not 
->> been done in upstream linux-wireless. I did post patches for testing 
->> last month. 
->
-> I was able to migrate to NXP kernel 6.1.36 with Debian bookworm rootfs 
-> containing IWD 2.3. I will try also to build IWD 2.22 later. If this 
-> setup / configuration makes sense I would go to roaming environments 
-> again. However, I have the following questions and please find the 
-> configuration and logs below:
->
-> 1. Why does brcmfmac report "Using regulatory domain US" even though I 
-> have set "ccode=EU" and "regrev=116" in 
-> /lib/firmware/brcm/brcmfmac4339-sdio.txt?
+>> I was able to migrate to NXP kernel 6.1.36 with Debian bookworm rootfs 
+>> containing IWD 2.3. I will try also to build IWD 2.22 later. If this 
+>> setup / configuration makes sense I would go to roaming environments 
+>> again. However, I have the following questions and please find the 
+>> configuration and logs below:
+>>
+>> 1. Why does brcmfmac report "Using regulatory domain US" even though I 
+>> have set "ccode=EU" and "regrev=116" in /lib/firmware/brcm/ 
+>> brcmfmac4339-sdio.txt?
+> 
+> I had an entry in the device tree (laird,regdomain = "US"), which seems 
+> to be stronger than the value in the brcmfmac4339-sdio.txt. Can you 
+> confirm?
+> 
+> Now I don't get any output like "Using regulatory domain ..." any more. 
+> How can I now be sure that EU (ETSI) is used?
 
-I had an entry in the device tree (laird,regdomain = "US"), which seems 
-to be stronger than the value in the brcmfmac4339-sdio.txt. Can you confirm?
+I really have no clue. This is not in the upstream driver so I assume 
+you are also using some Infineon flavor of the brcmfmac driver. That 
+device tree entry is definitely not in the bindings specification.
 
-Now I don't get any output like "Using regulatory domain ..." any more. 
-How can I now be sure that EU (ETSI) is used?
+>> 2. Is it the best approach to use firmware for Laird LWB5 / CYW43353 
+>> from their Git repository (laird-lwb5-etsi-firmware-11.171.0.24.tar.bz2)?
+> 
+> Here I switched to newer version 12.29.0.22. I assume this firmware is 
+> the correct one and should work with the Kernel brcmfmac driver 
+> (6.1.36), right?
 
+Sorry. No answer to that. I have no knowledge about distribution 
+packages from Laird.
 
-> 2. Is it the best approach to use firmware for Laird LWB5 / CYW43353 
-> from their Git repository (laird-lwb5-etsi-firmware-11.171.0.24.tar.bz2)?
+>> 3. If you say roaming can be handled by firmware (driver?) OR daemon 
+>> (IWD), what is the best approach and how to configure it?
+> 
+> This question is still open for me. In general the question, will 
+> brcmfmac work with the laird firmware and IWD stable (really good) also 
+> for roaming?
 
-Here I switched to newer version 12.29.0.22. I assume this firmware is 
-the correct one and should work with the Kernel brcmfmac driver 
-(6.1.36), right?
+In general it is best to let firmware take care of roaming. You can try 
+using the module parameter 'roam_off' and see how well IWD takes care of 
+roaming. I have never used IWD.
 
+>> 4. Is it valid to always use brcm-patchram-plus to load the firmware 
+>> on every boot?
 
-> 3. If you say roaming can be handled by firmware (driver?) OR daemon 
-> (IWD), what is the best approach and how to configure it?
+What is brcm-patchram-plus?
 
-This question is still open for me. In general the question, will 
-brcmfmac work with the laird firmware and IWD stable (really good) also 
-for roaming?
+>> 5. I see the following error (more log below). What is going wrong?
+>>
+>> Okt 10 09:38:19 tavla kernel: brcmfmac mmc0:0001:1: Direct firmware 
+>> load for brcm/brcmfmac4339-sdio.variscite,imx8mp-var-dart.bin failed 
+>> with error -2
+>> Okt 10 09:38:19 tavla kernel: brcmfmac mmc0:0001:1: Direct firmware 
+>> load for brcm/brcmfmac4339-sdio.clm_blob failed with error -2
+>> Okt 10 09:38:19 tavla kernel: brcmfmac: brcmf_c_process_clm_blob: no 
+>> clm_blob available (err=-2), device may have limited channels available
 
+Nothing wrong here except that it does not find a clm_blob file.
 
-> 4. Is it valid to always use brcm-patchram-plus to load the firmware 
-> on every boot?
-> 5. I see the following error (more log below). What is going wrong?
->
-> Okt 10 09:38:19 tavla kernel: brcmfmac mmc0:0001:1: Direct firmware 
-> load for brcm/brcmfmac4339-sdio.variscite,imx8mp-var-dart.bin failed 
-> with error -2
-> Okt 10 09:38:19 tavla kernel: brcmfmac mmc0:0001:1: Direct firmware 
-> load for brcm/brcmfmac4339-sdio.clm_blob failed with error -2
-> Okt 10 09:38:19 tavla kernel: brcmfmac: brcmf_c_process_clm_blob: no 
-> clm_blob available (err=-2), device may have limited channels available
+> What about the "clm_blob". Is it required in file system for 4339? (I 
+> don't want to have limited channels)
 
-What about the "clm_blob". Is it required in file system for 4339? (I 
-don't want to have limited channels)
+What channels are reported if you use the iw utility?
 
-Thanks,
-
-Martin
-
->
-> 6. Anything wrong in setup / configuration?
->
-> ##### Setup
->
-> SoM: Variscite DART-IMX8M-PLUS
-> SoC: NXP i.MX8M Plus
-> Wi-Fi Chip: Laird Sterling LWB5 (Infineon CYW43353)
-> Antenna: Laird FlexPIFA
-> RootFS: Debian bookworm
-> Kernel: NXP Kernel 6.1.36
-> Firmware: Laird 11.171.0.24
-> Network Daemon: systemd-networkd 252.30-1~deb12u2
-> Wi-Fi Daemon: IWD 2.3-1+deb12u1
-> DNS Resolver: systemd-resolved 252.30-1~deb12u2
->
-> ##### Firmware configuration
->
-> # Sample variables file for BCM94339 WLBGA with eTR,iPA, and eLNA. 
-> Laird Sterling-LWB5 CYW43353
-> NVRAMRev=$Rev: 410316 $
-> sromrev=11
-> boardrev=0x1203
-> boardtype=0x06c5
-> boardflags=0x00000c01
-> boardflags2=0x00002000
-> boardflags3=0x8101188
-> macaddr=00:90:4c:c5:12:38
-> cctl=0
-> ccode=EU
-> regrev=116
-> antswitch=0
-> pdgain5g=7
-> pdgain2g=7
-> tworangetssi2g=0
-> tworangetssi5g=0
-> femctrl=7
-> vendid=0x14e4
-> devid=0x43ae
-> manfid=0x2d0
-> nocrc=1
-> otpimagesize=502
-> xtalfreq=37400
-> extpagain2g=2
-> pdetrange2g=2
-> extpagain5g=2
-> pdetrange5g=2
-> rxgains2gelnagaina0=0
-> rxgains2gtrisoa0=7
-> rxgains2gtrelnabypa0=0
-> rxgains5gelnagaina0=0
-> rxgains5gtrisoa0=11
-> rxgains5gtrelnabypa0=0
-> rxchain=1
-> txchain=1
-> aa2g=1
-> aa5g=1
-> tssipos5g=0
-> tssipos2g=0
-> pa2ga0=-159,5841,-699
-> pa2gccka0=-162,6244,-755
-> pa5ga0=-185,5721,-690,-185,5693,-688,-193,5445,-670,-194,5352,-661
-> pa5gbw40a0=-188,5836,-710,-187,5839,-708,-173,5956,-714,-159,6022,-712
-> pa5gbw80a0=-184,5789,-700,-185,5784,-700,-175,5797,-699,-172,5749,-692
-> pdoffset40ma0=0
-> pdoffset80ma0=0
-> pdoffsetcckma0=0
-> maxp2ga0=0x4A
-> maxp5ga0=0x4A,0x4A,0x4A,0x4A
-> cckbw202gpo=0x0000
-> cckbw20ul2gpo=0x0000
-> mcsbw202gpo=0x66666666
-> mcsbw402gpo=0x66666666
-> dot11agofdmhrbw202gpo=0x4444
-> ofdmlrbw202gpo=0x4444
-> tssifloor2g=500
-> mcsbw205glpo=0x22222222
-> mcsbw405glpo=0x55555555
-> mcsbw805glpo=0xaaaaaaaa
-> mcsbw1605glpo=0xffffffff
-> mcsbw205gmpo=0x22222222
-> mcsbw405gmpo=0x55555555
-> mcsbw805gmpo=0xaaaaaaaa
-> mcsbw1605gmpo=0xffffffff
-> mcsbw205ghpo=0x22222222
-> mcsbw405ghpo=0x55555555
-> mcsbw805ghpo=0xaaaaaaaa
-> mcsbw1605ghpo=0xffffffff
-> mcslr5glpo=0x0000
-> mcslr5gmpo=0x0000
-> mcslr5ghpo=0x0000
-> sb20in40hrpo=0x0
-> sb20in80and160hr5glpo=0x0
-> sb40and80hr5glpo=0x0
-> sb20in80and160hr5gmpo=0x0
-> sb40and80hr5gmpo=0x0
-> sb20in80and160hr5ghpo=0x0
-> sb40and80hr5ghpo=0x0
-> sb20in40lrpo=0x0
-> sb20in80and160lr5glpo=0x0
-> sb40and80lr5glpo=0x0
-> sb20in80and160lr5gmpo=0x0
-> sb40and80lr5gmpo=0x0
-> sb20in80and160lr5ghpo=0x0
-> sb40and80lr5ghpo=0x0
-> dot11agduphrpo=0x0
-> dot11agduplrpo=0x0
-> phycal_tempdelta=25
-> cckdigfilttype=2
-> swctrlmap_5g=0x00000008,0x00000010,0x00000008,0x000000,0x038
-> swctrlmap_2g=0x00000001,0x00000002,0x00000001,0x040002,0x0ff
-> swctrlmapext_5g=0x00000000,0x00000000,0x00000000,0x000000,0x000
-> swctrlmapext_2g=0x00000000,0x00000000,0x00000000,0x000000,0x000
-> muxenab=0x11
-> rssicorrnorm_c0=3,3
-> rssicorrnorm5g_c0=2,3,4,2,3,3,0,1,2,0,1,2
-> paparambwver=1
-> AvVmid_c0=2,155,2,146,2,150,2,154,2,152
-> ed_thresh2g=-70
-> ed_thresh5g=-73
-> txidxcap2g=0
-> txidxcap5g=0
->
-> ##### IWD configuration (/etc/iwd/main.conf)
->
-> [General]
-> EnableNetworkConfiguration=true
->
-> [Network]
-> NameResolvingService=systemd
-> EnableIPv6=false
->
-> ##### systemd-networkd configuration 
-> (/etc/systemd/network/10-eth0.network) - no wifi device configured 
-> (handled by IWD only?!)
->
-> [Match]
-> Name=eth0
->
-> [Network]
-> DHCP=ipv4
->
-> [Link]
-> RequiredForOnline=no
->
-> ##### WiFi startup
->
-> tavla@tavla:~$ cat /lib/systemd/system/variscite-wifi.service
-> [Unit]
-> Description=Variscite WIFI service
-> Before=network.target
-> After=sysinit.target
->
-> [Service]
-> Type=oneshot
->
-> RemainAfterExit=yes
->
-> ExecStart=/opt/variscite/bin/wifi start
-> #ExecStop=/opt/variscite/bin/wifi stop
->
-> [Install]
-> WantedBy=network.target
->
-> tavla@tavla:~$ cat /opt/variscite/bin/wifi
-> #!/bin/sh -e
->
-> # Include common wireless functions
-> . /opt/variscite/bin/common
->
-> # Start WIFI hardware
-> wifi_start()
-> {
->     run_scripts "/opt/variscite/lib/wifi.d" "start"
-> }
->
-> # Stop WIFI hardware
-> # Note that on DART-MX8M this also stops Ethernet
-> wifi_stop()
-> {
->     run_scripts "/opt/variscite/lib/wifi.d" "stop"
-> }
->
-> ###########################
-> #  Execution starts here  #
-> ###########################
-> case $1 in
-> start)
->     wifi_start
->     ;;
-> stop)
->     wifi_stop
->     ;;
-> esac
->
-> exit
->
-> tavla@tavla:~$ cat /opt/variscite/lib/wifi.d/bcm43xx-wifi
-> #!/bin/sh -e
-> #
-> # Activate WIFI on Variscite DART-MX8M-PLUS/VAR-SOM-MX8M-PLUS
-> #
->
-> # Include common functions
-> . /opt/variscite/bin/common
->
-> # GPIO pin to supply WIFI power on DART-MX8M-PLUS
-> WIFI_PWR_GPIO_DART="gpiochip1 8"
->
-> # GPIO pin to supply WIFI power on VAR-SOM-MX8M-PLUS
-> WIFI_PWR_GPIO_SOM="gpiochip1 19"
->
-> # GPIO pin to enable WIFI module on DART-MX8M-PLUS
-> WIFI_EN_GPIO_DART="gpiochip1 7"
->
-> # GPIO pin to enable WIFI module on VAR-SOM-MX8M-PLUS
-> WIFI_EN_GPIO_SOM="gpiochip1 8"
->
-> # GPIO pin to control routing of UART signals
-> # to BT module or SOM connectoron DART-MX8M-PLUS
-> BT_BUF_GPIO_DART="gpiochip1 9"
->
-> # GPIO pin to control routing of UART signals
-> # to BT module or SOM connectoron VAR-SOM-MX8M-PLUS
-> BT_BUF_GPIO_SOM="gpiochip0 4"
->
-> # GPIO pin to enable BT module on DART-MX8M-PLUS
-> BT_EN_GPIO_DART="gpiochip1 6"
->
-> # GPIO pin to enable BT module on VAR-SOM-MX8M-PLUS
-> BT_EN_GPIO_SOM="gpiochip1 9"
->
-> # WIFI MMC host
-> WIFI_MMC_HOST=30b40000.mmc
-> WIFI_MMC_PATH="/sys/bus/platform/drivers/sdhci-esdhc-imx"
->
-> # Get the SOM revision
-> get_somrev() {
->     # Get the raw output
->     raw_output=$(i2cget -f -y 0x0 0x52 0x1e)
->
->     # Convert the output to decimal
->     decimal_output=$(( $raw_output ))
->
->     # Extract major and minor versions
->     major=$(( ($decimal_output & 0xE0) >> 5 ))
->     minor=$(( $decimal_output & 0x1F ))
->
->     # Adjust the major version as per the specification
->     major=$(( $major + 1 ))
->
->     echo "$major.$minor"
-> }
->
-> # Check if wifi is bcm43xx
-> wifi_is_bcm43xx() {
->     somrev=$(get_somrev)
->
->     if [ "$(echo "$somrev < 2.0" | bc)" -eq 1 ]; then
->         return 0
->     else
->         return 1
->     fi
-> }
->
-> # Return true if SOM is VAR-SOM-MX8M-PLUS
-> som_is_var_som_mx8m_plus()
-> {
->     grep -q VAR-SOM-MX8M-PLUS /sys/devices/soc0/machine
-> }
->
-> # Configure VAR-SOM-MX8M-PLUS WIFI/BT pins
-> config_pins()
-> {
->     if som_is_var_som_mx8m_plus; then
->         WIFI_PWR_GPIO=${WIFI_PWR_GPIO_SOM}
->         WIFI_EN_GPIO=${WIFI_EN_GPIO_SOM}
->         BT_BUF_GPIO=${BT_BUF_GPIO_SOM}
->         BT_EN_GPIO=${BT_EN_GPIO_SOM}
->     else
->         WIFI_PWR_GPIO=${WIFI_PWR_GPIO_DART}
->         WIFI_EN_GPIO=${WIFI_EN_GPIO_DART}
->         BT_BUF_GPIO=${BT_BUF_GPIO_DART}
->         BT_EN_GPIO=${BT_EN_GPIO_DART}
->     fi
-> }
->
-> # Power up WIFI chip
-> wifi_up()
-> {
->     # Unbind WIFI device from MMC controller
->     wifi_mmc_unbind ${WIFI_MMC_PATH} ${WIFI_MMC_HOST}
->
->     # WIFI_PWR up
->     gpioset ${WIFI_PWR_GPIO}=1
->     usleep 10000
->
->     # WLAN_EN up
->     gpioset ${WIFI_EN_GPIO}=1
->
->     # BT_EN up
->     gpioset ${BT_EN_GPIO}=1
->
->     # BT_BUF up
->     gpioset ${BT_BUF_GPIO}=0
->
->     # Wait at least 150ms
->     usleep 200000
->
->     # BT_BUF down
->     gpioset ${BT_BUF_GPIO}=1
->
->     # BT_EN down
->     gpioset ${BT_EN_GPIO}=0
->
->     # Bind WIFI device to MMC controller
->     wifi_mmc_bind ${WIFI_MMC_PATH} ${WIFI_MMC_HOST}
->
->     # Load WIFI driver
->     modprobe brcmfmac
-> }
->
-> # Power down WIFI chip
-> wifi_down()
-> {
->     # Unload WIFI driver
->     modprobe -r brcmfmac
->
->     # Unbind WIFI device from MMC controller
->     wifi_mmc_unbind ${WIFI_MMC_PATH} ${WIFI_MMC_HOST}
->
->     # Configure WIFI/BT pins
->     config_pins
->
->     # WIFI_EN down
->     gpioset ${WIFI_EN_GPIO}=0
->
->     # BT_BUF down
->     gpioset ${BT_BUF_GPIO}=1
->
->     # BT_EN down
->     gpioset ${BT_EN_GPIO}=0
->     usleep 10000
->
->     # WIFI_PWR down
->     gpioset ${WIFI_PWR_GPIO}=0
-> }
->
-> # Return true if SOM has WIFI module assembled
-> wifi_is_available()
-> {
->     # Read SOM options EEPROM field
->     opt=$(i2cget -f -y 0x0 0x52 0x20)
->
->     # Check WIFI bit in SOM options
->     if [ $((opt & 0x1)) -eq 1 ]; then
->         return 0
->     else
->         return 1
->     fi
-> }
->
-> # Return true if WIFI should be started
-> wifi_should_not_be_started()
-> {
->     if ! wifi_is_bcm43xx; then
->         return 0
->     fi
->
->     # Do not start WIFI if it is not available
->     if ! wifi_is_available; then
->         return 0
->     fi
->
->     # Do not start WIFI if it is already started
->     [ -d /sys/class/net/wlan0 ] && return 0
->
->     return 1
-> }
->
-> # Return true if WIFI should not be stopped
-> wifi_should_not_be_stopped()
-> {
->     if ! wifi_is_bcm43xx; then
->         return 0
->     fi
->
->     # Do not stop WIFI if it is not available
->     if ! wifi_is_available; then
->         return 0
->     fi
->
->     return 1
-> }
->
-> # Start WIFI hardware
-> wifi_start()
-> {
->     # Exit if WIFI should not be started
->     wifi_should_not_be_started && exit 0
->
->     # Configure WIFI/BT pins
->     config_pins
->
->     # Try starting WIFI hardware
->     for i in $(seq 1 3); do
->         # Up WIFI
->         wifi_up
->
->         # Exit if WIFI interface exists
->         wifi_interface_exists "wlan0" && exit 0
->
->         # Down WIFI
->         wifi_down
->
->         # Wait enough time for discharge
->         sleep 5
->     done
->
->     exit 1
-> }
->
-> # Stop WIFI hardware
-> wifi_stop()
-> {
->     # Exit if WIFI should not be stopped
->     wifi_should_not_be_stopped && exit 0
->
->     # Down WIFI
->     wifi_down
-> }
->
-> ###########################
-> #  Execution starts here  #
-> ###########################
-> case $1 in
-> start)
->     wifi_start
->     ;;
-> stop)
->     wifi_stop
->     ;;
-> esac
->
-> exit 0
->
-> ##### networkctl status
->
-> tavla@tavla:~$ networkctl
-> IDX LINK  TYPE     OPERATIONAL SETUP
->   1 lo    loopback carrier     unmanaged
->   2 eth0  ether    routable    configured
->   3 wlan0 wlan     routable    unmanaged
->
-> 3 links listed.
-> tavla@tavla:~$ networkctl status
-> ●        State: routable
->   Online state: unknown
->        Address: 192.168.178.149 on eth0
->                 192.168.178.113 on wlan0
->                 2a0a:a549:a304:0:fadc:7aff:fe67:2e4 on eth0
->                 fe80::fadc:7aff:fe67:2e4 on eth0
->                 fe80::c2ee:40ff:fe8a:dd62 on wlan0
->        Gateway: 192.168.178.1 on wlan0
->                 192.168.178.1 on eth0
->                 fe80::3a10:d5ff:fe37:2c79 on eth0
->            DNS: 192.168.178.1
->            NTP: 192.168.178.1
->
-> ##### IWD status
->
-> tavla@tavla:~$ iwctl device list
-> Devices
-> -------------------------------------------------------------------------------- 
->
->   Name                  Address               Powered Adapter Mode
-> -------------------------------------------------------------------------------- 
->
->   wlan0                 c0:ee:40:8a:dd:62     on phy0 station
->
-> tavla@tavla:~$ iwctl device wlan0 show
->                                  Device: wlan0
-> -------------------------------------------------------------------------------- 
->
->   Settable  Property Value
-> -------------------------------------------------------------------------------- 
->
->             Name wlan0
->          *  Mode station
->          *  Powered on
->             Address c0:ee:40:8a:dd:62
->             Adapter phy0
->
-> tavla@tavla:~$ iwctl station wlan0 show
->                                  Station: wlan0
-> -------------------------------------------------------------------------------- 
->
->   Settable  Property Value
-> -------------------------------------------------------------------------------- 
->
->             Scanning no
->             State connected
->             Connected network TAVLA
->             IPv4 address 192.168.178.113
->             ConnectedBss 38:10:d5:37:2c:7c
->             Frequency 5260
->             Security WPA2-Personal
->             RSSI                  -33 dBm
->             TxBitrate             433300 Kbit/s
->             RxBitrate             6000 Kbit/s
->
-> ##### brcmfmac log
->
-> Okt 10 09:38:19 tavla kernel: brcmfmac: brcmf_fw_alloc_request: using 
-> brcm/brcmfmac4339-sdio for chip BCM4339/2
-> Okt 10 09:38:19 tavla kernel: brcmfmac mmc0:0001:1: Direct firmware 
-> load for brcm/brcmfmac4339-sdio.variscite,imx8mp-var-dart.bin failed 
-> with error -2
-> Okt 10 09:38:19 tavla kernel: brcmfmac mmc0:0001:1: Direct firmware 
-> load for brcm/brcmfmac4339-sdio.clm_blob failed with error -2
-> Okt 10 09:38:19 tavla kernel: brcmfmac: brcmf_c_process_clm_blob: no 
-> clm_blob available (err=-2), device may have limited channels available
-> Okt 10 09:38:19 tavla kernel: brcmfmac: brcmf_c_preinit_dcmds: 
-> Firmware: BCM4339/2 wl0: Aug  4 2023 08:42:14 version 6.37.39.141 
-> (73212ff CY)
-> Okt 10 09:38:19 tavla kernel: brcmfmac: brcmf_cfg80211_attach: Using 
-> regulatory domain US
->
-> ##### IWD log
->
-> Okt 10 09:38:16 tavla systemd[1]: Mounting var-lib-iwd.mount - 
-> /var/lib/iwd...
-> Okt 10 09:38:16 tavla systemd[1]: Mounted var-lib-iwd.mount - 
-> /var/lib/iwd.
-> Okt 10 09:38:18 tavla systemd[1]: Starting iwd.service - Wireless 
-> service...
-> Okt 10 09:38:18 tavla iwd[386]: No Diffie-Hellman support found, WPS 
-> will not be available
-> Okt 10 09:38:18 tavla iwd[386]: The following options are missing in 
-> the kernel:
-> Okt 10 09:38:18 tavla iwd[386]:         CONFIG_KEY_DH_OPERATIONS
-> Okt 10 09:38:18 tavla iwd[386]: Wireless daemon version 2.3
-> Okt 10 09:38:18 tavla iwd[386]: Loaded configuration from 
-> /etc/iwd/main.conf
-> Okt 10 09:38:18 tavla systemd[1]: Started iwd.service - Wireless service.
-> Okt 10 09:38:19 tavla iwd[386]: Wiphy: 0, Name: phy0
-> Okt 10 09:38:19 tavla iwd[386]:         Permanent Address: 
-> c0:ee:40:8a:dd:62
-> Okt 10 09:38:19 tavla iwd[386]:         2.4Ghz Band:
-> Okt 10 09:38:19 tavla iwd[386]:                 Bitrates (non-HT):
-> Okt 10 09:38:19 tavla iwd[386]:                          1.0 Mbps
-> Okt 10 09:38:19 tavla iwd[386]:                          2.0 Mbps
-> Okt 10 09:38:19 tavla iwd[386]:                          5.5 Mbps
-> Okt 10 09:38:19 tavla iwd[386]:                         11.0 Mbps
-> Okt 10 09:38:19 tavla iwd[386]:                          6.0 Mbps
-> Okt 10 09:38:19 tavla iwd[386]:                          9.0 Mbps
-> Okt 10 09:38:19 tavla iwd[386]:                         12.0 Mbps
-> Okt 10 09:38:19 tavla iwd[386]:                         18.0 Mbps
-> Okt 10 09:38:19 tavla iwd[386]:                         24.0 Mbps
-> Okt 10 09:38:19 tavla iwd[386]:                         36.0 Mbps
-> Okt 10 09:38:19 tavla iwd[386]:                         48.0 Mbps
-> Okt 10 09:38:19 tavla iwd[386]:                         54.0 Mbps
-> Okt 10 09:38:19 tavla iwd[386]:         5Ghz Band:
-> Okt 10 09:38:19 tavla iwd[386]:                 Bitrates (non-HT):
-> Okt 10 09:38:19 tavla iwd[386]:                          6.0 Mbps
-> Okt 10 09:38:19 tavla iwd[386]:                          9.0 Mbps
-> Okt 10 09:38:19 tavla iwd[386]:                         12.0 Mbps
-> Okt 10 09:38:19 tavla iwd[386]:                         18.0 Mbps
-> Okt 10 09:38:19 tavla iwd[386]:                         24.0 Mbps
-> Okt 10 09:38:19 tavla iwd[386]:                         36.0 Mbps
-> Okt 10 09:38:19 tavla iwd[386]:                         48.0 Mbps
-> Okt 10 09:38:19 tavla iwd[386]:                         54.0 Mbps
-> Okt 10 09:38:19 tavla iwd[386]:         Ciphers: BIP-CMAC-128 CCMP-128 
-> TKIP
-> Okt 10 09:38:19 tavla iwd[386]:         Supported iftypes: ad-hoc 
-> station ap p2p-client p2p-go p2p-device
-> Okt 10 09:38:19 tavla iwd[386]: Wiphy phy0 will only use the default 
-> interface
-> Okt 10 09:38:19 tavla iwd[386]: No default interface for wiphy 0
-> Okt 10 09:38:19 tavla iwd[386]: Could not register frame watch type 
-> 00b0: -22
-> Okt 10 09:38:20 tavla iwd[386]: hardware_rekey not supported
-> Okt 10 09:38:20 tavla iwd[386]: [DHCPv4] l_dhcp_client_start:1219 
-> Entering state: DHCP_STATE_SELECTING
-> Okt 10 09:38:20 tavla iwd[386]: [DHCPv4] dhcp_client_handle_offer:811 
-> Entering state: DHCP_STATE_REQUESTING
-> Okt 10 09:38:20 tavla iwd[386]: [DHCPv4] dhcp_client_rx_message:915 
-> Entering state: DHCP_STATE_BOUND
-> Okt 10 09:38:20 tavla iwd[386]: [DHCPv4] dhcp_client_rx_message:948 T1 
-> expiring in 431999064 ms
->
-> ##### systemd-networkd log
->
-> Okt 10 09:38:14 tavla systemd[1]: Listening on systemd-networkd.socket 
-> - Network Service Netlink Socket.
-> Okt 10 09:38:15 tavla systemd[1]: Starting systemd-networkd.service - 
-> Network Configuration...
-> Okt 10 09:38:15 tavla systemd-networkd[255]: lo: Link UP
-> Okt 10 09:38:15 tavla systemd-networkd[255]: lo: Gained carrier
-> Okt 10 09:38:15 tavla systemd-networkd[255]: Enumeration completed
-> Okt 10 09:38:15 tavla systemd-networkd[255]: eth0: found matching 
-> network '/etc/systemd/network/10-eth0.network', based on potentially 
-> unpredictable interface name.
-> Okt 10 09:38:15 tavla systemd-networkd[255]: eth0: Configuring with 
-> /etc/systemd/network/10-eth0.network.
-> Okt 10 09:38:15 tavla systemd[1]: Started systemd-networkd.service - 
-> Network Configuration.
-> Okt 10 09:38:15 tavla systemd-networkd[255]: eth0: Link UP
-> Okt 10 09:38:19 tavla systemd-networkd[255]: wlan0: Link UP
-> Okt 10 09:38:20 tavla systemd-networkd[255]: wlan0: Connected WiFi 
-> access point: TAVLA (38:10:d5:37:2c:7c)
-> Okt 10 09:38:20 tavla systemd-networkd[255]: wlan0: Gained carrier
-> Okt 10 09:38:21 tavla systemd-networkd[255]: eth0: Gained carrier
-> Okt 10 09:38:21 tavla systemd-networkd[255]: eth0: found matching 
-> network '/etc/systemd/network/10-eth0.network', based on potentially 
-> unpredictable interface name.
-> Okt 10 09:38:21 tavla systemd-networkd[255]: eth0: DHCPv4 address 
-> 192.168.178.149/24, gateway 192.168.178.1 acquired from 192.168.178.1
-> Okt 10 09:38:22 tavla systemd-networkd[255]: wlan0: Gained IPv6LL
-> Okt 10 09:38:22 tavla systemd-networkd[255]: eth0: Gained IPv6LL
->
-> ##### systemd-resolved log
->
-> Okt 10 09:38:16 tavla systemd[1]: Starting systemd-resolved.service - 
-> Network Name Resolution...
-> Okt 10 09:38:16 tavla systemd-resolved[312]: Positive Trust Anchors:
-> Okt 10 09:38:16 tavla systemd-resolved[312]: . IN DS 20326 8 2 
-> e06d44b80b8f1d39a95c0b0d7c65d08458e880409bbc683457104237c7f8ec8d
-> Okt 10 09:38:16 tavla systemd-resolved[312]: Negative trust anchors: 
-> home.arpa 10.in-addr.arpa 16.172.in-addr.arpa 17.172.in-addr.arpa 
-> 18.172.in-addr.arpa 19.172.in-addr.arpa 20.172.in-addr.arpa 
-> 21.172.in-addr.arpa 22.172.in-addr.arpa 23.172.in-addr.arpa 
-> 24.172.in-addr.arpa 25.172.in-addr.arpa 26.172.in-addr.arpa 
-> 27.172.in-addr.arpa 28.172.in-addr.arpa 29.172.in-addr.arpa 
-> 30.172.in-addr.arpa 31.172.in-addr.arpa 170.0.0.192.in-addr.arpa 
-> 171.0.0.192.in-addr.arpa 168.192.in-addr.arpa d.f.ip6.arpa 
-> ipv4only.arpa corp home internal intranet lan local private test
-> Okt 10 09:38:18 tavla systemd-resolved[312]: Using system hostname 
-> 'tavla'.
-> Okt 10 09:38:18 tavla systemd[1]: Started systemd-resolved.service - 
-> Network Name Resolution.
-> Okt 10 09:38:20 tavla systemd-resolved[312]: wlan0: Bus client set DNS 
-> server list to: 192.168.178.1
-> Okt 10 09:38:20 tavla systemd-resolved[312]: wlan0: Bus client set 
-> search domain list to: fritz.box
-> Okt 10 09:38:20 tavla systemd-resolved[312]: Detected conflict on 
-> tavla IN A 192.168.178.113
-> Okt 10 09:38:20 tavla systemd-resolved[312]: Hostname conflict, 
-> changing published hostname from 'tavla' to 'tavla11'.
-> Okt 10 09:38:21 tavla systemd-resolved[312]: Clock change detected. 
-> Flushing caches.
-> Okt 10 09:38:21 tavla systemd-resolved[312]: Detected conflict on 
-> tavla11 IN A 192.168.178.113
-> Okt 10 09:38:21 tavla systemd-resolved[312]: Hostname conflict, 
-> changing published hostname from 'tavla11' to 'tavla18'.
-> Okt 10 09:38:45 tavla systemd-resolved[312]: Using degraded feature 
-> set UDP instead of UDP+EDNS0 for DNS server 192.168.178.1.
-> Okt 10 09:41:28 tavla sudo[1307]:    tavla : TTY=pts/0 ; 
-> PWD=/home/tavla ; USER=root ; COMMAND=/usr/bin/systemctl status 
-> systemd-resolved
->
->
->
--- 
-Martin Petzold (Inhaber & Geschäftsführer)
-
-TAVLA Technology GmbH
-Im Dau 14
-50678 Köln
-Deutschland
-
-Telefon: +49 (0)221 / 3466 0885
-Mobil: +49 (0)179 / 9220154
-E-Mail: martin.petzold@tavla.de
-
+Regards,
+Arend
