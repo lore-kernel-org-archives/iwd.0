@@ -1,212 +1,119 @@
-Received: from mail-lj1-f177.google.com (mail-lj1-f177.google.com [209.85.208.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mout-b-210.mailbox.org (mout-b-210.mailbox.org [195.10.208.40])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 614481C3F0A
-	for <iwd@lists.linux.dev>; Tue, 15 Oct 2024 08:57:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47F681C07D1
+	for <iwd@lists.linux.dev>; Tue, 15 Oct 2024 14:43:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.10.208.40
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728982634; cv=none; b=tWdItuBG39/vhNIXg2dG4hl4xlIe2F3Lc4S55qBzU9sB/ILnxqPe77xWAo/5mQxwG8EgBzztbAAdXDdqCgc1iUZiMZGCm26K30TBC/Vz+kqcM4IqCbGmYlV5jxYN41NRkVm6iPPBNG/WE7zKE5ZMZ+9qtLFBPV9N1M1lj7xREm8=
+	t=1729003433; cv=none; b=n/DuQd5BHNUMrER4lLxR2EGVfMQ9GscTEZGVGi5IunMUhC03D0Ada6YU3R6kDBUgRhbCGCAdMGbijtlQN25dq/ZResif+SBdkMYNlx9PsS3cRon1CUP2POLz3dgrkiyqV9ozjng4Rf5B51IuWZz8rajwk4LAGi7kt/86yB+C9I0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728982634; c=relaxed/simple;
-	bh=QxsasNLdc9RdIsxy6CkBha3FqmjzSifcJ6YdxFMXU3o=;
-	h=From:Content-Type:Mime-Version:Subject:Message-Id:Date:To; b=iS+4g1bQ4cxUfqWNb7chmFW4Ga7y+OXDethgJR+hIIChP5zMBBPPvBNOwqfV3xA5WFeYNhVg8Unt0isT9FjdLqLEI0H7/0Z60mTzNdh3PHCGB++h86OIGFWVlZ4ggB24K17lia2KDBVvt4fbKKW5U80eOq9n/9Pf/WYjjALNrnE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=K197VBz8; arc=none smtp.client-ip=209.85.208.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1729003433; c=relaxed/simple;
+	bh=yCdxKSqGBSH2F73jJn0mR/uHxZZ7i0hKSWsQD5lMgFU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ZE31PmkkMC24ymFeogBhHUNxnES9nTA8cnAGbgRoqbS//4nk/2l3ATtq28VbFK6CYVK9cyBbka3FrYffg4huqD4xuNKnD67csUJoaphUS53pa4UTm6gqeK0aZuti6xr35mbNPpT7hh0pRTxaXEC8vg2es9kmb5RZx3i6A8fkblg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tavla.de; spf=pass smtp.mailfrom=tavla.de; dkim=pass (2048-bit key) header.d=tavla.de header.i=@tavla.de header.b=pIoACgnr; arc=none smtp.client-ip=195.10.208.40
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tavla.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tavla.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="K197VBz8"
-Received: by mail-lj1-f177.google.com with SMTP id 38308e7fff4ca-2fb59652cb9so10183261fa.3
-        for <iwd@lists.linux.dev>; Tue, 15 Oct 2024 01:57:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1728982630; x=1729587430; darn=lists.linux.dev;
-        h=to:date:message-id:subject:mime-version:content-transfer-encoding
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=n2ct+XiUssvLiBYqGZBZrj/PLjgxrvbgzV5ODE34/84=;
-        b=K197VBz805ORskXZ4sX0IbIc0dDG3npZ5F9GQ7jwzHjDC2zus4WNfJeQeezQW/K7ts
-         y2lkYDNzFy6Rcub2dwxsyn+MHWNAATZw9VXVcZ4gIx9ChV7xaiWTAHoIwzpSbpu7x21e
-         EkdOlpOfM4Kpy/6XWJFI8lsVPQaMaOtofIs8eQroB1ub/Vt/PmqHLFFee+SwKUdyTCY/
-         ttsUDfsc9WxCTnPujLHxizWlTCBS26F8IH4T9yydt2vjxLlq8TYhKmd4wpteDR9YKiiL
-         9sdRBGDlgxeNvyLHZwwkuWCCGn2WoTPQjtU/h5AfleM1eOumHoX4nfXcsf/PNCPWopyq
-         A7Mg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728982630; x=1729587430;
-        h=to:date:message-id:subject:mime-version:content-transfer-encoding
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=n2ct+XiUssvLiBYqGZBZrj/PLjgxrvbgzV5ODE34/84=;
-        b=Es8KezeCOiwFI7E53hAr5UpUnrcZ/SpD0yZ2yN2vw1bpIHG10dXb1vqxhQehjgqwek
-         Fg/en/St86lRfxr6ictdaYqZW4oGtsJPkrS5MqhL8Rc5bf/sh7bpGMOTqJDP00cwt5DU
-         NwQp3rPa0gKftSPJ6FU2X9yXry0djLVIrbAPxHObAF+tM/YV8kRCE6USmER99b/LXFpW
-         rr01Ubikf+d4BwLsMmtWzTePJynv1kXfmFgSBUJfuOAPE26wM7wnl6GAQmtRNvdSub2B
-         lCC9LEX9jOFDvoWXWMFR4kkg22QtZb3Iw2u09wf+VCMJ09Edf1K/d7AoIle/e5Ngc5XC
-         +htQ==
-X-Gm-Message-State: AOJu0YyMRX7KjEd4GXMEvNcCZ3dkIVfx5zb8Eym6vXBSxQVAnrgqUuXH
-	1yPRPi7ARtw4UgYCPRfDpbvUf+zEb71mGQOq2rTPcxKBnApSu35AULr8PA==
-X-Google-Smtp-Source: AGHT+IFNdsWVaTqvGEmJl083olcs0VjzClAJPN2k56+bDzeq7IIxjliDUxls/WJv1d+fuB+DNucy4w==
-X-Received: by 2002:a05:651c:1547:b0:2fb:3e40:a924 with SMTP id 38308e7fff4ca-2fb3e40aaf7mr40471611fa.5.1728982628640;
-        Tue, 15 Oct 2024 01:57:08 -0700 (PDT)
-Received: from smtpclient.apple (89-73-96-21.dynamic.chello.pl. [89.73.96.21])
-        by smtp.gmail.com with ESMTPSA id 38308e7fff4ca-2fb5d135e86sm1097641fa.70.2024.10.15.01.57.06
-        for <iwd@lists.linux.dev>
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 15 Oct 2024 01:57:07 -0700 (PDT)
-From: Piotr Oniszczuk <piotr.oniszczuk@gmail.com>
-Content-Type: text/plain;
-	charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+	dkim=pass (2048-bit key) header.d=tavla.de header.i=@tavla.de header.b="pIoACgnr"
+Received: from smtp2.mailbox.org (smtp2.mailbox.org [IPv6:2001:67c:2050:b231:465::2])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mout-b-210.mailbox.org (Postfix) with ESMTPS id 4XScKl6g6NzDv2G;
+	Tue, 15 Oct 2024 16:43:39 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tavla.de; s=MBO0001;
+	t=1729003420;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=WlkdShprEqWDkXRq5Cb/XkI0GH9iCaR58kF0XhqRLk8=;
+	b=pIoACgnry/vHE8BOCPFIYerJvnXrNoMnJOHSHUD0eZRlU3gWzsBDLGIoHfxXM6zaBZEUU6
+	gy6CS/hfkK99jsMFvPdrQuVImiv2I5iQ/ioREHhJZPNf8+RNlnCRDTGE4X0Oza4iMeQacX
+	+i06JfioCrQF6XqW6de1m+Mtk3y0S/Nb8GNZLzBSKaq63GZw7X2iMDQHQOdf5p6duJcuzh
+	f9Ksso1YBzU6tHpwS0KmTir6jP0ZM1GpWbr6rZikQLAsdyh0enI978y9whqnSuB8ztZ90c
+	ZdgY1DI5c/exrGN4CpyNEEDSuexhVAGg2pCL4dUWlayjJnAa4YNF/931D40t5w==
+Message-ID: <c5e790a5-2854-47a6-9431-e02a0f9e6676@tavla.de>
+Date: Tue, 15 Oct 2024 16:43:38 +0200
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3776.700.51.11.1\))
-Subject: iwd 2.22 scan fails but... works ok with ConnMan
-Message-Id: <CF5A13CE-18AF-4A33-98F9-13FA353657C4@gmail.com>
-Date: Tue, 15 Oct 2024 10:56:55 +0200
-To: iwd@lists.linux.dev
-X-Mailer: Apple Mail (2.3776.700.51.11.1)
+MIME-Version: 1.0
+Subject: Re: IWD 1.27 with brcmfmac not working for roaming
+To: Denis Kenzior <denkenz@gmail.com>
+Cc: Arend Van Spriel <arend.vanspriel@broadcom.com>,
+ "iwd@lists.linux.dev" <iwd@lists.linux.dev>
+References: <a99e0ef1-8f97-4c1d-9aa5-5a07c87782a5@tavla.de>
+ <d91f33df-e9d7-430a-b1ca-13cd1dee973a@gmail.com>
+Content-Language: en-GB, de-DE
+From: Martin Petzold <martin.petzold@tavla.de>
+Organization: TAVLA Technology GmbH
+In-Reply-To: <d91f33df-e9d7-430a-b1ca-13cd1dee973a@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: 4XScKl6g6NzDv2G
 
-Hi,
+Hi Denis,
 
-I=E2=80=99m using iwd 2.22 as default way of automated wifi connection =
-in my project (https://github.com/warpme/minimyth2)
+Am 09.10.24 um 18:07 schrieb Denis Kenzior:
+> Hi Martin,
+>
+> On 10/9/24 4:43 AM, Martin Petzold wrote:
+>> [...]
+>> 3. Build IWD 2.22 from source (maybe using Debian sid source 
+>> package?) -> how to do best and will this work with libc6 version 
+>> 2.36? Missing libreadline8t64?
+>
+> I mean this is your only real solution.  There is no 'long term 
+> support' model for iwd.  You either run the latest or you're on your 
+> own.  It is highly unlikely that any of the developers will look at 
+> logs (or attempt to fix) anything but the latest version.
+>
+Okay, I build IWD from source and am now using HEAD 
+(c459dc75c080dcbff6f9b9389344e11328dec411). Please find below the new setup.
 
-Some of my users started to report issues about not able to establish =
-wifi connections.
-I asked to do 1st step verification: launch ConnMan =
-(https://wiki.archlinux.org/title/ConnMan) to verify is HW working ok.
+I think the regulatory domain issue is fixed. It seems that 99 is 
+correct (because it is handled in firmware). We see far better signal 
+and data rates at a site where we had problems. It seems the general 
+setup is far better now for simple setups. We removed the configuration 
+from device tree and then it may have used the configuration from 
+brcmfmac4339-sdio.txt (device tree stuff was something the SOM vendor 
+added for some reason).
 
-With ConnMan users are able to connect so HW is OK.
-It looks to me like issue is specific to iwd.
+However, I have now already seen at one of our testing sites, that it 
+connected to the router instead of the repeater (which is far closer and 
+has far far better signal: -67 vs. -29 dBm). It also did not switch to 
+the repeater after several hours (both FritzBox - so consumer grade and 
+we don't know the exact configuration). After a reboot, it connected to 
+the repeater and until now it remains there. I will switch to more 
+complex roaming environment, however, this is more sensitive because it 
+is at a clients site. This first impression gave me not much confidence...
 
-With iwd log says like below.
+What do you think about the idea to disable roaming in the firmware / 
+driver? (if I understand Arend right, this is setting "roam_off" in 
+brcmfmac4339-sdio.txt)
 
-May somebody from iwd team help me to solve this issue?
-=20
+Will IWD smoothly take over the roaming? How can I check who is handling 
+the roaming?
 
-Wireless daemon version 2.22
-src/main.c:main() Using configuration directory /etc/iwd
-Loaded configuration from /etc/iwd/main.conf
-src/storage.c:storage_create_dirs() Using state directory /var/lib/iwd
-src/main.c:nl80211_appeared() Found nl80211 interface
-src/module.c:iwd_modules_init()
-station: Network configuration is disabled.
-src/knownnetworks.c:known_network_frequencies_load() No known frequency =
-file found.
-src/wsc.c:wsc_init()
-src/eap.c:__eap_method_enable()
-src/eap-wsc.c:eap_wsc_init()
-src/eap-ttls.c:eap_ttls_init()
-src/eap-tls.c:eap_tls_init()
-src/eap-md5.c:eap_md5_init()
-src/eap-pwd.c:eap_pwd_init()
-src/eap-gtc.c:eap_gtc_init()
-src/eap-peap.c:eap_peap_init()
-src/eap-aka.c:eap_aka_prime_init()
-src/eap-aka.c:eap_aka_init()
-src/eap-sim.c:eap_sim_init()
-src/eap-mschapv2.c:eap_mschapv2_init()
-src/udev.c:udev_init()
-src/manager.c:manager_wiphy_dump_callback() New wiphy phy0 added (0)
-src/manager.c:manager_wiphy_dump_done()
-src/manager.c:manager_filtered_wiphy_dump_done()
-Wiphy: 0, Name: phy0
-        Permanent Address: 00:00:00:00:00:00
-        2.4GHz Band:
-                Bitrates (non-HT):
-                         1.0 Mbps
-                         2.0 Mbps
-                         5.5 Mbps
-                        11.0 Mbps
-                         6.0 Mbps
-                         9.0 Mbps
-                        12.0 Mbps
-                        18.0 Mbps
-                        24.0 Mbps
-                        36.0 Mbps
-                        48.0 Mbps
-                        54.0 Mbps
-                         6.5 Mbps
-                        13.0 Mbps
-                        19.5 Mbps
-                        26.0 Mbps
-                        39.0 Mbps
-                        52.0 Mbps
-                        58.5 Mbps
-                        13.0 Mbps
-                        26.0 Mbps
-                        39.0 Mbps
-                        52.0 Mbps
-                HT Capabilities:
-                        HT40
-                        Short GI for 20Mhz
-                        Short GI for 40Mhz
-                HT RX MCS indexes:
-                        0-7
-                HT TX MCS set undefined
-        5GHz Band:
-                Bitrates (non-HT):
-                         6.0 Mbps
-                         9.0 Mbps
-                        12.0 Mbps
-                        18.0 Mbps
-                        24.0 Mbps
-                        36.0 Mbps
-                        48.0 Mbps
-                        54.0 Mbps
-                         6.5 Mbps
-                        13.0 Mbps
-                        19.5 Mbps
-                        26.0 Mbps
-                        39.0 Mbps
-                        52.0 Mbps
-                        58.5 Mbps
-                        13.0 Mbps
-                        26.0 Mbps
-                        39.0 Mbps
-                        52.0 Mbps
-                HT Capabilities:
-                        HT40
-                        Short GI for 20Mhz
-                        Short GI for 40Mhz
-                HT RX MCS indexes:
-                        0-7
-                HT TX MCS set undefined
-                VHT Capabilities:
-                        Short GI for 80Mhz
-                        Max RX MCS: 0-9 for NSS: 1
-                        Max TX MCS: 0-9 for NSS: 1
-        Ciphers: BIP-CMAC-128 CCMP-128 TKIP
-        Supported iftypes: ad-hoc station ap p2p-client p2p-go =
-p2p-device
-Wiphy phy0 will only use the default interface
-src/manager.c:manager_interface_dump_callback()
-src/manager.c:manager_get_interface_cb()
-src/manager.c:manager_interface_dump_done()
-src/manager.c:manager_use_default()
-src/netdev.c:netdev_create_from_genl() Created interface wlan0[3 1]
-src/wiphy.c:wiphy_update_reg_domain() New reg domain country code for =
-phy0 is 00
-src/netdev.c:netdev_link_notify() event 16 on ifindex 3
-src/netdev.c:netdev_set_4addr() netdev: 3 use_4addr: 0
-src/netdev.c:netdev_initial_up_cb() Interface 3 initialized
-event: state, old: disconnected, new: autoconnect_quick
-src/scan.c:scan_periodic_start() Starting periodic scan for wdev 1
-src/wiphy.c:wiphy_radio_work_insert() Inserting work item 1
-src/wiphy.c:wiphy_radio_work_next() Starting work item 1
-src/rrm.c:rrm_add_frame_watches()
-src/netdev.c:netdev_link_notify() event 16 on ifindex 3
-Could not register frame watch type 00b0: -22
-src/manager.c:manager_config_notify() Notification of command Set =
-Interface(6)
-src/scan.c:scan_periodic_rearm() Arming periodic scan timer: 10
-src/wiphy.c:wiphy_radio_work_done() Work item 1 done
-Received error during CMD_TRIGGER_SCAN: Invalid argument (22)
-src/scan.c:scan_periodic_timeout() 1
-src/wiphy.c:wiphy_radio_work_insert() Inserting work item 2
-src/wiphy.c:wiphy_radio_work_next() Starting work item 2
-src/scan.c:scan_periodic_rearm() Arming periodic scan timer: 20
-src/wiphy.c:wiphy_radio_work_done() Work item 2 done
-Received error during CMD_TRIGGER_SCAN: Invalid argument (22)
+What would you suggest? Roaming via firmware or roaming via daemon?
 
+What do you think about the option to switch to Kernel / Debian firmware 
+package instead of Laird?
 
+SETUP:
+
+SoM: Variscite DART-IMX8M-PLUS
+SoC: NXP i.MX8M Plus
+Wi-Fi Chip: Laird Sterling LWB5 (Infineon CYW43353)
+Antenna: Laird FlexPIFA
+RootFS: Debian bookworm
+Kernel: NXP Kernel 6.1.36 (with Variscite patches)
+Driver: brcmfmac (from Kernel, only minor patches - device tree)
+Firmware: Laird 12.29.0.22 (loaded via scripts)
+Network Daemon: systemd-networkd 252.30
+Wi-Fi Daemon: IWD 2.22+ (HEAD) + ELL 0.69 (HEAD)
 
