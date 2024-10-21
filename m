@@ -1,50 +1,69 @@
-Received: from mout-b-105.mailbox.org (mout-b-105.mailbox.org [195.10.208.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oo1-f50.google.com (mail-oo1-f50.google.com [209.85.161.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19A2957CAC
-	for <iwd@lists.linux.dev>; Mon, 21 Oct 2024 15:02:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.10.208.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06C8F2E628
+	for <iwd@lists.linux.dev>; Mon, 21 Oct 2024 15:23:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729522942; cv=none; b=sJO8uitrSk+Ll1dq9vEU0qypo0W2TG1f2rTUS0TrC5WYl8v5iKx953VnUoR9dfcRC4+CuztGXd4f/iOKofV7pd0DRc6iMuDWpFc6m4XeLQLYH6NuGY4OY3S8QUAEnTwvEA/bf8acKo9tnx1pxi1WHefzH+L/GOs3pKL8R+f3WtU=
+	t=1729524196; cv=none; b=MbNE6OsD9kxXPDXAsbuQ9Vl5XSfZ1w43mGQiyAzBOk3yF+1qGT0zpnYjALIrtMSNncWOHSz6PgpYFhR5U1IpnwwpSiTmntU1gdOFZV9POV7jbWqWGQP/RpfvmBzTdzWBp+zu/jlRJWI9jWWa0cbSV6lBKsrlbyOSy9NetDaL4dA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729522942; c=relaxed/simple;
-	bh=1Hk3BCiChDEExzMegPDewo7aYdXc8wvRQVV7TCRVnDk=;
-	h=Content-Type:Message-ID:Date:MIME-Version:Subject:To:Cc:
-	 References:From:In-Reply-To; b=Hh8V/Sm7Vdkh0wWqor+uJDEksHnUGr4e2dooZfx3+1CMuGKqU2cy3YIdz3P5sOac2axo2YErYzFTUCvKc6AxJX0InSHRQZxEErgaGrOwvLIImMONsZ1m9S8CUYgczIGOw0tlCZGSFCOp4Q9P2XHKGZ0mwzCQXlPeJOIdsRCEgqo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tavla.de; spf=pass smtp.mailfrom=tavla.de; dkim=pass (2048-bit key) header.d=tavla.de header.i=@tavla.de header.b=DrJXgj9U; arc=none smtp.client-ip=195.10.208.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tavla.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tavla.de
+	s=arc-20240116; t=1729524196; c=relaxed/simple;
+	bh=INPYv8+tIp2cFhSeTl9wiY2oYIHY1qkvr8OGFkpkJ8E=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=nqDqOwbON1ylqWg4Kvm3+5sbfOL+lzuqk4/4VPPioThVMAwNy7Yk1N9bw+dinNz07NMFkAM5SnH207VPuV3BRO2+p6wmz+4a4g6jjgMHeAn3hPQ/BlvCj4T2DfrRw9SRU7o5cakU4BoosJu29Z7KrLM2eAM6DqR1N8d4xm27u9I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YLitnwyd; arc=none smtp.client-ip=209.85.161.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=tavla.de header.i=@tavla.de header.b="DrJXgj9U"
-Received: from smtp102.mailbox.org (smtp102.mailbox.org [10.196.197.102])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mout-b-105.mailbox.org (Postfix) with ESMTPS id 4XXJGg1pxnz9vBr;
-	Mon, 21 Oct 2024 16:53:47 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tavla.de; s=MBO0001;
-	t=1729522427;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=2Bc4AHl3SZ5bPrdfYKme/XuGKseL+0Fvghbw5iBZLiw=;
-	b=DrJXgj9UHHiTAZ7ANTKDrxMoGvIQ9YSaUwTwvDO8Hc0zYm56fyw0h6rf8xwnYMAmtcSo4T
-	yio2rz7CJkTMtSMF7a6ihfwmeDa/e2U8Ba3bFQHRIvVq4YttZcPxhBS5BYxc9M0NM2n1UI
-	YlIbIymfMOj3J9OHMUxZbvRqzYGQe8dHGvaoOgMB/p9bdoUbIU3oJ/B1Si3ZguWU9Wb1Z1
-	bNsmrAkWDop/+jgTvsfMKARr2YDlLFK933Ru50t0nSgY4vrvssJowCHKBLJA/6LNxuuBPF
-	j4MY3qTCIIERyiP2o4y7PLMsQklm9UxasKWSx/LnYYKlfkDPoB8Kg2HSmqNU3w==
-Content-Type: multipart/mixed; boundary="------------4IZdGWP8hHS0yZzwVwXLzy2J"
-Message-ID: <aa18ac9b-ae51-4530-8808-c723c383e3ea@tavla.de>
-Date: Mon, 21 Oct 2024 16:53:45 +0200
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YLitnwyd"
+Received: by mail-oo1-f50.google.com with SMTP id 006d021491bc7-5ebc1af8f10so482250eaf.2
+        for <iwd@lists.linux.dev>; Mon, 21 Oct 2024 08:23:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1729524194; x=1730128994; darn=lists.linux.dev;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=E7M8mkQ5mUesAQbI8xtVId6p26Wny/ElDGsOso7sAT4=;
+        b=YLitnwydb8waDZ37iPNmPNkyaSeEzxmiXZuZxmPK6oHGx197WmOeibW5gBNWtnLrRf
+         JjWc6pMzuM8rJUc+v/ROYdfTetdqZI/O4YdN0LCRWfWuGPb5H/lJV5z9y4wNvYbl8kiB
+         RIiTxY9e1OMYcDwkYMk/Ewbhss3lIGwZF7AdQUV2nYUap1Yax3mDhK0/sB87EnJxqirk
+         1jmdOK6zkWTtgJpWk4ew5GKFQ4J7rd6076XAFaiqNADMHCOH21zTtX3TWjiR4dc6H9xB
+         mwdY+9iWB7F2GuKWgjzC6tQ80Yq6ANKuOK6GNERxUfBVynSG4V5id+hpVmWxPc2LTrri
+         3EJQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1729524194; x=1730128994;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=E7M8mkQ5mUesAQbI8xtVId6p26Wny/ElDGsOso7sAT4=;
+        b=A24OBbE/Ag+WjB5Hfx2y8RjxwEO7+1jq+scGRI1NXag5/htijk6EEt4oUD9bfH161M
+         4+6RzL4f9P8W1Ued9B/9uzN/ysgoA61evv1c2SGQmRuwTY9VR9N25EFnjmOR229BC2El
+         UvY1bd0n2V/5uKABVVM71ji7G9uTTrZ2xb/c8R5EgfoY3qdnSJB98RpzleRuDIzrZRhg
+         F8ektS6b6Kt8Sdkuxh5+ZWb2yuv0qI8Yvyzvg9TAJZA4xEvoBmMkj6Z86+C0pAmX7xjb
+         TcyOV5KIwPJqLaxoKwbvBVKU5Zl5Jx3vyxqNPzPEoCfJG8FE796MfPdB7eyrfSN68gTj
+         9QHg==
+X-Gm-Message-State: AOJu0YwJ4YEMAGXxkSMh+SUDGAXPKdIkp1TTwM/QvD80FM/li++oyp5u
+	iiExKoZeeFZeiQZh8UufKR9M55Q912AQ6L0Idvqwd09mE4Cva5RV
+X-Google-Smtp-Source: AGHT+IEyY9ckIgvHLy225/TpBYrP8cA8fhIdtdLtuEUazNzTOp4everqBvNuQdbYTkvMvqZ1M055qg==
+X-Received: by 2002:a05:6359:4593:b0:1c3:9cf5:2866 with SMTP id e5c5f4694b2df-1c39de243a9mr356062455d.6.1729524193897;
+        Mon, 21 Oct 2024 08:23:13 -0700 (PDT)
+Received: from [10.100.121.195] ([152.193.78.90])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6ce00999f2dsm17915116d6.102.2024.10.21.08.23.12
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 21 Oct 2024 08:23:13 -0700 (PDT)
+Message-ID: <2ab8601e-1601-4d4f-b58d-e9f23877650f@gmail.com>
+Date: Mon, 21 Oct 2024 08:23:11 -0700
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
 Subject: Re: IWD 1.27 with brcmfmac not working for roaming
-To: Arend Van Spriel <arend.vanspriel@broadcom.com>
-Cc: iwd@lists.linux.dev, Denis Kenzior <denkenz@gmail.com>
+To: Arend Van Spriel <arend.vanspriel@broadcom.com>,
+ Martin Petzold <martin.petzold@tavla.de>, Denis Kenzior <denkenz@gmail.com>
+Cc: iwd@lists.linux.dev
 References: <a99e0ef1-8f97-4c1d-9aa5-5a07c87782a5@tavla.de>
  <d91f33df-e9d7-430a-b1ca-13cd1dee973a@gmail.com>
  <c5e790a5-2854-47a6-9431-e02a0f9e6676@tavla.de>
@@ -56,19 +75,15 @@ References: <a99e0ef1-8f97-4c1d-9aa5-5a07c87782a5@tavla.de>
  <5a128900-432f-439e-9008-3b303ee72eb1@gmail.com>
  <2dacc589-9927-40f7-85ed-5f6b2afbbd41@tavla.de>
  <192af85f1e0.279b.9b12b7fc0a3841636cfb5e919b41b954@broadcom.com>
-Content-Language: en-GB, de-DE
-From: Martin Petzold <martin.petzold@tavla.de>
-Organization: TAVLA Technology GmbH
+Content-Language: en-US
+From: James Prestwood <prestwoj@gmail.com>
 In-Reply-To: <192af85f1e0.279b.9b12b7fc0a3841636cfb5e919b41b954@broadcom.com>
-
-This is a multi-part message in MIME format.
---------------4IZdGWP8hHS0yZzwVwXLzy2J
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 
-Dear Arend,
+Hi Arend,
 
-Am 21.10.24 um 16:40 schrieb Arend Van Spriel:
+On 10/21/24 7:40 AM, Arend Van Spriel wrote:
 > On October 21, 2024 3:34:46 PM Martin Petzold 
 > <martin.petzold@tavla.de> wrote:
 >
@@ -93,16 +108,11 @@ Am 21.10.24 um 16:40 schrieb Arend Van Spriel:
 >
 > The log output is not hard to read. The brcmfmac indicates it does not 
 > support the requested akm suite 00-0F-AC:12 (Suite B 192b).
+This is actually the OWE AKM. The last byte is 0x12, not "12" in base 10 
+:) Does/should brcmfmac support OWE?
 >
 > What capabilities does iw command show for the wifi device? Maybe the 
 > driver announces something which the firmware does not support.
-
-Please find attached the capabilities.
-
-Best regards,
-
-Martin
-
 >
 > Regards,
 > Arend
@@ -143,119 +153,4 @@ Martin
 >
 >
 >
--- 
-Martin Petzold (Inhaber & Geschäftsführer)
-
-TAVLA Technology GmbH
-Im Dau 14
-50678 Köln
-Deutschland
-
-Telefon: +49 (0)221 / 3466 0885
-Mobil: +49 (0)179 / 9220154
-E-Mail: martin.petzold@tavla.de
-
---------------4IZdGWP8hHS0yZzwVwXLzy2J
-Content-Type: text/plain; charset=UTF-8; name="capabilities.txt"
-Content-Disposition: attachment; filename="capabilities.txt"
-Content-Transfer-Encoding: base64
-
-dGF2bGFAdGF2bGE6fiQgc3VkbyBpdyBsaXN0CldpcGh5IHBoeTAKCXdpcGh5IGluZGV4OiAw
-CgltYXggIyBzY2FuIFNTSURzOiAxMAoJbWF4IHNjYW4gSUVzIGxlbmd0aDogMjA0OCBieXRl
-cwoJbWF4ICMgc2NoZWQgc2NhbiBTU0lEczogMTYKCW1heCAjIG1hdGNoIHNldHM6IDE2CglS
-ZXRyeSBzaG9ydCBsaW1pdDogNwoJUmV0cnkgbG9uZyBsaW1pdDogNAoJQ292ZXJhZ2UgY2xh
-c3M6IDAgKHVwIHRvIDBtKQoJRGV2aWNlIHN1cHBvcnRzIHJvYW1pbmcuCglTdXBwb3J0ZWQg
-Q2lwaGVyczoKCQkqIFdFUDQwICgwMC0wZi1hYzoxKQoJCSogV0VQMTA0ICgwMC0wZi1hYzo1
-KQoJCSogVEtJUCAoMDAtMGYtYWM6MikKCQkqIENDTVAtMTI4ICgwMC0wZi1hYzo0KQoJCSog
-Q01BQyAoMDAtMGYtYWM6NikKCUF2YWlsYWJsZSBBbnRlbm5hczogVFggMCBSWCAwCglTdXBw
-b3J0ZWQgaW50ZXJmYWNlIG1vZGVzOgoJCSAqIElCU1MKCQkgKiBtYW5hZ2VkCgkJICogQVAK
-CQkgKiBQMlAtY2xpZW50CgkJICogUDJQLUdPCgkJICogUDJQLWRldmljZQoJQmFuZCAxOgoJ
-CUNhcGFiaWxpdGllczogMHgxMDIyCgkJCUhUMjAvSFQ0MAoJCQlTdGF0aWMgU00gUG93ZXIg
-U2F2ZQoJCQlSWCBIVDIwIFNHSQoJCQlObyBSWCBTVEJDCgkJCU1heCBBTVNEVSBsZW5ndGg6
-IDM4MzkgYnl0ZXMKCQkJRFNTUy9DQ0sgSFQ0MAoJCU1heGltdW0gUlggQU1QRFUgbGVuZ3Ro
-IDY1NTM1IGJ5dGVzIChleHBvbmVudDogMHgwMDMpCgkJTWluaW11bSBSWCBBTVBEVSB0aW1l
-IHNwYWNpbmc6IDE2IHVzZWMgKDB4MDcpCgkJSFQgVFgvUlggTUNTIHJhdGUgaW5kZXhlcyBz
-dXBwb3J0ZWQ6IDAtNwoJCUJpdHJhdGVzIChub24tSFQpOgoJCQkqIDEuMCBNYnBzCgkJCSog
-Mi4wIE1icHMgKHNob3J0IHByZWFtYmxlIHN1cHBvcnRlZCkKCQkJKiA1LjUgTWJwcyAoc2hv
-cnQgcHJlYW1ibGUgc3VwcG9ydGVkKQoJCQkqIDExLjAgTWJwcyAoc2hvcnQgcHJlYW1ibGUg
-c3VwcG9ydGVkKQoJCQkqIDYuMCBNYnBzCgkJCSogOS4wIE1icHMKCQkJKiAxMi4wIE1icHMK
-CQkJKiAxOC4wIE1icHMKCQkJKiAyNC4wIE1icHMKCQkJKiAzNi4wIE1icHMKCQkJKiA0OC4w
-IE1icHMKCQkJKiA1NC4wIE1icHMKCQlGcmVxdWVuY2llczoKCQkJKiAyNDEyIE1IeiBbMV0g
-KDIwLjAgZEJtKQoJCQkqIDI0MTcgTUh6IFsyXSAoMjAuMCBkQm0pCgkJCSogMjQyMiBNSHog
-WzNdICgyMC4wIGRCbSkKCQkJKiAyNDI3IE1IeiBbNF0gKDIwLjAgZEJtKQoJCQkqIDI0MzIg
-TUh6IFs1XSAoMjAuMCBkQm0pCgkJCSogMjQzNyBNSHogWzZdICgyMC4wIGRCbSkKCQkJKiAy
-NDQyIE1IeiBbN10gKDIwLjAgZEJtKQoJCQkqIDI0NDcgTUh6IFs4XSAoMjAuMCBkQm0pCgkJ
-CSogMjQ1MiBNSHogWzldICgyMC4wIGRCbSkKCQkJKiAyNDU3IE1IeiBbMTBdICgyMC4wIGRC
-bSkKCQkJKiAyNDYyIE1IeiBbMTFdICgyMC4wIGRCbSkKCQkJKiAyNDY3IE1IeiBbMTJdICgy
-MC4wIGRCbSkKCQkJKiAyNDcyIE1IeiBbMTNdICgyMC4wIGRCbSkKCQkJKiAyNDg0IE1IeiBb
-MTRdICgyMC4wIGRCbSkKCUJhbmQgMjoKCQlDYXBhYmlsaXRpZXM6IDB4MTA2MgoJCQlIVDIw
-L0hUNDAKCQkJU3RhdGljIFNNIFBvd2VyIFNhdmUKCQkJUlggSFQyMCBTR0kKCQkJUlggSFQ0
-MCBTR0kKCQkJTm8gUlggU1RCQwoJCQlNYXggQU1TRFUgbGVuZ3RoOiAzODM5IGJ5dGVzCgkJ
-CURTU1MvQ0NLIEhUNDAKCQlNYXhpbXVtIFJYIEFNUERVIGxlbmd0aCA2NTUzNSBieXRlcyAo
-ZXhwb25lbnQ6IDB4MDAzKQoJCU1pbmltdW0gUlggQU1QRFUgdGltZSBzcGFjaW5nOiAxNiB1
-c2VjICgweDA3KQoJCUhUIFRYL1JYIE1DUyByYXRlIGluZGV4ZXMgc3VwcG9ydGVkOiAwLTcK
-CQlWSFQgQ2FwYWJpbGl0aWVzICgweDAwMDAxODIwKToKCQkJTWF4IE1QRFUgbGVuZ3RoOiAz
-ODk1CgkJCVN1cHBvcnRlZCBDaGFubmVsIFdpZHRoOiBuZWl0aGVyIDE2MCBub3IgODArODAK
-CQkJc2hvcnQgR0kgKDgwIE1IeikKCQkJU1UgQmVhbWZvcm1lcgoJCQlTVSBCZWFtZm9ybWVl
-CgkJVkhUIFJYIE1DUyBzZXQ6CgkJCTEgc3RyZWFtczogTUNTIDAtOQoJCQkyIHN0cmVhbXM6
-IG5vdCBzdXBwb3J0ZWQKCQkJMyBzdHJlYW1zOiBub3Qgc3VwcG9ydGVkCgkJCTQgc3RyZWFt
-czogbm90IHN1cHBvcnRlZAoJCQk1IHN0cmVhbXM6IG5vdCBzdXBwb3J0ZWQKCQkJNiBzdHJl
-YW1zOiBub3Qgc3VwcG9ydGVkCgkJCTcgc3RyZWFtczogbm90IHN1cHBvcnRlZAoJCQk4IHN0
-cmVhbXM6IG5vdCBzdXBwb3J0ZWQKCQlWSFQgUlggaGlnaGVzdCBzdXBwb3J0ZWQ6IDAgTWJw
-cwoJCVZIVCBUWCBNQ1Mgc2V0OgoJCQkxIHN0cmVhbXM6IE1DUyAwLTkKCQkJMiBzdHJlYW1z
-OiBub3Qgc3VwcG9ydGVkCgkJCTMgc3RyZWFtczogbm90IHN1cHBvcnRlZAoJCQk0IHN0cmVh
-bXM6IG5vdCBzdXBwb3J0ZWQKCQkJNSBzdHJlYW1zOiBub3Qgc3VwcG9ydGVkCgkJCTYgc3Ry
-ZWFtczogbm90IHN1cHBvcnRlZAoJCQk3IHN0cmVhbXM6IG5vdCBzdXBwb3J0ZWQKCQkJOCBz
-dHJlYW1zOiBub3Qgc3VwcG9ydGVkCgkJVkhUIFRYIGhpZ2hlc3Qgc3VwcG9ydGVkOiAwIE1i
-cHMKCQlWSFQgZXh0ZW5kZWQgTlNTOiBub3Qgc3VwcG9ydGVkCgkJQml0cmF0ZXMgKG5vbi1I
-VCk6CgkJCSogNi4wIE1icHMKCQkJKiA5LjAgTWJwcwoJCQkqIDEyLjAgTWJwcwoJCQkqIDE4
-LjAgTWJwcwoJCQkqIDI0LjAgTWJwcwoJCQkqIDM2LjAgTWJwcwoJCQkqIDQ4LjAgTWJwcwoJ
-CQkqIDU0LjAgTWJwcwoJCUZyZXF1ZW5jaWVzOgoJCQkqIDUxNzAgTUh6IFszNF0gKDIwLjAg
-ZEJtKQoJCQkqIDUxODAgTUh6IFszNl0gKDIwLjAgZEJtKQoJCQkqIDUxOTAgTUh6IFszOF0g
-KDIwLjAgZEJtKQoJCQkqIDUyMDAgTUh6IFs0MF0gKDIwLjAgZEJtKQoJCQkqIDUyMTAgTUh6
-IFs0Ml0gKDIwLjAgZEJtKQoJCQkqIDUyMjAgTUh6IFs0NF0gKDIwLjAgZEJtKQoJCQkqIDUy
-MzAgTUh6IFs0Nl0gKDIwLjAgZEJtKQoJCQkqIDUyNDAgTUh6IFs0OF0gKDIwLjAgZEJtKQoJ
-CQkqIDUyNjAgTUh6IFs1Ml0gKDIwLjAgZEJtKQoJCQkqIDUyODAgTUh6IFs1Nl0gKDIwLjAg
-ZEJtKQoJCQkqIDUzMDAgTUh6IFs2MF0gKDIwLjAgZEJtKQoJCQkqIDUzMjAgTUh6IFs2NF0g
-KDIwLjAgZEJtKQoJCQkqIDU1MDAgTUh6IFsxMDBdICgyMC4wIGRCbSkKCQkJKiA1NTIwIE1I
-eiBbMTA0XSAoMjAuMCBkQm0pCgkJCSogNTU0MCBNSHogWzEwOF0gKDIwLjAgZEJtKQoJCQkq
-IDU1NjAgTUh6IFsxMTJdICgyMC4wIGRCbSkKCQkJKiA1NTgwIE1IeiBbMTE2XSAoMjAuMCBk
-Qm0pCgkJCSogNTYwMCBNSHogWzEyMF0gKDIwLjAgZEJtKQoJCQkqIDU2MjAgTUh6IFsxMjRd
-ICgyMC4wIGRCbSkKCQkJKiA1NjQwIE1IeiBbMTI4XSAoMjAuMCBkQm0pCgkJCSogNTY2MCBN
-SHogWzEzMl0gKDIwLjAgZEJtKQoJCQkqIDU2ODAgTUh6IFsxMzZdICgyMC4wIGRCbSkKCQkJ
-KiA1NzAwIE1IeiBbMTQwXSAoMjAuMCBkQm0pCgkJCSogNTcyMCBNSHogWzE0NF0gKDIwLjAg
-ZEJtKQoJCQkqIDU3NDUgTUh6IFsxNDldICgyMC4wIGRCbSkKCQkJKiA1NzY1IE1IeiBbMTUz
-XSAoMjAuMCBkQm0pCgkJCSogNTc4NSBNSHogWzE1N10gKDIwLjAgZEJtKQoJCQkqIDU4MDUg
-TUh6IFsxNjFdICgyMC4wIGRCbSkKCQkJKiA1ODI1IE1IeiBbMTY1XSAoMjAuMCBkQm0pCglT
-dXBwb3J0ZWQgY29tbWFuZHM6CgkJICogbmV3X2ludGVyZmFjZQoJCSAqIHNldF9pbnRlcmZh
-Y2UKCQkgKiBuZXdfa2V5CgkJICogc3RhcnRfYXAKCQkgKiBqb2luX2lic3MKCQkgKiBzZXRf
-cG1rc2EKCQkgKiBkZWxfcG1rc2EKCQkgKiBmbHVzaF9wbWtzYQoJCSAqIHJlbWFpbl9vbl9j
-aGFubmVsCgkJICogZnJhbWUKCQkgKiBzZXRfd2lwaHlfbmV0bnMKCQkgKiBzZXRfY2hhbm5l
-bAoJCSAqIHN0YXJ0X3NjaGVkX3NjYW4KCQkgKiBzdGFydF9wMnBfZGV2aWNlCgkJICogY29u
-bmVjdAoJCSAqIGRpc2Nvbm5lY3QKCQkgKiBjcml0X3Byb3RvY29sX3N0YXJ0CgkJICogY3Jp
-dF9wcm90b2NvbF9zdG9wCgkJICogdXBkYXRlX2Nvbm5lY3RfcGFyYW1zCglzb2Z0d2FyZSBp
-bnRlcmZhY2UgbW9kZXMgKGNhbiBhbHdheXMgYmUgYWRkZWQpOgoJdmFsaWQgaW50ZXJmYWNl
-IGNvbWJpbmF0aW9uczoKCQkgKiAjeyBtYW5hZ2VkIH0gPD0gMSwgI3sgUDJQLWRldmljZSB9
-IDw9IDEsICN7IFAyUC1jbGllbnQsIFAyUC1HTyB9IDw9IDEsCgkJICAgdG90YWwgPD0gMywg
-I2NoYW5uZWxzIDw9IDIKCQkgKiAjeyBtYW5hZ2VkIH0gPD0gMSwgI3sgQVAgfSA8PSAxLCAj
-eyBQMlAtY2xpZW50IH0gPD0gMSwgI3sgUDJQLWRldmljZSB9IDw9IDEsCgkJICAgdG90YWwg
-PD0gNCwgI2NoYW5uZWxzIDw9IDEKCURldmljZSBzdXBwb3J0cyBzY2FuIGZsdXNoLgoJbWF4
-ICMgc2NhbiBwbGFuczogMQoJbWF4IHNjYW4gcGxhbiBpbnRlcnZhbDogNTA4CgltYXggc2Nh
-biBwbGFuIGl0ZXJhdGlvbnM6IDAKCVN1cHBvcnRlZCBUWCBmcmFtZSB0eXBlczoKCQkgKiBt
-YW5hZ2VkOiAweDAwIDB4MTAgMHgyMCAweDMwIDB4NDAgMHg1MCAweDYwIDB4NzAgMHg4MCAw
-eDkwIDB4YTAgMHhiMCAweGMwIDB4ZDAgMHhlMCAweGYwCgkJICogQVA6IDB4MDAgMHgxMCAw
-eDIwIDB4MzAgMHg0MCAweDUwIDB4NjAgMHg3MCAweDgwIDB4OTAgMHhhMCAweGIwIDB4YzAg
-MHhkMCAweGUwIDB4ZjAKCQkgKiBQMlAtY2xpZW50OiAweDAwIDB4MTAgMHgyMCAweDMwIDB4
-NDAgMHg1MCAweDYwIDB4NzAgMHg4MCAweDkwIDB4YTAgMHhiMCAweGMwIDB4ZDAgMHhlMCAw
-eGYwCgkJICogUDJQLUdPOiAweDAwIDB4MTAgMHgyMCAweDMwIDB4NDAgMHg1MCAweDYwIDB4
-NzAgMHg4MCAweDkwIDB4YTAgMHhiMCAweGMwIDB4ZDAgMHhlMCAweGYwCgkJICogUDJQLWRl
-dmljZTogMHgwMCAweDEwIDB4MjAgMHgzMCAweDQwIDB4NTAgMHg2MCAweDcwIDB4ODAgMHg5
-MCAweGEwIDB4YjAgMHhjMCAweGQwIDB4ZTAgMHhmMAoJU3VwcG9ydGVkIFJYIGZyYW1lIHR5
-cGVzOgoJCSAqIG1hbmFnZWQ6IDB4NDAgMHhkMAoJCSAqIEFQOiAweDAwIDB4MjAgMHg0MCAw
-eGEwIDB4YjAgMHhjMCAweGQwCgkJICogUDJQLWNsaWVudDogMHg0MCAweGQwCgkJICogUDJQ
-LUdPOiAweDAwIDB4MjAgMHg0MCAweGEwIDB4YjAgMHhjMCAweGQwCgkJICogUDJQLWRldmlj
-ZTogMHg0MCAweGQwCglTdXBwb3J0ZWQgZXh0ZW5kZWQgZmVhdHVyZXM6CgkJKiBbIENRTV9S
-U1NJX0xJU1QgXTogbXVsdGlwbGUgQ1FNX1JTU0lfVEhPTEQgcmVjb3JkcwoJCSogWyBERlNf
-T0ZGTE9BRCBdOiBERlMgb2ZmbG9hZAo=
-
---------------4IZdGWP8hHS0yZzwVwXLzy2J--
+>
