@@ -1,112 +1,282 @@
-Received: from mail-oo1-f45.google.com (mail-oo1-f45.google.com [209.85.161.45])
+Received: from mail-qv1-f53.google.com (mail-qv1-f53.google.com [209.85.219.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D676F33CE8
-	for <iwd@lists.linux.dev>; Sat, 19 Oct 2024 14:41:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0CE41E6DFC
+	for <iwd@lists.linux.dev>; Mon, 21 Oct 2024 12:42:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729348904; cv=none; b=ebFd6bq162yF9psCYMf9Q/o1VtqY1WXly5tq9H3FSu0l2mis6YIlnxp1JKzCMiYMrWKZBegyD/QEoUV3nGvVIyg4bQzOOqkzgBNCvsdixBZTyzLB2+s+vtt5jV/DftTHF/+e1sv48D+h1rTJ1MUqe3ODzY0mxQpeoXQneSdUO/E=
+	t=1729514557; cv=none; b=ipEcNggpFn8rYZhGqQXJ/ZasX/GsFKBFpjoQut63wTyaV/EMnqeWL6QdcYle8pFs2FmpBvp9hf7NSFmSygz+5dcmEJd+tjBlYgNWVp3Ac3Se6ca2kbXSeeaYIT1tbnQ5TQYX+9jAaqLrCtNWFKaPWGgk6tjR6vAJKLTN8ipsZB0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729348904; c=relaxed/simple;
-	bh=rytb50V/R5UUD9ICDToWkr3imftFmEXQEsyTj/poBxk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=m0l6s6Pbq0E4sLW1jtdUlnqGOxlfL/xmgwjV6Ia+LgB/3ek+P4yuAOawiFjWQi6Sf77xqIfbAVs6vHDQ2Per5Nt13M2Rdb8QK7V3bUdnXOlHbDFC3RJhdrcaJYCkNe+OSb7qeaD+94bCUQAnWgYcicLDviCxS6ZlgRQzxLQRRUA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RIS1rIMs; arc=none smtp.client-ip=209.85.161.45
+	s=arc-20240116; t=1729514557; c=relaxed/simple;
+	bh=zSVYF9l/Ta+jiHdLZZFCc7ShXdxzsNGTpeoacApvsuQ=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=L49Unr4E8XlT4iy33KxJABrt4OCD9Z5PGi37cfa828JelVHUlulXqHuaKA1bE6SguNiyBnlHSuTi+DbrjSh4WzaskcHX+hgyuh8+a+acqz/uCM4C0CYS1K23kb3ouNxHlag8iHIJomANDIQ09hhRBC4WovI3GWa825AQ2X5t3jE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lhDpAbxw; arc=none smtp.client-ip=209.85.219.53
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RIS1rIMs"
-Received: by mail-oo1-f45.google.com with SMTP id 006d021491bc7-5e5d0a80db4so1555328eaf.3
-        for <iwd@lists.linux.dev>; Sat, 19 Oct 2024 07:41:42 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lhDpAbxw"
+Received: by mail-qv1-f53.google.com with SMTP id 6a1803df08f44-6cbd1ae26a6so27935776d6.1
+        for <iwd@lists.linux.dev>; Mon, 21 Oct 2024 05:42:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1729348902; x=1729953702; darn=lists.linux.dev;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=sDuvifj0mB98p5xVSdNwR0ZsSWc4ScV3JEEBnBk45rw=;
-        b=RIS1rIMsRRBvCJfOuUFSJiQRuKPVcNqNUFs/uVLjRWqZrwIE9n6l1fc1+VeNYP9U7h
-         wriHdw4lSJOH67trK13B9jxRcPHvhb2VdAlBU2yvNGAsTk0MELlaah/984GGFZG53W6R
-         s73exooBoLFvxtoBZvBRdk4639Up6SXk6i4kD9KAikEG+eEL90eL/Zc/WZAXD/OI5IRe
-         VHRpownxXtGJzgAz+QFgfKYJnYMUOx2EDF0E1HbCkcszgP46GPZ/+Wcfm2iOsO8YbFM0
-         95whVQVnk/2wwj04uWLDEp2nWNBiPewRpy4eKfc9NHP2l8+2RsJLjuCkmyNTon1kQC32
-         RXnA==
+        d=gmail.com; s=20230601; t=1729514554; x=1730119354; darn=lists.linux.dev;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=p0TNcHPu/qjDPiDPqm+Ndqr3W8h2jWCENfx7iK+20iE=;
+        b=lhDpAbxwecayoAZs03AIyf73npLoKAaCOw/0z+6fRssUmV2PqbV+TMq78AQtykKhVz
+         Qc+essZk7x7VBaZ3uTLiSvKvLo2H5Rz6Bx+IcpBNppNI33kfmts5XxDxsT3O25JuELGM
+         Ia22MCW43nOWQKaODuFXthB7xddubMkyGGf5rMyvLdQjbnTv5UOK6y1Ssknvqol1tddD
+         NF3WVW3ChaQlZfFhAhWGI9vZF5rEO/tfZWpKdB5FhZuJw1a+03alIVl93c4mlNgEZOsk
+         Au0LqfkCk6pFhaKZxy9GehSLzqE+RGA0ndgZWTvUj/gqQs9LmsvW6BOljngXoxS6ZTbY
+         A9yw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729348902; x=1729953702;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=sDuvifj0mB98p5xVSdNwR0ZsSWc4ScV3JEEBnBk45rw=;
-        b=Kl5Ppt86ZImcJAiqmXZxA2xYsfxQC/EudQgPVLTNHqAn4H/SWgLfawH3UBSuKabF8z
-         NDUP2DrxEJtbp4CrOm4ge1iX/Lxm0VSKw60SJ9UzzP2yD+fFpPjAbGAUkBN5gBCsgUhi
-         h1B7HNP9d7bxo/iyb+DKx4P3b/UIsG85gJysR6WFK5hJg46bj1cIp3EtjLHNDbzk/OFJ
-         dr9la5ZaY7+wstW1wK/y2KagnK5ljAUp/q4HHl1yTqQXHKn7WFXgfBD5k2RZxPFqCrTV
-         TaeSvYrMi0x+3NHfSGNi/wWHzFZt7arcLG6QaqSWmh/tArZlv/SsiwQEx5UIMl5WFN2z
-         gaqQ==
-X-Gm-Message-State: AOJu0YwH0FITP3+PpnonU8JSA8p6Ha3BrEf5bfZeTScPjn/7zuoBv00o
-	pLzP/+3FglvipmW4ZZlVcAAnXpyNTYow5EY5CZp+uRtFrGnwxkNp
-X-Google-Smtp-Source: AGHT+IEW+JVdZkfGS3tXVPBlEE7tqmu78/lwCPZLX0BPheFP1i+9si26Mkibi4mzkWkEnHQv1nXoGA==
-X-Received: by 2002:a05:6820:822:b0:5e5:7086:ebed with SMTP id 006d021491bc7-5eb8b6cb95fmr3540107eaf.7.1729348901890;
-        Sat, 19 Oct 2024 07:41:41 -0700 (PDT)
-Received: from [192.168.1.22] (syn-070-114-247-242.res.spectrum.com. [70.114.247.242])
-        by smtp.googlemail.com with ESMTPSA id 006d021491bc7-5eb8a7789ddsm630518eaf.5.2024.10.19.07.41.40
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 19 Oct 2024 07:41:41 -0700 (PDT)
-Message-ID: <5a128900-432f-439e-9008-3b303ee72eb1@gmail.com>
-Date: Sat, 19 Oct 2024 09:41:39 -0500
+        d=1e100.net; s=20230601; t=1729514554; x=1730119354;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=p0TNcHPu/qjDPiDPqm+Ndqr3W8h2jWCENfx7iK+20iE=;
+        b=Z6Fq2L/Hfdjagy3C6zMuX+v29YIxQW4osIGmohVLowSZHOfLehG1eAhCehUploQ3W3
+         Y4WJ1VjFyJy9tqQ1Q+UYZQT3SxQLQAZRFuDhX0d29lvS6lsEZakXnUXTHgOVFlZAXNVS
+         P6ThqaJep4KD3PvgmCVYImyW3T+VVujeaMnZU70KFO69Ss7vScBNwAR+PYZSQYZyAzWw
+         cZJumwB2bR1KJDsZ3G9VODNyVK3R2nuf67Va0NPJO3y4Vx/F/oR2sFHMLASOBevRYWa4
+         1AT32mZ8EkhAbXXkiYIShHyRZl1ybeagQSNVEU7toNFMajP1S33DZ+tMkGkQEdBRPYJP
+         3aWQ==
+X-Gm-Message-State: AOJu0YxwOFYA7IyJqeE3oxMXimbZ8B3GFFOu7hQ1qZSyLjddKK7iTebX
+	GMtouMjEP1vUij4IVbOAwoEIZ7WbLO5leyDEoy5ej9R0U8TnPMj/QLateQ==
+X-Google-Smtp-Source: AGHT+IFQmykAu5PW3eYJ34nqrGhfZMnUMDv6bubk1J4HbBMm37X11afMX4doG1o7wITp7dXwY/HcEQ==
+X-Received: by 2002:a05:6214:2f87:b0:6cb:ffd6:3ed8 with SMTP id 6a1803df08f44-6cde14bdef5mr171746286d6.10.1729514554292;
+        Mon, 21 Oct 2024 05:42:34 -0700 (PDT)
+Received: from LOCLAP699.localdomain ([72.46.116.182])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6ce00999ab0sm17006586d6.93.2024.10.21.05.42.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 21 Oct 2024 05:42:33 -0700 (PDT)
+From: James Prestwood <prestwoj@gmail.com>
+To: iwd@lists.linux.dev
+Cc: James Prestwood <prestwoj@gmail.com>
+Subject: [PATCH 1/3] frame-xchg: add multicast RX flag argument
+Date: Mon, 21 Oct 2024 05:42:26 -0700
+Message-Id: <20241021124228.145516-1-prestwoj@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: IWD 1.27 with brcmfmac not working for roaming
-To: Martin Petzold <martin.petzold@tavla.de>
-Cc: "iwd@lists.linux.dev" <iwd@lists.linux.dev>,
- Arend van Spriel <arend.vanspriel@broadcom.com>
-References: <a99e0ef1-8f97-4c1d-9aa5-5a07c87782a5@tavla.de>
- <d91f33df-e9d7-430a-b1ca-13cd1dee973a@gmail.com>
- <c5e790a5-2854-47a6-9431-e02a0f9e6676@tavla.de>
- <5efc11fc-9c21-44a0-b282-5d41bfb96a8c@gmail.com>
- <f496ad63-e2a6-46cb-b7d6-1a084523c7d9@broadcom.com>
- <1761198e-9f41-4e5a-b2b9-a1652732346d@gmail.com>
- <6898cd84-c7b9-4fa0-aeb5-c7a90d81b58b@tavla.de>
- <b0afc4f1-6496-48a4-a11c-789ee08368e4@tavla.de>
-Content-Language: en-US
-From: Denis Kenzior <denkenz@gmail.com>
-In-Reply-To: <b0afc4f1-6496-48a4-a11c-789ee08368e4@tavla.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-Hi Martin,
+DPP optionally uses the multicast RX flag for frame registrations but
+since frame-xchg did not support that, it used its own registration
+internally. To avoid code re-use within DPP add a flag to
+frame_watch_add in order to allow DPP to utilize frame-xchg.
+---
+ src/ap.c         | 12 ++++++------
+ src/dpp.c        |  4 ++--
+ src/frame-xchg.c |  7 ++++++-
+ src/frame-xchg.h |  1 +
+ src/netdev.c     | 14 +++++++-------
+ src/p2p.c        |  5 +++--
+ src/rrm.c        |  2 +-
+ src/station.c    |  2 +-
+ 8 files changed, 27 insertions(+), 20 deletions(-)
 
-> Additional information about our setup: We do OTA rootfs image upgrades. So the 
-> whole rootfs (including /var) is replaced. AND after reboot we always have a 
-> fresh setup an initial boot again (systemd "firstboot"). Here also machine id 
-> and other things are re-created. We ONLY preserve the "/var/lib/iwd" directory 
-> (and bluetooth etc.) on a separate partition and use bind mounts (in fstab) to 
-> include this path under "/".
+diff --git a/src/ap.c b/src/ap.c
+index 6650f0af..562e00c8 100644
+--- a/src/ap.c
++++ b/src/ap.c
+@@ -3914,34 +3914,34 @@ struct ap_state *ap_start(struct netdev *netdev, struct l_settings *config,
+ 
+ 	if (!frame_watch_add(wdev_id, 0, 0x0000 |
+ 			(MPDU_MANAGEMENT_SUBTYPE_ASSOCIATION_REQUEST << 4),
+-			NULL, 0, ap_assoc_req_cb, ap, NULL))
++			NULL, 0, false, ap_assoc_req_cb, ap, NULL))
+ 		goto error;
+ 
+ 	if (!frame_watch_add(wdev_id, 0, 0x0000 |
+ 			(MPDU_MANAGEMENT_SUBTYPE_REASSOCIATION_REQUEST << 4),
+-			NULL, 0, ap_reassoc_req_cb, ap, NULL))
++			NULL, 0, false, ap_reassoc_req_cb, ap, NULL))
+ 		goto error;
+ 
+ 	if (!wiphy_supports_probe_resp_offload(wiphy)) {
+ 		if (!frame_watch_add(wdev_id, 0, 0x0000 |
+ 				(MPDU_MANAGEMENT_SUBTYPE_PROBE_REQUEST << 4),
+-				NULL, 0, ap_probe_req_cb, ap, NULL))
++				NULL, 0, false, ap_probe_req_cb, ap, NULL))
+ 			goto error;
+ 	}
+ 
+ 	if (!frame_watch_add(wdev_id, 0, 0x0000 |
+ 				(MPDU_MANAGEMENT_SUBTYPE_DISASSOCIATION << 4),
+-				NULL, 0, ap_disassoc_cb, ap, NULL))
++				NULL, 0, false, ap_disassoc_cb, ap, NULL))
+ 		goto error;
+ 
+ 	if (!frame_watch_add(wdev_id, 0, 0x0000 |
+ 				(MPDU_MANAGEMENT_SUBTYPE_AUTHENTICATION << 4),
+-				NULL, 0, ap_auth_cb, ap, NULL))
++				NULL, 0, false, ap_auth_cb, ap, NULL))
+ 		goto error;
+ 
+ 	if (!frame_watch_add(wdev_id, 0, 0x0000 |
+ 				(MPDU_MANAGEMENT_SUBTYPE_DEAUTHENTICATION << 4),
+-				NULL, 0, ap_deauth_cb, ap, NULL))
++				NULL, 0, false, ap_deauth_cb, ap, NULL))
+ 		goto error;
+ 
+ 	ap->mlme_watch = l_genl_family_register(ap->nl80211, "mlme",
+diff --git a/src/dpp.c b/src/dpp.c
+index 03e2a7a6..004b431d 100644
+--- a/src/dpp.c
++++ b/src/dpp.c
+@@ -3861,11 +3861,11 @@ static void dpp_create(struct netdev *netdev)
+ 
+ 	frame_watch_add(netdev_get_wdev_id(netdev), 0, 0x00d0,
+ 				dpp_conf_response_prefix,
+-				sizeof(dpp_conf_response_prefix),
++				sizeof(dpp_conf_response_prefix), false,
+ 				dpp_handle_config_response_frame, dpp, NULL);
+ 	frame_watch_add(netdev_get_wdev_id(netdev), 0, 0x00d0,
+ 				dpp_conf_request_prefix,
+-				sizeof(dpp_conf_request_prefix),
++				sizeof(dpp_conf_request_prefix), false,
+ 				dpp_handle_config_request_frame, dpp, NULL);
+ 
+ 	dpp->known_network_watch = known_networks_watch_add(
+diff --git a/src/frame-xchg.c b/src/frame-xchg.c
+index 158befd0..42d9a3ae 100644
+--- a/src/frame-xchg.c
++++ b/src/frame-xchg.c
+@@ -575,6 +575,7 @@ drop:
+ 
+ bool frame_watch_add(uint64_t wdev_id, uint32_t group_id, uint16_t frame_type,
+ 			const uint8_t *prefix, size_t prefix_len,
++			bool multicast_rx,
+ 			frame_watch_cb_t handler, void *user_data,
+ 			frame_xchg_destroy_func_t destroy)
+ {
+@@ -614,6 +615,10 @@ bool frame_watch_add(uint64_t wdev_id, uint32_t group_id, uint16_t frame_type,
+ 	l_genl_msg_append_attr(msg, NL80211_ATTR_FRAME_MATCH,
+ 				prefix_len, prefix);
+ 
++	if (multicast_rx)
++		l_genl_msg_append_attr(msg, NL80211_ATTR_RECEIVE_MULTICAST,
++					0, NULL);
++
+ 	if (group->id == 0)
+ 		l_genl_family_send(nl80211, msg, frame_watch_register_cb,
+ 					L_UINT_TO_PTR(frame_type), NULL);
+@@ -1194,7 +1199,7 @@ uint32_t frame_xchg_startv(uint64_t wdev_id, struct iovec *frame, uint32_t freq,
+ 		watch->prefix = prefix;
+ 		watch->cb = va_arg(resp_args, void *);
+ 		frame_watch_add(wdev_id, group_id, prefix->frame_type,
+-				prefix->data, prefix->len,
++				prefix->data, prefix->len, false,
+ 				frame_xchg_resp_cb, fx, NULL);
+ 
+ 		if (!fx->rx_watches)
+diff --git a/src/frame-xchg.h b/src/frame-xchg.h
+index 9e250e3f..3f1e0e55 100644
+--- a/src/frame-xchg.h
++++ b/src/frame-xchg.h
+@@ -45,6 +45,7 @@ enum frame_xchg_group {
+ 
+ bool frame_watch_add(uint64_t wdev_id, uint32_t group, uint16_t frame_type,
+ 			const uint8_t *prefix, size_t prefix_len,
++			bool multicast_rx,
+ 			frame_watch_cb_t handler, void *user_data,
+ 			frame_xchg_destroy_func_t destroy);
+ bool frame_watch_group_remove(uint64_t wdev_id, uint32_t group);
+diff --git a/src/netdev.c b/src/netdev.c
+index 8379a598..2eebf457 100644
+--- a/src/netdev.c
++++ b/src/netdev.c
+@@ -5720,35 +5720,35 @@ static void netdev_add_station_frame_watches(struct netdev *netdev)
+ 
+ 	/* Subscribe to Management -> Action -> RM -> Neighbor Report frames */
+ 	frame_watch_add(wdev, 0, 0x00d0, action_neighbor_report_prefix,
+-			sizeof(action_neighbor_report_prefix),
++			sizeof(action_neighbor_report_prefix), false,
+ 			netdev_neighbor_report_frame_event, netdev, NULL);
+ 
+ 	frame_watch_add(wdev, 0, 0x00d0, action_sa_query_resp_prefix,
+-			sizeof(action_sa_query_resp_prefix),
++			sizeof(action_sa_query_resp_prefix), false,
+ 			netdev_sa_query_resp_frame_event, netdev, NULL);
+ 
+ 	frame_watch_add(wdev, 0, 0x00d0, action_sa_query_req_prefix,
+-			sizeof(action_sa_query_req_prefix),
++			sizeof(action_sa_query_req_prefix), false,
+ 			netdev_sa_query_req_frame_event, netdev, NULL);
+ 
+ 	frame_watch_add(wdev, 0, 0x00d0, action_ft_response_prefix,
+-			sizeof(action_ft_response_prefix),
++			sizeof(action_ft_response_prefix), false,
+ 			netdev_ft_response_frame_event, netdev, NULL);
+ 
+ 	frame_watch_add(wdev, 0, 0x00b0, auth_ft_response_prefix,
+-			sizeof(auth_ft_response_prefix),
++			sizeof(auth_ft_response_prefix), false,
+ 			netdev_ft_auth_response_frame_event, netdev, NULL);
+ 
+ 	if (wiphy_supports_qos_set_map(netdev->wiphy))
+ 		frame_watch_add(wdev, 0, 0x00d0, action_qos_map_prefix,
+-				sizeof(action_qos_map_prefix),
++				sizeof(action_qos_map_prefix), false,
+ 				netdev_qos_map_frame_event, netdev, NULL);
+ 
+ 	if (!wiphy_supports_cmds_auth_assoc(netdev->wiphy) &&
+ 			wiphy_has_feature(netdev->wiphy, NL80211_FEATURE_SAE))
+ 		frame_watch_add(wdev, 0, 0x00b0,
+ 				auth_sae_prefix, sizeof(auth_sae_prefix),
+-				netdev_sae_external_auth_frame_event,
++				false, netdev_sae_external_auth_frame_event,
+ 				netdev, NULL);
+ }
+ 
+diff --git a/src/p2p.c b/src/p2p.c
+index e8c7c5de..e55cb76a 100644
+--- a/src/p2p.c
++++ b/src/p2p.c
+@@ -4163,10 +4163,11 @@ static void p2p_device_discovery_start(struct p2p_device *dev)
+ 						L_ARRAY_SIZE(channels_social)];
+ 
+ 	frame_watch_add(dev->wdev_id, FRAME_GROUP_P2P_LISTEN, 0x0040,
+-			(uint8_t *) "", 0, p2p_device_probe_cb, dev, NULL);
++			(uint8_t *) "", 0, false,
++			p2p_device_probe_cb, dev, NULL);
+ 	frame_watch_add(dev->wdev_id, FRAME_GROUP_P2P_LISTEN, 0x00d0,
+ 			p2p_frame_go_neg_req.data, p2p_frame_go_neg_req.len,
+-			p2p_device_go_negotiation_req_cb, dev, NULL);
++			false, p2p_device_go_negotiation_req_cb, dev, NULL);
+ 
+ 	p2p_device_scan_start(dev);
+ }
+diff --git a/src/rrm.c b/src/rrm.c
+index a11a6532..e5118a99 100644
+--- a/src/rrm.c
++++ b/src/rrm.c
+@@ -798,7 +798,7 @@ static void rrm_add_frame_watches(struct rrm_state *rrm)
+ 	l_debug("");
+ 
+ 	frame_watch_add(rrm->wdev_id, 0, frame_type, prefix, sizeof(prefix),
+-					rrm_frame_watch_cb, rrm, NULL);
++					false, rrm_frame_watch_cb, rrm, NULL);
+ }
+ 
+ static struct rrm_state *rrm_new_state(struct netdev *netdev)
+diff --git a/src/station.c b/src/station.c
+index b7905c4f..cef6c66a 100644
+--- a/src/station.c
++++ b/src/station.c
+@@ -5698,7 +5698,7 @@ static void add_frame_watches(struct netdev *netdev)
+ 	 */
+ 	frame_watch_add(netdev_get_wdev_id(netdev), 0, 0x00d0,
+ 			action_ap_roam_prefix, sizeof(action_ap_roam_prefix),
+-			ap_roam_frame_event,
++			false, ap_roam_frame_event,
+ 			L_UINT_TO_PTR(netdev_get_ifindex(netdev)), NULL);
+ }
+ 
+-- 
+2.34.1
 
-What you describe is standard practice.
-
-> 
-> So maybe for IWD it is uncommon to find a "known-network" on firstboot 
-> (typically not possible). Or maybe some kind of BSS information is cached and 
-> then gone because of our rootfs upgrade. Or it is about the change of machine id 
-> (MAC address in our case remains the same, because it comes from the chip). 
-> Maybe if you have a known-network, you assume the BSS cache has to exist (been 
-> built) already. No ideas, something like this...
-
-iwd does not make any such assumptions.  No information is kept outside of 
-/var/lib/iwd.  The only cache iwd keeps is of frequencies for known networks 
-kept in /var/lib/iwd/.known_network.freq which is used to speed up the initial 
-scan.  If the file doesn't exist, iwd simply falls back to a full scan.
-
-> 
-> This is a more or less common setup for embedded environments. Would be glad if 
-> you could double-check if this could cause wrong initial connection (weaker AP).
-
-We can't help you unless you provide logs.
-
-Regards,
--Denis
