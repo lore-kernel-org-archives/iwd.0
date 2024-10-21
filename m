@@ -1,69 +1,51 @@
-Received: from mail-qk1-f172.google.com (mail-qk1-f172.google.com [209.85.222.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mout-b-210.mailbox.org (mout-b-210.mailbox.org [195.10.208.40])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E04DC1F942E
-	for <iwd@lists.linux.dev>; Mon, 21 Oct 2024 19:11:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD843194A7C
+	for <iwd@lists.linux.dev>; Mon, 21 Oct 2024 19:15:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.10.208.40
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729537866; cv=none; b=k4lvfnKZC3QQXYnQRQ95iLRfCZufj9n0AcC6+FaPvhRO64YBVWs2DennYGXZ6DG4OMgebr8uL+SvqkncXBY6wBgzwM/mvrzZdLgG5O+aLiE8s1n0M9MZOA802a1JZrzApPtn9T1XKx1U8TULWrNqmjqcfpUz0VyXxvWzCJB5TBs=
+	t=1729538129; cv=none; b=TxZYcKjrho4eXIcCslo69TbiLX69oFJjpOaRbmwBtt+FH49rEBuiNGudoyuMzFfREWHfJ9+q2VbIErkKYtq9qIWauCrnOHy5EYGTqdO6agvkd38Q3oca+4mZutd4lsiBus9+RBnwhibsheN/+WGSH4u9/R/DKJui8WZstGQZ13o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729537866; c=relaxed/simple;
-	bh=irD+y4uiEgpl+tbKVr0hlxWAMzwABM2jcbwIujvambs=;
+	s=arc-20240116; t=1729538129; c=relaxed/simple;
+	bh=fHmLqr8Enj/0NUuMc8bHk1G2oP50oLYUUw9xjt+ongo=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=iDzSLTydIHHQ/HSzumSrhahiY+rY2b/bAwfGhkWXtrSD7OwtBsZwNuXKxS4/0qB3nM3PKRui3+td9Z0fFksSBGjs8I0/9nndOcxjRIbXZTuyBJX9EuZwYF90WffiWCSGwNAVBZ0CtL3zcyGM4/44aIoOvz+GEfTHb2haphcefZ8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YuX3RGSs; arc=none smtp.client-ip=209.85.222.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	 In-Reply-To:Content-Type; b=a7azT/DuWJGFhkPZdWS9aima0Ci7vMETGB0hAR4/evqPU4KfuuSPwQtNqRPTP1Y4pGEc3aGXhPhxDSK3zuZrhw6nrrODUJYHezmU2Attr/DHMOkdzjWbEEWWEDNHvmKFSFOSVVPLiXKKAEZKJKndIDzOYYtnAYGWjYom3teaflU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tavla.de; spf=pass smtp.mailfrom=tavla.de; dkim=pass (2048-bit key) header.d=tavla.de header.i=@tavla.de header.b=YjykMigH; arc=none smtp.client-ip=195.10.208.40
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tavla.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tavla.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YuX3RGSs"
-Received: by mail-qk1-f172.google.com with SMTP id af79cd13be357-7b149ef910eso405934185a.3
-        for <iwd@lists.linux.dev>; Mon, 21 Oct 2024 12:11:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1729537864; x=1730142664; darn=lists.linux.dev;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=YWthGB6i9ll5JFe9Bfo6Uu48wMxIh6+jdPUwj1NaR4Q=;
-        b=YuX3RGSsCNZCWVMT6IWUHb26cLScWpBGibji2XsskeQ2ncS6wGSAt8bf1HQ78xEIVu
-         IQDGxO+njzHKxRxGp6g42t9+fhatfYxonalNPUxS0Z63Ib0zhwmza8vxBLw2QkBU/tYI
-         KtBjNFiNIIxU3RMUy0DSj1NUJ9oY1mov2syeeoNS9VctyG9Fn7Yl26Dvmt7FRvuT8h3B
-         svE//NeSGLbP/SELX9Zz1H+tgRuGzFRNdxOF+4HQN2rFPLCTX3leX/4PZskPf/4fRC5d
-         bmSoLfgq9PnoCGaZ+B45XqHCXACEH+IqoRZOkZb7tPNsw8xiIgdF3ojDPOPZImClsSJC
-         dasA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729537864; x=1730142664;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=YWthGB6i9ll5JFe9Bfo6Uu48wMxIh6+jdPUwj1NaR4Q=;
-        b=sn8vamuaIarKRS5YdnajfZCPfbKYKx5bnDFuaO1qM7K9mbVZOgyG10/2taK+fA/odS
-         nBJEELVqVU/LsKxCoywlXKpfwbg4br5TnOhpi8pZzIPOndO5Ngm0l1FbBE/TVRvyVqP5
-         FbrYfTxy5bI5lmqqWE38y+MeC4MJcKGHHvrEM3g4SNa9m8aYsHWrX3Qdh+YK3r4SYrNK
-         vtuQi1YzRS7zF2CiKQ28UMMM2Ed/MUNbPCiIv+7W5Z/YA0DnRppMO2rMJDP0t/MuuIa2
-         idH4D8CeKZYiJsk6KHAw/fzXy2c2KCjfaL9luGpZHNdQHs2kILg+tWCjiD+ZI+HtMmqp
-         ed8w==
-X-Gm-Message-State: AOJu0YynAEGJu9lSzyI7AT0YEnlhj7PWgnN66ZGlOoF3A/ILAAiEk0Zw
-	TUPQGdpA7iGOZwmDAPC5OQPD4zCI3fNRQCTUxNtABBRg2CD3fq6X
-X-Google-Smtp-Source: AGHT+IEi7071SkorguYnjvz2qF+STdJZ9kPRtDbZ2cYxMtsePlyd4JlPVPKPwHB/ukcG1r4ajglN6Q==
-X-Received: by 2002:a05:620a:4687:b0:7b1:3e41:849f with SMTP id af79cd13be357-7b157bdbeb9mr1783019385a.47.1729537863526;
-        Mon, 21 Oct 2024 12:11:03 -0700 (PDT)
-Received: from [10.100.121.195] ([152.193.78.90])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7b165a883f1sm196753485a.130.2024.10.21.12.11.02
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 21 Oct 2024 12:11:03 -0700 (PDT)
-Message-ID: <494b8be3-8094-446f-9b96-b06debbbeac6@gmail.com>
-Date: Mon, 21 Oct 2024 12:11:01 -0700
+	dkim=pass (2048-bit key) header.d=tavla.de header.i=@tavla.de header.b="YjykMigH"
+Received: from smtp202.mailbox.org (smtp202.mailbox.org [10.196.197.202])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mout-b-210.mailbox.org (Postfix) with ESMTPS id 4XXQ4T5ZP7zDtxd;
+	Mon, 21 Oct 2024 21:15:21 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tavla.de; s=MBO0001;
+	t=1729538121;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=GRTji+XK+pGX0wJKZCgG0SyUUDYUJM320FAnHOZehas=;
+	b=YjykMigHhAA5814t9Y/2pQ6LFzcab83JpAk4FDClC69PFkfXrpbL1TWN0DYPqMV21GgXkv
+	39YUUssCR/WyfJl/TXrsk4O3cVL5i3tVKTOfoH5g6Lki1fzNiJWI2B/s/TyVzlxU7DE0l3
+	tDaVKkc8XeuQznHuxdg0GuBCo0mwxGtdD1aM9P/r+HXo56gybz33d6/gTaZVpptBfcB74x
+	/99yvaZu2X+lqr7Iv0zJyx+JPO+nEVMZzlox0Ln4dBzBXBI+2+7X7DnRA/RmwVs9J7xOvl
+	15RQbO68PbQ0KuaFBsz6Ir454toa7R/+BFIr0EZ6CUAi1N0ivlFBbP80Oi0UaA==
+Message-ID: <a2b79fd9-fa4e-4270-b5c8-4a3c726416c4@tavla.de>
+Date: Mon, 21 Oct 2024 21:15:20 +0200
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
 Subject: Re: IWD 1.27 with brcmfmac not working for roaming
-To: Arend van Spriel <arend.vanspriel@broadcom.com>,
- Denis Kenzior <denkenz@gmail.com>, Martin Petzold <martin.petzold@tavla.de>
-Cc: iwd@lists.linux.dev
+To: Denis Kenzior <denkenz@gmail.com>
+Cc: iwd@lists.linux.dev, Arend van Spriel <arend.vanspriel@broadcom.com>,
+ James Prestwood <prestwoj@gmail.com>
 References: <a99e0ef1-8f97-4c1d-9aa5-5a07c87782a5@tavla.de>
  <d91f33df-e9d7-430a-b1ca-13cd1dee973a@gmail.com>
  <c5e790a5-2854-47a6-9431-e02a0f9e6676@tavla.de>
@@ -79,56 +61,37 @@ References: <a99e0ef1-8f97-4c1d-9aa5-5a07c87782a5@tavla.de>
  <192b00cf460.279b.9b12b7fc0a3841636cfb5e919b41b954@broadcom.com>
  <54a62c50-5c9b-47c6-b8ab-f7369381fdf9@gmail.com>
  <c57706f6-2d5c-4e73-bc42-e2b7e4239a78@broadcom.com>
-Content-Language: en-US
-From: James Prestwood <prestwoj@gmail.com>
-In-Reply-To: <c57706f6-2d5c-4e73-bc42-e2b7e4239a78@broadcom.com>
+ <db8b9660-3e68-4223-aa3e-e3d6a7d18906@gmail.com>
+Content-Language: en-GB, de-DE
+From: Martin Petzold <martin.petzold@tavla.de>
+Organization: TAVLA Technology GmbH
+In-Reply-To: <db8b9660-3e68-4223-aa3e-e3d6a7d18906@gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-Hi Arend,
+Hi Denis,
 
-On 10/21/24 11:26 AM, Arend van Spriel wrote:
-> On 10/21/2024 7:40 PM, Denis Kenzior wrote:
->> Hi Arend,
+Am 21.10.24 um 20:55 schrieb Denis Kenzior:
+> Hi Arend,
 >>
->>>
->>> I have not seen patches for OWE in brcmfmac. Looking at the 
->>> supported ciphers:
->>
->> OWE is an AKM.  It still uses CCMP/CMAC underneath.
+>> I have never seen any mention of OWE either. Regarding 
+>> CMD_EXTERNAL_AUTH support I recently posted patches on linux-wireless 
+>> list as RFT. There has been zero feedback and so I assume also zero 
+>> interest. In order to use CMD_EXTERNAL_AUTH the firmware needs to 
+>> advertise "sae_ext" in fwcap debugfs file. So if Martin can check 
+>> that, ie:
 >
-> My bad. Always confused by those concepts.
->
->>>
->>> Supported Ciphers:
->>>   * WEP40 (00-0f-ac:1)
->>>   * WEP104 (00-0f-ac:5)
->>>   * TKIP (00-0f-ac:2)
->>>   * CCMP-128 (00-0f-ac:4)
->>>   * CMAC (00-0f-ac:6)
->>>
->>> The error message seems to match with the above.
->>
->> I've never seen support for OWE in brcmfmac mentioned.  OWE requires 
->> CMD_AUTHENTICATE / CMD_ASSOCIATE (or CMD_EXTERNAL_AUTH) to derive the 
->> PMK, so iwd can't support it on FullMAC.
->
-> I have never seen any mention of OWE either. Regarding 
-> CMD_EXTERNAL_AUTH support I recently posted patches on linux-wireless 
-> list as RFT. There has been zero feedback and so I assume also zero 
-> interest. In order to use CMD_EXTERNAL_AUTH the firmware needs to 
-> advertise "sae_ext" in fwcap debugfs file. So if Martin can check 
-> that, ie:
->
-> $ grep sae_ext /sys/kernel/debug/ieee80211/phy0/fwcap
->
-> Regards,
-> Arend
+> Any suggestions for hardware I can buy that I can test the upstream 
+> kernel on easily?  I don't have any brcmfmac devices besides the RPI5 
+> and that uses a totally different kernel. 
 
-Maybe its just a naming issue, but is "sae_ext" only relevant for SAE? 
-Not OWE? So would CMD_EXTERNAL_AUTH even matter in this case?
+This is the one I am using (however, all data given is from our custom 
+carrier board):
 
-Thanks,
+https://www.variscite.de/product/evaluation-kits/var-som-mx8m-plus-nxp-i-mx-8m-plus/var-som-mx8m-plus-evaluation-kits/
 
-James
+But you need to order the SOM v1.3 because with SOM 2.0 they SWITCHED to 
+NXP IW612 WIFI+BT wifi chip (no comment).
+
+Martin
 
