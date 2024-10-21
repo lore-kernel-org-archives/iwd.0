@@ -1,58 +1,58 @@
-Received: from mail-ot1-f43.google.com (mail-ot1-f43.google.com [209.85.210.43])
+Received: from mail-qk1-f175.google.com (mail-qk1-f175.google.com [209.85.222.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39FBC199239
-	for <iwd@lists.linux.dev>; Mon, 21 Oct 2024 17:40:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A845A1CBEB6
+	for <iwd@lists.linux.dev>; Mon, 21 Oct 2024 17:55:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729532415; cv=none; b=c99dv9V5UlXYZZdxicgtPVYkZf32vrJVgnovOGsEt9jSQ2lBXnnVswzi2tHbNIvTj6eG/YJshkIPIzL9ymU3ywb3+uPoANDpdSwLWBrxuNvdKJn+SIqL8cffS7spiVw8OfFlZfZ5HnYw2GbJCdNHRB6/nhXZiJia5JO+1FCGQe0=
+	t=1729533336; cv=none; b=I4/GZ9PZv40C53jwynykpCth2zLICcX6BKhwIe8f6BaB8Wdbd5fUx6gwdcWE0Arxm4Lwz+KLrc4oCtn5RjvCeTLhIpxDtlx2sFBX+IL2lMjpWcIZXfA+Ie/liFs3pxSsBvtXrsXMU0xqg9tSiH+CO53ZYsEDeEO7GRALo78L0rQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729532415; c=relaxed/simple;
-	bh=bybfaXfgbtNGGdLtm7141OTyYtmlkFBX8f1wUPZjxvw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=JPwWj2z0uEy3ynsprGU5wrvynNVX6PCnYfh/ejrT7yB3VZ9PVwmOAAkEuDHZE4NmqKtvDZRV7TIbpWWyhVtbTTuwPrsLqklAjWsxVlRdPcqXcWWTEtnGJOdoVJYO2oLKmblKjY1fEcuPaXe9VP8PyxTOILXLvwpVIGnaPRQkRTY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=L1b6CQBr; arc=none smtp.client-ip=209.85.210.43
+	s=arc-20240116; t=1729533336; c=relaxed/simple;
+	bh=z1RMbWkYylHh508f4J0xq3HXZooL0LIOR0G0F+TgCj0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:Cc:From:
+	 In-Reply-To:Content-Type; b=MrAYqpRPa7c87mAivjyIFNrjFwTSQEDtj4W1uf6wykvAwCCmEEUwOQJnQn791qBUPzoUWWsRHLjjN+HWL+CIzmvaXdDyJjYDF4l5TDxYWBnie/l4VRK2UylNP8tP1IycS5hOojfsJvMfK3kXg0GLctvwIsCXdr2rB4tTfP5f1As=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ctpKNLi7; arc=none smtp.client-ip=209.85.222.175
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="L1b6CQBr"
-Received: by mail-ot1-f43.google.com with SMTP id 46e09a7af769-7181a8af549so1495936a34.2
-        for <iwd@lists.linux.dev>; Mon, 21 Oct 2024 10:40:12 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ctpKNLi7"
+Received: by mail-qk1-f175.google.com with SMTP id af79cd13be357-7b158542592so273905985a.2
+        for <iwd@lists.linux.dev>; Mon, 21 Oct 2024 10:55:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1729532412; x=1730137212; darn=lists.linux.dev;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=MAzHim7sFQ0of36vdSnssfuxZxKixkd5wGYcLqi11JY=;
-        b=L1b6CQBroIHvBCk0CLVz8MjMpjG0W0rmXIPat1VI8lH3JGaU8EbcDn/ulpVQplEar4
-         fasyJOkrwNyOVEpDSuAS2eVb5lQfjgN9yw7cInbt525E5vPODFnugjRpOl3pHRmivMP8
-         Fzi4/ZFO6i/DvcONXXAjK+bbArieD0twDGLqr+R88i70fB1qAmeCBfjLzU+o8mPfe34j
-         V73q9DJcy/0q0LWIkUfE/uYgSVKcTzxZK76rGJlw99h/tZ7TZ85pen9Ko0miFseBr/dV
-         eEhu3qlBH5aPVcfhIihxAlVp+llwvV3v+/cuFGhuGjazGoPK0ZPOcOQHl17gRZhT7pyl
-         qd5w==
+        d=gmail.com; s=20230601; t=1729533333; x=1730138133; darn=lists.linux.dev;
+        h=content-transfer-encoding:in-reply-to:from:cc:content-language
+         :references:to:subject:user-agent:mime-version:date:message-id:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=Uhp+BNe9LVvWezfY12f6YVDBNTuMUYRSwldHH0ODHxU=;
+        b=ctpKNLi7PFTCKnmqLZQTs+VHKfQ4tZNXrwA7xF6Ey9Rm0o0Oe6G2T9P+O/a/p5fVjZ
+         khmbz232LaFtRLotyerJrS8M2UDZseAPB48H1KcalxUokKcSeX03gyL5hS6/EhPQ1hKX
+         /UMhCHszd6FUk56BeBObnkxQiBOx82FwYJXIaS7xHD7gqAshQ+LjwNOzBUlrwWp+O3B9
+         LT+Qk86o0WNUhbu9I4k0GtGdBJSAFB37esjWw5XgMg/Y9MXwMzYU8/1Q5lh7IKsJIhZz
+         haGAhQXbmjbRvFfmYFJe3pICO1mhlbtGXXb18PuMCKSv6kRu1vdXEcuy76T8dLXGVWmn
+         lQhw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729532412; x=1730137212;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
+        d=1e100.net; s=20230601; t=1729533333; x=1730138133;
+        h=content-transfer-encoding:in-reply-to:from:cc:content-language
+         :references:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=MAzHim7sFQ0of36vdSnssfuxZxKixkd5wGYcLqi11JY=;
-        b=Zvz/OGKsm0UnjN3mw8F9usNjxXTd2ewDytcQ1rjWPWbjeJEe/EpTOnbfKKKYNjYLtm
-         S6By9j0tupZ8KjwfvnI8gGFt5b73ng8Ewtn2g63n8rqU+G3Ms990A9aqhce6R8++BUbi
-         AsiwkZCXSDUiaiUYheqmYubpPnxRWjbnW928Gy0xQhqJ2A8a0G/2T0SL/d2vUMlsB/sf
-         fcGVH3jXrTbErCfqD/bk4AWorI0FGspd7/omj9Fvoq4J/OazPRcDz/9TxRnLcIPzLlik
-         B2GE3L0YWW/MMgJGnTecR6vDXOEO2J3lp8NXb/NJz4/aHlNCqA5EAAijyHDfMwptzTZs
-         Bowg==
-X-Gm-Message-State: AOJu0YzHwyiMqB22OjKsbaq4V8M57ey9iM3H8AtUFP1k9OTMzNQh+viD
-	uQsSSkDz4D1ki6xOPrsYtgYuzUIALvFTHwsQxbkh4eQqRo5gkwXQ
-X-Google-Smtp-Source: AGHT+IGi9Y2XLFKiGpxewEh42XRzm7SVrb0dIWbHWAEQwtX1q3uAxjLHsUJXDW8a4eo79q90OO7q6w==
-X-Received: by 2002:a05:6830:4386:b0:715:4cb1:4414 with SMTP id 46e09a7af769-7181a6eee49mr9789370a34.12.1729532412167;
-        Mon, 21 Oct 2024 10:40:12 -0700 (PDT)
-Received: from [192.168.1.22] (syn-070-114-247-242.res.spectrum.com. [70.114.247.242])
-        by smtp.googlemail.com with ESMTPSA id 46e09a7af769-7182eb50327sm856957a34.37.2024.10.21.10.40.11
+        bh=Uhp+BNe9LVvWezfY12f6YVDBNTuMUYRSwldHH0ODHxU=;
+        b=dhLZXKq6R8bPrQggBTgT+f9MwqrvPPbBrXqIT3ANjd7h9Ws7lB2VDcMCtCeHFolH3P
+         Z6NjFLGZyEOz5E1z1hzLXmLiTd655f+Uk+UzwyiKlnoaKv1bbOKIwQ4unaRoouZ6Qhm2
+         njgHOjkM5NOW+Gjg8s8MxfiMnzHImYv/QlZc8VzRtsiI5scSYKuFC2qKPoh6T3fmmGRd
+         cduhReyDPfEQpI4cJA20BHsNgvwkY5kWhVm8JCmeLWf3P6EkCZ+z9KVm/FsqPkKvHKa2
+         LqLVzc0bOUbq5TkObp8sqQ3xCarqDNKpFlDDRaFm8irBXVOP0UsgANOozkHDWL2/5Jmr
+         vY8A==
+X-Gm-Message-State: AOJu0Yyq9kj1KSIsPV0vCJBx9YRPJe7ELH988NY3Zh9BOMKjm6EUxm/H
+	esXbCu1RGoADDEloA1Gq1EgXBkyM4lGpPz/mslVauExfiTCvXpp86X+iLA==
+X-Google-Smtp-Source: AGHT+IH4tqtXoLILvsOPC66WT34TCp6HzX89y0B8xbbB8xvnHd1KHK8n27xv3+8Jhx2+h9C/fi8xxw==
+X-Received: by 2002:a05:620a:1916:b0:7b1:4ff4:6a05 with SMTP id af79cd13be357-7b157bebf63mr1700806485a.54.1729533333139;
+        Mon, 21 Oct 2024 10:55:33 -0700 (PDT)
+Received: from [10.100.121.195] ([152.193.78.90])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7b165a89d54sm194034485a.129.2024.10.21.10.55.32
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 21 Oct 2024 10:40:11 -0700 (PDT)
-Message-ID: <54a62c50-5c9b-47c6-b8ab-f7369381fdf9@gmail.com>
-Date: Mon, 21 Oct 2024 12:40:10 -0500
+        Mon, 21 Oct 2024 10:55:32 -0700 (PDT)
+Message-ID: <1b41f5d1-39e2-439a-8bd6-c270c18a3335@gmail.com>
+Date: Mon, 21 Oct 2024 10:55:30 -0700
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
@@ -60,50 +60,37 @@ List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: IWD 1.27 with brcmfmac not working for roaming
-To: Arend Van Spriel <arend.vanspriel@broadcom.com>,
- James Prestwood <prestwoj@gmail.com>,
- Martin Petzold <martin.petzold@tavla.de>
-Cc: iwd@lists.linux.dev
-References: <a99e0ef1-8f97-4c1d-9aa5-5a07c87782a5@tavla.de>
- <d91f33df-e9d7-430a-b1ca-13cd1dee973a@gmail.com>
- <c5e790a5-2854-47a6-9431-e02a0f9e6676@tavla.de>
- <5efc11fc-9c21-44a0-b282-5d41bfb96a8c@gmail.com>
- <f496ad63-e2a6-46cb-b7d6-1a084523c7d9@broadcom.com>
- <1761198e-9f41-4e5a-b2b9-a1652732346d@gmail.com>
- <6898cd84-c7b9-4fa0-aeb5-c7a90d81b58b@tavla.de>
- <b0afc4f1-6496-48a4-a11c-789ee08368e4@tavla.de>
- <5a128900-432f-439e-9008-3b303ee72eb1@gmail.com>
- <2dacc589-9927-40f7-85ed-5f6b2afbbd41@tavla.de>
- <192af85f1e0.279b.9b12b7fc0a3841636cfb5e919b41b954@broadcom.com>
- <2ab8601e-1601-4d4f-b58d-e9f23877650f@gmail.com>
- <192b00cf460.279b.9b12b7fc0a3841636cfb5e919b41b954@broadcom.com>
+Subject: Re: [PATCH 1/2] wiphy: parse TX/RX frame types, and API to check auth
+ frame support
+To: iwd@lists.linux.dev
+References: <20241011145503.51330-1-prestwoj@gmail.com>
 Content-Language: en-US
-From: Denis Kenzior <denkenz@gmail.com>
-In-Reply-To: <192b00cf460.279b.9b12b7fc0a3841636cfb5e919b41b954@broadcom.com>
+Cc: Dierk.Modrow@sew-eurodrive.de
+From: James Prestwood <prestwoj@gmail.com>
+In-Reply-To: <20241011145503.51330-1-prestwoj@gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 
-Hi Arend,
+Hi Dierk,
 
-> 
-> I have not seen patches for OWE in brcmfmac. Looking at the supported ciphers:
+On 10/11/24 7:55 AM, James Prestwood wrote:
+> Drivers have been identified that do not support authentication via
+> CMD_FRAME. This prevents FT from succeeding but since there is no
+> way to check this in IWD station cannot handle it gracefully.
+>
+> Now IWD can parse the TX/RX frame types and check if authentication
+> is supported and plan the type of roam according to what protocol
+> will work correctly.
+> ---
+>   src/wiphy.c | 54 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+>   src/wiphy.h |  1 +
+>   2 files changed, 55 insertions(+)
 
-OWE is an AKM.  It still uses CCMP/CMAC underneath.
+Were you able to try these patches yet? I can't test them on the 
+hardware you are using, so if possible we'd like a confirmation the fix 
+worked as expected before they are merged upstream.
 
-> 
-> Supported Ciphers:
->   * WEP40 (00-0f-ac:1)
->   * WEP104 (00-0f-ac:5)
->   * TKIP (00-0f-ac:2)
->   * CCMP-128 (00-0f-ac:4)
->   * CMAC (00-0f-ac:6)
-> 
-> The error message seems to match with the above.
+Thanks,
 
-I've never seen support for OWE in brcmfmac mentioned.  OWE requires 
-CMD_AUTHENTICATE / CMD_ASSOCIATE (or CMD_EXTERNAL_AUTH) to derive the PMK, so 
-iwd can't support it on FullMAC.
+James
 
-Regards,
--Denis
