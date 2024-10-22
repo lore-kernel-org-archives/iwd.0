@@ -1,61 +1,65 @@
-Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
+Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBE4712F5B3
-	for <iwd@lists.linux.dev>; Tue, 22 Oct 2024 19:09:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 472AD1C9ED3
+	for <iwd@lists.linux.dev>; Tue, 22 Oct 2024 19:09:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729624170; cv=none; b=u/AbnUXYr8Z62GhZAfzD0wANJmjNgi0UbtTX+Qb1s/ZyGwvuGZIdiIdvab5NdkDlV60hCCErw1OnT4m5MA37TzusNWaw0NIqNg/UCRbAIG+EVim3hN0bSP2I5Z9q6ofs1ioFUNIEF9jsh11CIafN7TIWBBjyUWKbdBaX5aGzQqk=
+	t=1729624171; cv=none; b=WgiRQ2Brk8/G89gmDZHs1VkHiFRw/Tl/zxS1QLGsQJobnT2OFohBd57D74P/Dtsj081e5B40J/wo7bOZl+yHKmlXcTeXM9OvBgCi4u3vVBy2SsQPr3YRV7b54BNZuiJEQsNNfDOr7TklJ1TcdVJEE6zbT093hQqy/aGvYYWHyMw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729624170; c=relaxed/simple;
-	bh=k7hQsFIiPz5kFa7UOkMQG2YFK07kO6qA98e2/rl9tMk=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=jPg7WgOte60e+h3hJkuIGCBfKVUtcCtLBey13lhGZ26QlNhzAgIZRfVTnOBWQX572EyP8dHcb6r2Tsseeic2Juwx+H0memeOePTf3Ucnz4pPKBSWcJEATBC8VmOCjRrWKMsUBKGXcOxQ7Jnj8oV7hhTovxSrtGDfxwWCKlOBxpc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ik1C5E20; arc=none smtp.client-ip=209.85.128.53
+	s=arc-20240116; t=1729624171; c=relaxed/simple;
+	bh=fy9saxEeOdAc2Inw7MDy0DT5tM/z2T3Vhe4JotQlYac=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=MnDmoATnT+2cKlEKZ+oVSc4FxokFUwHeO8UvhQqGdMQVhfX5cnfE37b5H+YSePNdzebn/8X73KNG7HVPnMaNkRlETLGqKF33D56cmn9Dswj3jM/Jyettpp5gqrBwqYx+Gich1TTipu/eoc7jummYzxvowaPBem2VAixJflxGIrw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gJ4TdsJh; arc=none smtp.client-ip=209.85.128.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ik1C5E20"
-Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-43163667f0eso44577295e9.0
-        for <iwd@lists.linux.dev>; Tue, 22 Oct 2024 12:09:28 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gJ4TdsJh"
+Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-4316e9f4a40so34137855e9.2
+        for <iwd@lists.linux.dev>; Tue, 22 Oct 2024 12:09:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1729624167; x=1730228967; darn=lists.linux.dev;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=GbMU1UmrQ7as2VneU9/Yk+OqP0ZnxNDgwe4aY0Vhvg0=;
-        b=ik1C5E20oABy0iVXDjZeKrQ6ShPhDpg9oawXqmvl8veuBkvyudM4VmAzI4EZ9DJDS7
-         atwqH0X47ph8J46i3QMavBx01dJ6AosYtWEozBahmkpm4kw6j9ka/KxmMDj5KHLZ2pR1
-         GXrckdSApCx56fS2id/yufwceI0f5AO/100SeZRDnqGimnHcJsgEBrrnwTAFaxOXDXT8
-         cOIYbg2SLOiDs4C9bSLbhRKvVCx4WQr1gvb3ElGpcu1Cec0tV6Q9OQYyX+aVZneYBKhY
-         wfYxawOKWxxk0nrB219gmsehZAWwQF2XSn5Wh2iexYg0eWn1zNc0JiEZawIQhCMzLxqP
-         mCSA==
+        d=gmail.com; s=20230601; t=1729624168; x=1730228968; darn=lists.linux.dev;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=3cleyCgLZFebwLrA8Z5Cn7hfeGHhF6AVUO0c6mbLoWI=;
+        b=gJ4TdsJh5RJW49pd6uD+G0+ibr+Scofn2QrSIWokvzYpDeCQ+lm4Z3ebUHlGHWY/6J
+         OYABzCyuH2MNx9CB5d/9KMKWthryU/RsNwFzzS1m1d72Q3pcRFA8jM6RXhh/cxj6mEJ8
+         hPb0LnG/jlmEg7H2HzzzERVtZCxS91/5cXeVH0fIVNT5koaOAqK6mx6hVpY6nnTU2xby
+         AAOoMQLIHUsV+CVWoAUDvf4LK3QBM6HRhlB9OwdEa7X00cVBRtKWpdnrBsRcTASjbPbR
+         wTfKlD4xXUuaZyyvbB/MdLZa/NTYsSfXzzdzhswebJ2GO3f6/s/BBmfKw5bvP8z0QIkc
+         gVVw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729624167; x=1730228967;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=GbMU1UmrQ7as2VneU9/Yk+OqP0ZnxNDgwe4aY0Vhvg0=;
-        b=awSWyT+F/X8LYC9ot21k4F2IyeJ4q+yLVngiAodkhUsraVq6xeMN7gLsiChnZ2tCxw
-         kgBIRcAZn4W39fwMxMDOJCnDpemcIX1YM/Ml/2NIe10FBMwUcx3o1CRm2nXf6FFBEH1D
-         Wy13grfgPAucUrPLA/PG1h8P/OxtsgmFV1EZ0dmXvcsKaNUSXe8rlOkOPUuuBNPgjL4I
-         Eq3f8FcdjET9QtQ6c3lqX1M7pKstdoZF1R3s20nJUea2ACBJsfp2hhyYqZ3Q9E16s3n5
-         Efh59saKytnhGeFRzXWdc/ZASJlBiIhuORKW+nDC1LTDG3dJ+fZ6DKYNB7sG0zC4IiBU
-         XiWw==
-X-Gm-Message-State: AOJu0Yz4tVDxp2wWTzXEA9YgPFk0KyC0wakShppHA2YA+N+kEtvqmwR9
-	OhRwt0Ypfej98gyUptwiljSIZbulU/+Lqnan7AyQqECCVQalbq8tcclODTAf
-X-Google-Smtp-Source: AGHT+IEswozwxEKhiis4bNk+SXBifuM598OS7QG+D7Z2oDeJw8/dcqvJXeUseZvw5UJigwcXySb0wQ==
-X-Received: by 2002:a05:600c:46c8:b0:431:44fe:fd9a with SMTP id 5b1f17b1804b1-43184209b20mr1605265e9.19.1729624166407;
-        Tue, 22 Oct 2024 12:09:26 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1729624168; x=1730228968;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=3cleyCgLZFebwLrA8Z5Cn7hfeGHhF6AVUO0c6mbLoWI=;
+        b=cxS3dwD5rpVbvbLfwFVVz7gga+wfk0J3mc3rjoYb60hQW4zujJeG/aUC7HER1QZz43
+         3NsI5qTqbiIZV6j0u5r+Njwsn15v0puChG/gg/dfaZbSFgwY9/LInNmTUzeGRzYNuyGd
+         WSENQy/m9DBKaZaoAYWnh/lliM32Yhhe9OEYUk579WSK97fUli6r1W38h1HmH2PXPdJp
+         sYhIgNjEaDzNmu6haSMBOemA5iUywddYdQGQL4GrfkY6lZZckRKbn7qkEVCz1Edm3FYq
+         edEMK7VX4l4xnUDg9zka4kw00OX9ptvP1pwZWFiIsNcU5PX6dZr1G8dRo8gY8ac3lDj3
+         Q/Dg==
+X-Gm-Message-State: AOJu0Yw0YF+H7JPudn2RJGz/FuWmlWP6P8ZlEoPAt8LhqOgly5jCXu5G
+	kYfsiP8TZeuwvuStbbB8JxbeBTnrhtBJwgzjrtRRJ/sjOCkOxf49vV2o46xw
+X-Google-Smtp-Source: AGHT+IFmGoQk0j/NE6omFNNE+uetm4WcNTUtV48WJA16RX7WTLHkmVXIZvaZ3HtoB00eRB4LI9ePdw==
+X-Received: by 2002:a05:600c:55d5:b0:431:46fe:4cc1 with SMTP id 5b1f17b1804b1-431841440c2mr1877925e9.10.1729624168023;
+        Tue, 22 Oct 2024 12:09:28 -0700 (PDT)
 Received: from LOCLAP699.localdomain ([81.145.46.166])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4316f50b15csm96032055e9.0.2024.10.22.12.09.24
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4316f50b15csm96032055e9.0.2024.10.22.12.09.26
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 22 Oct 2024 12:09:25 -0700 (PDT)
+        Tue, 22 Oct 2024 12:09:27 -0700 (PDT)
 From: James Prestwood <prestwoj@gmail.com>
 To: iwd@lists.linux.dev
 Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [RFC 1/2] wiphy: add OweDisable driver quirk
-Date: Tue, 22 Oct 2024 12:09:18 -0700
-Message-Id: <20241022190919.29005-1-prestwoj@gmail.com>
+Subject: [RFC 2/2] network: don't allow connection to OWE AKM if disabled
+Date: Tue, 22 Oct 2024 12:09:19 -0700
+Message-Id: <20241022190919.29005-2-prestwoj@gmail.com>
 X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20241022190919.29005-1-prestwoj@gmail.com>
+References: <20241022190919.29005-1-prestwoj@gmail.com>
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
@@ -65,77 +69,23 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
 ---
- src/wiphy.c | 16 +++++++++++++++-
- src/wiphy.h |  1 +
- 2 files changed, 16 insertions(+), 1 deletion(-)
+ src/network.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/src/wiphy.c b/src/wiphy.c
-index cc0e6dd7..d57d657a 100644
---- a/src/wiphy.c
-+++ b/src/wiphy.c
-@@ -72,6 +72,7 @@ enum driver_flag {
- 	DEFAULT_IF = 0x1,
- 	FORCE_PAE = 0x2,
- 	POWER_SAVE_DISABLE = 0x4,
-+	OWE_DISABLE = 0x8,
- };
- 
- struct driver_flag_name {
-@@ -103,6 +104,7 @@ static const struct driver_flag_name driver_flag_names[] = {
- 	{ "DefaultInterface", DEFAULT_IF },
- 	{ "ForcePae",         FORCE_PAE },
- 	{ "PowerSaveDisable", POWER_SAVE_DISABLE },
-+	{ "OweDisable",       OWE_DISABLE },
- };
- 
- struct wiphy {
-@@ -344,7 +346,8 @@ wpa2_personal:
- 		if (info->akm_suites & IE_RSN_AKM_SUITE_PSK)
- 			return IE_RSN_AKM_SUITE_PSK;
- 	} else if (security == SECURITY_NONE) {
--		if (info->akm_suites & IE_RSN_AKM_SUITE_OWE)
-+		if (info->akm_suites & IE_RSN_AKM_SUITE_OWE &&
-+					!wiphy_owe_disabled(wiphy))
- 			return IE_RSN_AKM_SUITE_OWE;
+diff --git a/src/network.c b/src/network.c
+index 20d9a3dd..5a856fb4 100644
+--- a/src/network.c
++++ b/src/network.c
+@@ -911,6 +911,9 @@ int network_can_connect_bss(struct network *network, const struct scan_bss *bss)
+ 		return ret;
  	}
  
-@@ -721,6 +724,14 @@ bool wiphy_power_save_disabled(struct wiphy *wiphy)
- 	return false;
- }
- 
-+bool wiphy_owe_disabled(struct wiphy *wiphy)
-+{
-+	if (wiphy->driver_flags & OWE_DISABLE)
-+		return true;
++	if (IE_AKM_IS_OWE(rsn.akm_suites) && wiphy_owe_disabled(wiphy))
++		return -EPERM;
 +
-+	return false;
-+}
-+
- const uint8_t *wiphy_get_extended_capabilities(struct wiphy *wiphy,
- 							uint32_t iftype)
- {
-@@ -1355,6 +1366,9 @@ static void wiphy_print_basic_info(struct wiphy *wiphy)
- 		if (wiphy->driver_flags & POWER_SAVE_DISABLE)
- 			flags = l_strv_append(flags, "PowerSaveDisable");
- 
-+		if (wiphy->driver_flags & OWE_DISABLE)
-+			flags = l_strv_append(flags, "OweDisable");
-+
- 		joined = l_strjoinv(flags, ' ');
- 
- 		l_info("\tDriver Flags: %s", joined);
-diff --git a/src/wiphy.h b/src/wiphy.h
-index fe7e9e49..a68e48c3 100644
---- a/src/wiphy.h
-+++ b/src/wiphy.h
-@@ -134,6 +134,7 @@ const char *wiphy_get_name(struct wiphy *wiphy);
- bool wiphy_uses_default_if(struct wiphy *wiphy);
- bool wiphy_control_port_enabled(struct wiphy *wiphy);
- bool wiphy_power_save_disabled(struct wiphy *wiphy);
-+bool wiphy_owe_disabled(struct wiphy *wiphy);
- const uint8_t *wiphy_get_extended_capabilities(struct wiphy *wiphy,
- 							uint32_t iftype);
- const uint8_t *wiphy_get_rm_enabled_capabilities(struct wiphy *wiphy);
+ 	if (!config || !config->have_transition_disable) {
+ 		if (band == BAND_FREQ_6_GHZ)
+ 			goto mfp_no_tkip;
 -- 
 2.34.1
 
