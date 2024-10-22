@@ -1,70 +1,52 @@
-Received: from mail-yb1-f182.google.com (mail-yb1-f182.google.com [209.85.219.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mout-b-110.mailbox.org (mout-b-110.mailbox.org [195.10.208.55])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0CF613AD26
-	for <iwd@lists.linux.dev>; Tue, 22 Oct 2024 18:47:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCF1A13AD26
+	for <iwd@lists.linux.dev>; Tue, 22 Oct 2024 18:47:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.10.208.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729622861; cv=none; b=sRIabbZWNzHHvTqnOy4u7AV+9Yh0b4qsHpJ23wriRUI1IjfInYWdvcUPk2H0FgGwe/R4P/DCfjHK3AR2diyBTjccUZ0dvcuouwmRbwvt3cq0voDCJytFzVv7iVclxmShE61u7aVd6PfXQTnaXadViBiDroz2IkPMD66mfLFt608=
+	t=1729622868; cv=none; b=DaVcjn0jysmXP34b/THBxDlNG1ZYMNJgVwYf2plHeaLPe2ZTVQYUg0Oh2gz9i1B4/botWxyPeBuaTGh+TGQkfR/DQBSpI3WWYLMkRT9IG9pyrKh2BO9HIO09Zbi9Paq4Pl3I9aet+K2YV0G6IxVQGGSeJi7jkFucEbo+R559BOI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729622861; c=relaxed/simple;
-	bh=NRURVwFtfUqNtMVp6+c7lAwyt2sqm1i0vCTCiH8tq/o=;
+	s=arc-20240116; t=1729622868; c=relaxed/simple;
+	bh=FhJEtB5GgnE26x7H6DCUjVaAD7+np/h74lXgTuD7jF0=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=srTG/7z1XMDZryIT+PpMrmpTXr4IcWhazegrb3GbUq1z7qv3RKWw8QvDk4Q6iqmq0jaDAzM8sb60dlf1pZniyma+rDUfGEwAYj4IL10+rWtxSONe9NHDCZzhjCvqhCbHrtl3nV1nhmLz1x+mrzLS2/iGnntv0Y7wr8qnqIL4kLU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZacfUcf4; arc=none smtp.client-ip=209.85.219.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	 In-Reply-To:Content-Type; b=ngJaNUE36trR1hAQDcb7xGh41lNKz1XCE94o+zpzwoOqL5LAU8cKl0KB+wbsjjFQ0cZXAZG22L+EY3DcJZ5tC+5izDbJoABjLsxTRrdPapg2+G4/WbX7U/vx5NV9gKiP7oC9lxGhnNQnafaS55PlEnnpwai19sxFrVZxP5grShU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tavla.de; spf=pass smtp.mailfrom=tavla.de; dkim=pass (2048-bit key) header.d=tavla.de header.i=@tavla.de header.b=CAtPSDoD; arc=none smtp.client-ip=195.10.208.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tavla.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tavla.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZacfUcf4"
-Received: by mail-yb1-f182.google.com with SMTP id 3f1490d57ef6-e28fea0f5b8so5674930276.1
-        for <iwd@lists.linux.dev>; Tue, 22 Oct 2024 11:47:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1729622859; x=1730227659; darn=lists.linux.dev;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=V9f+KKvEaUqnTtuZVrPMYKIx/h1wiuVLqKD4D07OjzE=;
-        b=ZacfUcf4HF/T8X80S84MmmQgg8oRP02V+VbFPeqitiDijm+Sx6mTSfP0u9UwgmxUZ0
-         OkF85wl456jCWbKgk00h9sYZM9XPkqujKXR4Fi26ymBsK218yKOrdz1P09nYgVwd56qE
-         i4mKhe6RYuydHNXbLz0rgxsS+hwQmFAz5rQjjD2GncMzJVRFTXhvN154lDSs5XoaEsM/
-         eqFyJFSs/ahjcMNOdToHPKu2pvK9SQVBJvAO8rZyxm47OcmwXxZWY74hidqbd/opU6h5
-         lFR4Tls+qXDPsacNHfCH8Ec0j02NibnGsrlAbD6xly2BKVPY18dPXMzslBNO7KI16c0M
-         /JfQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729622859; x=1730227659;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=V9f+KKvEaUqnTtuZVrPMYKIx/h1wiuVLqKD4D07OjzE=;
-        b=KiB1SSNRWqKuwqAqCJ9iY6d8e9KnycmwVIpzWYkITWDowA4CS+Qx00xG9zbz75e5As
-         XBZmN3+hIcu4z0CT4nH5o2y3dB2UTvysOM/lKveknmuCfMKRDqePTOjUcP5dXX1y4ItL
-         WEgITPQ6AG7FeNz4OzHVBHQXgAq5JEa1uRUlYhslD8WF9JJnXOPKvDD5n2BhSopsXkGA
-         Z+Mpitu7slZqjlj7C81nHNVXQhX00SJbntHFUOjPdxB9Kldnp1molhdFIFn9sRUQSv1+
-         VqUt/yCGWJ5rNWGE5FSH8jiODc6WHU9Bsl0K5mAYsR1JuLl6T+Wzcwyk6qnTjUckMIqn
-         IZGQ==
-X-Gm-Message-State: AOJu0YyIZw7jYLBdF5Vbq03ZKewnq5HJqNWTkl2e8GgDW073z+XDGzbU
-	1CHKz7V+2ldmKi4PjyuM9ffFkkiLvtiej4+QUIVGqzmUJ+yqEFD9
-X-Google-Smtp-Source: AGHT+IHLO2ngZUq/3nwW9TV3URjFAcyJPctmf7NfSOvSXRtrR0liNCadYbMzphc2Yj76HBmioFGfCg==
-X-Received: by 2002:a05:6902:260a:b0:e29:5540:7f85 with SMTP id 3f1490d57ef6-e2bb11e55b0mr13801056276.1.1729622858675;
-        Tue, 22 Oct 2024 11:47:38 -0700 (PDT)
-Received: from [10.100.121.195] ([152.193.78.90])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-460d3d69453sm32062771cf.77.2024.10.22.11.47.37
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 22 Oct 2024 11:47:38 -0700 (PDT)
-Message-ID: <68a6c65a-0c53-4679-aa93-8cd9eb66228d@gmail.com>
-Date: Tue, 22 Oct 2024 11:47:35 -0700
+	dkim=pass (2048-bit key) header.d=tavla.de header.i=@tavla.de header.b="CAtPSDoD"
+Received: from smtp1.mailbox.org (smtp1.mailbox.org [IPv6:2001:67c:2050:b231:465::1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mout-b-110.mailbox.org (Postfix) with ESMTPS id 4XY1Pz20qnz9x04;
+	Tue, 22 Oct 2024 20:47:35 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tavla.de; s=MBO0001;
+	t=1729622855;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=G+KVFPouWxpSiqWb8aExNEu2x2ss07QNGOrxfVoQ768=;
+	b=CAtPSDoD0qX43hxtYfdJntscV9x6malwo5TsKw31mf46ks6jwDkts9clWbsXm0kZnIQqIp
+	vrVyG3MG+T6R0MfJgpH0pjaOiVlWM9MM9cZa9fzdr63wbtbZc7ngstuQNbI0XdNnG64yJ8
+	xmn30rWEisgImNnQjLq51jjkVr2jfri4PCtqXcB7NkpqktXZtryQ2WSKwkKYxgAWbqBqBH
+	d5O/66VEveKibqqUavflKkJdibqmWfK8PSo4sxC+e8ja5C7fC728OkAQDPBe3vNee9Eaow
+	7k67hr2xh+paFM4cwVt7p13BTvRgLxHvl6TJO6DVkcjsoVdakL4U/MqYLGW+Rw==
+Message-ID: <d5d5357b-cc90-47fc-b7bb-7f25d99972fc@tavla.de>
+Date: Tue, 22 Oct 2024 20:47:30 +0200
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
 Subject: Re: IWD 1.27 with brcmfmac not working for roaming
-To: Denis Kenzior <denkenz@gmail.com>,
- Arend van Spriel <arend.vanspriel@broadcom.com>
+To: Denis Kenzior <denkenz@gmail.com>
 Cc: iwd@lists.linux.dev, KeithG <ys3al35l@gmail.com>,
- Martin Petzold <martin.petzold@tavla.de>
+ James Prestwood <prestwoj@gmail.com>,
+ Arend van Spriel <arend.vanspriel@broadcom.com>
 References: <a99e0ef1-8f97-4c1d-9aa5-5a07c87782a5@tavla.de>
  <5efc11fc-9c21-44a0-b282-5d41bfb96a8c@gmail.com>
  <f496ad63-e2a6-46cb-b7d6-1a084523c7d9@broadcom.com>
@@ -84,15 +66,17 @@ References: <a99e0ef1-8f97-4c1d-9aa5-5a07c87782a5@tavla.de>
  <6170a2a5-dc7d-4182-8b83-1b43b93c4f46@tavla.de>
  <06e10782-0c31-4cdd-bd2b-31d1daec03d5@gmail.com>
  <b3b58b08-da06-4485-a980-edcc42d2453c@gmail.com>
-Content-Language: en-US
-From: James Prestwood <prestwoj@gmail.com>
+Content-Language: en-GB, de-DE
+From: Martin Petzold <martin.petzold@tavla.de>
+Organization: TAVLA Technology GmbH
 In-Reply-To: <b3b58b08-da06-4485-a980-edcc42d2453c@gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: 4XY1Pz20qnz9x04
 
-Denis,
+Hi Denis,
 
-On 10/22/24 11:44 AM, Denis Kenzior wrote:
+Am 22.10.24 um 20:44 schrieb Denis Kenzior:
 > Hi James, Arend,
 >
 >> errors out as its unsupported. I don't believe there is any way for 
@@ -117,11 +101,4 @@ On 10/22/24 11:44 AM, Denis Kenzior wrote:
 > Too bad no upstream driver actually sets this bit. Unless... maybe OWE 
 > works with other FullMAC devices and we'd break things for those...?  
 > Kernel folks really need to chime in here.
-For an explicit option what about the transition disable stuff? I know 
-you set those options based on AP capabilities IIRC, but could we allow 
-a profile to set those manually? It appears that is checked for in 
-network_can_connect_bss() but I need to refresh myself on how that all 
-works.
->
-> Regards,
-> -Denis
+If you provide a patch for kernel driver or IWD, I can test tomorrow.
