@@ -1,51 +1,70 @@
-Received: from mout-b-105.mailbox.org (mout-b-105.mailbox.org [195.10.208.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ot1-f41.google.com (mail-ot1-f41.google.com [209.85.210.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E1E617C98
-	for <iwd@lists.linux.dev>; Tue, 22 Oct 2024 18:32:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.10.208.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B4161C9EBA
+	for <iwd@lists.linux.dev>; Tue, 22 Oct 2024 18:44:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729621943; cv=none; b=OneUgZLnJeVO1U28hrFA3+6jLWFxRPeBgl4aQpNGCDEnWaefw9SNNb9B2WQk3N0troAzNJE6gIZ8xDyzOR1MeyOq4H4eYhE5bYM8z8WqlSNxy91YPYrrdW/mGDTgTDJjH//c7xpGShUvS1SKcnhGfKKUYn+Zfgpo3OhuHlwtZE4=
+	t=1729622664; cv=none; b=WxeF8+ytN2MOj0dO08xiek86cJIYZgNnYxbwCXbnvIOtFCP/JuTzsclEuvY+DT/RYvYnOoOi0oGPyEUcYpLRwcFTe9eNFsbC6zpGCXV0gJhHYEYCIU0NvyQY9vC7i3gpKyMxqJ/BoddtVwIVA2+Qo0bZmmHfxRtl8A3hOO8pBAM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729621943; c=relaxed/simple;
-	bh=b8XDF0ef+G+grSe5tqxNzzjHGp2Zo6KfjrJ8bpv4tFE=;
+	s=arc-20240116; t=1729622664; c=relaxed/simple;
+	bh=sdWMWg8TQA5Ao8E/PkNFBw/A8KEqc9AV76y2oHDniXQ=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ffrpnJcHIYljw6jahHIkqbddfohACx/WTu4jBdp7e+yGdxvT3Nm550wSYKyo5NnNdXGzTnEacITtpdBZi6ppP6KLFKh4YhsXCOgEY8GEdcsaS3LL6/kFzJT7LxaMJTcGqNRgtjf6NGu2xgaB3B1z/BkQKwmCz3fZUca0ccmZ6s4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tavla.de; spf=pass smtp.mailfrom=tavla.de; dkim=pass (2048-bit key) header.d=tavla.de header.i=@tavla.de header.b=o5v/w703; arc=none smtp.client-ip=195.10.208.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tavla.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tavla.de
+	 In-Reply-To:Content-Type; b=f1elzXqvHEhRh6eK9pOeZbbLxRhEa6THvJ922Dv3a+DA9kCgAUuPwJhVsf4WWuiSsZUhHGh8UFZYruhFGFHqx8lwP1xhljaUVXtpK8sagf5+PiN6C/sXrxM8iXjAuybffPGXgM9ZH3Et38hJFUXjGXQCuCa8kdvEjOQT47iNfW4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JEo9NEl7; arc=none smtp.client-ip=209.85.210.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=tavla.de header.i=@tavla.de header.b="o5v/w703"
-Received: from smtp1.mailbox.org (smtp1.mailbox.org [IPv6:2001:67c:2050:b231:465::1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mout-b-105.mailbox.org (Postfix) with ESMTPS id 4XY14B1TXzz9wPG;
-	Tue, 22 Oct 2024 20:32:10 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tavla.de; s=MBO0001;
-	t=1729621930;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Lx90wNmCxWYPhrQdD9IZmC/5w8LaIA9oam55dBFMLdU=;
-	b=o5v/w703ciwpH3ugMtJvykYNEkFOwZiZ53MNXqtEo7HZg/Y+DfXG/f9kJyukOiObB5fL1s
-	jFf2sOUA0Hra9c21ONwaNRMKDJneOVPhqF8nMpFjTnExwGvKnWbDBgkxsyHgTXqSsiXdu5
-	L5ziytCXvVSXHy8sGeS7UovLKYrDV/yx3xK2fWfvkauowWiebCwgE883nHNZEyX/4uXcCA
-	kz7CloXsaquNnjoDQ/BqZgi+dXi0gLsTzNUWMlpJ5Y+R3a2EL9/Sq3Lbn6ADmPpRaFyt51
-	UpcMNCYGoidJeGyu67vO+R6rpJ3/XmFLDRaypvsedwyXc7lxq9DTePwowK4xBA==
-Message-ID: <cd042c10-68db-47b1-8dc8-e92753c2d248@tavla.de>
-Date: Tue, 22 Oct 2024 20:32:03 +0200
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JEo9NEl7"
+Received: by mail-ot1-f41.google.com with SMTP id 46e09a7af769-7180a5ba498so2698528a34.2
+        for <iwd@lists.linux.dev>; Tue, 22 Oct 2024 11:44:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1729622662; x=1730227462; darn=lists.linux.dev;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=u/jaWpvjZ14a8TmrZZP+e+rxH9AhcWVZk3uTBzlZsgY=;
+        b=JEo9NEl7tT9FKkTYWYTg5ik7X+JTU7BoMTAy/eSSbVLSdpICA99Nmbyu4yAxeouVMi
+         4huK8Y8l0UkwIeVxCLO7LUBiJRWisgiXhOaq4amlrIsUrP8quK7G0mGVRpj0brfl4e4H
+         vJrZk/dVMet9KwrdK0nwFhrnbcFt9rhGJKNX3xkvBViTOLj7uytg+iw315u8nmzgZ3Aj
+         1LP4aGPreAhK9rcFQ6lCNAmQyDFUyTd/uxeJr2oqDUrjScM3/+an2lHWvd0RSMUM+tPf
+         30xnYFWGOLNAdtbetnzfwKz+BqNmhTrpO28E+Gu3DHLtLqG3GkjcPek+2xtkM0UH/IFE
+         1QRg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1729622662; x=1730227462;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=u/jaWpvjZ14a8TmrZZP+e+rxH9AhcWVZk3uTBzlZsgY=;
+        b=YSvg9d7sOJYxksX3cyKFpzYU8L8W9aQggKcfi9k/9sedUfJgf9w1UweyMTrZXVUxMX
+         a0oZA023BXr6XWaD/C/Ckbvc4CS+IBfa3lInD6spjAeCL0vWoT0bbFBCV6U8oSAiI3nv
+         lr689GjrRnpKKP1MP+KHrMsmhL1B9+bQoTVRrazeb4ZxdJfmGzmdEjZbMK3rI6VVXtWp
+         SCCAXJUgA4gUuJdBtOm35HqxhFjC6axNEe7S/CVjVOg1CWb76obV4iC1yJf1cCqy/GJH
+         vOfN27UVZcxOv3LhgM1ZMB7pk0IgtHNLasaea3xOa7TqiWCtgvdyFMO5GzogTNhgE0wS
+         Cqbw==
+X-Gm-Message-State: AOJu0YzxCsctMn3kyIEr+9PcMggnLEoXzEUEfo8I4OK/RSOgl2Xw9J1X
+	j7kZ8Jj0PLXLaK0TjHHCW9DgnK6VqlJkXwE/ZnO3OKnJqkgQaEAP
+X-Google-Smtp-Source: AGHT+IFHvsvlDOZQkJ+8I+J3C2XtLfZQgFjR0ZGGw9keqzQeF9KdpiTLzmEjQ/JaidCzlLleMrPqbQ==
+X-Received: by 2002:a05:6830:25c1:b0:70f:3720:16bb with SMTP id 46e09a7af769-7184b2bb6bcmr187789a34.19.1729622662255;
+        Tue, 22 Oct 2024 11:44:22 -0700 (PDT)
+Received: from [192.168.1.22] (syn-070-114-247-242.res.spectrum.com. [70.114.247.242])
+        by smtp.googlemail.com with ESMTPSA id 46e09a7af769-7182eb2210dsm1372592a34.6.2024.10.22.11.44.21
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 22 Oct 2024 11:44:21 -0700 (PDT)
+Message-ID: <b3b58b08-da06-4485-a980-edcc42d2453c@gmail.com>
+Date: Tue, 22 Oct 2024 13:44:20 -0500
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
 Subject: Re: IWD 1.27 with brcmfmac not working for roaming
-To: James Prestwood <prestwoj@gmail.com>
-Cc: Denis Kenzior <denkenz@gmail.com>, iwd@lists.linux.dev,
- KeithG <ys3al35l@gmail.com>, Arend van Spriel <arend.vanspriel@broadcom.com>
+To: James Prestwood <prestwoj@gmail.com>,
+ Arend van Spriel <arend.vanspriel@broadcom.com>
+Cc: iwd@lists.linux.dev, KeithG <ys3al35l@gmail.com>,
+ Martin Petzold <martin.petzold@tavla.de>
 References: <a99e0ef1-8f97-4c1d-9aa5-5a07c87782a5@tavla.de>
  <c5e790a5-2854-47a6-9431-e02a0f9e6676@tavla.de>
  <5efc11fc-9c21-44a0-b282-5d41bfb96a8c@gmail.com>
@@ -65,75 +84,34 @@ References: <a99e0ef1-8f97-4c1d-9aa5-5a07c87782a5@tavla.de>
  <f1f2b4cc-367b-43df-a637-b380d979e11d@gmail.com>
  <6170a2a5-dc7d-4182-8b83-1b43b93c4f46@tavla.de>
  <06e10782-0c31-4cdd-bd2b-31d1daec03d5@gmail.com>
-Content-Language: en-GB, de-DE
-From: Martin Petzold <martin.petzold@tavla.de>
-Organization: TAVLA Technology GmbH
+Content-Language: en-US
+From: Denis Kenzior <denkenz@gmail.com>
 In-Reply-To: <06e10782-0c31-4cdd-bd2b-31d1daec03d5@gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: 4XY14B1TXzz9wPG
 
-Hi James,
+Hi James, Arend,
 
-Am 22.10.24 um 20:24 schrieb James Prestwood:
-> Hi Martin,
->
-> On 10/22/24 11:04 AM, Martin Petzold wrote:
->> Hi James,
->>
->> Am 22.10.24 um 19:40 schrieb James Prestwood:
->>> Hi Martin,
->>>
->>> On 10/21/24 3:10 PM, Martin Petzold wrote:
->>>> Hi Arend,
->>>>
->>>> Am 22.10.24 um 00:01 schrieb KeithG:
->>>>> Arend,
->>>>>
->>>>> If there is a patch for brcmfmac to use CMD_EXTERNAL_AUTH, I am
->>>>> interested in testing. The last time we tried, it errored out and did
->>>>> not work as expected.
->>>>
->>>> Support with our current chip for WPA3 and also OWE by offloading 
->>>> SAE etc. to IWD. That is possible?! This would be great!
->>>
->>> Have you also checked with the vendor (Solid Run?) if SAE/OWE are 
->>> supported by the hardware/kernel they ship with (even with 
->>> wpa_supplicant)?
->>
->> Vendor is Variscite and the chip is Laird LWB5 (BCM4339). According 
->> to Laird WPA3 is NOT supported. However, this is not the problem: I 
->> knew this all the time.
->>
->> The Cisco enterprise network is (should be) configured as WPA3 OWE 
->> with Transition Mode (there should be one hidden and one visible 
->> network) [1]. And, my device connects ONCE initially (it is connected 
->> and online). Then it looses the connection (I assume maybe due to 
->> roaming) and does not connect again. Also manual re-connection 
->> attempts using iwctl fail (see log). All auto-connects fail. Maybe 
->> you can check the logs again, and can confirm WPA3 OWE with 
->> Transition Mode is configured?
->
-> From your logs I see no successful connection, but it looks like the 
-> OWE transition mode is configured on the APs. Based on what brcmfmac 
-> is saying the issue appears to be that IWD chooses the OWE AKM when 
-> connecting and brcmfmac errors out as its unsupported. I don't believe 
-> there is any way for IWD to check if OWE is supported by the driver, 
-> and we just assume it is (Arend, maybe you know of a way to check 
-> this?). It appears that what you need is a new IWD option to force 
-> connecting to an open network, not the OWE transition/hidden network, 
-> right?
+> errors out as its unsupported. I don't believe there is any way for IWD to check 
+> if OWE is supported by the driver, and we just assume it is (Arend, maybe you 
+> know of a way to check this?). It appears that what you need is a new IWD option 
 
-There was a reboot between initial successful connection and these logs. 
-I only pulled the logs for the boot. But 100% it connected initially! 
-Because this was confirmed, the device was online (no Ethernet) and was 
-connected to our servers. Only then, I had access to the device 
-connecting Ethernet. This is on clients site. I cannot access it all the 
-time. However, of course I can debug everything at our site (except this 
-WPA3 OWE Transition Mode scenario, and we also don't have roaming 
-environment here).
+Indeed, there's no explicit way of checking supported AKMs.  The NL80211 API 
+isn't much help either:
 
-Thanks,
+/**
+  * DOC: OWE DH IE handling offload
+  *
+  * By setting @NL80211_EXT_FEATURE_OWE_OFFLOAD flag, drivers can indicate
+  * kernel/application space to avoid DH IE handling. When this flag is
+  * advertised, the driver/device will take care of DH IE inclusion and
+  * processing of peer DH IE to generate PMK.
+  */
 
-Martin
+Perhaps for FullMAC, iwd should start checking for EXT_FEATURE_OWE_OFFLOAD 
+presence, and if not present, do not use OWE.  Too bad no upstream driver 
+actually sets this bit.  Unless... maybe OWE works with other FullMAC devices 
+and we'd break things for those...?  Kernel folks really need to chime in here.
 
+Regards,
+-Denis
