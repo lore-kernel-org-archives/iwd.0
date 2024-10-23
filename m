@@ -1,50 +1,67 @@
-Received: from mout-b-110.mailbox.org (mout-b-110.mailbox.org [195.10.208.55])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FF081C3023
-	for <iwd@lists.linux.dev>; Wed, 23 Oct 2024 15:27:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.10.208.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 284F91C82F1
+	for <iwd@lists.linux.dev>; Wed, 23 Oct 2024 15:28:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729697283; cv=none; b=JMvVERkt3hsXLcPZCT6orcTcFDWeSWyF02+ZR2c6ZQWvjiAALzfoNTn5kkC4nlZIOYwHaz2EY3dEqXBf1aSmzLgzra3iPN0u845fZuN5xHNTKc0wgW/zuzPtFK3It8J+k/3Ltz15XKMAbBw+I6Y9XI7L/NJWb6PcKwJLW9pvn2c=
+	t=1729697322; cv=none; b=DotAGp4Fb441gttl1CAP6hAmH7bs2/9uuPsRM5XNXBm3ToCJNeiXTnsH2bGHkiDJM1a4THRvU11DN4SmoeGjPM40sNaMZ2lJZh+ijpx2MlBVWH05uCA8Tf1kn/8TzdCcdw9/4cVlZNTWsJJeWvhSVk9xc0LsbzRU97o7m5hiCLw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729697283; c=relaxed/simple;
-	bh=4jF8qykP2X2Kvzdcbb7rE1sOBqNcGs+xFu+dj5R5iwo=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=VHnUry6VlOi84E8AdHpHMGHlHWva6ATardwyZL8yRICLTZjA9Lo9XVpKS+TyN8f1pSuU7RCYU0cGC3cgx/XFYp/+3JCral0WP6QrAUB3mfJFlN9ipPNu2GKyO7++jeFjkLXiM6duDL0o6fwv0DW3HT102Ka/cPxpKtNJifrfvjE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tavla.de; spf=pass smtp.mailfrom=tavla.de; dkim=pass (2048-bit key) header.d=tavla.de header.i=@tavla.de header.b=MLd/zmo3; arc=none smtp.client-ip=195.10.208.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tavla.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tavla.de
+	s=arc-20240116; t=1729697322; c=relaxed/simple;
+	bh=H/lZH5ujJxeVgng/dCpEBheD6BgsnQbH/WNDJSLW22Y=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=mrdV25U4ebiCd2YQ//XYVGAv+5cuqMxQfqLlRlvL9CmlzE05lYp5VpYfXqYECMFs8asQ2SNCXSdN+mKfcnEoIMN0LRJ40NCQuuscO866Pu5G8VylEzOjEcFZnQF2EtzBircKb78SxF/MtKMcpY3x3wEsOgB44M/Bma3QmNb+ir8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NXkC3Y+M; arc=none smtp.client-ip=209.85.214.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=tavla.de header.i=@tavla.de header.b="MLd/zmo3"
-Received: from smtp1.mailbox.org (smtp1.mailbox.org [IPv6:2001:67c:2050:b231:465::1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mout-b-110.mailbox.org (Postfix) with ESMTPS id 4XYXx812gDz9wvT;
-	Wed, 23 Oct 2024 17:27:56 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tavla.de; s=MBO0001;
-	t=1729697276;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=p3Uub5ZzcdC4OSKyL5ocKxZDZYCGOvFB4xMt2GwNiR8=;
-	b=MLd/zmo3m6W7tN90dRuNUEKfwmFZHGWwyUhN60rWb/+XxH8tHDqLqlPbX3hYAXdyzMqkD9
-	3FMRQV+w8VH7cacXU7ePKgSv8clloZ9H1dkfGw+U86Ec8+mL2DKltz0WrIWnqLPtp6qjey
-	p9HXXLl7qJLVLPNcoTa6DKzGR9LXffqvcOnvpmOPOWKy3t83tLrTL6GkizCxIEuNwHtBab
-	HGobGvDuX268R7BzIOP+J/6CqjZqa1m+09Hgw4cEtASVvLREvPLOxPfJZH/Xnczs1oWUgb
-	BfTjvmzNNxP6gmHbCTKf6aYj65toyy03bdnJojgS/5TVT0tr841eYmVkZrSmpA==
-Message-ID: <f5a8eb0c-5cbc-4f3e-89c0-6704ae7d5ee1@tavla.de>
-Date: Wed, 23 Oct 2024 17:27:55 +0200
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NXkC3Y+M"
+Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-20c9978a221so78982625ad.1
+        for <iwd@lists.linux.dev>; Wed, 23 Oct 2024 08:28:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1729697320; x=1730302120; darn=lists.linux.dev;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=JWUOahOv0Bf/rChAPYB9jLAyIsOzXydzpwoi/08iXSo=;
+        b=NXkC3Y+MZN7c7H1nsKUMNRDuAhnJCMJgfXpFcniwtkH0NxIBkDlKQ0Kxy9ZLITu+eb
+         d4OlAYXJe6kq9GDbiMNM2TDQU5H7Fk9GoEyEvb/HKbVOKY2J4Ycv/9xBCJWye1rqtVyp
+         5b9dGajy9yTOcseXv60LvsKkLYm1GaxbBkHBfn3oSVEbHm0sO0m9OLuLMWHDw+TpFPna
+         KoVfXDh1+AIPiUZi8K3TQQ9HlzpfXRu0yBUtfUbZCAWUN4/ox9eVTXuYoRG3qt8v+50k
+         y5BF622/6NhrUXdAkKHJRut5s5fR7TReucUDQM7BEn/6v7K2VpGy4GQ7p4PhtDCwBSnz
+         O+KQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1729697320; x=1730302120;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=JWUOahOv0Bf/rChAPYB9jLAyIsOzXydzpwoi/08iXSo=;
+        b=eQZB0O9qFkRUDUvtd4vUSs7Tc2bGlICVQWDyQBFcm3pDrZoBqfHxK5y0x8VqBQADpI
+         P5VmYHGhOQm+mECf3LqqiI+WLmKlAWazpDYRGlAfYmsZ8Hsmo00WkWT5I6achDEN6Bbu
+         +F82xzMi6BMpouTU9TWjuj787pe8M77/4ZSriTCWc4HdbD+5ghs7N2/twNl83ajT7Klj
+         QNuluE7joAbo4Me7dpgTncnnYjZ84ZuEkZ6kAsKTgHcsOCfHSqH+rpe5zdE1SwhmdjFJ
+         uh8n7Z9snWBYNPyVuFZ29iGd0pDjKqNUudjl+vyPnS63k7HT43ebSDKsifqhTmiYCE36
+         wLhQ==
+X-Gm-Message-State: AOJu0Yy6LR4pH51wgvhmFO34Tm/gQGXSF8Z7CeJpYxmVjEAmExMjrZHw
+	sa/eu2qklvRKyRB2s++jnmOQxFanaizNPv9Fu0GcN7t6MRyLb8bd
+X-Google-Smtp-Source: AGHT+IEPgh3a/gjhVQZpWbEcR420VrhdxVd3tjZpDTS+234AmUciAMQzGjd6rsWoNLlSzIcCA6YZKA==
+X-Received: by 2002:a17:902:ced2:b0:20c:af07:a816 with SMTP id d9443c01a7336-20fa9e8f817mr43086225ad.31.1729697320067;
+        Wed, 23 Oct 2024 08:28:40 -0700 (PDT)
+Received: from [10.100.121.195] ([152.193.78.90])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-20e7f0bd48fsm58844035ad.129.2024.10.23.08.28.38
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 23 Oct 2024 08:28:39 -0700 (PDT)
+Message-ID: <60e609c8-7c83-4510-9a3b-706698705e1b@gmail.com>
+Date: Wed, 23 Oct 2024 08:28:36 -0700
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
 Subject: Re: IWD 1.27 with brcmfmac not working for roaming
-From: Martin Petzold <martin.petzold@tavla.de>
-To: James Prestwood <prestwoj@gmail.com>
+To: Martin Petzold <martin.petzold@tavla.de>
 Cc: iwd@lists.linux.dev, Denis Kenzior <denkenz@gmail.com>,
  Arend van Spriel <arend.vanspriel@broadcom.com>
 References: <a99e0ef1-8f97-4c1d-9aa5-5a07c87782a5@tavla.de>
@@ -66,15 +83,15 @@ References: <a99e0ef1-8f97-4c1d-9aa5-5a07c87782a5@tavla.de>
  <c2c8262e-9a40-4e2f-aa50-458373639dcb@tavla.de>
  <21d3d993-f753-4b01-98f1-5a9259cfb5a3@gmail.com>
  <713f032a-a286-47f2-9729-5430e4675b59@tavla.de>
-Content-Language: en-GB, de-DE
-Organization: TAVLA Technology GmbH
+Content-Language: en-US
+From: James Prestwood <prestwoj@gmail.com>
 In-Reply-To: <713f032a-a286-47f2-9729-5430e4675b59@tavla.de>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 4XYXx812gDz9wvT
 
-Am 23.10.24 um 17:22 schrieb Martin Petzold:
+Hi Martin,
 
+On 10/23/24 8:22 AM, Martin Petzold wrote:
 > Hi James,
 >
 > Am 23.10.24 um 15:22 schrieb James Prestwood:
@@ -223,6 +240,31 @@ Am 23.10.24 um 17:22 schrieb Martin Petzold:
 > manual disconnect and waiting for auto-connect. Here I can't force any 
 > roaming (not a mobile device). As I am not 100% confident, I will run 
 > several more tests also in other environments.
-btw. it did NOT auto re-connect if I disconnected manually (state 
-"degraded" in networkctl). I assume this is correct, if it was forced to 
-disconnect.
+>
+> Do you need logs?
+No, not if its working. I was able to reproduce the same situation in a 
+simulated environment so I'm pretty confident the bug is fixed with 
+respect to OWE/open networks.
+>
+> However, I still also have some issues with devices in a non-OWE 
+> network. I am not really confident general connection and roaming is 
+> behaving as it should. I have seen one disappearing today (no network 
+> logs available), however that one did not have any of the three 
+> patches. But this network is using WPA2-PSK with a single router as 
+> far as I know. Does your last patch only target WPA3 and/or OWE 
+> environments or also others?
+The patches should only change behavior on OWE networks. As far as 
+roaming that is again up to brcmfmac. IWD just gets notified when a roam 
+occurred. With OWE disabled though I would expect roaming within open 
+networks to work as well as with WPA2 as this is quite basic, but I 
+can't really assume anything here. We would need to see logs if there 
+was some issue here to know if it was brcmfmac or IWD not acting properly.
+>
+> I will upgrade all our devices in testing environments and then will 
+> have to observe carefully...
+>
+> Nevertheless, thanks for your response and effort!
+No worries, glad we at least got the OWE part hopefully figured out.
+>
+> Martin
+>
