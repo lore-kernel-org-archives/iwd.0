@@ -1,59 +1,51 @@
-Received: from mail-qk1-f177.google.com (mail-qk1-f177.google.com [209.85.222.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mout-b-110.mailbox.org (mout-b-110.mailbox.org [195.10.208.55])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 889FBE56A
-	for <iwd@lists.linux.dev>; Wed, 23 Oct 2024 15:11:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 240311CACE0
+	for <iwd@lists.linux.dev>; Wed, 23 Oct 2024 15:22:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.10.208.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729696273; cv=none; b=Wv9HkCHLya/YuWfaVzS5BVrbM4f6AcMp9n91Uh/b50+jdo4byUqSmKTvnos9ayD0ZkroVSFGb6w+L7j80LGe6buRkITxjy+tBguDgZb6XRJ/VmhsuZo9pDIILogYocQ2pXrQPpuyjXWg2usGfNK8CceX9NrZpMC8RsfzWzPrqlQ=
+	t=1729696975; cv=none; b=n7Qd+9GjsOrKKmLBmP/FhvJDni1ZcjNEsrE9IJG0ozVD21YRaIDMJwAvJi3R65xWpgTkryR42zWhDpUnzK5Ap0hUnLuaU3pLV2yalQiBPgDn7koghNZjjx0+EXcP+9Hfy3d+NW01JWV9+ecz68JPjDEaA9WY7+ry8P/pJz9+QG0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729696273; c=relaxed/simple;
-	bh=7RloDtS7VsBmflDpFCPtuFiUL+WYu5wX7wD3DwGTvng=;
-	h=From:To:CC:Date:Message-ID:In-Reply-To:References:Subject:
-	 MIME-Version:Content-Type; b=QtMdxdF8OGbLIntjzXI77CPaqRN/QyPj04lOILSxa4GeuuKUUQhhqm0coeejb8ONZoCD7Agk1JwO5xcMe1nNBAlCtmKgG00DKFw937Oj4WR3gqhOba/ccFjjHY57HvdqlEFULUPlCy0iIeNLpLpWf08lVWhgejj/+8KKf78Hm6A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=T+3BmeeQ; arc=none smtp.client-ip=209.85.222.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+	s=arc-20240116; t=1729696975; c=relaxed/simple;
+	bh=4s414iKhIKlcGGZ/E80dnSJTfKqgA8Nl/3wrKPYRfbw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=rqTcOjyHnIwcfsaheqIg90FhDm44zYRKc1z+yDODOw66BrbBxwWN0iZxeWVm4Ly+O/qbURcYdsEURdPA5hhnLGnVgayjb8toDiVargj3WKbDW9v8sR79akKbrvwGL90qNyyv9T7C18b5dfm9F5s5xpoyekwaWawOYGIHqI+IU8M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tavla.de; spf=pass smtp.mailfrom=tavla.de; dkim=pass (2048-bit key) header.d=tavla.de header.i=@tavla.de header.b=xPIfvwfC; arc=none smtp.client-ip=195.10.208.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tavla.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tavla.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="T+3BmeeQ"
-Received: by mail-qk1-f177.google.com with SMTP id af79cd13be357-7b15467f383so444815185a.3
-        for <iwd@lists.linux.dev>; Wed, 23 Oct 2024 08:11:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1729696270; x=1730301070; darn=lists.linux.dev;
-        h=content-transfer-encoding:mime-version:subject:user-agent
-         :references:in-reply-to:message-id:date:cc:to:from:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ZFq3rSgPk36fKHtL6JnNAxtroOcy/+JV+R4FMKCbgfE=;
-        b=T+3BmeeQTVtLxRdIUEWrDFV81cm5h14Ni28Gsffyru2Jv/FE61G16wMB9hKuJEC9U2
-         skYiUgUi4OCOtjDP9lRGcP4ZSJNPtA753iKOnqZJ+w4njWkrS/PYIW1pAPbV23/aHf1m
-         ydO2dOnbol1o6pUnKbqkSI3Z2T4k0Z6WqiT38=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729696270; x=1730301070;
-        h=content-transfer-encoding:mime-version:subject:user-agent
-         :references:in-reply-to:message-id:date:cc:to:from
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZFq3rSgPk36fKHtL6JnNAxtroOcy/+JV+R4FMKCbgfE=;
-        b=DTu0jbWaNVLCfvHrxGKn8SOFakSP5zJRwmCrclkQozt3UMFkS98Qdeh/C1eEghSVY/
-         N28PzRQJ0vnxNAVAD6OKvXF0QiUtkqlI3EU/xu9DpANZlwN38uGX+hbkXGVq6V/0chFA
-         hFiUcm6jPj1YysojtyaNg216DEdxMbBHfBN4JF7UfDxvwt06veoJT3uv/IQEFUKCY8Hu
-         VXla//08UJ+1zZJoFCd4+MgEmf2PCGqX/kAEcnez+F2g4Qat/BLEgR2wsnH0Xf/53sWd
-         fW10j5im9B2jhj/B9+N98WQqzeeQBv9/BTj+Do5lOqK0wfMM6Phr+qskQ0npS/StxWXe
-         JC9Q==
-X-Gm-Message-State: AOJu0Yx/nO820aZLZmk2DnkofPfg5SmzmhdLG0dibmRL1z/RoknCs+ww
-	5GN+gpa9Z00U9INjeRkeE8r2MjooCZ0O+d7X5lfzTcAg//qhYyAikr/k6DjqNA==
-X-Google-Smtp-Source: AGHT+IG7i30BctpU04X9fuhnk/UH3XKEGFePx1MWKtv/DN2Qqkoi0o0yggXCTx/nZBGQgD1qiXNKIw==
-X-Received: by 2002:a05:620a:1a92:b0:7b1:481f:b8b7 with SMTP id af79cd13be357-7b17e5b2d7cmr379646185a.43.1729696270349;
-        Wed, 23 Oct 2024 08:11:10 -0700 (PDT)
-Received: from [10.229.40.71] ([192.19.176.250])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7b1659e6022sm394008885a.47.2024.10.23.08.11.08
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 23 Oct 2024 08:11:09 -0700 (PDT)
-From: Arend Van Spriel <arend.vanspriel@broadcom.com>
-To: Martin Petzold <martin.petzold@tavla.de>, James Prestwood <prestwoj@gmail.com>
-CC: <iwd@lists.linux.dev>, Denis Kenzior <denkenz@gmail.com>
-Date: Wed, 23 Oct 2024 17:11:06 +0200
-Message-ID: <192b9ee7710.279b.9b12b7fc0a3841636cfb5e919b41b954@broadcom.com>
-In-Reply-To: <e5626359-2b7c-4161-9aa7-7fd7133ec390@tavla.de>
+	dkim=pass (2048-bit key) header.d=tavla.de header.i=@tavla.de header.b="xPIfvwfC"
+Received: from smtp102.mailbox.org (smtp102.mailbox.org [10.196.197.102])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mout-b-110.mailbox.org (Postfix) with ESMTPS id 4XYXqD0N6Nz9x6t;
+	Wed, 23 Oct 2024 17:22:48 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tavla.de; s=MBO0001;
+	t=1729696968;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ETtbID4FYy6IjHtYQnAX/MkjQumQN9x2oNzUn6DwH0Q=;
+	b=xPIfvwfCpsLNiC28R41AsAyp6Jv1xcCMf/FtK+1P3gBMoEUQRidGPrTHTisSZ4pfolBVgS
+	WUu9q1UICmgPcEo2cwEDePLMsTMjsqXxVIfk1X2Cahw5uczCVkQi48HAf/tfzUHsquU31i
+	hjWq1SKKahCYjZqsPcfE1s1bamhg6u8tz3i5XJI91GEhEtCIjvozIc0YrrSz2EDJc4y/WH
+	jI2WTqHeuNvcBk1KKa2HKbU/7f5yllcki+Or2QnYdnkOPJ9RYfrtra9JuOoJxDY0I9AKNP
+	A+zwG7czRDNnNmPeU7rE/k7sbRa6CdbttSwPXKfrFPi18iGb7wpZrcKeSxHa+g==
+Message-ID: <713f032a-a286-47f2-9729-5430e4675b59@tavla.de>
+Date: Wed, 23 Oct 2024 17:22:46 +0200
+Precedence: bulk
+X-Mailing-List: iwd@lists.linux.dev
+List-Id: <iwd.lists.linux.dev>
+List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
+List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
+MIME-Version: 1.0
+Subject: Re: IWD 1.27 with brcmfmac not working for roaming
+To: James Prestwood <prestwoj@gmail.com>
+Cc: iwd@lists.linux.dev, Denis Kenzior <denkenz@gmail.com>,
+ Arend van Spriel <arend.vanspriel@broadcom.com>
 References: <a99e0ef1-8f97-4c1d-9aa5-5a07c87782a5@tavla.de>
  <d91f33df-e9d7-430a-b1ca-13cd1dee973a@gmail.com>
  <c5e790a5-2854-47a6-9431-e02a0f9e6676@tavla.de>
@@ -70,59 +62,181 @@ References: <a99e0ef1-8f97-4c1d-9aa5-5a07c87782a5@tavla.de>
  <54a62c50-5c9b-47c6-b8ab-f7369381fdf9@gmail.com>
  <c57706f6-2d5c-4e73-bc42-e2b7e4239a78@broadcom.com>
  <e5626359-2b7c-4161-9aa7-7fd7133ec390@tavla.de>
-User-Agent: AquaMail/1.53.0 (build: 105300523)
-Subject: Re: IWD 1.27 with brcmfmac not working for roaming
-Precedence: bulk
-X-Mailing-List: iwd@lists.linux.dev
-List-Id: <iwd.lists.linux.dev>
-List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
-List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; format=flowed; charset="us-ascii"
+ <77fc14d0-96bc-465c-b425-111ba4310c86@gmail.com>
+ <c2c8262e-9a40-4e2f-aa50-458373639dcb@tavla.de>
+ <21d3d993-f753-4b01-98f1-5a9259cfb5a3@gmail.com>
+Content-Language: en-GB, de-DE
+From: Martin Petzold <martin.petzold@tavla.de>
+Organization: TAVLA Technology GmbH
+In-Reply-To: <21d3d993-f753-4b01-98f1-5a9259cfb5a3@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-On October 23, 2024 2:02:20 PM Martin Petzold <martin.petzold@tavla.de> wrote:
+Hi James,
 
-> Hi Arend and James
-
-[...]
-
-> -----
+Am 23.10.24 um 15:22 schrieb James Prestwood:
+> Hi Martin,
 >
-> @Arend: Here the requested output (debugging enabled; PATCHES ALREADY
-> APPLIED!).
->
-> -----
->
-> tavla@tavla:~$ sudo cat /sys/kernel/debug/ieee80211/phy0/fwcap
-> ap
-> sta
-> wme
-> 802.11d
-> 802.11h
-> rm
-> cqa
-> ccx
-> cac
-> dualband
-> ampdu
-> ampdu_tx
-> ampdu_rx
-> amsdurx
-> amsdutx
-> radio_pwrsave
-> btamp
-> p2p
-> proptxstatus
-> mchan
-> vht-prop-rates
-> p2po
-> anqpo
-> txpwrcache
-> stbc-tx
-> stbc-rx-1ss
+> On 10/23/24 5:19 AM, Martin Petzold wrote:
+>> Hi James,
+>>
+>> Am 23.10.24 um 14:13 schrieb James Prestwood:
+>>> Hi Martin,
+>>>
+>>> On 10/23/24 5:02 AM, Martin Petzold wrote:
+>>>> Hi Arend and James,
+>>>>
+>>>> Am 21.10.24 um 20:26 schrieb Arend van Spriel:
+>>>>> On 10/21/2024 7:40 PM, Denis Kenzior wrote:
+>>>>>> Hi Arend,
+>>>>>>
+>>>>>>>
+>>>>>>> I have not seen patches for OWE in brcmfmac. Looking at the 
+>>>>>>> supported ciphers:
+>>>>>>
+>>>>>> OWE is an AKM.  It still uses CCMP/CMAC underneath.
+>>>>>
+>>>>> My bad. Always confused by those concepts.
+>>>>>
+>>>>>>>
+>>>>>>> Supported Ciphers:
+>>>>>>>   * WEP40 (00-0f-ac:1)
+>>>>>>>   * WEP104 (00-0f-ac:5)
+>>>>>>>   * TKIP (00-0f-ac:2)
+>>>>>>>   * CCMP-128 (00-0f-ac:4)
+>>>>>>>   * CMAC (00-0f-ac:6)
+>>>>>>>
+>>>>>>> The error message seems to match with the above.
+>>>>>>
+>>>>>> I've never seen support for OWE in brcmfmac mentioned. OWE 
+>>>>>> requires CMD_AUTHENTICATE / CMD_ASSOCIATE (or CMD_EXTERNAL_AUTH) 
+>>>>>> to derive the PMK, so iwd can't support it on FullMAC.
+>>>>>
+>>>>> I have never seen any mention of OWE either. Regarding 
+>>>>> CMD_EXTERNAL_AUTH support I recently posted patches on 
+>>>>> linux-wireless list as RFT. There has been zero feedback and so I 
+>>>>> assume also zero interest. In order to use CMD_EXTERNAL_AUTH the 
+>>>>> firmware needs to advertise "sae_ext" in fwcap debugfs file. So if 
+>>>>> Martin can check that, ie:
+>>>>>
+>>>>> $ grep sae_ext /sys/kernel/debug/ieee80211/phy0/fwcap
+>>>>>
+>>>>>
+>>>> @James: Could please check the logs (PATCH WAS APPLIED):
+>>>>
+>>>> A. Initial boot and connect (device remained connected)
+>>>
+>>> On this run I'm seeing an agent connecting and issuing an explicit 
+>>> connect call rather than IWD autoconnecting. This is fine, and will 
+>>> create a new .open profile.
+>>>
+>>> Okt 23 12:39:35 tavla iwd[383]: src/agent.c:agent_free() agent free 
+>>> 0xaaaadbf376a0
+>>> Okt 23 12:39:35 tavla iwd[383]: src/agent.c:agent_register() agent 
+>>> register called
+>>> Okt 23 12:39:35 tavla iwd[383]: src/agent.c:agent_register() agent 
+>>> :1.69 path /agent/1420
+>>> Okt 23 12:39:35 tavla iwd[383]: src/network.c:network_connect()
+>>>
+>>>> B. Reboot -> device does NOT connect
+>>>
+>>> This tells me you have no profile in /var/lib/iwd
+>>>
+>>>>
+>>>> -----
+>>>>
+>>>> tavla@tavla:~$ sudo ls -l /system/var/lib/iwd/
+>>>> insgesamt 4
+>>>> -rw------- 1 root root    0 23. Okt 12:39 XYZ-Gast.open
+>>>> drwx------ 2 root root 4096  4. Apr 2024  hotspot
+>>>> tavla@tavla:~$ sudo cat /system/var/lib/iwd/XYZ-Gast.open
+>>>> tavla@tavla:~$
+>>>
+>>> IWD is looking in /var/lib/iwd as seen by:
+>>>
+>>> Okt 23 12:35:58 tavla iwd[383]: src/storage.c:storage_create_dirs() 
+>>> Using state directory /var/lib/iwd
+>>>
+>>> Not sure if you have /system/var/lib/iwd mounted there or what, but 
+>>> it seems IWD cannot find that profile. IWD will not autoconnect to a 
+>>> random open network without a profile. On your first boot you are 
+>>> forcing a connection which should generate a profile, but on the 
+>>> second boot no profile exists. So that is where I could check, where 
+>>> is the profile going? can you "ls" that directory on the _second_ 
+>>> boot to see if it exists?
+>> -----
+>> tavla@tavla:~$ sudo ls -l /var/lib/iwd/
+>> insgesamt 4
+>> -rw------- 1 root root    0 23. Okt 12:39 XYZ-Gast.open
+>> drwx------ 2 root root 4096  4. Apr 2024  hotspot
+>> tavla@tavla:~$ sudo ls -l /system/var/lib/iwd/
+>> insgesamt 4
+>> -rw------- 1 root root    0 23. Okt 12:39 XYZ-Gast.open
+>> drwx------ 2 root root 4096  4. Apr 2024  hotspot
+>> tavla@tavla:~$ sudo cat /system/var/lib/iwd/XYZ-Gast.open
+>> tavla@tavla:~$
+>> tavla@tavla:~$
+>> tavla@tavla:~$ iwctl known-networks list
+>>                                  Known Networks
+>> -------------------------------------------------------------------------------- 
+>>
+>>   Name                              Security     Hidden     Last 
+>> connected
+>> -------------------------------------------------------------------------------- 
+>>
+>>   XYZ-Gast                          open                    Oct 23, 
+>> 11:39 AM
+>>
+>> tavla@tavla:~$ iwctl known-networks XYZ-Gast show
+>>                             Known Network: XYZ-Gast
+>> -------------------------------------------------------------------------------- 
+>>
+>>   Settable  Property Value
+>> -------------------------------------------------------------------------------- 
+>>
+>>             Name XYZ-Gast
+>> Hidden
+>>          *  AutoConnect yes
+>>
+>> tavla@tavla:~$
+>> tavla@tavla:~$ iwctl station wlan0 show
+>>                                  Station: wlan0
+>> -------------------------------------------------------------------------------- 
+>>
+>>   Settable  Property Value
+>> -------------------------------------------------------------------------------- 
+>>
+>>             Scanning no
+>>             State                 disconnected
+>>
+>> -----
+> I was barking up the wrong tree. I found a bug in the BSS selection 
+> specific to OWE transitional networks. I just sent an RFC patch to the 
+> list. Note, you will still need the earlier patches to disable OWE in 
+> order to force the connection to the open network. 
 
-So there is no sae_ext. Also no sae or idsup so that rules out WPA3 I would 
-say. With this firmware at least.
+Device connected after image upgrade (pre-existing configured network) 
+and then also connected after consecutive reboots. I have also tested to 
+forget the network, re-configure the network and then do some reboots. I 
+also tested manual disconnect and connect. Also tested manual disconnect 
+and waiting for auto-connect. Here I can't force any roaming (not a 
+mobile device). As I am not 100% confident, I will run several more 
+tests also in other environments.
 
+Do you need logs?
+
+However, I still also have some issues with devices in a non-OWE 
+network. I am not really confident general connection and roaming is 
+behaving as it should. I have seen one disappearing today (no network 
+logs available), however that one did not have any of the three patches. 
+But this network is using WPA2-PSK with a single router as far as I 
+know. Does your last patch only target WPA3 and/or OWE environments or 
+also others?
+
+I will upgrade all our devices in testing environments and then will 
+have to observe carefully...
+
+Nevertheless, thanks for your response and effort!
+
+Martin
 
