@@ -1,62 +1,62 @@
-Received: from mail-pg1-f174.google.com (mail-pg1-f174.google.com [209.85.215.174])
+Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com [209.85.210.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B2231D0E13
-	for <iwd@lists.linux.dev>; Wed, 23 Oct 2024 18:29:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F11EF1D0E2B
+	for <iwd@lists.linux.dev>; Wed, 23 Oct 2024 18:29:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729708164; cv=none; b=Yvf0FLJ4/fVHxF7jBp49Rqnf8Y4Is/3Wbr8l330UkZu20G7xxYnxa2gQZqKVjBXp+ITFpFiqc7YcuLmcDPPxf1O0BLV65FbtdUM2dFwhaV+qeWlF/uqCk0RMGjmy6eHqzvH5zuIUUnDr6srLfn7l5EYBLr6+pmRavsniGxOD/co=
+	t=1729708166; cv=none; b=LWzJwc2GPRUFk3qPLr+1Uxqpqv8LJM+ie2JTx4SwYSK2QiH0B9aiXrRBZOl1+5GNeV9t/3/wLcBlg7m7X6nK3GEsI2/pI2qC1z2EI04f6hlzPTZl43ISER5kycpN2wt5bysrKNzXU9QrQ/oW0+qHzlNvj1PFc69IpxQ3I6uIDjU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729708164; c=relaxed/simple;
-	bh=hUc3JMsSH9MJrzBwRge9tDni+5tOZDKc6AHr4/PuXJQ=;
+	s=arc-20240116; t=1729708166; c=relaxed/simple;
+	bh=NpeRjzndCNRsacZyfxijkggR7qWgKwLo1+H6PAtbo7Q=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=l90WZ54PEhgHaWe9LpN9wcrJ925qijNLHMHX08BsH9DSvr+vcOH/wFsBQZhIkvEA8Q299vfqUYBjBr9h4+BOn8MDFgTIaepUidjoIbMtASumMS3JTltK0Kwf2otN1tBE1U2HynYTlMpl255JIXN97dY3KMrs2y10tTfvH8HMhjg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AcOJRn/l; arc=none smtp.client-ip=209.85.215.174
+	 MIME-Version; b=JDkhqNNKinSWctOyqKBW2PedH7805/tX11SIMlwAfWCW1qNMl3nPDmCFDLihF81THsBYBLs3Zx1H9VQfyZQAFJpwwL6M58MUyX2UhuXSGgqcnoZkRnvyZ7KiV66Br7FLhQJjqnXy4bP0hhJz4Z9hVnP2u7xkxCjYAmPbCIUT5fk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WjhjkgAA; arc=none smtp.client-ip=209.85.210.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AcOJRn/l"
-Received: by mail-pg1-f174.google.com with SMTP id 41be03b00d2f7-7ea12e0dc7aso51753a12.3
-        for <iwd@lists.linux.dev>; Wed, 23 Oct 2024 11:29:23 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WjhjkgAA"
+Received: by mail-pf1-f172.google.com with SMTP id d2e1a72fcca58-71e6cec7227so110931b3a.0
+        for <iwd@lists.linux.dev>; Wed, 23 Oct 2024 11:29:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1729708162; x=1730312962; darn=lists.linux.dev;
+        d=gmail.com; s=20230601; t=1729708164; x=1730312964; darn=lists.linux.dev;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=aP1EsuKzBrfHY7uwCOVu6kTse0CaJzkRX4cZQ4vWMmY=;
-        b=AcOJRn/lKNfc6HeTfnHeYLIGaWSmK+MAs2DzUEAD02RSDlzMw0A3VjP04plQubXEcr
-         WpY26rMUKmsGTY9cbMdwgf9h+ZjoXYwdj3ppdYd+5FhB+7v6A4v+XV6Zd7TaoxrCaLeg
-         fQWFPNacRwVRdDyBTOAMkDEiRFftR/iMUf20GUhIitZvC/ZzmzJS4h4+Jq7RrChvxiZQ
-         rENaUVyO0FSGC1oyP5tr20LvHvtSXia8GgS6okkz1s2EAki95Pnw71TQFUkqnAhl/I+/
-         Wkp9jWSKZ0a08MeQH0VdCGT74dfhI/liM9Gxt2R2BE+438A+ho0sfYFy8lv0Qxoyaa84
-         NDDA==
+        bh=9hRnfiOV1eVShqlKq7FIoA/iABA9JXFy42N4zJaQbbo=;
+        b=WjhjkgAAEvBPMpZ7oeN13Uu5zY92dGLDhQzT2hd1VXOy5e6DGDdYAXlBJQ5Y1NOmWB
+         6LH6BuPotZuxO/uHWZoVwFq/Y2qZxkQdr0/hQ6CwWDv5e2105UFD1pxFLAiyqS8VzD3F
+         mi/sPmT9iExjX9dla1WOO7s3o9kKtQ5fCBxC8fYafj+4lQ2XSVchpzIml+7gF1SPok8S
+         SblmN6NkrQsoGjwryNjhHaaaZpmv8DcbKSvEvoO92GgjPkixPepK/tvpK6d8joxzAL+t
+         KSQxp4QmrsjQNq4bv+s8kmKufdSVljIgfh6NJH4Hkjm2wRw4Csjf+QW9kpJu5k37biEm
+         w3TA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729708162; x=1730312962;
+        d=1e100.net; s=20230601; t=1729708164; x=1730312964;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=aP1EsuKzBrfHY7uwCOVu6kTse0CaJzkRX4cZQ4vWMmY=;
-        b=OqR+dHqebJVflQnORWAG2lVvhjCuUMIY+vx7N5i9jWBKQM5fkuOueF8GFWNJ2AXEi7
-         LssjJwRHQpDhQAGFP4HsmGlM4DNBVPNzvTVqmssSRYIOZjIRffHgS3VhdhdQfRWC0BOi
-         z2SxI4dn6A9LamQTGybLOuMBS1ShADK13hqqXFq04r+7FnDwqbKqw3WfJ5vCO6NErlJO
-         KSSUVCruD2Y/Ck8J32gFi36/EQSgTTftZb6u3OoYnhh1VPa68vU7/jooeESIDMeIgkZd
-         BaEkf+i6WgxacS4my3N2RmhPo2+lK/JEA6z73g5oDSyCcLwmCpjPn2NilodqTsDLhW84
-         k63g==
-X-Gm-Message-State: AOJu0YyPri9BOPaO9B3i/0gWIl4ASpnXqlA6K7oLf0XN7rIcZZNebpdh
-	EOHRIMZo/YVgYO3FRvLYOKJ4zFMCrLyleYpNFPuQhMZX9x2q/1m4cGcC45dN
-X-Google-Smtp-Source: AGHT+IGp+JwKcN1W/SmMPIm/pSvTCzRfHIYjzdg0V/L7aAydrZGhW8zjAxArQQ/pE1G/WB7ja1v/7Q==
-X-Received: by 2002:a05:6a20:438e:b0:1d9:6d08:4b43 with SMTP id adf61e73a8af0-1d978b37d6cmr4400169637.22.1729708162437;
-        Wed, 23 Oct 2024 11:29:22 -0700 (PDT)
+        bh=9hRnfiOV1eVShqlKq7FIoA/iABA9JXFy42N4zJaQbbo=;
+        b=a74tnFywjhTFsFDv1l2Uwx9Lc/OwKSrYWQX7NVviRpOBCl8cc1rGyJY5fvZB2BfhgR
+         FJktG5tJ7g7iYvyaj0HBFIMMvpkWzSdv90jBPf2A7PuHS1YQGp35B84M7sqbUC/z1A5z
+         17bNxhHVOjo0iFnJbK34ooo/+rB14366xNn1w9UZ5ufF7RMLsudXdPkpZt+dz1pPiwKF
+         AUu9MajDvnpRI9BuOuK37AgqcxBSimICk2MW0HV2n2AFMQ0qIUTYiHZ/g1QKYPszn8Ig
+         fBkDG70rES4kHsBmpgqNvCNc388XBUPP2+kwmqJVuMohaB5eaKQz2tIJlCLvdC2sJCGv
+         nzjQ==
+X-Gm-Message-State: AOJu0Yy0WaWsefprQ4JD81i7ZYynOqP46DFZaGH6TT1NHGrDDuOCuCkw
+	ly3d8RjbK15hWLzUPNQ6hfWkA8XN8iAE/D0DrbCXIXVVyROWJYJbcaYpcy+6
+X-Google-Smtp-Source: AGHT+IEQancsDBv5RSVB1vKQnB/M+UvodXi0CNsJw/MlC1wuIwub5LfUmR5qdMPhTu4GK/BiON03bg==
+X-Received: by 2002:aa7:88cb:0:b0:71e:1722:d02c with SMTP id d2e1a72fcca58-72030a79c21mr4997211b3a.3.1729708163967;
+        Wed, 23 Oct 2024 11:29:23 -0700 (PDT)
 Received: from LOCLAP699.localdomain ([152.193.78.90])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-7eaeabc11a7sm7024871a12.60.2024.10.23.11.29.21
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-7eaeabc11a7sm7024871a12.60.2024.10.23.11.29.22
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 23 Oct 2024 11:29:22 -0700 (PDT)
+        Wed, 23 Oct 2024 11:29:23 -0700 (PDT)
 From: James Prestwood <prestwoj@gmail.com>
 To: iwd@lists.linux.dev
 Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH v2 3/4] network: fix OWE transition BSS selection
-Date: Wed, 23 Oct 2024 11:29:11 -0700
-Message-Id: <20241023182912.128388-3-prestwoj@gmail.com>
+Subject: [PATCH v2 4/4] auto-t: add test for the new OweDisable driver quirk
+Date: Wed, 23 Oct 2024 11:29:12 -0700
+Message-Id: <20241023182912.128388-4-prestwoj@gmail.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20241023182912.128388-1-prestwoj@gmail.com>
 References: <20241023182912.128388-1-prestwoj@gmail.com>
@@ -68,85 +68,141 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The selection loop was choosing an initial candidate purely for
-use of the "fallback_to_blacklist" flag. But we have a similar
-case with OWE transitional networks where we avoid the legacy
-open network in preference for OWE:
-
-/* Don't want to connect to the Open BSS if possible */
-if (!bss->rsne)
-	continue;
-
-If no OWE network gets selected we may iterate all BSS's and end
-the loop, which then returns NULL.
-
-To fix this move the blacklist check earlier and still ignore any
-BSS's in the blacklist. Also add a new flag in the selection loop
-indicating an open network was skipped. If we then exhaust all
-other BSS's we can return this candidate.
+Tests that when OWE is disabled IWD will still connect to the legacy
+open network.
 ---
- src/network.c | 21 +++++++++++++--------
- 1 file changed, 13 insertions(+), 8 deletions(-)
+ autotests/testOWE-disabled/connection_test.py | 51 +++++++++++++++++++
+ autotests/testOWE-disabled/hw.conf            |  7 +++
+ autotests/testOWE-disabled/main.conf          |  2 +
+ autotests/testOWE-disabled/ssidOWE.conf       | 15 ++++++
+ autotests/testOWE-disabled/ssidOpen.conf      |  9 ++++
+ autotests/testOWE-disabled/transition.open    |  0
+ 6 files changed, 84 insertions(+)
+ create mode 100644 autotests/testOWE-disabled/connection_test.py
+ create mode 100644 autotests/testOWE-disabled/hw.conf
+ create mode 100644 autotests/testOWE-disabled/main.conf
+ create mode 100644 autotests/testOWE-disabled/ssidOWE.conf
+ create mode 100644 autotests/testOWE-disabled/ssidOpen.conf
+ create mode 100644 autotests/testOWE-disabled/transition.open
 
-v2:
- - Fixed issue where the loop returned the first candidate, not
-   the actual BSS that its currently checking.
-
-diff --git a/src/network.c b/src/network.c
-index 5a856fb4..cd8b0ee9 100644
---- a/src/network.c
-+++ b/src/network.c
-@@ -1281,6 +1281,7 @@ struct scan_bss *network_bss_select(struct network *network,
- 	struct l_queue *bss_list = network->bss_list;
- 	const struct l_queue_entry *bss_entry;
- 	struct scan_bss *candidate = NULL;
-+	bool skipped_open = false;
- 
- 	for (bss_entry = l_queue_get_entries(bss_list); bss_entry;
- 			bss_entry = bss_entry->next) {
-@@ -1300,30 +1301,34 @@ struct scan_bss *network_bss_select(struct network *network,
- 		if (!candidate)
- 			candidate = bss;
- 
-+		/* check if temporarily blacklisted */
-+		if (l_queue_find(network->blacklist, match_bss, bss))
-+			continue;
+diff --git a/autotests/testOWE-disabled/connection_test.py b/autotests/testOWE-disabled/connection_test.py
+new file mode 100644
+index 00000000..849cb58a
+--- /dev/null
++++ b/autotests/testOWE-disabled/connection_test.py
+@@ -0,0 +1,51 @@
++#!/usr/bin/python3
 +
-+		if (blacklist_contains_bss(bss->addr))
-+			continue;
++import unittest
++import sys
 +
- 		/* OWE Transition BSS */
- 		if (bss->owe_trans) {
- 			/* Don't want to connect to the Open BSS if possible */
--			if (!bss->rsne)
-+			if (!bss->rsne) {
-+				skipped_open = true;
- 				continue;
-+			}
- 
- 			/* Candidate is not OWE, set this as new candidate */
- 			if (!(candidate->owe_trans && candidate->rsne))
- 				candidate = bss;
- 		}
- 
--		/* check if temporarily blacklisted */
--		if (l_queue_find(network->blacklist, match_bss, bss))
--			continue;
--
--		if (!blacklist_contains_bss(bss->addr))
--			return bss;
-+		return bss;
- 	}
- 
- 	/*
- 	 * No BSS was found, but if we are falling back to blacklisted BSS's we
- 	 * can just use the first connectable candidate found above.
- 	 */
--	if (fallback_to_blacklist)
-+	if (fallback_to_blacklist || skipped_open)
- 		return candidate;
- 
- 	return NULL;
++sys.path.append('../util')
++from iwd import IWD, Network
++from hostapd import HostapdCLI
++import testutil
++
++class Test(unittest.TestCase):
++    def test_autoconnect_to_open(self):
++        IWD.copy_to_storage("transition.open")
++
++        wd = IWD(True)
++
++        devices = wd.list_devices(1)
++        device = devices[0]
++        device.autoconnect = True
++
++        condition = 'obj.state == DeviceState.connected'
++        wd.wait_for_object_condition(device, condition)
++
++        testutil.test_iface_operstate()
++
++        network = Network(device.connected_network)
++
++        self.assertEqual(network.name, "transition")
++        self.assertIn(device.address, self.hapd.list_sta())
++
++        device.disconnect()
++
++    def setUp(self):
++        self.hapd = HostapdCLI(config="ssidOpen.conf")
++        pass
++
++    def tearDown(self):
++        IWD.clear_storage()
++
++        self.wd = None
++
++    @classmethod
++    def setUpClass(cls):
++        pass
++
++    @classmethod
++    def tearDownClass(cls):
++        IWD.clear_storage()
++
++if __name__ == '__main__':
++    unittest.main(exit=True)
+diff --git a/autotests/testOWE-disabled/hw.conf b/autotests/testOWE-disabled/hw.conf
+new file mode 100644
+index 00000000..42b12d59
+--- /dev/null
++++ b/autotests/testOWE-disabled/hw.conf
+@@ -0,0 +1,7 @@
++[SETUP]
++num_radios=3
++start_iwd=0
++
++[HOSTAPD]
++rad0=ssidOpen.conf
++rad1=ssidOWE.conf
+diff --git a/autotests/testOWE-disabled/main.conf b/autotests/testOWE-disabled/main.conf
+new file mode 100644
+index 00000000..2554c011
+--- /dev/null
++++ b/autotests/testOWE-disabled/main.conf
+@@ -0,0 +1,2 @@
++[DriverQuirks]
++OweDisable=mac80211_hwsim
+\ No newline at end of file
+diff --git a/autotests/testOWE-disabled/ssidOWE.conf b/autotests/testOWE-disabled/ssidOWE.conf
+new file mode 100644
+index 00000000..72809fa6
+--- /dev/null
++++ b/autotests/testOWE-disabled/ssidOWE.conf
+@@ -0,0 +1,15 @@
++ssid=owe-hidden
++bssid=02:00:00:00:f1:00
++channel=1
++ignore_broadcast_ssid=1
++ieee80211w=1
++
++wpa=2
++wpa_key_mgmt=OWE
++rsn_pairwise=CCMP
++vendor_elements=dd15506f9a1c02000000f0000a7472616e736974696f6e
++
++# You would conventionally use these options but hostapd does not include an
++# IE for the OWE network, hence vendor_elements must be used directly
++#owe_transition_ssid="transition"
++#owe_transition_bssid=02:00:00:00:f0:00
+diff --git a/autotests/testOWE-disabled/ssidOpen.conf b/autotests/testOWE-disabled/ssidOpen.conf
+new file mode 100644
+index 00000000..096b52c4
+--- /dev/null
++++ b/autotests/testOWE-disabled/ssidOpen.conf
+@@ -0,0 +1,9 @@
++channel=1
++ssid=transition
++bssid=02:00:00:00:f0:00
++vendor_elements=dd15506f9a1c02000000f1000a6f77652d68696464656e
++
++# You would conventionally use these options but hostapd does not include an
++# IE for the OWE network, hence vendor_elements must be used directly
++#owe_transition_ssid="owe-hidden"
++#owe_transition_bssid=02:00:00:00:f1:00
+diff --git a/autotests/testOWE-disabled/transition.open b/autotests/testOWE-disabled/transition.open
+new file mode 100644
+index 00000000..e69de29b
 -- 
 2.34.1
 
