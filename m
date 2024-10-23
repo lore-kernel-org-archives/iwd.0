@@ -1,65 +1,61 @@
 Received: from mail-pg1-f174.google.com (mail-pg1-f174.google.com [209.85.215.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 071521D043F
-	for <iwd@lists.linux.dev>; Wed, 23 Oct 2024 17:23:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FDE21CACE8
+	for <iwd@lists.linux.dev>; Wed, 23 Oct 2024 18:29:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729704195; cv=none; b=mVAJlUWkao/yVrprKRPCqmcGNE3edUh0Ur9WUXo2ny+lUDWs42nQNrcS33kLzsKTOQfcLSnHRaEG09FZtPPyggG0o/dDjqwmsLSbSCXvfQFRI6xLPHGvzDzJ09W6O6TiwGQ9lMlIi12kaHEQcs8K4lIqBp2aD/zu2zp+uMZTfkQ=
+	t=1729708161; cv=none; b=mEisAXhJZ0uTBISHCOgHJRsi7uRzjnpsYrWml9cu36nWy+GiEEdjq3GlqbgEkMurJqPcW81ynT/+h857JGlr0FGyM4IL7krdJ143l3YQd/AiUeFsBePoUmRY1ih3NiHsFaQE3CqNSkAUnLoz3+OCHVEYB2EX8+yGvJ2y77b7JQw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729704195; c=relaxed/simple;
-	bh=NpeRjzndCNRsacZyfxijkggR7qWgKwLo1+H6PAtbo7Q=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=OrbQOvuJBhaf6/kSxJlFB9d5l+GJfY62nL6P5MNYEyg7do4UwEh+QLk/Tx8CB+loE6uF3EvBmU8ftZpjkhM5wNlqQ1VKPg/uymkYzC/FO1QN7WEvgNlDK07aCHnWyvxTV0fGzsArfHlZEnjiUKVuWBn0FVsfzhNk3W8oURIdXUg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZiFFaPzW; arc=none smtp.client-ip=209.85.215.174
+	s=arc-20240116; t=1729708161; c=relaxed/simple;
+	bh=Et6idfdvQ6toD2ed8vrwN4sya/GuqyrnOmrL2ZaeoL4=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=XGr6uOE5qzy4yuCq0QW9EPb2oPYnPFEHpgRBhu4Bm5NA4QwKoU7frEyql0KZ4y5CrzOQZR52EHr308ORie2oa0XjXl++hIzkTT96tfrJPrQalnf4AMv+kbLf291XRj17O114bQy1zVn1eJzIhiGj2o3xPlIQVXeedKReBAUb74c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YMAx8ZZW; arc=none smtp.client-ip=209.85.215.174
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZiFFaPzW"
-Received: by mail-pg1-f174.google.com with SMTP id 41be03b00d2f7-7db238d07b3so7869a12.2
-        for <iwd@lists.linux.dev>; Wed, 23 Oct 2024 10:23:13 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YMAx8ZZW"
+Received: by mail-pg1-f174.google.com with SMTP id 41be03b00d2f7-7ea8ecacf16so57517a12.1
+        for <iwd@lists.linux.dev>; Wed, 23 Oct 2024 11:29:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1729704193; x=1730308993; darn=lists.linux.dev;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=9hRnfiOV1eVShqlKq7FIoA/iABA9JXFy42N4zJaQbbo=;
-        b=ZiFFaPzWGzaFzv58G1sO3oz5alvrlk6liw7meUI1pD/eE2y654ip5rNHMRmE7d+y3A
-         bucco1XtInMHS1btdVnDJ1TNjBguQfLVJlp4Gn7tWjcjxyFbLn1lTqCTE7evResGyMiQ
-         mg5ChaIBRAmSwbLQ2jYNtLSTWrqCPcwkBPJBnpPacOwbmxYcMImqeZOKGn/socEfbtPR
-         AaHwTCsfqEgaifHazayTsaN2xucDb0GlZI2TUSASdEME/X7CDDRcyYDxAmTi7M9d3peL
-         q610d1QNR+1qmW2ODWArI2fwES8yNzXe/2Nn6gkB4s4OOK72xSwKGsmN3/mDdczDbtrd
-         +7lQ==
+        d=gmail.com; s=20230601; t=1729708159; x=1730312959; darn=lists.linux.dev;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=yyipGZ74nB5NE2vzUBO8Q2hyzO0Dn/o9V44gLe7YzDw=;
+        b=YMAx8ZZWt20R+9MktNcUhV8s+daF6bv2U6u/PLTdPPwo8+U1tYsDzigLfAi+C6aJ5P
+         MVsacvIx8eU2nBuc38Txv7Y26631mcZA++CI8y7UWmRYDG2UARrYOYHTqCwuU/ur8Sgx
+         tgp8J/EdalIWAALjV7PVWEKjGiayfW9ftldkHjQfzlNHUbC75P8ykjNjvz3b8xIfsUM6
+         bq/yh3XXQutfnxbR0EyRa39kUSpnSpOgaZaKU+udch91L8Ih/NCWAmNPggu4x+2gidY9
+         bm1Kkv+ZI6s1c2a76NtHLa0QcmUzKqElFfENFygDWrbTgx6mVtUZ5vBLPPvfgoBsSMXI
+         JuWQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729704193; x=1730308993;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=9hRnfiOV1eVShqlKq7FIoA/iABA9JXFy42N4zJaQbbo=;
-        b=HzZGJ1kDYc/A9hoiCvRsb6MUvByurhy7V+RIz5n5BlJmEKevL0uG1pM73az5Zv1YvH
-         bcw7Wc/nrfAGSojpm/rWehwK+hEneDBYPRc8qbs3yADeI4bfzInTRnuAop61sdMl4zz0
-         1OoURfDKF9oLFt1EG2w5FTJp1ixxfN9UM9iUfDd7QNRI3IHvNFcIlwjJJvznIjj0mKCr
-         XAJLwLD29CavzSX9Bs4ypMvwMtzkIKo1zOP4Irle4XAfTcNn75jozkaWYmw8fah1Kb4q
-         1qyiukHatDEdVWMEyX9EECQdEkMbJ/mF/3XL8XV5Jc81L+i5H8pJTo0BLd20KiakLrov
-         porw==
-X-Gm-Message-State: AOJu0YzgKs/+xH7eKdbuXqnZR8Wfod352dKl+Vp5+cjfXF60P4Kd05QG
-	Cd3QVK2Hg1Fgp0otWAh1sLG09wmkmzlAQxOWFW1WedInFcj6aNQ2KitJky9U
-X-Google-Smtp-Source: AGHT+IFIBmuuHKyZUqlSCWTb6lbtt+NpnMdlBA5JER47f8DckM6gewQ7nLl9RiF98LCZ1JP8LabZYg==
-X-Received: by 2002:a05:6a21:a4c1:b0:1d9:239b:a125 with SMTP id adf61e73a8af0-1d978b1a121mr3925952637.15.1729704192983;
-        Wed, 23 Oct 2024 10:23:12 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1729708159; x=1730312959;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=yyipGZ74nB5NE2vzUBO8Q2hyzO0Dn/o9V44gLe7YzDw=;
+        b=fefStl5Aw9ZN1NoNDbJivuytSVf5qZ4MLtyiZC0Bgiz39Je+6L5+7i8QJ8CmyjJ0LA
+         IjHBkt3Zzw2DcFDnPkK6F/t2etuiGegz/W4w2vwI4f9ZX8q+b0nFufNBAmE0utued1Hf
+         pLro0kNMXro13dXHePDijQ+NfFzN5zup2YCEhMutz5j8Pe6cGdKnMphCSeciOKJRpMlr
+         WJHEUNzq+Fy9fANoTPvVEHiwbNws8RbF/X/ImlLsgqZkzA4g1YJ0f9ixpDtcVBnC6d2g
+         S9p8hvj170lMCNdOudGqT0ABYz1RvAqRYlw85JI18u8M5wEN1nPblhC36bNM/nvMVQLd
+         pyRQ==
+X-Gm-Message-State: AOJu0YyI6rxv1amBPn8+KwocAyasAuGMuKFNvKvGabQl2LRgyD7fPVgb
+	vQygiQG6bk5UtiUNmzdh2d5la6GpNQxq8yFLRpuQizgQe+AFB6VeH/RkoTZ2
+X-Google-Smtp-Source: AGHT+IHAagNx5b+JSROXOYF2aNzT3zGxlo1EVoHW/Bbvh77GvFfHmqZmeGnVIiwmyZhU8TjWWuxbCw==
+X-Received: by 2002:a05:6a21:170f:b0:1d0:7df2:cf39 with SMTP id adf61e73a8af0-1d978ad5892mr3911717637.7.1729708159265;
+        Wed, 23 Oct 2024 11:29:19 -0700 (PDT)
 Received: from LOCLAP699.localdomain ([152.193.78.90])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-71ec1407ed7sm6551923b3a.214.2024.10.23.10.23.11
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-7eaeabc11a7sm7024871a12.60.2024.10.23.11.29.17
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 23 Oct 2024 10:23:12 -0700 (PDT)
+        Wed, 23 Oct 2024 11:29:18 -0700 (PDT)
 From: James Prestwood <prestwoj@gmail.com>
 To: iwd@lists.linux.dev
 Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 4/4] auto-t: add test for the new OweDisable driver quirk
-Date: Wed, 23 Oct 2024 10:22:57 -0700
-Message-Id: <20241023172257.112771-4-prestwoj@gmail.com>
+Subject: [PATCH v2 1/4] wiphy: add OweDisable driver quirk
+Date: Wed, 23 Oct 2024 11:29:09 -0700
+Message-Id: <20241023182912.128388-1-prestwoj@gmail.com>
 X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20241023172257.112771-1-prestwoj@gmail.com>
-References: <20241023172257.112771-1-prestwoj@gmail.com>
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
@@ -68,141 +64,82 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Tests that when OWE is disabled IWD will still connect to the legacy
-open network.
+Some drivers like brcmfmac don't support OWE but from userspace its
+not possible to query this information. Rather than completely
+blacklist brcmfmac we can allow the user to configure this and
+disable OWE in IWD.
 ---
- autotests/testOWE-disabled/connection_test.py | 51 +++++++++++++++++++
- autotests/testOWE-disabled/hw.conf            |  7 +++
- autotests/testOWE-disabled/main.conf          |  2 +
- autotests/testOWE-disabled/ssidOWE.conf       | 15 ++++++
- autotests/testOWE-disabled/ssidOpen.conf      |  9 ++++
- autotests/testOWE-disabled/transition.open    |  0
- 6 files changed, 84 insertions(+)
- create mode 100644 autotests/testOWE-disabled/connection_test.py
- create mode 100644 autotests/testOWE-disabled/hw.conf
- create mode 100644 autotests/testOWE-disabled/main.conf
- create mode 100644 autotests/testOWE-disabled/ssidOWE.conf
- create mode 100644 autotests/testOWE-disabled/ssidOpen.conf
- create mode 100644 autotests/testOWE-disabled/transition.open
+ src/wiphy.c | 16 +++++++++++++++-
+ src/wiphy.h |  1 +
+ 2 files changed, 16 insertions(+), 1 deletion(-)
 
-diff --git a/autotests/testOWE-disabled/connection_test.py b/autotests/testOWE-disabled/connection_test.py
-new file mode 100644
-index 00000000..849cb58a
---- /dev/null
-+++ b/autotests/testOWE-disabled/connection_test.py
-@@ -0,0 +1,51 @@
-+#!/usr/bin/python3
+diff --git a/src/wiphy.c b/src/wiphy.c
+index cc0e6dd7..d57d657a 100644
+--- a/src/wiphy.c
++++ b/src/wiphy.c
+@@ -72,6 +72,7 @@ enum driver_flag {
+ 	DEFAULT_IF = 0x1,
+ 	FORCE_PAE = 0x2,
+ 	POWER_SAVE_DISABLE = 0x4,
++	OWE_DISABLE = 0x8,
+ };
+ 
+ struct driver_flag_name {
+@@ -103,6 +104,7 @@ static const struct driver_flag_name driver_flag_names[] = {
+ 	{ "DefaultInterface", DEFAULT_IF },
+ 	{ "ForcePae",         FORCE_PAE },
+ 	{ "PowerSaveDisable", POWER_SAVE_DISABLE },
++	{ "OweDisable",       OWE_DISABLE },
+ };
+ 
+ struct wiphy {
+@@ -344,7 +346,8 @@ wpa2_personal:
+ 		if (info->akm_suites & IE_RSN_AKM_SUITE_PSK)
+ 			return IE_RSN_AKM_SUITE_PSK;
+ 	} else if (security == SECURITY_NONE) {
+-		if (info->akm_suites & IE_RSN_AKM_SUITE_OWE)
++		if (info->akm_suites & IE_RSN_AKM_SUITE_OWE &&
++					!wiphy_owe_disabled(wiphy))
+ 			return IE_RSN_AKM_SUITE_OWE;
+ 	}
+ 
+@@ -721,6 +724,14 @@ bool wiphy_power_save_disabled(struct wiphy *wiphy)
+ 	return false;
+ }
+ 
++bool wiphy_owe_disabled(struct wiphy *wiphy)
++{
++	if (wiphy->driver_flags & OWE_DISABLE)
++		return true;
 +
-+import unittest
-+import sys
++	return false;
++}
 +
-+sys.path.append('../util')
-+from iwd import IWD, Network
-+from hostapd import HostapdCLI
-+import testutil
+ const uint8_t *wiphy_get_extended_capabilities(struct wiphy *wiphy,
+ 							uint32_t iftype)
+ {
+@@ -1355,6 +1366,9 @@ static void wiphy_print_basic_info(struct wiphy *wiphy)
+ 		if (wiphy->driver_flags & POWER_SAVE_DISABLE)
+ 			flags = l_strv_append(flags, "PowerSaveDisable");
+ 
++		if (wiphy->driver_flags & OWE_DISABLE)
++			flags = l_strv_append(flags, "OweDisable");
 +
-+class Test(unittest.TestCase):
-+    def test_autoconnect_to_open(self):
-+        IWD.copy_to_storage("transition.open")
-+
-+        wd = IWD(True)
-+
-+        devices = wd.list_devices(1)
-+        device = devices[0]
-+        device.autoconnect = True
-+
-+        condition = 'obj.state == DeviceState.connected'
-+        wd.wait_for_object_condition(device, condition)
-+
-+        testutil.test_iface_operstate()
-+
-+        network = Network(device.connected_network)
-+
-+        self.assertEqual(network.name, "transition")
-+        self.assertIn(device.address, self.hapd.list_sta())
-+
-+        device.disconnect()
-+
-+    def setUp(self):
-+        self.hapd = HostapdCLI(config="ssidOpen.conf")
-+        pass
-+
-+    def tearDown(self):
-+        IWD.clear_storage()
-+
-+        self.wd = None
-+
-+    @classmethod
-+    def setUpClass(cls):
-+        pass
-+
-+    @classmethod
-+    def tearDownClass(cls):
-+        IWD.clear_storage()
-+
-+if __name__ == '__main__':
-+    unittest.main(exit=True)
-diff --git a/autotests/testOWE-disabled/hw.conf b/autotests/testOWE-disabled/hw.conf
-new file mode 100644
-index 00000000..42b12d59
---- /dev/null
-+++ b/autotests/testOWE-disabled/hw.conf
-@@ -0,0 +1,7 @@
-+[SETUP]
-+num_radios=3
-+start_iwd=0
-+
-+[HOSTAPD]
-+rad0=ssidOpen.conf
-+rad1=ssidOWE.conf
-diff --git a/autotests/testOWE-disabled/main.conf b/autotests/testOWE-disabled/main.conf
-new file mode 100644
-index 00000000..2554c011
---- /dev/null
-+++ b/autotests/testOWE-disabled/main.conf
-@@ -0,0 +1,2 @@
-+[DriverQuirks]
-+OweDisable=mac80211_hwsim
-\ No newline at end of file
-diff --git a/autotests/testOWE-disabled/ssidOWE.conf b/autotests/testOWE-disabled/ssidOWE.conf
-new file mode 100644
-index 00000000..72809fa6
---- /dev/null
-+++ b/autotests/testOWE-disabled/ssidOWE.conf
-@@ -0,0 +1,15 @@
-+ssid=owe-hidden
-+bssid=02:00:00:00:f1:00
-+channel=1
-+ignore_broadcast_ssid=1
-+ieee80211w=1
-+
-+wpa=2
-+wpa_key_mgmt=OWE
-+rsn_pairwise=CCMP
-+vendor_elements=dd15506f9a1c02000000f0000a7472616e736974696f6e
-+
-+# You would conventionally use these options but hostapd does not include an
-+# IE for the OWE network, hence vendor_elements must be used directly
-+#owe_transition_ssid="transition"
-+#owe_transition_bssid=02:00:00:00:f0:00
-diff --git a/autotests/testOWE-disabled/ssidOpen.conf b/autotests/testOWE-disabled/ssidOpen.conf
-new file mode 100644
-index 00000000..096b52c4
---- /dev/null
-+++ b/autotests/testOWE-disabled/ssidOpen.conf
-@@ -0,0 +1,9 @@
-+channel=1
-+ssid=transition
-+bssid=02:00:00:00:f0:00
-+vendor_elements=dd15506f9a1c02000000f1000a6f77652d68696464656e
-+
-+# You would conventionally use these options but hostapd does not include an
-+# IE for the OWE network, hence vendor_elements must be used directly
-+#owe_transition_ssid="owe-hidden"
-+#owe_transition_bssid=02:00:00:00:f1:00
-diff --git a/autotests/testOWE-disabled/transition.open b/autotests/testOWE-disabled/transition.open
-new file mode 100644
-index 00000000..e69de29b
+ 		joined = l_strjoinv(flags, ' ');
+ 
+ 		l_info("\tDriver Flags: %s", joined);
+diff --git a/src/wiphy.h b/src/wiphy.h
+index fe7e9e49..a68e48c3 100644
+--- a/src/wiphy.h
++++ b/src/wiphy.h
+@@ -134,6 +134,7 @@ const char *wiphy_get_name(struct wiphy *wiphy);
+ bool wiphy_uses_default_if(struct wiphy *wiphy);
+ bool wiphy_control_port_enabled(struct wiphy *wiphy);
+ bool wiphy_power_save_disabled(struct wiphy *wiphy);
++bool wiphy_owe_disabled(struct wiphy *wiphy);
+ const uint8_t *wiphy_get_extended_capabilities(struct wiphy *wiphy,
+ 							uint32_t iftype);
+ const uint8_t *wiphy_get_rm_enabled_capabilities(struct wiphy *wiphy);
 -- 
 2.34.1
 
