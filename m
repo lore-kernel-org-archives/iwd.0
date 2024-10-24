@@ -1,124 +1,147 @@
-Received: from mail-ej1-f49.google.com (mail-ej1-f49.google.com [209.85.218.49])
+Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C1F31B4F02
-	for <iwd@lists.linux.dev>; Thu, 24 Oct 2024 10:04:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E6961E3763
+	for <iwd@lists.linux.dev>; Thu, 24 Oct 2024 13:16:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729764278; cv=none; b=YLPrShhSLZNz4DKb1C+K0QDnzGFfvhuO02G/OYqUZBoLK8QImJl04dauSdHSJYK1t/X/RELvF/W3f/PWBQB472TKtkBPku2/0pSptR7/sHHqbVTyiG3gEvZR695FzlfKIGrX9g5+qyX4enNYz/5LN06kaOJ4+nWBZ5G2SjLUcaQ=
+	t=1729775797; cv=none; b=rzwIczugVIXPGa9fNxPTtbYoKg5VNLH0YPLE7LPpejMRFBILWykxD32zRvryNFMwIQbV1ZVZsw4G3qvJJuSrFruXcu02tytQ2Z2GhxgkBmIig1pz2XYy4wGbjABlWrHfLyU0RRz1pe5S9HbDChhtc/41WKvMMmjV+bnhW5KiQGQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729764278; c=relaxed/simple;
-	bh=u8/QroND86c5ZF2zmJya43eI0c/JX+rKKMoaGEgEWUQ=;
-	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
-	 Message-Id:References:To; b=LObisi/a9Np4/UIajTnTusoDdau8NUnn8CCt+pA40rWcidBcUTgsCyA/OiNl37f0qC4SGnI6YWP4VUvh47nE8XriM+dGBD+3Y42AsmkCohA9ASui9H5rhBrHyosL1UjfnkVzYW+CK5s5a4E9pqnjTs7zWgdrHUn7aZSFXlaBMkw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JDAXZcMG; arc=none smtp.client-ip=209.85.218.49
+	s=arc-20240116; t=1729775797; c=relaxed/simple;
+	bh=QWd+2+Z/Z8dRIeUtxlEJMwD59tee9Kj3A2Y1167K2h4=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=hx9EJOeTCZfAmhDSGFXEi1VnYD//wHgHMTZmMSa0YjNCpNkJkTU3FV6Xdh06imKyHBA7zeHariu1XOhwtnek5MT5uElem3I1C29VwsmroFXwWOmqdUuw8WwM8hfRujHuYmN/XGxioq6ej/uJlGRMoXbAAQ0eUv25HMSWS9m2Rr8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PXiCpoNz; arc=none smtp.client-ip=209.85.210.175
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JDAXZcMG"
-Received: by mail-ej1-f49.google.com with SMTP id a640c23a62f3a-a99f629a7aaso118027466b.1
-        for <iwd@lists.linux.dev>; Thu, 24 Oct 2024 03:04:36 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PXiCpoNz"
+Received: by mail-pf1-f175.google.com with SMTP id d2e1a72fcca58-71e467c3996so661113b3a.2
+        for <iwd@lists.linux.dev>; Thu, 24 Oct 2024 06:16:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1729764274; x=1730369074; darn=lists.linux.dev;
-        h=to:references:message-id:content-transfer-encoding:cc:date
-         :in-reply-to:from:subject:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=6dlB5+xkTqvo2v9RiHyLVAgvU3yQukVyG0p4dot1Rcs=;
-        b=JDAXZcMGmrON11Sb+abf9y/jizP+zgB8aioAzZaqUCgZxxxT7Pp6MOvD4BjKBcem8b
-         umsOW3RsLfOQf0u2iVA1l86WJ6zHz1szOZ8t6KRDd8SFf2c6MReqq2Ea7uwoJX2QTQjI
-         2vHQHEsX4PbwF1oufP0u46+PAnfkCa/oJuAPY6hEi/LFw+uvA2QFYxhXPvzGpYTtK0Hl
-         0NnDh+PyFHsP95iDKvyAluctesnEKjMh56UMWX1TwcHRoDUc2S8ssEx4CDcbfMFMHlFq
-         g0YSLjdfbteINQUdaNLyi3xc/s2O5AlwPYINNQHieLP79Lwc64qaSqcFG6Zu34wmAATi
-         9CEA==
+        d=gmail.com; s=20230601; t=1729775794; x=1730380594; darn=lists.linux.dev;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=C+dpV4Cfy3wlTzuZkHMq/ecCh9qUNcs5xq5sK1IWHJc=;
+        b=PXiCpoNzYxbuAToK1iP8CCubrj8PIo0RfDR4HU1IPPhzt6Bt1IAIxCbOVQbIQ5swMU
+         zWBPM44pMUwBXvVyBbXfI5hBzmdCXk4x3J+9lfbyEB6r9jgT9uVX6QMd7yCuh/EpGWux
+         c7cdu7SeA7Y1Fo01+uRRc9Y1Hy21VHMowoaQHFQEi2K6sfIEbz2TUlfFwMyx/O4V2jA0
+         fO6NZ54dNnlPfu/1F139bYke0NQ/gLQMFpAvX6D9vYIGvWNapo9/xeuuCzHHwzSIZ+F+
+         DdGoejz8DfTzRPtxRKutdWdsqcgDGQuhoanHhRk6hA2S4favngylLn0o72EuGIjaiebf
+         PDzA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729764274; x=1730369074;
-        h=to:references:message-id:content-transfer-encoding:cc:date
-         :in-reply-to:from:subject:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=6dlB5+xkTqvo2v9RiHyLVAgvU3yQukVyG0p4dot1Rcs=;
-        b=GDm1UQyyJ8zE8KTnTOlTXwl0XFzsMzS2wU7MW93Fo9T2JBAJocQU8IUDemYRCTdVRb
-         fH9tcq1wcqFDm2G2jEL27d9b1ohAdBq+a0uYgUI0Ngjg46UH/ZZWS6ltxLDMcqP+NqvB
-         6SvWIx/pKVcjz68qCF9alrUgnj+HHNDC5xwgs2FgK7+pAVVFirym6Xi5/7XNs1sKG98j
-         vCC6x7mcXVf/JXQIXUQmRHJVhA6fMY/XfgDaMLi/0sfvhlyI0ObMMKEpvXC5A8zoYRBk
-         3qASn1Re7QhRZ0SUGEoNVJP4Dd4Siu/TrLAblHyDEfOqCxzywuzP2r4Q+wdTQEZsmv1A
-         Hmlg==
-X-Gm-Message-State: AOJu0YyZyyG1p9AsBGlGl339uRxNwrcGFPZ9FyFQDRkcFZbOGDvJ27Ud
-	Jg4U4zcK7T14fmpmQODAFxBeaEj76u1/J6FtP78qFF/UL5iKQscy91bjuA==
-X-Google-Smtp-Source: AGHT+IFtSTmVZ3LCCd/2S8f+r4a8xdSBpBSNwZruLRFXUBDmMdqbYUEkDc57rdAFGs/zNUiejgJ0jg==
-X-Received: by 2002:a17:907:1c84:b0:a9a:8263:d2c7 with SMTP id a640c23a62f3a-a9ad199c2c5mr154918066b.7.1729764274180;
-        Thu, 24 Oct 2024 03:04:34 -0700 (PDT)
-Received: from smtpclient.apple (89-73-96-21.dynamic.chello.pl. [89.73.96.21])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a9a912f65e9sm594540866b.74.2024.10.24.03.04.33
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 24 Oct 2024 03:04:33 -0700 (PDT)
-Content-Type: text/plain;
-	charset=utf-8
+        d=1e100.net; s=20230601; t=1729775794; x=1730380594;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=C+dpV4Cfy3wlTzuZkHMq/ecCh9qUNcs5xq5sK1IWHJc=;
+        b=ZR6hJ8Jmbc/eufwaB4PN7JYqq0mAIKFS5NXtjyrB/mFhzJ23dtaokS7nX25GIOGlh2
+         fldy58yeX+Z/M3/wPuZpq3LWlTJrxcbI1HtQoz9U8DizQDDcytDvXby+LIVArIXUmglJ
+         L04dVDoItOmCCt5IuWcz8WNoOOx6+zrhaIR7WGikRo3Daueh3dxZWdp94I9AuPd9OgJr
+         jFOnVI7ahiWtoP/prq6sYcLbfe1QvA+XEa5M4zJJKrGOwiXtXmXJ3AXSHszFAPH6wmMr
+         sqQhpHDTaDPRFvZwyrCxwrYlOnuGRowMkjBm6iknP52kf6kMjDAntFFtAh7UXZ4YfP05
+         17Vw==
+X-Gm-Message-State: AOJu0Yz8JFymOEOpYHmQZJu/wiktIHmw28KLwZMLvYn22ZLhb7mtJGIE
+	+GrsUyaenbO4YlsmECj8gXkX0eUY6uXBVi99bbONBYL2fFdT4d0wzFT22w==
+X-Google-Smtp-Source: AGHT+IE7r82Y/qIfln4qXfOFzUlJSsLUyWoNPazsCYkZ7uNwhE8KrB18z6rwARoGyRXBvmMUxIdTEw==
+X-Received: by 2002:a05:6a00:4fc4:b0:71e:4196:ddb2 with SMTP id d2e1a72fcca58-72045e4903fmr2099043b3a.9.1729775794042;
+        Thu, 24 Oct 2024 06:16:34 -0700 (PDT)
+Received: from LOCLAP699.localdomain ([152.193.78.90])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-71ec131391asm7897963b3a.26.2024.10.24.06.16.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 24 Oct 2024 06:16:33 -0700 (PDT)
+From: James Prestwood <prestwoj@gmail.com>
+To: iwd@lists.linux.dev
+Cc: James Prestwood <prestwoj@gmail.com>
+Subject: [PATCH] station: check support for all sysfs settings
+Date: Thu, 24 Oct 2024 06:16:28 -0700
+Message-Id: <20241024131628.152607-1-prestwoj@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3776.700.51.11.1\))
-Subject: Re: iwd 2.22 scan fails but... works ok with ConnMan
-From: Piotr Oniszczuk <piotr.oniszczuk@gmail.com>
-In-Reply-To: <38b1af93-83c8-4cfb-ae63-5e480ac4420b@gmail.com>
-Date: Thu, 24 Oct 2024 12:04:22 +0200
-Cc: iwd@lists.linux.dev
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <D6BB0209-39DB-430B-977A-955928ED3701@gmail.com>
-References: <CF5A13CE-18AF-4A33-98F9-13FA353657C4@gmail.com>
- <38b1af93-83c8-4cfb-ae63-5e480ac4420b@gmail.com>
-To: Denis Kenzior <denkenz@gmail.com>
-X-Mailer: Apple Mail (2.3776.700.51.11.1)
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-Denis,
-thx for picking this up :)
-pls see inline
+If IPv6 is disabled or not supported at the kernel level writing the
+sysfs settings will fail. A few of them had a support check but this
+patch adds a supported bool to the remainder so we done get errors
+like:
 
-> Wiadomo=C5=9B=C4=87 napisana przez Denis Kenzior <denkenz@gmail.com> w =
-dniu 24.10.2024, o godz. 00:04:
->=20
-> Hi Piotr,
->=20
-> On 10/15/24 3:56 AM, Piotr Oniszczuk wrote:
->> Hi,
->> I=E2=80=99m using iwd 2.22 as default way of automated wifi =
-connection in my project (https://github.com/warpme/minimyth2)
->> Some of my users started to report issues about not able to establish =
-wifi connections.
->> I asked to do 1st step verification: launch ConnMan =
-(https://wiki.archlinux.org/title/ConnMan) to verify is HW working ok.
->> With ConnMan users are able to connect so HW is OK.
->> It looks to me like issue is specific to iwd.
->> With iwd log says like below.
->> May somebody from iwd team help me to solve this issue?
->=20
-> What hardware is being used?
+Unable to write drop_unsolicited_na to /proc/sys/net/ipv6/conf/wlan0/drop_unsolicited_na
+---
+ src/station.c | 36 ++++++++++++++++++++++++++++--------
+ 1 file changed, 28 insertions(+), 8 deletions(-)
 
-
-this is allwinner h618 zero3 sbc with uwe5622 wifi chip.
-Kernel is 6.11.5 with uwe5622 driver backported from vendor bsp =
-(https://github.com/warpme/minimyth2/blob/master/script/kernel/linux-6.11/=
-files/0630-net-wireless-add-uwe5622-support-v20231020.patch)
-
-
->  Can you include iwmon output?
-> =
-https://archive.kernel.org/oldwiki/iwd.wiki.kernel.org/debugging.html#iwmo=
-n
-
-Trying to use iwmon shows me:
-
-root@myth-frontend-0200dd63cc00:~ # ip link
-1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue qlen 1000
-    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
-2: eth0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc mq qlen 1000
-    link/ether 02:00:dd:63:cc:00 brd ff:ff:ff:ff:ff:ff
-3: wlan0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc pfifo_fast =
-qlen 1000
-    link/ether 24:b7:2a:45:f4:e5 brd ff:ff:ff:ff:ff:ff
-root@myth-frontend-0200dd63cc00:~ # iwmon -i wlan0
-Wireless monitor ver 3.0
-Failed to create monitor interface wlan0: Unknown error -17
-root@myth-frontend-0200dd63cc00:~ #
+diff --git a/src/station.c b/src/station.c
+index cef6c66a..34537b26 100644
+--- a/src/station.c
++++ b/src/station.c
+@@ -74,6 +74,10 @@ static uint32_t roam_retry_interval;
+ static bool anqp_disabled;
+ static bool supports_arp_evict_nocarrier;
+ static bool supports_ndisc_evict_nocarrier;
++static bool supports_drop_gratuitous_arp;
++static bool supports_drop_unsolicited_na;
++static bool supports_ipv4_drop_unicast_in_l2_multicast;
++static bool supports_ipv6_drop_unicast_in_l2_multicast;
+ static struct watchlist event_watches;
+ static uint32_t known_networks_watch;
+ static uint32_t allowed_bands;
+@@ -1641,10 +1645,13 @@ static void station_set_drop_neighbor_discovery(struct station *station,
+ {
+ 	char *v = value ? "1" : "0";
+ 
+-	sysfs_write_ipv4_setting(netdev_get_name(station->netdev),
+-				"drop_gratuitous_arp", v);
+-	sysfs_write_ipv6_setting(netdev_get_name(station->netdev),
+-				"drop_unsolicited_na", v);
++	if (supports_drop_gratuitous_arp)
++		sysfs_write_ipv4_setting(netdev_get_name(station->netdev),
++					"drop_gratuitous_arp", v);
++
++	if (supports_drop_unsolicited_na)
++		sysfs_write_ipv6_setting(netdev_get_name(station->netdev),
++					"drop_unsolicited_na", v);
+ }
+ 
+ static void station_set_drop_unicast_l2_multicast(struct station *station,
+@@ -1652,10 +1659,13 @@ static void station_set_drop_unicast_l2_multicast(struct station *station,
+ {
+ 	char *v = value ? "1" : "0";
+ 
+-	sysfs_write_ipv4_setting(netdev_get_name(station->netdev),
+-				"drop_unicast_in_l2_multicast", v);
+-	sysfs_write_ipv6_setting(netdev_get_name(station->netdev),
+-				"drop_unicast_in_l2_multicast", v);
++	if (supports_ipv4_drop_unicast_in_l2_multicast)
++		sysfs_write_ipv4_setting(netdev_get_name(station->netdev),
++					"drop_unicast_in_l2_multicast", v);
++
++	if (supports_ipv6_drop_unicast_in_l2_multicast)
++		sysfs_write_ipv6_setting(netdev_get_name(station->netdev),
++					"drop_unicast_in_l2_multicast", v);
+ }
+ 
+ static void station_signal_agent_notify(struct station *station);
+@@ -5813,6 +5823,16 @@ static int station_init(void)
+ 						"arp_evict_nocarrier");
+ 	supports_ndisc_evict_nocarrier = sysfs_supports_ipv6_setting("all",
+ 						"ndisc_evict_nocarrier");
++	supports_drop_gratuitous_arp = sysfs_supports_ipv4_setting("all",
++						"drop_gratuitous_arp");
++	supports_drop_unsolicited_na = sysfs_supports_ipv6_setting("all",
++						"drop_unsolicited_na");
++	supports_ipv4_drop_unicast_in_l2_multicast =
++					sysfs_supports_ipv4_setting("all",
++					"drop_unicast_in_l2_multicast");
++	supports_ipv6_drop_unicast_in_l2_multicast =
++					sysfs_supports_ipv6_setting("all",
++					"drop_unicast_in_l2_multicast");
+ 
+ 	watchlist_init(&event_watches, NULL);
+ 
+-- 
+2.34.1
 
