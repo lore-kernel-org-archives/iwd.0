@@ -1,119 +1,87 @@
-Received: from mail-lj1-f180.google.com (mail-lj1-f180.google.com [209.85.208.180])
+Received: from mail-qt1-f172.google.com (mail-qt1-f172.google.com [209.85.160.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 610681D5ACC
-	for <iwd@lists.linux.dev>; Thu, 24 Oct 2024 14:32:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 913E549652
+	for <iwd@lists.linux.dev>; Thu, 24 Oct 2024 16:46:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729780372; cv=none; b=BR0ZyrcRxSqITWtOalt+KyzIVWaHHl5KBK2XtzGCATgeYVeEGxERqnPUcb/QrEkmEsRLnh+CBYREqHBbUAE7Gumz6o5cnnA3X8ZnbSKvYxDKgxyGpxf1PzuzZ/22xCZMc5XwZMaETU+UlJbSQ3zo9BEoY87yo2Ove3yS2CallIY=
+	t=1729788402; cv=none; b=slBaRSBz8oUj+aaV6XNtKycD725lGNFCm9oAM4Lej2xglnnR7r1IN+2PvUK7ERG4f3OgDARVHygEJk5vwOQq5n3LzrYiYzUUzsRlGLiM5gSfde/9xX47uM7dSFtWL2kLZeH/pzfjMHQx/Am4Y75VyUOiFBeHDA43uns1GBd7H9o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729780372; c=relaxed/simple;
-	bh=8p+rWA0ik7FAh+TgqWklXnrtZWnz/NCrIT/8tDjqpVU=;
-	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
-	 Message-Id:References:To; b=lvRSMIjWum3VO2n404OcoyjdrHjR5MPULgfWzgQeM9R36P2ToCLWKOqiJMobZaPJFGIvs0TaaGyarpIJfFdTaiMGfkNX1vTf75hscLCNHdFyiRrtS1bFPwrLUC/K+uox2CYVC0OCbdgLTh6KwTCULHT0HNDVQROE3eckrLQl9q8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XHyOST+M; arc=none smtp.client-ip=209.85.208.180
+	s=arc-20240116; t=1729788402; c=relaxed/simple;
+	bh=IhL2zv0AcQlomJBD2wCPsazNDogCOglhE1riBuNflEE=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=nbl/UWd4DNNHj3/uEyBDA7hlC5vOTQ4ipjSa3Np4BtnPBlJxoleJkjVlpDkMqBfDq5AGUeU++MjHSsirCxNchrU4hJcBRwnh49c8q8/MbcShpG1FtgRFnagZZUOYPLuK1AbCTJG6EBLHOavdx0nTGTD52zLI/E5JiaRkL0ueuDE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IwhAdVj9; arc=none smtp.client-ip=209.85.160.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XHyOST+M"
-Received: by mail-lj1-f180.google.com with SMTP id 38308e7fff4ca-2fb3da341c9so11107471fa.2
-        for <iwd@lists.linux.dev>; Thu, 24 Oct 2024 07:32:50 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IwhAdVj9"
+Received: by mail-qt1-f172.google.com with SMTP id d75a77b69052e-460dce6fff9so7536361cf.1
+        for <iwd@lists.linux.dev>; Thu, 24 Oct 2024 09:46:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1729780368; x=1730385168; darn=lists.linux.dev;
-        h=to:references:message-id:content-transfer-encoding:cc:date
-         :in-reply-to:from:subject:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=KOTSfP5agu0Gr55L8ujhBFXd5tWgYRhc+xaJbRbz0zE=;
-        b=XHyOST+MqBlze5C3XzP86XcPhNVhhaFupABTybC5zHibiGzm/sSqdfGKycycRiF9ZX
-         2UPEs4mDc2uErzoGWzk7YJnWZ4McNWIL14GH1xzUN7Ff8Cvnv98C/tOt8yWjot6BbXmJ
-         FXSl84Jrk6j3WTzmqSCj714THmkOfS4A5SiZRr3AZbp/UAPfiS49DqgYZnMk9iva6HNW
-         T2EiIkzVC1sYf0ZMrTJXxQc8eEJtqrlpOd7cWiq278YoFs1LsNtqQJZSD09RZGRCbH/s
-         k3/u+dplE1cxo9qjC+p1GR8eqHQZ33pYf1v81g6gTfeqZ4lh1UzwHd//qovC1c26xbLi
-         dTjg==
+        d=gmail.com; s=20230601; t=1729788399; x=1730393199; darn=lists.linux.dev;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=1FevfuVyxuZ1qPPZzJ7wX/yreqxQXzM7LyohybtWB90=;
+        b=IwhAdVj94iVUA0vHCve3vTR5lu27G/ccVvpJtCAUCyP7e2SqPAZsYpNxXWv4dYSvlk
+         nZ9dMq822y4hcBFcs4yWjpXBfUc9eTsDTJpC4JDf5e4O/7aasVu3fgjPeChQQk2Inmm9
+         8GpYAMT/ASQwQSVQzuRsnmgnLTXgbR3vWkPozvZv91P6IM1tpyiUmmmFWevJkhXqJC2Z
+         jnqt7jFyt0x0IuixaV7mKrA4CYEsryBBPX4vO5U7mvBamkZqC4EHKTdAeNeX5b7cHCae
+         /Z71qedoJIiXXddYObN/vzIZQzFsNh6OyKL/Qn0V60znXkyl6N4JQe5a0cutlMkPddFo
+         D/VA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729780368; x=1730385168;
-        h=to:references:message-id:content-transfer-encoding:cc:date
-         :in-reply-to:from:subject:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=KOTSfP5agu0Gr55L8ujhBFXd5tWgYRhc+xaJbRbz0zE=;
-        b=Kvi3/5XNnJZXAWdo6daRCRF4pTpL8C1gdIazM85f5Xg6y2aU7mm4sKNjUGGXIbbom2
-         eVTjoGGf691eq2tOZemIonJ//hnRAAdrR2ueuhkLHCNmZqCFlmqGXuiI4q8OJafl3tKq
-         45arkoNa6ViU8FDxSACvgav5IWUWg6VF7KbzPOU3zxw3AF5AWXYlQwuK65kDhXQwczNf
-         bz43iW90AOUlK6e3H6JziWIISYN8hYqubpF9ZZbczrRn0dRDVibn2j7hFOuBtxDh5Q7F
-         8Ah5VEU7flxaHI6p9bYUNvX8rHOMmpX54LoMFZvgsr7W92Frm9STi3NW9PC+QoofBsnF
-         5KYA==
-X-Gm-Message-State: AOJu0YytHvdMvIdtbYry1a4Eqbsqz6C6nYrqnGi6EPzGuxqwAiXxKC0i
-	HNAlE0RmnBEnKWeDNM6Ej0U8cKNFBsli/KZgDDgrHz42rwbiQPsg
-X-Google-Smtp-Source: AGHT+IHsd/g1Drb64+Ie6zNCoMc4BiET7jH0NjOk4a29ZFUnXgDnr4VwILscJAot1NdqBGUSFXq87g==
-X-Received: by 2002:a2e:4e02:0:b0:2fa:fc41:cf80 with SMTP id 38308e7fff4ca-2fc9d48c2a0mr28008991fa.43.1729780367929;
-        Thu, 24 Oct 2024 07:32:47 -0700 (PDT)
-Received: from smtpclient.apple (89-73-96-21.dynamic.chello.pl. [89.73.96.21])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5cb6696b530sm5778660a12.2.2024.10.24.07.32.47
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 24 Oct 2024 07:32:47 -0700 (PDT)
-Content-Type: text/plain;
-	charset=utf-8
+        d=1e100.net; s=20230601; t=1729788399; x=1730393199;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=1FevfuVyxuZ1qPPZzJ7wX/yreqxQXzM7LyohybtWB90=;
+        b=GA92A4frEIueXZ+ovxlNUG46EOrWIIalF737tmwP+gRy+jwkoyyfhPMgUcd/gsNVJD
+         L9nfhRkbiacmlN/xbuPjkhaHw7lsmqW7TFpn5PAtq59/ECSsdvxkg4Gyc2/yCpSNEouO
+         HGGlPfBCuhx4X3T3hM3UZfUMPbt6NH7o44Tlixpx+ZML4ptGo9lb22rxLFtMCph30jsU
+         GYH6bN5SB+dKHV7H5PqaEe1G90eUplh4bgNBkPB4LM9c0xlpluimWvv00qpIGuMyqzds
+         nCH++ze3Hjjf2DetMnklP5OXS6PxGNq4/r6fDAymhOnsGeZeupJihQvcndpLELXa0gFW
+         4FNQ==
+X-Gm-Message-State: AOJu0Ywu7JpmCKHQjrKs4iyXcUV6lXfw0fK1ETyV845HCzLk9TnNW7wD
+	rW/S6W2GvPl4OOWlPMznZKPLPnGU8aS8psr3egJkvf2SKTLvjp+7p2BB/g==
+X-Google-Smtp-Source: AGHT+IHcuOeqaZygevGjHT290k79xBx0/bFOEtvwyBZ6WuBaoaVFKxGetB7I0le2JQMzS+jjmvDkgg==
+X-Received: by 2002:a05:622a:c6:b0:460:4027:601 with SMTP id d75a77b69052e-461145aae23mr110725151cf.6.1729788399122;
+        Thu, 24 Oct 2024 09:46:39 -0700 (PDT)
+Received: from LOCLAP699.localdomain ([152.193.78.90])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4611a19be2csm16893901cf.70.2024.10.24.09.46.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 24 Oct 2024 09:46:38 -0700 (PDT)
+From: James Prestwood <prestwoj@gmail.com>
+To: iwd@lists.linux.dev
+Cc: James Prestwood <prestwoj@gmail.com>
+Subject: [PATCH 1/5] band: correct oper class 136 starting frequency
+Date: Thu, 24 Oct 2024 09:46:31 -0700
+Message-Id: <20241024164635.176631-1-prestwoj@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3776.700.51.11.1\))
-Subject: Re: iwd 2.22 scan fails but... works ok with ConnMan
-From: Piotr Oniszczuk <piotr.oniszczuk@gmail.com>
-In-Reply-To: <d27c9f76-ee7f-4509-a05e-6e05ee444181@gmail.com>
-Date: Thu, 24 Oct 2024 16:32:36 +0200
-Cc: iwd@lists.linux.dev
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <A112F6DF-E1BE-4350-86DD-7A85BA4FC1CA@gmail.com>
-References: <CF5A13CE-18AF-4A33-98F9-13FA353657C4@gmail.com>
- <38b1af93-83c8-4cfb-ae63-5e480ac4420b@gmail.com>
- <D6BB0209-39DB-430B-977A-955928ED3701@gmail.com>
- <d27c9f76-ee7f-4509-a05e-6e05ee444181@gmail.com>
-To: Denis Kenzior <denkenz@gmail.com>
-X-Mailer: Apple Mail (2.3776.700.51.11.1)
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-Pls see inline
+This should be 5925, not 5950
+---
+ src/band.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-> Wiadomo=C5=9B=C4=87 napisana przez Denis Kenzior <denkenz@gmail.com> w =
-dniu 24.10.2024, o godz. 16:00:
->=20
-> Hi Piotr,
->=20
->>>=20
->>> What hardware is being used?
->> this is allwinner h618 zero3 sbc with uwe5622 wifi chip.
->> Kernel is 6.11.5 with uwe5622 driver backported from vendor bsp =
-(https://github.com/warpme/minimyth2/blob/master/script/kernel/linux-6.11/=
-files/0630-net-wireless-add-uwe5622-support-v20231020.patch)
->=20
-> So yet another non-upstream driver, sigh.
+diff --git a/src/band.c b/src/band.c
+index 14daeb37..4e8eb9b0 100644
+--- a/src/band.c
++++ b/src/band.c
+@@ -896,7 +896,7 @@ static const struct operating_class_info e4_operating_classes[] = {
+ 	},
+ 	{
+ 		.operating_class = 136,
+-		.starting_frequency = 5950,
++		.starting_frequency = 5925,
+ 		.channel_spacing = 20,
+ 		.center_frequencies = { 2 },
+ 	}
+-- 
+2.34.1
 
-Ah - believe me: mine frustration because of this is much bigger :-p=20
-
->=20
->>>  Can you include iwmon output?
-
-After compiling nlmon now is much better: =
-https://gist.github.com/warpme/4b21b51dd1e2c74075498acd9af5082d
-
->>=20
->=20
-> Is this in any way related to the problem reported in this thread?
-> =
-https://lore.kernel.org/all/CAOCHtYj9OjZGQ=3DG139i=3DKRRcxpFD-1=3DGSvUPmFY=
-aqSvFz0NwJg@mail.gmail.com/
->=20
-
-Indeed I saw this thread.
-Some time ago I was trying to play with iwd.cfg without success
-Maybe I put incorrect settings there?
-
-May you hint me what exactly I need to add in iwd.cfg?
-
-To load wifi kernel module I=E2=80=99m using: modprobe sprdwl_ng
-
-Btw: all was working ok few versions back of iwd/kernel
-Unfortunately I can=E2=80=99t say which change: iwd or kernel breaks iwd =
-operation on uwe5622 wifi=E2=80=A6.
-  =20
