@@ -1,119 +1,92 @@
-Received: from mail-oi1-f174.google.com (mail-oi1-f174.google.com [209.85.167.174])
+Received: from mail-ot1-f51.google.com (mail-ot1-f51.google.com [209.85.210.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55C1615957D
-	for <iwd@lists.linux.dev>; Thu, 24 Oct 2024 18:43:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 332C322B676
+	for <iwd@lists.linux.dev>; Thu, 24 Oct 2024 21:01:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729795426; cv=none; b=Ps7U926lnYM4EVnEtMmrgoD+Ge1zk+a4T0N+3mau6VfBPYfBPtqpwnxCk6i2250/wJRK/i8GofrZA5Q1dyrhhAmK5LqMFSbUNOvieLU73bTF+u6+6kYFaVp13rdTd91eQSWVY5HdnFk7/vAPA+3KTUiiwfURJA72G48imDFDrTw=
+	t=1729803684; cv=none; b=Tufdiggh1wUQwFM/F0kD/VA2H6gL2CR75Y6n2qK7ZX+RfQV5VvBsCdSmWQ4nQFg5Vha1SPKAy8/zzHwYL0gKfvb6BFm88E7p5/YOC01bQyVopdpr9ozNOwFDdTecgmDkna308UxF7aK8CNO2Uw+4sVwFs87Wr8JPPIA9s6e0kBQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729795426; c=relaxed/simple;
-	bh=aWZf5BZ+gJrzy2D0n1Nj0FZYfEulOHc1zL4WlJpvhC4=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=QRnoCxSuXWH8DC21aDE8U6JN5SVwFMz9jhPLjUHAvROsf8LcKIEIQauHjIRr7QftxZuPZsP8Ogvzk3a+YGFBb9jFw/5otgyGE98m27sTA/astipZryO/vKch2DKk9KZQ9NRXe/kVs/bayMQMjjOwX/PDKXZpGnB4ztgafUINXRE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dhd5VtOX; arc=none smtp.client-ip=209.85.167.174
+	s=arc-20240116; t=1729803684; c=relaxed/simple;
+	bh=NwCSwijrqz4T749QTxVF/giuU2czRDtJtHecbGhIXuI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=SBbeAcQRHDT5uq3RmiKtPrpLCSXyIE6fgD8pQwIG2mL616DDAeKw8HZh3OfrIJRkJtw+AUj1gT5fHZp65eY1acDLNIxAWHGTyaCQZBOcYzLAFjm/JVvQbp5JzDbrhooPX0IdNoW2jecyBBwrFAkWEPQgGPykyg6bC+p1Hab9k7A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=h/JRNwSm; arc=none smtp.client-ip=209.85.210.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dhd5VtOX"
-Received: by mail-oi1-f174.google.com with SMTP id 5614622812f47-3e612437c09so771775b6e.2
-        for <iwd@lists.linux.dev>; Thu, 24 Oct 2024 11:43:44 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="h/JRNwSm"
+Received: by mail-ot1-f51.google.com with SMTP id 46e09a7af769-71808e95ae2so1015927a34.0
+        for <iwd@lists.linux.dev>; Thu, 24 Oct 2024 14:01:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1729795423; x=1730400223; darn=lists.linux.dev;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=Yy8T2BlYDnTx14jdAyDmjwkwpNbG5iqC/fFpU4falIY=;
-        b=dhd5VtOX7+K2YO87fNqV633Lf/zc5bNp2ubTDeEvLb45Q+qI3bkrfnFeZ542atqX2S
-         fatxck5vgmXHgDfoT1EkwShd9nfXJt94DTYJqJPKIQfa6J3cegyEHRqj28990r4hQdEw
-         frLtPzal8jRelFz7JJ/+spPfCksTyDAHYjc/DoIoIn0tpCyK5e8LHbkxQzz7LL3JDTcA
-         f6dB4QnssYfXbOZZDwCCPufghH5Gq6FWuelWbC2nTi0sizyHYhYJ+gTc7K3VgAXiiDgT
-         E8ZE0L1LUYeMBf9Dbph6iLWHM6hkll4REFb1aDUWdqAGQjwmqkd+Ljt2BOMwHtQ2L2bb
-         PeoQ==
+        d=gmail.com; s=20230601; t=1729803681; x=1730408481; darn=lists.linux.dev;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:to:subject:user-agent:mime-version:date:message-id:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=xRquLpBPFB/M9Bhca9A0Cbii6LzyWcpzeLaBo9u5bD0=;
+        b=h/JRNwSmX9THx1NBGBhQ3Fj+hCNA/zlRnDI9zih6vUIuBDyujnOmslmmgCFT7HTQpx
+         cLGMrXv2gg/xsZPaCd09XfVqzcLq1YKz+u24Jfphn0hz4xHGWdM3m2ji/MDl01SZDsxU
+         gDbbHz3X+xwWxRqK5ZiYUy+zIDspnxo6iq8mROn+8Lu1BmK4sbntVmnwHFTnrDNh5TAb
+         gR7FqXDtLhi7qtiZ93s8PfWD5vCr1IhzwyzqGtZ0g/Ol0ZxFVrwtt1PiNPN2tAsFNXuj
+         3z8Kx1BC+BNbpqgxYAiNrMURt5ny7/x/g4B9PV1TL92UELEbPoqcfBYf5Onjw2hZDYWf
+         /T3w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729795423; x=1730400223;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Yy8T2BlYDnTx14jdAyDmjwkwpNbG5iqC/fFpU4falIY=;
-        b=ZqJFowEn70rzysG76bYjUzDPdwXmxVrsj37SsP2SLL6EySW5q1w1D4GCWMQLOVP3Qo
-         RUYN2bvEpMTIsRI3kEz8weOkZ6lZUq8Mhtln4GC+HGDacLyOeLFt5bbcn60LQioMqSJn
-         Als+NW39zdhwUMPunNKgsJSMH38JHuFQgz0TiCDQGmOJItogMc4ZbWddNC0yDy1NdUOP
-         16MyoDoHYcS86jHol08W6g0Q8updJ9TYg2lEaMpu/Zy1ZeAtL0XblSxGxg5RuHM16VAW
-         N0TvrilzH3ERPHWEaQhA1Au0NLm6mvIRUJ/0A9I2VDw1nEuy6APQMyhUEL7pKtodTpm5
-         LdcA==
-X-Gm-Message-State: AOJu0YygiomuPm/p51Q7HlFozExRBmdIBJ/0KcXdegtvO+nFTvKgxk4j
-	kPz1P2YIuLknCU0Hg7rHlBqZV7D/aybwLeJEP13ct1cbqWgEjTLQOouFYA==
-X-Google-Smtp-Source: AGHT+IG/Uq04mk5befYrV8DgkGY/eZSwFyRJWN7EaJRc9hgwokwSN+Kemf4VJQzDEX/2jp4SydhKKg==
-X-Received: by 2002:a05:6808:38cd:b0:3e6:773:c99e with SMTP id 5614622812f47-3e62452d03bmr6506509b6e.21.1729795422935;
-        Thu, 24 Oct 2024 11:43:42 -0700 (PDT)
-Received: from LOCLAP699.localdomain ([152.193.78.90])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6ce009e26c2sm52954116d6.121.2024.10.24.11.43.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 24 Oct 2024 11:43:42 -0700 (PDT)
-From: James Prestwood <prestwoj@gmail.com>
-To: iwd@lists.linux.dev
-Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH] unit: add test with list of known unsupported frequencies
-Date: Thu, 24 Oct 2024 11:43:38 -0700
-Message-Id: <20241024184338.186018-1-prestwoj@gmail.com>
-X-Mailer: git-send-email 2.34.1
+        d=1e100.net; s=20230601; t=1729803681; x=1730408481;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=xRquLpBPFB/M9Bhca9A0Cbii6LzyWcpzeLaBo9u5bD0=;
+        b=p/xtwHO8GYBwy2hWjVcp+KBAs0wWt3o37Cvss1NGPOnsJqV0ESgrYoiHyf/5XD/oA+
+         RJMkf7yq53oTnLj0bE8g3DTS1+UWscCBrZrrl+yYu9JIJMiV+lN44Lc5PbE0CPJoZecJ
+         wNgj3ppz+EZh42RY9+DDuAQ8VnWtzIx49KmnF/F5uKduG3R2vhiDai/ljzfL1055+VFP
+         ZPKRqy49Towkwd2WFeEO4PZNmFf0RZy3vax0hQCHU1DjYRV7shjTyUymSXd89wAK3EEe
+         6JePN0TTmKAmjk7/ieY1edPyDPIIa9bFNlXptbxfdr1TebSgzFoCJjqC4XClHJkoAkoV
+         uGRQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUrOh5fI0nn80vQSF03N2f5UVxxiwI/rjcwxeAVzZb2RkBo4AQAsPnWbJb/wrtp+x5GV6k=@lists.linux.dev
+X-Gm-Message-State: AOJu0YxUCZY3yselpHTLjyLLDQHJoKoLt94ylINNMrleBOIcRSEp8nyB
+	quLp/4JGAmv4E3Oh/yi9Ie3V0OrxEhHj2dHxR500jbh0u21Opf1v
+X-Google-Smtp-Source: AGHT+IGDdHTdPKqDn6BbCtkuQgzdJnlwRd5/d1nwMjpVwiLgh2azzmaEppM3OyY2GmcoxPn9qKU4CQ==
+X-Received: by 2002:a05:6870:89aa:b0:277:fa33:a19f with SMTP id 586e51a60fabf-28ceba86ca1mr1947245fac.10.1729803681112;
+        Thu, 24 Oct 2024 14:01:21 -0700 (PDT)
+Received: from [192.168.1.22] (syn-070-114-247-242.res.spectrum.com. [70.114.247.242])
+        by smtp.googlemail.com with ESMTPSA id 586e51a60fabf-28c7925bb55sm3235488fac.21.2024.10.24.14.01.20
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 24 Oct 2024 14:01:20 -0700 (PDT)
+Message-ID: <36cbf092-9a4e-4748-a0f9-404ede666f44@gmail.com>
+Date: Thu, 24 Oct 2024 16:01:19 -0500
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] unit: add test with list of known unsupported frequencies
+To: James Prestwood <prestwoj@gmail.com>, iwd@lists.linux.dev
+References: <20241024184338.186018-1-prestwoj@gmail.com>
+Content-Language: en-US
+From: Denis Kenzior <denkenz@gmail.com>
+In-Reply-To: <20241024184338.186018-1-prestwoj@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-These frequencies were seen being advertised by a driver and IWD has
-no operating class/channel mapping for them. Specifically 5960 was
-causing issues due to a few bugs and mapping to channel 2 of the 6ghz
-band. Those bugs have now been resolved.
+Hi James,
 
-If these frequencies can be supported in a clean manor we can remove
-this test, but until then ensure IWD does not parse them.
----
- unit/test-band.c | 21 +++++++++++++++++++++
- 1 file changed, 21 insertions(+)
+On 10/24/24 1:43 PM, James Prestwood wrote:
+> These frequencies were seen being advertised by a driver and IWD has
+> no operating class/channel mapping for them. Specifically 5960 was
+> causing issues due to a few bugs and mapping to channel 2 of the 6ghz
+> band. Those bugs have now been resolved.
+> 
+> If these frequencies can be supported in a clean manor we can remove
+> this test, but until then ensure IWD does not parse them.
+> ---
+>   unit/test-band.c | 21 +++++++++++++++++++++
+>   1 file changed, 21 insertions(+)
+> 
 
-diff --git a/unit/test-band.c b/unit/test-band.c
-index 606bb854..edf1e02e 100644
---- a/unit/test-band.c
-+++ b/unit/test-band.c
-@@ -683,6 +683,26 @@ static void test_conversion_fallback(const void *data)
- 	assert(band == BAND_FREQ_5_GHZ);
- }
- 
-+static void test_unsupported_freqs(const void *data)
-+{
-+	/*
-+	 * These are frequencies that were seen advertised by some drivers
-+	 * but that don't match any global operating classes IWD has. They may
-+	 * be valid, but IWD should not parse them correctly without added
-+	 * support in band.c.
-+	 */
-+	uint32_t unsupported[] = {
-+		5920, 5940, 5960, 5980, 6000, 6020, 6040, 6060, 6080,
-+	};
-+	unsigned int i;
-+
-+	for (i = 0; i < L_ARRAY_SIZE(unsupported); i++) {
-+		uint8_t channel = band_freq_to_channel(unsupported[i], NULL);
-+
-+		assert(!channel);
-+	}
-+}
-+
- int main(int argc, char *argv[])
- {
- 	l_test_init(&argc, &argv);
-@@ -750,6 +770,7 @@ int main(int argc, char *argv[])
- 
- 	l_test_add("/band/conversions", test_conversions, NULL);
- 	l_test_add("/band/conversion fallback", test_conversion_fallback, NULL);
-+	l_test_add("/band/unsupported freqs", test_unsupported_freqs, NULL);
- 
- 	return l_test_run();
- }
--- 
-2.34.1
+Applied, thanks.
+
+Regards,
+-Denis
 
