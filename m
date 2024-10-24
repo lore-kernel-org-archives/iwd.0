@@ -1,88 +1,172 @@
-Received: from mail-oi1-f182.google.com (mail-oi1-f182.google.com [209.85.167.182])
+Received: from mail-ed1-f50.google.com (mail-ed1-f50.google.com [209.85.208.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBF751FAF01
-	for <iwd@lists.linux.dev>; Thu, 24 Oct 2024 17:13:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F7281D6DA8
+	for <iwd@lists.linux.dev>; Thu, 24 Oct 2024 18:37:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729790009; cv=none; b=ARrE4DWNpBHNKGVcpCF2FtPMfk0URFv0gfS7lhnep8okMIeyOcC8CEQts6QYuIFK9SZnCi/pGdSmxFmmYy+lEkOsZ8L/dwvmFDEdN4jKyviXvvRhXSVtrIeu3GcNidRkm8C5meUFPNdsku1yNyOgZTuhCtSaZXfpLMy1N3/M0J4=
+	t=1729795059; cv=none; b=MePW9bF8XS+bumfLAfQd1Id24iBwkj0hosRXUbI6HLYF92ag6ByZTA/tRta3vOuerfu2u0ORzcsbCbnRNnWn4+HJzShQFaBY3br6BebrU4TrR/uywcUirlrCn6wr0UnL2kbaVDcLEs9tcCIdJMJWBxVYF0ktpxFo0mc8GgblAkk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729790009; c=relaxed/simple;
-	bh=j+iVzB6vyVOGmEfXt5aXi8N93wiwA/TDUJTj3mfMfFQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=Tp5EZc50waOZxeDn2IqHcH8t5HJXe+7ZqWTcE7oLcEhnadGPB5iOMPtzZevO7haevdwRaGdL1jH/OSu2bFTiK5E3UPkCtfFO9KVYyFGHGqXgBJMQDGyLFpxA1/riU+tToLxCw5qzFSJT7tRuyh4j1B7bwueELOmiYic4TNr9DIg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=H5e2qcE4; arc=none smtp.client-ip=209.85.167.182
+	s=arc-20240116; t=1729795059; c=relaxed/simple;
+	bh=TyS89bElmz9znXwzVjNz4SBzyunCexsPwRDzjqr2Wqg=;
+	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
+	 Message-Id:References:To; b=m6r/MIM4LnQo9+UnO8H0BLxypjLHHrIONYDYSkGY1K5eXyJbQ/O9tlXTC/yvOJHIJ+qgOd9EF8ShZF5D2bXWWBdZkyI5Rd9FQPx/JbHY5QN4/JZXx1Z6sHbC919JP1ZND3Apj24+uK+B4VZ5yqzu6mZm5UF7RL63S8tMpvY7+9Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=L28zNeke; arc=none smtp.client-ip=209.85.208.50
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="H5e2qcE4"
-Received: by mail-oi1-f182.google.com with SMTP id 5614622812f47-3e5f86e59f1so709414b6e.1
-        for <iwd@lists.linux.dev>; Thu, 24 Oct 2024 10:13:27 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="L28zNeke"
+Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-5c9c28c1ecbso1608690a12.0
+        for <iwd@lists.linux.dev>; Thu, 24 Oct 2024 11:37:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1729790007; x=1730394807; darn=lists.linux.dev;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=0tkznxfYIWQIqfaIdC/OokdMv+X6/jrzwZ87nhbsMxU=;
-        b=H5e2qcE4mS1G4nHklWZyl/ik+68F8XJSLEhqw/Im08Dp/EVecIHRdcp9zCmDzkdmih
-         HnK/jJNkjTEePAv1eEUad7abpFZPOFKmsd4X71QIRY6hZQGvaWtdT4Hh7V9Oq47bZaCX
-         3LodlSXWs2cmiPWM+ZhivdOV5iE2u4IsxMI+4D2SDKtWVfZxXe681EATg2Uarp994/vb
-         iH9mgfC6DsHCKm1m6LIKjSAZmEWokeVIlWY5HNDRXxBMXTz9u0vlpkEcMQRKZ8CPaXHH
-         XSKGWiAFUdSpGhsq2QRGjFmh2o4Ud7k04KEUkUprSzis7y/lHULhv6voIEueooiJp/Ur
-         DJ6A==
+        d=gmail.com; s=20230601; t=1729795055; x=1730399855; darn=lists.linux.dev;
+        h=to:references:message-id:content-transfer-encoding:cc:date
+         :in-reply-to:from:subject:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=FD9NDiwE7Md6d2QvECLqmmzZ2bHfq7EXONZJ9Nteo70=;
+        b=L28zNekee49iCt0/7bwyoqJe74t8Jal0x1tshHgw389MKoEI3whiRZV0kaIlF6+0R0
+         yCsKhEkuaMGTCA5NK6sISujA8pK0Vp9AebMcVctOEvsP5Ay1nlE0/fO5K8DOrDFRGG93
+         8QBI1YVc7e0g8Bpl6yxLFIHOBv4ywYOXCPLMrDbAORCg6+Yv2pT+j1Fppn5cRjzTwofN
+         NLZqYgRH5PBXqkAwmBGHQrHri4poh5BKjLmkypJpwKB7Z+qTGC9S6uRxZd7IyrvAeTYn
+         pBN2Nxc+X5kr9siXN3sxxZesegRtvlvsGyfJeDJ3NZnuTCvpcYGFwGWGpacGDS3vZP8b
+         I8jw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729790007; x=1730394807;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=0tkznxfYIWQIqfaIdC/OokdMv+X6/jrzwZ87nhbsMxU=;
-        b=BHhkWQ3IXU5AMMSSn9nUplKhgMQacF2R35TJYSuRL7TAmu9EEjLKHLNhroHiaHcYlm
-         7prccC+3nA6ajz+auIeawvAi48ZNedUwWhHT1PRp34CuNsltmWdehTRYCMVb1Vtyd4O/
-         HNYBkHgmD3wL+BCqVliKDbNWd9Wa713pGTwi/AUg0RK1jJDl9tcpq4KoewASGNohp4DD
-         CuG5B7SKx7oOMYVQe4bjaw/qyilN9+O9oDBI45d3XFkI/Tp8NgMnTWCsJkMdA0HIzCvF
-         zVwPM8tP+F/g+3YXlQbDjz0/mOr/+w1UzSe1hwz3NURzRMeY+uZ+furVkcUrClgETehS
-         W2XA==
-X-Forwarded-Encrypted: i=1; AJvYcCUQXax2c60V9S2QpYmGEbyiXa+x3n/fvQdKjvhhs2hN5kEPTTt8DMS0akh1FNJBQO9DCfA=@lists.linux.dev
-X-Gm-Message-State: AOJu0YykcGLspo7o9yMYYiGSPJiH/yMy7Tpuseiy0xoYC5iyKef+Xnw6
-	br+0AJTtnueMAABtJerGGrafko4OS4prp02xY5SWgOzgSMt+cMiz
-X-Google-Smtp-Source: AGHT+IG3Zciz78imUozdPkuQgIsx8t/55bn8C05uZ35z+8Ak5hxZCTLqhjOWC1xLpQvNr9NRxm+Xcw==
-X-Received: by 2002:a05:6808:3a13:b0:3e6:2772:2a53 with SMTP id 5614622812f47-3e627722ddfmr6271344b6e.16.1729790006700;
-        Thu, 24 Oct 2024 10:13:26 -0700 (PDT)
-Received: from [192.168.1.22] (syn-070-114-247-242.res.spectrum.com. [70.114.247.242])
-        by smtp.googlemail.com with ESMTPSA id 5614622812f47-3e61035fc2dsm2311741b6e.52.2024.10.24.10.13.25
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 24 Oct 2024 10:13:26 -0700 (PDT)
-Message-ID: <804b48c1-cb5d-4d16-a579-e32fd930228b@gmail.com>
-Date: Thu, 24 Oct 2024 12:13:25 -0500
+        d=1e100.net; s=20230601; t=1729795055; x=1730399855;
+        h=to:references:message-id:content-transfer-encoding:cc:date
+         :in-reply-to:from:subject:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=FD9NDiwE7Md6d2QvECLqmmzZ2bHfq7EXONZJ9Nteo70=;
+        b=CcMMZ3ClYvQukDZLTx2cjkR1edD0N0nlYaZvojNqn3Enz6g9KAkXXxF1RQ3qhZ0Ncb
+         5EyKjvWMiqEz+0/2Qm5jlvD7G+W7lN8R5btW+xxv6m8PnVUNS3gWdkKZzLB965wjMa1t
+         Rpni/4BToHfbjIHQgk/T6/WnJKCnrN6Wq6nO232Z6QVH2/XODyezchdz7g3dmwIVwoqd
+         TauCL0MIcVfP8OGvWP1+uq7LJ8h6Rxe8MBsNu9aK6YNtPgKxf3t05bPoDcGkjA0MfXm9
+         dDCCsh4B0FNOt0VsRu4w3kqgjS0LQFbpuVXPSK1keCa0WwkhEWrzY+CHpp9++5MukXhl
+         JooQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUGLwI9JXF0yKOXR0DVusS3Vh82o9XyXO2uwnPvKNiZpFYXxQzm34B74L1Ni84QY/Jwo90=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yysv2NbF4vvDX3ivWQo/LZqLz4rKREGCyb3LzpvuB/A9bNeNzPR
+	iWnLjhXabR8uj+4xlTAmFUcMBudAaeX515HyxuN//FYMGWBzNvh+
+X-Google-Smtp-Source: AGHT+IGM7qfDXqGcwwvgdBl8I8mnPW18rV+ty/S5zgq7qT1VQA+5IZfjV3ZiXW7yHrMTUemYRFB09g==
+X-Received: by 2002:a17:907:9620:b0:a9a:825:4c46 with SMTP id a640c23a62f3a-a9ad275d4d7mr275279866b.28.1729795054923;
+        Thu, 24 Oct 2024 11:37:34 -0700 (PDT)
+Received: from smtpclient.apple (89-73-96-21.dynamic.chello.pl. [89.73.96.21])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a9a91598f05sm651638866b.196.2024.10.24.11.37.34
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Thu, 24 Oct 2024 11:37:34 -0700 (PDT)
+Content-Type: text/plain;
+	charset=utf-8
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 4/5] scan: warn on zero frequency when adding to request
-To: James Prestwood <prestwoj@gmail.com>, iwd@lists.linux.dev
-References: <20241024164635.176631-1-prestwoj@gmail.com>
- <20241024164635.176631-4-prestwoj@gmail.com>
-Content-Language: en-US
-From: Denis Kenzior <denkenz@gmail.com>
-In-Reply-To: <20241024164635.176631-4-prestwoj@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3776.700.51.11.1\))
+Subject: Re: iwd 2.22 scan fails but... works ok with ConnMan
+From: Piotr Oniszczuk <piotr.oniszczuk@gmail.com>
+In-Reply-To: <ec368cb3-325e-4df5-aeaa-f84dc0641da6@gmail.com>
+Date: Thu, 24 Oct 2024 20:37:23 +0200
+Cc: Denis Kenzior <denkenz@gmail.com>,
+ iwd@lists.linux.dev
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <14BEDE0F-7548-4C4C-876B-8E651406734C@gmail.com>
+References: <CF5A13CE-18AF-4A33-98F9-13FA353657C4@gmail.com>
+ <38b1af93-83c8-4cfb-ae63-5e480ac4420b@gmail.com>
+ <D6BB0209-39DB-430B-977A-955928ED3701@gmail.com>
+ <d27c9f76-ee7f-4509-a05e-6e05ee444181@gmail.com>
+ <A112F6DF-E1BE-4350-86DD-7A85BA4FC1CA@gmail.com>
+ <ec368cb3-325e-4df5-aeaa-f84dc0641da6@gmail.com>
+To: James Prestwood <prestwoj@gmail.com>
+X-Mailer: Apple Mail (2.3776.700.51.11.1)
 
-Hi James,
 
-On 10/24/24 11:46 AM, James Prestwood wrote:
-> This shouldn't ever happen, but if it does we want to alert the user.
-> ---
->   src/scan.c | 3 +++
->   1 file changed, 3 insertions(+)
-> 
 
-This patch was redundant due to patch 5, so I dropped this.  The rest applied, 
-thanks.
+> Wiadomo=C5=9B=C4=87 napisana przez James Prestwood =
+<prestwoj@gmail.com> w dniu 24.10.2024, o godz. 18:51:
+>=20
+> Hi Piotr,
+>=20
+> On 10/24/24 7:32 AM, Piotr Oniszczuk wrote:
+>>=20
+>>=20
+>> Btw: all was working ok few versions back of iwd/kernel
+>> Unfortunately I can=E2=80=99t say which change: iwd or kernel breaks =
+iwd operation on uwe5622 wifi=E2=80=A6.
+>>   =20
+> Thank you for the iwmon logs, that really helped diagnose the issue. =
+There are a few patches on the list that I just sent which will =
+hopefully fix your problem. We identified a few separate issues:
+>=20
+>  - Incorrect starting frequency for operating class 136
+>  - No check for the correct band when checking the e4 table
+>  - No check for the correct band when parsing the advertised =
+frequencies from the kernel/driver
+>=20
+>  Your hardware seems to be advertising some frequencies [1] which are =
+not exactly common and this threw IWD for a loop and exposed several =
+bugs. These fixes will basically disallow those frequencies, but we need =
+to take a closer look at them to be able to parse them correctly.
+>=20
+> [1] =
+https://en.wikipedia.org/wiki/List_of_WLAN_channels#5.9_GHz_(802.11p)
+>=20
+> Thanks,
+>=20
+> James
+>=20
 
-Regards,
--Denis
+James,=20
+
+Fantastic work!
+
+With patches I=E2=80=99m getting:
+
+root@myth-frontend-0200dd63cc00:~ # iwctl
+NetworkConfigurationEnabled: disabled
+StateDirectory: /var/lib/iwd
+Version: 3.0
+[iwd]# station wlan0 scan
+[iwd]# station wlan0 get-networks
+                               Available networks
+=
+--------------------------------------------------------------------------=
+------
+      Network name                      Security            Signal
+=
+--------------------------------------------------------------------------=
+------
+  >   WarpedNET-2.4                     psk                 ****
+      WarpedNET-5                       psk                 ****
+      Toshiba1                          psk                 ****
+      PLAY_Swiatlowodowy_4B0F           psk                 ****
+      UHF7DRX                           psk                 ****
+      PLAY_Swiatlowodowy_3CC8_5G        psk                 ****
+
+[iwd]# station wlan0 connect WarpedNET-2.4
+Type the network passphrase for WarpedNET-2.4 psk.
+Passphrase: ***********
+[iwd]# station wlan0 show
+                                 Station: wlan0
+=
+--------------------------------------------------------------------------=
+------
+  Settable  Property              Value
+=
+--------------------------------------------------------------------------=
+------
+            Scanning              no
+            State                 connected
+            Connected network     WarpedNET-2.4
+            No IP addresses       Is DHCP client configured?
+            ConnectedBss          8c:53:c3:e6:bb:8f
+            Frequency             2452
+            Channel               9
+            Security              WPA2-Personal
+            RSSI                  -49 dBm
+            TxMode                802.11n
+            TxMCS                 7
+            TxBitrate             65000 Kbit/s
+
+[iwd]#
+
+Many thx for fixing this!
+
 
