@@ -1,58 +1,58 @@
-Received: from mail-qk1-f173.google.com (mail-qk1-f173.google.com [209.85.222.173])
+Received: from mail-qv1-f42.google.com (mail-qv1-f42.google.com [209.85.219.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81EA6212164
-	for <iwd@lists.linux.dev>; Fri, 25 Oct 2024 13:17:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2AF8212161
+	for <iwd@lists.linux.dev>; Fri, 25 Oct 2024 13:18:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729862261; cv=none; b=bxH9A5pP85wFrkCvMSwr3A2guVNhXFufdWtLvJM7zeGHRbjHef0wUIf9hLarmLWqDXDORl851e5ySkaz31tgGIdGizhXTX2BUTfFmoDYIKJZ9JmhO+CvoAeLP4XX9khByKVHQ/Vk+3UyLdh0MSQtV2aWg7mK7POxpG7+k8orOqg=
+	t=1729862336; cv=none; b=dl58XBeE+4abqeWikROLQttXiudSHRUuTH21r3MBGoeMW+3wFFIN2rGeRSL2sSH1oRK0N7oI1rgIKb3KE4Q7gttknOdroCvPehd159Z0Km1MxwBoyoNI6itfkJSNXVqW2exW2IuAbM9xMj+Rzc78uORQZFd2fBnylp3SZ8mQlfE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729862261; c=relaxed/simple;
-	bh=DJtjnYzbaYhCPbd9s2dtySAXDXUx+RDdgUe1b0O79lg=;
+	s=arc-20240116; t=1729862336; c=relaxed/simple;
+	bh=2W12LXJM9qfNN2nt/jwI8wgVj/pSFCAQitjsp6/ZjMU=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ad/Nd8eMySOEBGNOjkiVQsgSasU6Hirak+pmeCsbUM8YH0n9VuA24XP901yQNptwsFiMU2xaMz4uVVkpWIKNsE8ci5I5nEzr7MbuDy1oQgurxaWL8HxmgJkC48ctWxD27YGBh/rERMIcqH3RCSEK2yVIhSVspsVTeU3E/Co3l4E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=F03fb5HX; arc=none smtp.client-ip=209.85.222.173
+	 In-Reply-To:Content-Type; b=qKCIemjLgEIdwTwhvHNgYELk/TsVIFc7/6naV8Mr/pAXkUEejlDpCWYEFIjh3j7pjj3bSuStyL7YbR+7So2TxFlCLsCyZ/D5QHlTeyPV2qn2z19GlMYk9r2HotvkjfCrYbpwqT58PucatVHdRkIUxR+mAKB3unOO16HPLnVvnqU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=J+55iBan; arc=none smtp.client-ip=209.85.219.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="F03fb5HX"
-Received: by mail-qk1-f173.google.com with SMTP id af79cd13be357-7b14f3927ddso131518085a.3
-        for <iwd@lists.linux.dev>; Fri, 25 Oct 2024 06:17:38 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="J+55iBan"
+Received: by mail-qv1-f42.google.com with SMTP id 6a1803df08f44-6cbceb48613so12957646d6.2
+        for <iwd@lists.linux.dev>; Fri, 25 Oct 2024 06:18:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1729862257; x=1730467057; darn=lists.linux.dev;
+        d=gmail.com; s=20230601; t=1729862332; x=1730467132; darn=lists.linux.dev;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=NtaL62XpB+g/YwXKdhzOzNeeSQI5OWtu7co2FkG3vIc=;
-        b=F03fb5HXrxiMTxipRTBeyiTEKBF/p+9499tTgBdsdEezhbgC5gtGHfFBxcI7fOj3Bg
-         EVoVcwq9HvaEnmPPjIR9TV0m0A0c+qYM/41Dg7NK5v2hpBq7i6nWhZp1+V97XMEi/jvo
-         QdOLIHt70pTuDM/ozT7vDE5XLN9wBBetYNOs+kMDxdcKmx1hrgiPFDBjA/wcITmn1h2X
-         eFv38uVv3JrH5Ycnf5KTj6twgNohxAm3RVII6UBRX2Bh8/Nvk+WNmToek68sAcLPFt6b
-         nugosWHE8gwrfuwL2OGELSOj6aZfbZa+p9eT1qvvySKkJbiRo4lsi/4yo8hiVaCjFgXw
-         RovQ==
+        bh=kttjqMDqVW+ou9U/wMw3MEoGX6Q+zqwFgNJTNXXiyVc=;
+        b=J+55iBan7GLK9zXBo39hdPTxoUj/M8z1pZrXWycAP5EYz8ePZ2s5gWLbXOHB+cssfv
+         IamJw6p7yK9vKWlceNetx/JfnWfkUuostlk9SkQbuA1x0FiMJRihWdG2aLC3GoUBnQUf
+         oXF0vKZaEHfIfbHvX+8txMZoBN0gyvd8K+eL7i255njXLYHdYe6KwfhXIVc/398b7/k/
+         GVIvozgB9pgFSH3EoFuIS0VhMPi7/OG6o73zC5oaVw8elnWobIfXnBOICKr3e+7WeDKa
+         swfGC50uD1xFSf2XW/ruO+x0d2Dzd3BI9aV4TGXl8vUXY/3m2a+7kdC1PF2VxNN0zan1
+         gSVQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729862257; x=1730467057;
+        d=1e100.net; s=20230601; t=1729862332; x=1730467132;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=NtaL62XpB+g/YwXKdhzOzNeeSQI5OWtu7co2FkG3vIc=;
-        b=Cx75D6JvErFPZPvHtxpfMJ91KxoqCZirfLN8fY9Sl2kLCDw4YfEUA+TsH2KWUWeNdG
-         Ir0ZsPW3yEAUvoZgtWCg47w6m+sFwS2yZPBdgn13qhDiXIKGSnaV0/FwPUYDi/QGcQ5g
-         tnbB65gCc58/Tqd1ecABpfxXn4l9MLXegIwgloUDRvPNtCwAlU+FdmUd75cZbnFph9zg
-         wujKeL/ISXhJJWlJrLSz4vseH7fEw0vM1d5vYu0OnTgSHjZ70tJ5ksVJwe3NXFZ2H2ch
-         XkD97Xl24h6S2eZmw6j0Pei2Uane5crTd+4/lSAf6pGGNWp8gsQ2dLzbAN+JrTCitoTh
-         JxCQ==
-X-Gm-Message-State: AOJu0YxQpRcqC4ihNg7px8kRLmMV4rDtvqvYRhBvTf94W0HmPFgJmCpp
-	8ctuuYks9+cADgLwtAEdf+Tq2JpK5PTxsSlFLw2BoVUhgqUDJL5IaRNCBQ==
-X-Google-Smtp-Source: AGHT+IEM0Y+8xNrgfF3g7uNuNmmEvLHkjqlyBzJf6C8urWhNHCP3kBiKvHf1Nvm6BOw722JwBcODSg==
-X-Received: by 2002:a05:620a:244f:b0:7af:ceed:1a4a with SMTP id af79cd13be357-7b186cff1a8mr790905585a.43.1729862256977;
-        Fri, 25 Oct 2024 06:17:36 -0700 (PDT)
+        bh=kttjqMDqVW+ou9U/wMw3MEoGX6Q+zqwFgNJTNXXiyVc=;
+        b=rgDC/Vx5I1lxfVZeBle/5TBpLc6D7ZOl70XGM0p/esVOExpZnMNB42lDjnOKqb/CtP
+         K8x4X1eRK8YJ375n7uT9rrdFESwu/DeCPf217UXPRu52IXb5D7VgBEguVowUJ4x+fMeG
+         ZIMWnhZJQcEil55peqxcRBWvJ6/J7YM6VAnVcAPAV/ZyQxcw2i25kreDKrPtskxIwa8L
+         O0pzriuVnZCh220sqz+O0AQ3BtceHT7IyanlFGyivD4GU2+S7eE17q2Hg9hgcABrX7pd
+         GYtNM0x8WbNZKNpqE70CtrYd/BWK1VeHChXn8jyqTER2ax6YYGKGHuoyieDht/WM+44U
+         60YQ==
+X-Gm-Message-State: AOJu0YxzSwOC89PTEWj2m4D+F68fajIsMmIEfI3IpXi58klxZ3yak6dO
+	9ZhFfYLS5tQmfu5gKI4URp6Fh8AaRJGOA4AmPVE+HXWXevqc03Hyy+pL9w==
+X-Google-Smtp-Source: AGHT+IFoFfhjtxpmGPvX1WXAMX7HGBStRXm7d0LYLquF+4pv5jsddKEmRp+5YQp96AwnD2tcxqry9A==
+X-Received: by 2002:a05:6214:5d06:b0:6ce:30ac:9a51 with SMTP id 6a1803df08f44-6ce33f47f43mr120080506d6.0.1729862332387;
+        Fri, 25 Oct 2024 06:18:52 -0700 (PDT)
 Received: from [10.100.121.195] ([152.193.78.90])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7b18d27911asm54396885a.26.2024.10.25.06.17.35
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6d1798aa5bdsm5715596d6.43.2024.10.25.06.18.50
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 25 Oct 2024 06:17:36 -0700 (PDT)
-Message-ID: <9092227f-23d5-4efb-b103-93ad11e8a71d@gmail.com>
-Date: Fri, 25 Oct 2024 06:17:34 -0700
+        Fri, 25 Oct 2024 06:18:51 -0700 (PDT)
+Message-ID: <e19e7527-9cc1-4c84-95ac-dcb39f836d58@gmail.com>
+Date: Fri, 25 Oct 2024 06:18:49 -0700
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
@@ -69,15 +69,15 @@ References: <1147b5a6-883a-43be-a577-f16e9e6351ef@tavla.de>
  <02bb45e1-cfef-433d-9a83-2b312c1ae064@gmail.com>
  <6d384377-ee6c-4a5d-8b67-75f367403acd@tavla.de>
  <d33154fa-9309-4285-a592-9e377e199f43@gmail.com>
- <228c149f-24f7-4d46-bf0e-d2dcafeb326a@tavla.de>
+ <57826e6a-8466-4e45-8906-6cb15968bcc8@tavla.de>
 Content-Language: en-US
 From: James Prestwood <prestwoj@gmail.com>
-In-Reply-To: <228c149f-24f7-4d46-bf0e-d2dcafeb326a@tavla.de>
+In-Reply-To: <57826e6a-8466-4e45-8906-6cb15968bcc8@tavla.de>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
 
-On 10/25/24 6:05 AM, Martin Petzold wrote:
+On 10/25/24 6:11 AM, Martin Petzold wrote:
 > Hi James,
 >
 > Am 25.10.24 um 14:54 schrieb James Prestwood:
@@ -172,14 +172,6 @@ On 10/25/24 6:05 AM, Martin Petzold wrote:
 >>
 >> Yep, IWD is ultimately hung up waiting for a connect event from the 
 >> kernel/driver. A few things I noticed prior to that:
->
-> Why should there be a connect event from the kernel/driver? Why don't 
-> we get any related logs from brcm?
-IWD requests to connect and the expectation is for the kernel to return 
-us an event with the result. Failed or successful. This is part of the 
-kernel API. Why we don't see brcmfmac logs I have no idea.
->
->
 >>
 >> 1. Not really critical but you have an agent connecting and 
 >> disconnecting multiple times a second. Are you polling info with 
@@ -204,34 +196,65 @@ kernel API. Why we don't see brcmfmac logs I have no idea.
 >>
 >> # You got disconnected by the AP here
 >
-> Okay, thanks. I don't do any polling of IWD or other network daemons. 
-> However, I do have a mechanism for web socket re-connects in case of 
-> disconnect.
+> I stopped my application (all processes gone!). And then tried a 
+> manual re-connect via iwctl:
 >
-> What I also see: networkctl shows some IPv6 for wlan0. However, I have 
-> IPv6 disabled in the iwd.conf. Could this be a problem?
-
-Disabling IPv6 in IWD just means it won't do DHCPv6 and other IPv6 
-related operations. IPv6 is still "enabled" from a system point of view.
-
-Apart from addressing the shortcomings in the driver, one suggestion I 
-have (I also work with headless devices that cannot go offline) is to 
-implement a watchdog. I did this about a year and a half ago originally 
-as a quick/temporary fix for a nasty IWD bug causing a hang (since 
-fixed, long ago) but kept it around just in case. We also found a bug in 
-ath10k which required unloading/reloading the driver to recover from. 
-Its unfortunate it has to come to this, but I don't know what else to 
-say. We can't implement special cases in IWD for every buggy driver and 
-at some point you just have to either scrap the driver your using, fix 
-it, or work around the issues it has.
-
-Thanks,
-
-James
-
-> I sent additional log output for networkd and resolved in an earlier 
-> message.
+> -----
 >
+> tavla@tavla:~$ iwctl station wlan0 connect "XYZ"
+>
+> Okt 25 15:07:06 tavla iwd[384]: src/agent.c:agent_register() agent 
+> register called
+> Okt 25 15:07:06 tavla iwd[384]: src/agent.c:agent_register() agent 
+> :1.13733 path /agent/204414
+> Okt 25 15:07:06 tavla iwd[384]: src/network.c:network_connect()
+> Okt 25 15:07:06 tavla iwd[384]: src/agent.c:agent_disconnect() agent 
+> :1.13733 disconnected
+> Okt 25 15:07:06 tavla iwd[384]: src/agent.c:agent_free() agent free 
+> 0xaaaae76e8b30
+>
+> tavla@tavla:~$ iwctl station wlan0 show
+>                                  Station: wlan0
+> -------------------------------------------------------------------------------- 
+>
+>   Settable  Property Value
+> -------------------------------------------------------------------------------- 
+>
+>             Scanning no
+>             State connecting
+>             Connected network     XYZ
+>             No IP addresses       Is DHCP client configured?
+>
+> tavla@tavla:~$ iwctl station wlan0 disconnect
+> Operation failed
+>
+> Okt 25 15:08:56 tavla iwd[384]: src/agent.c:agent_register() agent 
+> register called
+> Okt 25 15:08:56 tavla iwd[384]: src/agent.c:agent_register() agent 
+> :1.13740 path /agent/204425
+> Okt 25 15:08:56 tavla iwd[384]: src/station.c:station_dbus_disconnect()
+> Okt 25 15:08:56 tavla iwd[384]: 
+> src/station.c:station_reset_connection_state() 3
+> Okt 25 15:08:56 tavla iwd[384]: 
+> src/station.c:station_roam_state_clear() 3
+> Okt 25 15:08:56 tavla iwd[384]: event: state, old: connecting (auto), 
+> new: disconnecting
+> Okt 25 15:08:56 tavla iwd[384]: src/wiphy.c:wiphy_radio_work_done() 
+> Work item 19 done
+> Okt 25 15:08:56 tavla iwd[384]: src/station.c:station_connect_cb() 3, 
+> result: 5
+> Okt 25 15:08:56 tavla iwd[384]: src/station.c:station_disconnect_cb() 
+> 3, success: 0
+> Okt 25 15:08:56 tavla iwd[384]: event: state, old: disconnecting, new: 
+> disconnected
+> Okt 25 15:08:56 tavla iwd[384]: src/agent.c:agent_disconnect() agent 
+> :1.13740 disconnected
+> Okt 25 15:08:56 tavla iwd[384]: src/agent.c:agent_free() agent free 
+> 0xaaaae76eaa50
+Yes, the driver seems completely stuck. I would recommend 
+unloading/reloading it with modprobe.
+>
+> -----
 >
 >>
 >> Okt 25 06:13:21 tavla iwd[384]: 
