@@ -1,41 +1,41 @@
-Received: from mout-b-206.mailbox.org (mout-b-206.mailbox.org [195.10.208.51])
+Received: from mout-b-210.mailbox.org (mout-b-210.mailbox.org [195.10.208.40])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCBB2231C8C
-	for <iwd@lists.linux.dev>; Fri, 25 Oct 2024 12:33:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.10.208.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1AEC01F7544
+	for <iwd@lists.linux.dev>; Fri, 25 Oct 2024 12:39:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.10.208.40
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729859623; cv=none; b=WmWMpq2RvP9cmc8Jyg/0iDIp7ITD0vXrckRTxWPufwT/3mWUo+hCNbkrj8hPnOkpIas83lY2wWWb4slRETUsr93oXqWN5MJl8Acs9R0P53SuGk2erNOewfpId/VyRHOo0G1/3vD9/Ulb2S2e8wUqEEkeibN3Rsr98oCGY0IyN8w=
+	t=1729859997; cv=none; b=IAx4fV8iKsRd+JhiRU8TbWYMTvNp6N5kqNvM3uUi/fC1Q4FvRWZripcAAWFg5jYxka0i3+abEeEk5loLxGfQvq0YjiU8G9azsenZ8v/L3pTkz308Ljthuv0WHimp3u++5tBvoaqwSgZrAaF/kk+zExfD4JSBzwnnENLGUk7h4cU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729859623; c=relaxed/simple;
-	bh=fYISCFr1RpYlDmtDCPvR1QGNHyraBtYy4Sz9ZvjCRh8=;
+	s=arc-20240116; t=1729859997; c=relaxed/simple;
+	bh=uD81qTKzGI6hjnVfnzyLpwF80/ArLxGlXOk9+W3nWWQ=;
 	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=iLyZp5SNTit8WuGz1iuDNtAmvPAjd3iQ8tsYNf4hgmt80vfg0sKhVg3A5s0vTvA95nD9vcrzuiS7DqdZCwZmZVRUQ+MeXrTXvEbrWnHG+dx4x8xoJNPc9PIw3kpvPWftAJ0beXPqQ038K6JsAaX7fdz8RieJEpAD92jZa1OwoLk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tavla.de; spf=pass smtp.mailfrom=tavla.de; dkim=pass (2048-bit key) header.d=tavla.de header.i=@tavla.de header.b=bxMS1tz/; arc=none smtp.client-ip=195.10.208.51
+	 In-Reply-To:Content-Type; b=B9vrKTFE8nk304NbwAaQMDOWbseq7deRnYrxZ0duFoMkchrFw2YuZN54XNMyBkEbbIS2Sj9588G83Y3pPw8AElDEpwzfOj1i5Gtrp6UkDIhElSGmip4xx0uZMNXwBoxWcHD6g3hXDF5GQZ9OBYUbcd45HtHVAd7VuGCkvMkj6dM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tavla.de; spf=pass smtp.mailfrom=tavla.de; dkim=pass (2048-bit key) header.d=tavla.de header.i=@tavla.de header.b=PwVpxtuL; arc=none smtp.client-ip=195.10.208.40
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tavla.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tavla.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=tavla.de header.i=@tavla.de header.b="bxMS1tz/"
-Received: from smtp1.mailbox.org (smtp1.mailbox.org [10.196.197.1])
+	dkim=pass (2048-bit key) header.d=tavla.de header.i=@tavla.de header.b="PwVpxtuL"
+Received: from smtp202.mailbox.org (smtp202.mailbox.org [10.196.197.202])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mout-b-206.mailbox.org (Postfix) with ESMTPS id 4XZhyx0mYyz9vfd;
-	Fri, 25 Oct 2024 14:33:29 +0200 (CEST)
+	by mout-b-210.mailbox.org (Postfix) with ESMTPS id 4XZj6F6jSpzDvGP;
+	Fri, 25 Oct 2024 14:39:49 +0200 (CEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tavla.de; s=MBO0001;
-	t=1729859609;
+	t=1729859990;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=YETVyZINsz3i16CwFrnC32g87SS0PP+B0ECNxVKMIAI=;
-	b=bxMS1tz/TRgPxaqHdYbMjBh/2w3EXLkOWF02tSo29/G1sNjVnFbEPzR7DXIfHZG2A8+KNI
-	NFmTlw+gQcbuPT0clchooWWk5SXVB3ix+2lB13jUGbwDzTQ3hKw1B6jAe9sRjUfna/QFfR
-	ANULvFBdKF6Z9WNbem3Kp/Ps9IW7zDbpyR73u8uWi1QoXhq1uW9k2bU8FkY9t751XNms5+
-	VKcw5d4p8NhTwkuU13dXTyaEv+LVNeKCmhMXql6uZQ45lhcVQ+s3CU7qv7sAmZZY5cuHZ8
-	Wdg30pHwieA/xiTyKjfwDCvQRxRpj3Jw2SgLamVocK3mTxWAppriC6zUGND3YQ==
-Message-ID: <7ff6147b-6b20-44e5-896d-3f1c76f81d86@tavla.de>
-Date: Fri, 25 Oct 2024 14:33:28 +0200
+	bh=fv2gazehRltxwidZ+g44wAixjR782htzqkIG7bP/kSE=;
+	b=PwVpxtuLSL1udZufbDJkXbnoUpEEzs1Mvb7rkMJ8ZjUJ6MB9txMDyfzIpf72t77fkPA4wl
+	PpOBggpy3Xz/vrP6d6+dB4Hohc8yjjlELDHmdxsepNc+0Y56/c1lvNXondyeLQsM77G19+
+	r8XEaP5iCkmoC6FvmJHN74faeSpm7/xVU2geZvhyKxaKlfcBk4U4d4z1wnhw7J91gP6gpq
+	n0bzS8lJ95laeyvKPiN2DhcDOz3nSJahdmVO1avlXMo26jI4+2kOYDi8rAXyXqjMk/WXv6
+	1Iabu9lwfvioPy6xltg1MIJyvMnH7pBw5gvlTU1MC45C9TvvfWd+cBmpP8aD8g==
+Message-ID: <5ba46601-a2fa-4c6d-b9e3-c6425bea119e@tavla.de>
+Date: Fri, 25 Oct 2024 14:39:48 +0200
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
@@ -113,11 +113,9 @@ Am 25.10.24 um 14:28 schrieb Martin Petzold:
 > it alternates between Ethernet and WiFi. You will understand better. 
 > Or the network is re-configured all the time.
 
-Maybe also blacklisted on AP / router side because of this behaviour.
+Happens also on a device here without Ethernet connected. So there is no 
+alternation. Just on-going connects and disconnects.
 
-But I was also always wondering how your blacklisting works. Maybe you 
-could explain? Does this also take into account network connection 
-quality parameters?
 
 >
 > Here is my local status:
