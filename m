@@ -1,92 +1,123 @@
-Received: from mail-ot1-f51.google.com (mail-ot1-f51.google.com [209.85.210.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mout-b-112.mailbox.org (mout-b-112.mailbox.org [195.10.208.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 332C322B676
-	for <iwd@lists.linux.dev>; Thu, 24 Oct 2024 21:01:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C39D81D54E1
+	for <iwd@lists.linux.dev>; Fri, 25 Oct 2024 10:12:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.10.208.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729803684; cv=none; b=Tufdiggh1wUQwFM/F0kD/VA2H6gL2CR75Y6n2qK7ZX+RfQV5VvBsCdSmWQ4nQFg5Vha1SPKAy8/zzHwYL0gKfvb6BFm88E7p5/YOC01bQyVopdpr9ozNOwFDdTecgmDkna308UxF7aK8CNO2Uw+4sVwFs87Wr8JPPIA9s6e0kBQ=
+	t=1729851146; cv=none; b=Voohp19q46ksyWf2Rct/1+dAtGMt3/UNZitkNJ3A0OlqjHlxV6pyHp7UCe8JgsnouyaoPr9LSP0ohTDPhDr7yMXmBHl42H6OqqAQPkK0e/g4Ub7ChOi7rmFWj3vfgxPY/hiaj8MJtPmrpXmCYZARLinQTeMvaVmPG0NfUVHK/Tc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729803684; c=relaxed/simple;
-	bh=NwCSwijrqz4T749QTxVF/giuU2czRDtJtHecbGhIXuI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=SBbeAcQRHDT5uq3RmiKtPrpLCSXyIE6fgD8pQwIG2mL616DDAeKw8HZh3OfrIJRkJtw+AUj1gT5fHZp65eY1acDLNIxAWHGTyaCQZBOcYzLAFjm/JVvQbp5JzDbrhooPX0IdNoW2jecyBBwrFAkWEPQgGPykyg6bC+p1Hab9k7A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=h/JRNwSm; arc=none smtp.client-ip=209.85.210.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1729851146; c=relaxed/simple;
+	bh=Rs6YotloxEbEluLLzLeplITV1plMQkoJJtrrWL4wTX0=;
+	h=Message-ID:Date:MIME-Version:From:Subject:To:Content-Type; b=ua9IYDU5NPCxMBgGbB2a/gkjk22Go6qKs5zDRbTo+o/x/Vm6ggr4R8Qc501/szBAa0TPQh8gWUwUyxdkVLq9oczMyxvvYkMEsCQ+TJ1k8aHh6biAM7K9D/Ft6t/+//ei5cJMz8jntM+oNaNRBb9aFh9bNwrdyu3TK5Pglr80yfg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tavla.de; spf=pass smtp.mailfrom=tavla.de; dkim=pass (2048-bit key) header.d=tavla.de header.i=@tavla.de header.b=RKDNP1++; arc=none smtp.client-ip=195.10.208.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tavla.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tavla.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="h/JRNwSm"
-Received: by mail-ot1-f51.google.com with SMTP id 46e09a7af769-71808e95ae2so1015927a34.0
-        for <iwd@lists.linux.dev>; Thu, 24 Oct 2024 14:01:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1729803681; x=1730408481; darn=lists.linux.dev;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=xRquLpBPFB/M9Bhca9A0Cbii6LzyWcpzeLaBo9u5bD0=;
-        b=h/JRNwSmX9THx1NBGBhQ3Fj+hCNA/zlRnDI9zih6vUIuBDyujnOmslmmgCFT7HTQpx
-         cLGMrXv2gg/xsZPaCd09XfVqzcLq1YKz+u24Jfphn0hz4xHGWdM3m2ji/MDl01SZDsxU
-         gDbbHz3X+xwWxRqK5ZiYUy+zIDspnxo6iq8mROn+8Lu1BmK4sbntVmnwHFTnrDNh5TAb
-         gR7FqXDtLhi7qtiZ93s8PfWD5vCr1IhzwyzqGtZ0g/Ol0ZxFVrwtt1PiNPN2tAsFNXuj
-         3z8Kx1BC+BNbpqgxYAiNrMURt5ny7/x/g4B9PV1TL92UELEbPoqcfBYf5Onjw2hZDYWf
-         /T3w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729803681; x=1730408481;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=xRquLpBPFB/M9Bhca9A0Cbii6LzyWcpzeLaBo9u5bD0=;
-        b=p/xtwHO8GYBwy2hWjVcp+KBAs0wWt3o37Cvss1NGPOnsJqV0ESgrYoiHyf/5XD/oA+
-         RJMkf7yq53oTnLj0bE8g3DTS1+UWscCBrZrrl+yYu9JIJMiV+lN44Lc5PbE0CPJoZecJ
-         wNgj3ppz+EZh42RY9+DDuAQ8VnWtzIx49KmnF/F5uKduG3R2vhiDai/ljzfL1055+VFP
-         ZPKRqy49Towkwd2WFeEO4PZNmFf0RZy3vax0hQCHU1DjYRV7shjTyUymSXd89wAK3EEe
-         6JePN0TTmKAmjk7/ieY1edPyDPIIa9bFNlXptbxfdr1TebSgzFoCJjqC4XClHJkoAkoV
-         uGRQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUrOh5fI0nn80vQSF03N2f5UVxxiwI/rjcwxeAVzZb2RkBo4AQAsPnWbJb/wrtp+x5GV6k=@lists.linux.dev
-X-Gm-Message-State: AOJu0YxUCZY3yselpHTLjyLLDQHJoKoLt94ylINNMrleBOIcRSEp8nyB
-	quLp/4JGAmv4E3Oh/yi9Ie3V0OrxEhHj2dHxR500jbh0u21Opf1v
-X-Google-Smtp-Source: AGHT+IGDdHTdPKqDn6BbCtkuQgzdJnlwRd5/d1nwMjpVwiLgh2azzmaEppM3OyY2GmcoxPn9qKU4CQ==
-X-Received: by 2002:a05:6870:89aa:b0:277:fa33:a19f with SMTP id 586e51a60fabf-28ceba86ca1mr1947245fac.10.1729803681112;
-        Thu, 24 Oct 2024 14:01:21 -0700 (PDT)
-Received: from [192.168.1.22] (syn-070-114-247-242.res.spectrum.com. [70.114.247.242])
-        by smtp.googlemail.com with ESMTPSA id 586e51a60fabf-28c7925bb55sm3235488fac.21.2024.10.24.14.01.20
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 24 Oct 2024 14:01:20 -0700 (PDT)
-Message-ID: <36cbf092-9a4e-4748-a0f9-404ede666f44@gmail.com>
-Date: Thu, 24 Oct 2024 16:01:19 -0500
+	dkim=pass (2048-bit key) header.d=tavla.de header.i=@tavla.de header.b="RKDNP1++"
+Received: from smtp202.mailbox.org (smtp202.mailbox.org [IPv6:2001:67c:2050:b231:465::202])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mout-b-112.mailbox.org (Postfix) with ESMTPS id 4XZdqx3cl0zDsv8
+	for <iwd@lists.linux.dev>; Fri, 25 Oct 2024 12:12:13 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tavla.de; s=MBO0001;
+	t=1729851133;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=mXOPGSrsqatV8RJDjjc3ChAogytfGZbcm27v8GFQ/o0=;
+	b=RKDNP1++j65QFpAVzulnloFjLKpoY/zeCvU+4EDXkp9oNcRkOdWZidzrsRhfvtHI8rWX38
+	meZhvAou1RnOtPQw8fyYJiu7HzRDYJSpOXnr11jcUDeORKQHAtuIJjejgFFYLzFqwz5Hs9
+	T3NnG47F8+NK5N8UMjPeHD+868RxWfZMTiZwtb5pEqEnVnkR3AzkAd4g3iWsBy6rofWBql
+	rJix8D6cwUCHqpW0m6AU5clokgH+RPXwav4qcKaAVi6EQMCj9S+t/lz8Km51pOAzzHdf2a
+	0iF/1veWzcThrcpclubKX0bGJiOZMq3K4i5BO4raffVPiz9p+K/XueFIt71MjA==
+Message-ID: <1147b5a6-883a-43be-a577-f16e9e6351ef@tavla.de>
+Date: Fri, 25 Oct 2024 12:12:12 +0200
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] unit: add test with list of known unsupported frequencies
-To: James Prestwood <prestwoj@gmail.com>, iwd@lists.linux.dev
-References: <20241024184338.186018-1-prestwoj@gmail.com>
-Content-Language: en-US
-From: Denis Kenzior <denkenz@gmail.com>
-In-Reply-To: <20241024184338.186018-1-prestwoj@gmail.com>
+From: Martin Petzold <martin.petzold@tavla.de>
+Subject: Connection loss (IWD HEAD with latest OWE / BSS selection patches) -
+ brcmfmac driver
+To: iwd@lists.linux.dev
+Content-Language: en-GB, de-DE
+Organization: TAVLA Technology GmbH
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
+X-Rspamd-Queue-Id: 4XZdqx3cl0zDsv8
 
-Hi James,
+Hi all,
 
-On 10/24/24 1:43 PM, James Prestwood wrote:
-> These frequencies were seen being advertised by a driver and IWD has
-> no operating class/channel mapping for them. Specifically 5960 was
-> causing issues due to a few bugs and mapping to channel 2 of the 6ghz
-> band. Those bugs have now been resolved.
-> 
-> If these frequencies can be supported in a clean manor we can remove
-> this test, but until then ensure IWD does not parse them.
-> ---
->   unit/test-band.c | 21 +++++++++++++++++++++
->   1 file changed, 21 insertions(+)
-> 
+I open a new thread for this one: During the last weeks I have seen 
+connection losses for 30+ minutes, sometimes even hours or just now even 
+forever (IWD HEAD with v2 OWE / BSS selection patches). Driver is 
+brcmfmac (NXP 6.1.36 kernel) and chip is BCM4339 (Laird LWB5).
 
-Applied, thanks.
+It happens in a) single router environment (WPA2-PSK; Touchstone 
+TG3442DE), and b) router + repeater environment (WPA2 CCMP; Fritz!Box + 
+Fritz!Repeater), and maybe also in the WPA3 OWE Transition network 
+(yesterday lost a connection again).
 
-Regards,
--Denis
+We have 100% reproducable builds, test environments (testing sites), and 
+web socket-based telemetry. Thus my feeling is, there is still something 
+wrong with the BSS selection (maybe blacklisting)! Of course this can 
+also be something about the driver (brcmfmac) or firmware (roaming?). Or 
+can this be about IPv6 disabled (my configuration below)?
+
+This is really really serious, I (still) lose connections to devices!
+
+I will investigate further and provide logs later today, if possible.
+
+SETUP:
+
+SoM: Variscite DART-IMX8M-PLUS
+SoC: NXP i.MX8M Plus
+Wi-Fi Chip: Laird Sterling LWB5 (Infineon CYW43353)
+Antenna: Laird FlexPIFA
+RootFS: Debian bookworm
+Kernel: NXP Kernel 6.1.36 (with Variscite patches)
+Driver: brcmfmac (from Kernel, only minor patches - device tree)
+Firmware: Laird 12.29.0.22 (loaded via scripts)
+Network Daemon: systemd-networkd 252.30
+Wi-Fi Daemon: IWD 2.22+ (c459dc75c080dcbff6f9b9389344e11328dec411 + OWE 
+and BSS selection patches) + ELL 0.69 
+(7bed251f8020ef896043f008276f41cd13fdd43f)
+
+KERNEL:
+
+REPOSITORY=https://github.com/tavla/linux-imx.git (fork from 
+https://github.com/varigit/linux-imx)
+BRANCH=lf-6.1.y_var03
+COMMIT=a4b3cc1dbbb396284e501b938aa79d2dfd4f1a98
+
+FIRMWARE:
+
+summit-lwb5-etsi-firmware-12.29.0.22.tar.bz2
+
+From: 
+https://github.com/LairdCP/Sterling-LWB-and-LWB5-Release-Packages/releases/
+
+IWD
+
+-----
+
+[General]
+EnableNetworkConfiguration=true
+
+[Network]
+NameResolvingService=systemd
+EnableIPv6=false
+
+[DriverQuirks]
+OweDisable=brcmfmac
+
+-----
+
+Best regards,
+
+Martin
 
