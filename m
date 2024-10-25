@@ -1,65 +1,82 @@
-Received: from mout-b-110.mailbox.org (mout-b-110.mailbox.org [195.10.208.55])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f172.google.com (mail-qk1-f172.google.com [209.85.222.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04AF92064E0
-	for <iwd@lists.linux.dev>; Fri, 25 Oct 2024 12:48:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.10.208.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB5802064F7
+	for <iwd@lists.linux.dev>; Fri, 25 Oct 2024 12:54:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729860507; cv=none; b=cwoBqM05dRvDHVsRzKzU0oVl+D6kFnwyyoasIF7wMqA/2cE4iyAyenH0Hk0EGXMBLgI6dEsm34V/C5pxXPhy133cbvkuMEA9mRqMmreRJd1kIEsakclRMzapDY+Bf+Av8iGjqjgSuESFQOAZXHDYcD7ZR1Wn//LOpF7hJ7z/B4Y=
+	t=1729860892; cv=none; b=W1rI0LwnoQf8FjdEt/o+DUrtWr5YJZ0OLfg6tYpZo0cLpxMatLi402xVUGfKb/81SWsIxn0r4Pp4FPEKyIFukd1ubgVJJz5vxYYngTE3E78WcXuTH1bMQ3HBoRT4OFIV+NF4lFqqFLIjTTBv6CEYn6hsyJVb6WeT1tKLdzEeL9o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729860507; c=relaxed/simple;
-	bh=g9OFomTGvziS/cp2Qa2w9yxOJDVVkUDkKmI0oXDhZm0=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=cMyv2cC0pQQ0eJsEwfz/2iLsyL6gVoT4f6JTf6RpQuyVD5RH2wwnAUukVubBB+P+sDuxwwu0SOHbgiG6EJDTPsR7VqKluczsOzqikfBk6Q0fQtSi7/K1Oz8/B9XnpaKWzlrunVKRpzYHKnR/jes5zKWPVRUwd6sbA0B97P/MUC0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tavla.de; spf=pass smtp.mailfrom=tavla.de; dkim=pass (2048-bit key) header.d=tavla.de header.i=@tavla.de header.b=xKWmfMdX; arc=none smtp.client-ip=195.10.208.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tavla.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tavla.de
+	s=arc-20240116; t=1729860892; c=relaxed/simple;
+	bh=tmB1AO4S44EzqYrflt/kKVpM4kzkTnbo2Nl33g+vN5E=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=LgQGfvnoWd970T+DMYVua7JUsDs+5uJpOaw4ViypBBaNqetpOMTCqJyaX0ZQ4wtjjmOA2X/gv/UjornaqodSVmyPMF2JA/Z41877d1BT3CCTZPl4Oilc0up5fqIkUiz+Ce2uaauAZal+A61lYYV6n8XxtpAYC1zfZx724MSyLYc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IvL1dm8s; arc=none smtp.client-ip=209.85.222.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=tavla.de header.i=@tavla.de header.b="xKWmfMdX"
-Received: from smtp102.mailbox.org (smtp102.mailbox.org [10.196.197.102])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mout-b-110.mailbox.org (Postfix) with ESMTPS id 4XZjJ24mCYz9x54;
-	Fri, 25 Oct 2024 14:48:18 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tavla.de; s=MBO0001;
-	t=1729860498;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=eM+qO/fUM46WMDNzZxaWvRoZ2QDVp+juuhj/OJeNAI0=;
-	b=xKWmfMdXp50ggXz3wSGVIi+bkWweqk21N2jBcmpX3lT7zMKb+eeWr/zZ8MxP65v9kpu1qp
-	vLSLpVaPp/a/fJ9otW3+AAn09xqqSDda7nPBC6tRSu6ggisw9RR11+rn0NauQsH5Oh1ji/
-	zxckqZ5ZI66IKlJx4Kl2KObVs4ze2bJPIE7EbVVB/56ZESQ8hoSmDTClePLsYSMUbP4cXQ
-	RsAnhCzT95Sgl7UftH37qjyYfnNqOR5nAeCggs2c6k9X/9f5Rn/Ytdxq+SaWJ+I8CuJWpG
-	cbdFpp75ADyVdtojE4ShUpO1PTRgulX+BBdoKJrr90RXkTI0nurQfQ9RNHaEog==
-Message-ID: <10eb1927-6dd6-4e73-9acc-2da75cef2078@tavla.de>
-Date: Fri, 25 Oct 2024 14:48:17 +0200
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IvL1dm8s"
+Received: by mail-qk1-f172.google.com with SMTP id af79cd13be357-7b152a23e9aso138661885a.0
+        for <iwd@lists.linux.dev>; Fri, 25 Oct 2024 05:54:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1729860889; x=1730465689; darn=lists.linux.dev;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=uAzvdFuQ97nO3goR2u4yroQ3VfiArOTcaUs4ncCdEvk=;
+        b=IvL1dm8sl8eGCnYGRVpAAHBfpw9h2Og3g7sMzOhvU+3/wnnhjUyXYjykMnSrb9VqG0
+         ddGlVZn7zqxAVkpB93jdrXY2AOF5358vd13t7X81215oqYdwUY1u550lRDoVFCT0Kwsi
+         X6A2pE62nJnTg+DzGDEeZu+vBv0Ex+8CmdYa0XldDo/P2/1EBa0De8W6mecZVsym2Kxv
+         9ZEBZbSB1xhVpKhQUEHrFCQzT2kSkh+NlCrMs6uOaQ4UhXG8G24amfaSxufPAEh34I5I
+         O+YkWGLqqtdwhCvP+jYwP6gXwSZXQQmRG1Lh09YFZL7SpvLyOEz54Z6MP1O0YNrQ1Ckg
+         1sTg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1729860889; x=1730465689;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=uAzvdFuQ97nO3goR2u4yroQ3VfiArOTcaUs4ncCdEvk=;
+        b=Y/jYyY08/lAY5fQ/lhtTt5XRd6AKTEFzR1nbOxNGLMDqzxTfvCns35P4vhknaFxtoJ
+         GXNokYu+aJ7cCWC8WBEks4hg8RIHBu1gy110H2ARPbaEbmeH1OC79m6SACqC0JZ+X7Q3
+         JU/F0iiujjvvvxb1Or+/PwqH0/4CuVvHSz+iWNJBVynTIkHlyb9H2S25cMMDBv0fkv0O
+         ZAUn4WqQ105NBb79PtLIsdzeudJ4N2yxeBUEqoYGMFI33SLYe0oVAoIw80Z093VusDtZ
+         oJyuByS9QlCmfQZ/udgc19skza6kH/26fe9S/Y0Uv8OAfEcm9nmrPQx0RoXVQxDjZXYU
+         b07A==
+X-Gm-Message-State: AOJu0YybUIHtsEv0Rkun4i06r2SdsMltayeFXB4qWbHxVH5A+OQL9Ta+
+	EsOnC0Q7IgEWIbvCI5yjF+RFbgDH5h2e7+Wh3HrQDsja3KJ3t7ZrYP/N/g==
+X-Google-Smtp-Source: AGHT+IHh2F9Cs8dikrNyppwMSlmHkdC3q0IAOxMmA67KoSiDVLuno23N8IgCx7Yr4VG0FjT+n1XYjQ==
+X-Received: by 2002:a05:620a:1720:b0:7ac:b93b:b250 with SMTP id af79cd13be357-7b186af0fa5mr732991385a.0.1729860888491;
+        Fri, 25 Oct 2024 05:54:48 -0700 (PDT)
+Received: from [10.100.121.195] ([152.193.78.90])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7b18d294926sm52226785a.45.2024.10.25.05.54.47
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 25 Oct 2024 05:54:47 -0700 (PDT)
+Message-ID: <d33154fa-9309-4285-a592-9e377e199f43@gmail.com>
+Date: Fri, 25 Oct 2024 05:54:45 -0700
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
 Subject: Re: Connection loss (IWD HEAD with latest OWE / BSS selection
  patches) - brcmfmac driver
-From: Martin Petzold <martin.petzold@tavla.de>
-To: James Prestwood <prestwoj@gmail.com>
+To: Martin Petzold <martin.petzold@tavla.de>
 Cc: iwd@lists.linux.dev
 References: <1147b5a6-883a-43be-a577-f16e9e6351ef@tavla.de>
  <7dbbd152-f251-414a-8d00-29c08bbb272e@tavla.de>
  <02bb45e1-cfef-433d-9a83-2b312c1ae064@gmail.com>
  <6d384377-ee6c-4a5d-8b67-75f367403acd@tavla.de>
-Content-Language: en-GB, de-DE
-Organization: TAVLA Technology GmbH
+Content-Language: en-US
+From: James Prestwood <prestwoj@gmail.com>
 In-Reply-To: <6d384377-ee6c-4a5d-8b67-75f367403acd@tavla.de>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-Hi James,
+Hi Martin,
 
-Am 25.10.24 um 14:28 schrieb Martin Petzold:
+On 10/25/24 5:28 AM, Martin Petzold wrote:
 > Hi James,
 >
 > Am 25.10.24 um 13:48 schrieb James Prestwood:
@@ -144,53 +161,144 @@ Am 25.10.24 um 14:28 schrieb Martin Petzold:
 >   3 wlan0 wlan     no-carrier  unmanaged
 >
 > 3 links listed.
+
+Yep, IWD is ultimately hung up waiting for a connect event from the 
+kernel/driver. A few things I noticed prior to that:
+
+1. Not really critical but you have an agent connecting and 
+disconnecting multiple times a second. Are you polling info with iwctl 
+or something?
+
+2. I see this really odd local disconnect with reason code 0. This is 
+likely something from brcmfmac because I doubt the wireless subsystem 
+would use a "success" reason code in a local deauth:
+
+Okt 24 06:05:00 tavla iwd[384]: Received Deauthentication event, reason: 
+0, from_ap: false
+
+3. You had another disconnect from the AP, but IWD reconnected:
+
+Okt 24 06:06:12 tavla iwd[384]: Received Deauthentication event, reason: 
+6, from_ap: true
+
+4. You then got a disconnect from the AP yet again, reason code 3:
+
+Okt 25 06:13:21 tavla iwd[384]: Received Deauthentication event, reason: 
+3, from_ap: true
+
+# You got disconnected by the AP here
+
+Okt 25 06:13:21 tavla iwd[384]: src/station.c:station_disconnect_event() 3
+Okt 25 06:13:21 tavla iwd[384]: event: disconnect-info, reason: 3
+Okt 25 06:13:21 tavla iwd[384]: src/station.c:station_disassociated() 3
+Okt 25 06:13:21 tavla iwd[384]: 
+src/station.c:station_reset_connection_state() 3
+Okt 25 06:13:21 tavla iwd[384]: src/station.c:station_roam_state_clear() 3
+Okt 25 06:13:21 tavla iwd[384]: 
+src/netconfig.c:netconfig_event_handler() l_netconfig event 2
+Okt 25 06:13:21 tavla iwd[384]: 
+src/netconfig-commit.c:netconfig_commit_print_addrs() removing address: 
+192.168.178.113
+Okt 25 06:13:21 tavla iwd[384]: src/resolve.c:resolve_systemd_revert() 
+ifindex: 3
+Okt 25 06:13:21 tavla iwd[384]: event: state, old: connected, new: 
+disconnected
+Okt 25 06:13:21 tavla iwd[384]: event: state, old: disconnected, new: 
+autoconnect_quick
+Okt 25 06:13:21 tavla iwd[384]: src/wiphy.c:wiphy_radio_work_insert() 
+Inserting work item 17
+Okt 25 06:13:21 tavla iwd[384]: src/wiphy.c:wiphy_radio_work_next() 
+Starting work item 17
+Okt 25 06:13:21 tavla iwd[384]: src/wiphy.c:wiphy_reg_notify() 
+Notification of command Reg Change(36)
+Okt 25 06:13:21 tavla iwd[384]: src/netdev.c:netdev_link_notify() event 
+16 on ifindex 3
+Okt 25 06:13:21 tavla iwd[384]: src/scan.c:scan_notify() Scan 
+notification Trigger Scan(33)
+Okt 25 06:13:21 tavla iwd[384]: src/netdev.c:netdev_link_notify() event 
+16 on ifindex 3
+Okt 25 06:13:21 tavla iwd[384]: src/scan.c:scan_request_triggered() 
+Passive scan triggered for wdev 1
+Okt 25 06:13:21 tavla iwd[384]: 
+src/station.c:station_quick_scan_triggered() Quick scan triggered for wlan0
+Okt 25 06:13:21 tavla iwd[384]: src/scan.c:scan_notify() Scan 
+notification New Scan Results(34)
+Okt 25 06:13:21 tavla iwd[384]: src/netdev.c:netdev_link_notify() event 
+16 on ifindex 3
+Okt 25 06:13:21 tavla iwd[384]: src/station.c:station_print_scan_bss() 
+Processing BSS '38:10:d5:37:2c:7b' with SSID: XYZ, freq: 2462, rank: 
+442, strength: -3300, data_rate: 54.0, load: 21/255
+Okt 25 06:13:21 tavla iwd[384]: src/station.c:station_print_scan_bss() 
+Processing BSS '38:10:d5:7a:45:ca' with SSID: FRITZ!Box 7490, freq: 
+5580, rank: 16, strength: -8700, data_rate: 2.0, load: 12/255
+Okt 25 06:13:21 tavla iwd[384]: src/station.c:station_print_scan_bss() 
+Processing BSS '84:47:65:1a:c8:14' with SSID: WLAN-T4MQUD, freq: 5260, 
+rank: 442, strength: -6100, data_rate: 54.0, load: 46/255
+Okt 25 06:13:21 tavla iwd[384]: src/station.c:station_print_scan_bss() 
+Processing BSS '84:47:65:1a:c8:11' with SSID: WLAN-T4MQUD, freq: 2437, 
+rank: 294, strength: -6700, data_rate: 36.0, load: 63/255
+Okt 25 06:13:21 tavla iwd[384]: src/station.c:station_autoconnect_start()
+Okt 25 06:13:21 tavla iwd[384]: src/station.c:station_autoconnect_next() 
+autoconnect: Trying SSID: XYZ
+Okt 25 06:13:21 tavla iwd[384]: src/station.c:station_autoconnect_next() 
+autoconnect: '38:10:d5:37:2c:7b' freq: 2462, rank: 442, strength: -3300
+Okt 25 06:13:21 tavla iwd[384]: src/netdev.c:netdev_cqm_rssi_update()
+Okt 25 06:13:21 tavla iwd[384]: src/wiphy.c:wiphy_radio_work_insert() 
+Inserting work item 18
+Okt 25 06:13:21 tavla iwd[384]: event: connect-info, ssid: XYZ, bss: 
+38:10:d5:37:2c:7b, signal: -33, load: 21/255
+Okt 25 06:13:21 tavla iwd[384]: event: state, old: autoconnect_quick, 
+new: connecting (auto)
+Okt 25 06:13:21 tavla iwd[384]: src/scan.c:scan_cancel() Trying to 
+cancel scan id 17 for wdev 1
+Okt 25 06:13:21 tavla iwd[384]: src/wiphy.c:wiphy_radio_work_done() Work 
+item 17 done
+Okt 25 06:13:21 tavla iwd[384]: src/wiphy.c:wiphy_radio_work_next() 
+Starting work item 18
+Okt 25 06:13:22 tavla iwd[384]: src/netdev.c:netdev_mlme_notify() MLME 
+notification Connect(46)
+Okt 25 06:13:22 tavla iwd[384]: src/netdev.c:netdev_connect_event()
+Okt 25 06:13:22 tavla iwd[384]: src/netdev.c:netdev_connect_event() 
+aborting and ignore_connect_event not set, proceed
+Okt 25 06:13:22 tavla iwd[384]: src/netdev.c:netdev_connect_event() 
+expect_connect_failure not set, proceed
+Okt 25 06:13:22 tavla iwd[384]: src/wiphy.c:wiphy_radio_work_done() Work 
+item 18 done
+Okt 25 06:13:22 tavla iwd[384]: src/station.c:station_connect_cb() 3, 
+result: 2
+Okt 25 06:13:22 tavla iwd[384]: event: connect-failed, status: 16
+
+# AP rejects your next attempt to connect with status 16 (group 
+handshake timeout). Looks like the 4-way handshake never even started so 
+this is kinda odd.
+
+Okt 25 06:13:22 tavla iwd[384]: src/netdev.c:netdev_cqm_rssi_update()
+Okt 25 06:13:22 tavla iwd[384]: src/wiphy.c:wiphy_radio_work_insert() 
+Inserting work item 19
+Okt 25 06:13:22 tavla iwd[384]: src/wiphy.c:wiphy_radio_work_next() 
+Starting work item 19
+Okt 25 06:13:22 tavla iwd[384]: event: connect-info, ssid: XYZ, bss: 
+38:10:d5:37:2c:7b, signal: -33, load: 21/255
+Okt 25 06:13:22 tavla iwd[384]: src/station.c:station_try_next_bss() 
+Attempting to connect to next BSS 38:10:d5:37:2c:7b
+
+# Then IWD tries to connect again and we get no connect even whatsoever.
+
+I think brcmfmac got very confused and stuck. There are many cases in 
+IWD where we trust the kernel (and associated driver) will send the 
+events we expect. And in this case that did not happen and IWD waits 
+indefinitely.
+
+Unless I'm missing something this seems like a bug in the driver. When 
+IWD issues a CMD_CONNECT call the driver needs to tell us if it 
+succeeded or failed. Not replying at all is going to cause IWD to hang 
+like this.
+
+Thanks,
+
+James
+
 >
-Some additional output from networkd and resolved:
-
------
-
-Okt 25 14:29:33 tavla systemd-networkd[248]: eth0: DHCPv6 lease lost
-Okt 25 14:29:46 tavla systemd-networkd[248]: eth0: Gained carrier
-Okt 25 14:29:46 tavla systemd-networkd[248]: eth0: found matching 
-network '/etc/systemd/network/10-eth0.network', based on potentially 
-unpredictable interface name.
-Okt 25 14:38:23 tavla systemd-networkd[248]: eth0: DHCPv4 address 
-192.168.178.178/24, gateway 192.168.178.1 acquired from 192.168.178.1
-Okt 25 14:46:50 tavla systemd-networkd[248]: eth0: Lost carrier
-Okt 25 14:46:50 tavla systemd-networkd[248]: eth0: DHCP lease lost
-Okt 25 14:46:50 tavla systemd-networkd[248]: eth0: DHCPv6 lease lost
-Okt 25 14:47:06 tavla systemd-networkd[248]: eth0: Gained carrier
-Okt 25 14:47:06 tavla systemd-networkd[248]: eth0: found matching 
-network '/etc/systemd/network/10-eth0.network', based on potentially 
-unpredictable interface name.
-Okt 25 14:47:13 tavla systemd-networkd[248]: eth0: DHCPv4 address 
-192.168.178.178/24, gateway 192.168.178.1 acquired from 192.168.178.1
-
------
-
-Okt 25 13:52:13 tavla systemd-resolved[306]: Grace period over, resuming 
-full feature set (UDP+EDNS0) for DNS server fd00::3a10:d5ff:fe37:2c79.
-Okt 25 13:53:33 tavla systemd-resolved[306]: Using degraded feature set 
-UDP instead of UDP+EDNS0 for DNS server 192.168.178.1.
-Okt 25 14:08:25 tavla systemd-resolved[306]: Using degraded feature set 
-UDP instead of UDP+EDNS0 for DNS server fd00::3a10:d5ff:fe37:2c79.
-Okt 25 14:16:45 tavla systemd-resolved[306]: Using degraded feature set 
-UDP instead of UDP+EDNS0 for DNS server 192.168.178.1.
-Okt 25 14:16:56 tavla systemd-resolved[306]: Using degraded feature set 
-UDP instead of UDP+EDNS0 for DNS server fd00::3a10:d5ff:fe37:2c79.
-Okt 25 14:36:27 tavla systemd-resolved[306]: Using degraded feature set 
-UDP instead of UDP+EDNS0 for DNS server fd00::3a10:d5ff:fe37:2c79.
-Okt 25 14:36:39 tavla systemd-resolved[306]: Using degraded feature set 
-TCP instead of UDP for DNS server fd00::3a10:d5ff:fe37:2c79.
-Okt 25 14:37:07 tavla systemd-resolved[306]: Using degraded feature set 
-UDP instead of TCP for DNS server fd00::3a10:d5ff:fe37:2c79.
-Okt 25 14:38:45 tavla systemd-resolved[306]: Using degraded feature set 
-TCP instead of UDP for DNS server fd00::3a10:d5ff:fe37:2c79.
-Okt 25 14:42:40 tavla systemd-resolved[306]: Using degraded feature set 
-UDP instead of UDP+EDNS0 for DNS server 192.168.178.1.
-
------
-
 >>>
 >>>>
 >>>> We have 100% reproducable builds, test environments (testing 
