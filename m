@@ -1,41 +1,41 @@
-Received: from mout-b-105.mailbox.org (mout-b-105.mailbox.org [195.10.208.50])
+Received: from mout-b-203.mailbox.org (mout-b-203.mailbox.org [195.10.208.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3174206500
-	for <iwd@lists.linux.dev>; Fri, 25 Oct 2024 13:05:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.10.208.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE3312064E3
+	for <iwd@lists.linux.dev>; Fri, 25 Oct 2024 13:11:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.10.208.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729861524; cv=none; b=O3B3J0ILZTWinoZRbb833BJV++Twk9ByBHjO1OhkNfNF2/3U9D5dlOY8ytRBMznbUrP3LvwASRI2cujjAhzfHIvsk5nV0Lnant+sJ/k1DJqMqEZQOi7qgSCviDGVzDcUyr0JAndNZNZIIdNaylL89Ah2a7gn67g6RRY7r5ursuA=
+	t=1729861908; cv=none; b=BZ4SAob91xMa9xdxtuARaShOBg7K+FkJaHVAYsptlU2pRh2jnZMsN72ebllV/ivK5gKRLNxkHeEt6QIiXjnL8betS5v3Xg3Ciy5z/zHJ04px68/aEC7twiXCwbEmrbCmnM+7Qpf1qkDJN3qCztUuLBHpkGTAbDHawfyFwWDMx2I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729861524; c=relaxed/simple;
-	bh=8fLGDmbzVkOAzJbY9QK4SD2KCYjnAD9StKuudubdves=;
+	s=arc-20240116; t=1729861908; c=relaxed/simple;
+	bh=Zf5wmb8KiLqOylTndR4AUsf/XNL4gBXYjyTXIJUMPJw=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=tvL+jTwb/anbvc5KG6VIWH6Eu6Xag0EP+we0U23i1c0rp0Nb7HHbY02b5bPRokJGgyHl8G2Jg9liF/ATrRAiA749yqk5/R5HDUTEQ32AwGQcLAAvkjdussrKQKnWU6OUFeBi3CAzos/MkaU+YO0lTJUOdwGzxa+puU0hLJ6gXQQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tavla.de; spf=pass smtp.mailfrom=tavla.de; dkim=pass (2048-bit key) header.d=tavla.de header.i=@tavla.de header.b=wZr315+t; arc=none smtp.client-ip=195.10.208.50
+	 In-Reply-To:Content-Type; b=kO2MiG/fo6jO6P4tGIHp9GzVblnqXh1FHyeSlEe7KWHmcSrATNQnCcRXp0t6purTsCBqb9dvoT36uxA8nGBJJBGqlHFb4I9kTIOhcxJBCfl6ED4pn5L4Am7u8gs/wVWV3fw+vEamFa98k2AmFufT/3ZaZ9OMwz7zOtC/OvugJEM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tavla.de; spf=pass smtp.mailfrom=tavla.de; dkim=pass (2048-bit key) header.d=tavla.de header.i=@tavla.de header.b=VkV4VYnB; arc=none smtp.client-ip=195.10.208.52
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tavla.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tavla.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=tavla.de header.i=@tavla.de header.b="wZr315+t"
-Received: from smtp1.mailbox.org (smtp1.mailbox.org [IPv6:2001:67c:2050:b231:465::1])
+	dkim=pass (2048-bit key) header.d=tavla.de header.i=@tavla.de header.b="VkV4VYnB"
+Received: from smtp102.mailbox.org (smtp102.mailbox.org [10.196.197.102])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mout-b-105.mailbox.org (Postfix) with ESMTPS id 4XZjgV1B2Fz9vrl;
-	Fri, 25 Oct 2024 15:05:10 +0200 (CEST)
+	by mout-b-203.mailbox.org (Postfix) with ESMTPS id 4XZjps5kBfz9vQt;
+	Fri, 25 Oct 2024 15:11:33 +0200 (CEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tavla.de; s=MBO0001;
-	t=1729861510;
+	t=1729861893;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=TYIen3sLd2RE7Miu49wqWAQJvUBcgIVYvAt+SbboyzM=;
-	b=wZr315+tLURruC51QyzFF8psd9SgNhOWw8zlIfeYIzluynkTB9gCd1W25UspT5C0buWytC
-	gVc72i/gipJ29wMoFeDcVWGjit2C2BtIJa4KDXgz0EQNEPBGg7tZ7rT3DQcJKCEYRyCC1C
-	sRlTJwFa6xS4BxirW3uD9qaGpJEzHLTEEouYwBICOxovbdDa0J4YD0ObuJYD3gWalv7CSc
-	/4cxGBkydWX5bnQXUP+CFXs6lRwexnDqR0C25zAl0mqnu+fRzh/US2hQ6jaUqLIpiJDCOp
-	4iHqPg/YYT2BjpNeZI9jEDtee1a5ZQPlHNMA2s3kA7prZd+DQyceLGhiW23wpw==
-Message-ID: <228c149f-24f7-4d46-bf0e-d2dcafeb326a@tavla.de>
-Date: Fri, 25 Oct 2024 15:05:08 +0200
+	bh=VhC6pbnR9Dpz/LKgrFb1biefKAztmGsvfI6PrtaCT+A=;
+	b=VkV4VYnBv9gcwdDSmKeJ0lA6Lw4/kb0UkUiyD7SGRcD9tHdvQi0Rs7oYKS3NbNMAlrSite
+	/RjG6oo28LpMzmDbEIBvay8ZalcPfGGW/e5fpO9wfXbElrUV5dpgrcDJ0L2KvHiRe3phs8
+	UlirVwNU0Gh42YT/6h4dnsIKsi6isg6DVdfw2z5ni4quGLXr6TVJR4NnsT4/N3i3GBUsiY
+	xccqpaPsIWrJ5ZdnTDd8xTAXxmPW4ci5YTHOr2mWsegD5EFzp05FZB9KpkdYelDkbxRbOn
+	5yilIdfR+IJ5flrER6/sR4Kt7HsuNEMmIbeTLo+3coPOC7b7E7DzeKv63jo/3Q==
+Message-ID: <57826e6a-8466-4e45-8906-6cb15968bcc8@tavla.de>
+Date: Fri, 25 Oct 2024 15:11:32 +0200
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
@@ -57,7 +57,6 @@ Organization: TAVLA Technology GmbH
 In-Reply-To: <d33154fa-9309-4285-a592-9e377e199f43@gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 4XZjgV1B2Fz9vrl
 
 Hi James,
 
@@ -153,11 +152,6 @@ Am 25.10.24 um 14:54 schrieb James Prestwood:
 >
 > Yep, IWD is ultimately hung up waiting for a connect event from the 
 > kernel/driver. A few things I noticed prior to that:
-
-Why should there be a connect event from the kernel/driver? Why don't we 
-get any related logs from brcm?
-
-
 >
 > 1. Not really critical but you have an agent connecting and 
 > disconnecting multiple times a second. Are you polling info with iwctl 
@@ -182,16 +176,60 @@ get any related logs from brcm?
 >
 > # You got disconnected by the AP here
 
-Okay, thanks. I don't do any polling of IWD or other network daemons. 
-However, I do have a mechanism for web socket re-connects in case of 
-disconnect.
+I stopped my application (all processes gone!). And then tried a manual 
+re-connect via iwctl:
 
-What I also see: networkctl shows some IPv6 for wlan0. However, I have 
-IPv6 disabled in the iwd.conf. Could this be a problem?
+-----
 
-I sent additional log output for networkd and resolved in an earlier 
-message.
+tavla@tavla:~$ iwctl station wlan0 connect "XYZ"
 
+Okt 25 15:07:06 tavla iwd[384]: src/agent.c:agent_register() agent 
+register called
+Okt 25 15:07:06 tavla iwd[384]: src/agent.c:agent_register() agent 
+:1.13733 path /agent/204414
+Okt 25 15:07:06 tavla iwd[384]: src/network.c:network_connect()
+Okt 25 15:07:06 tavla iwd[384]: src/agent.c:agent_disconnect() agent 
+:1.13733 disconnected
+Okt 25 15:07:06 tavla iwd[384]: src/agent.c:agent_free() agent free 
+0xaaaae76e8b30
+
+tavla@tavla:~$ iwctl station wlan0 show
+                                  Station: wlan0
+--------------------------------------------------------------------------------
+   Settable  Property Value
+--------------------------------------------------------------------------------
+             Scanning no
+             State connecting
+             Connected network     XYZ
+             No IP addresses       Is DHCP client configured?
+
+tavla@tavla:~$ iwctl station wlan0 disconnect
+Operation failed
+
+Okt 25 15:08:56 tavla iwd[384]: src/agent.c:agent_register() agent 
+register called
+Okt 25 15:08:56 tavla iwd[384]: src/agent.c:agent_register() agent 
+:1.13740 path /agent/204425
+Okt 25 15:08:56 tavla iwd[384]: src/station.c:station_dbus_disconnect()
+Okt 25 15:08:56 tavla iwd[384]: 
+src/station.c:station_reset_connection_state() 3
+Okt 25 15:08:56 tavla iwd[384]: src/station.c:station_roam_state_clear() 3
+Okt 25 15:08:56 tavla iwd[384]: event: state, old: connecting (auto), 
+new: disconnecting
+Okt 25 15:08:56 tavla iwd[384]: src/wiphy.c:wiphy_radio_work_done() Work 
+item 19 done
+Okt 25 15:08:56 tavla iwd[384]: src/station.c:station_connect_cb() 3, 
+result: 5
+Okt 25 15:08:56 tavla iwd[384]: src/station.c:station_disconnect_cb() 3, 
+success: 0
+Okt 25 15:08:56 tavla iwd[384]: event: state, old: disconnecting, new: 
+disconnected
+Okt 25 15:08:56 tavla iwd[384]: src/agent.c:agent_disconnect() agent 
+:1.13740 disconnected
+Okt 25 15:08:56 tavla iwd[384]: src/agent.c:agent_free() agent free 
+0xaaaae76eaa50
+
+-----
 
 >
 > Okt 25 06:13:21 tavla iwd[384]: 
