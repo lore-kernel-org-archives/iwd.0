@@ -1,41 +1,41 @@
-Received: from mout-b-210.mailbox.org (mout-b-210.mailbox.org [195.10.208.40])
+Received: from mout-b-110.mailbox.org (mout-b-110.mailbox.org [195.10.208.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1AEC01F7544
-	for <iwd@lists.linux.dev>; Fri, 25 Oct 2024 12:39:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.10.208.40
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04AF92064E0
+	for <iwd@lists.linux.dev>; Fri, 25 Oct 2024 12:48:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.10.208.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729859997; cv=none; b=IAx4fV8iKsRd+JhiRU8TbWYMTvNp6N5kqNvM3uUi/fC1Q4FvRWZripcAAWFg5jYxka0i3+abEeEk5loLxGfQvq0YjiU8G9azsenZ8v/L3pTkz308Ljthuv0WHimp3u++5tBvoaqwSgZrAaF/kk+zExfD4JSBzwnnENLGUk7h4cU=
+	t=1729860507; cv=none; b=cwoBqM05dRvDHVsRzKzU0oVl+D6kFnwyyoasIF7wMqA/2cE4iyAyenH0Hk0EGXMBLgI6dEsm34V/C5pxXPhy133cbvkuMEA9mRqMmreRJd1kIEsakclRMzapDY+Bf+Av8iGjqjgSuESFQOAZXHDYcD7ZR1Wn//LOpF7hJ7z/B4Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729859997; c=relaxed/simple;
-	bh=uD81qTKzGI6hjnVfnzyLpwF80/ArLxGlXOk9+W3nWWQ=;
+	s=arc-20240116; t=1729860507; c=relaxed/simple;
+	bh=g9OFomTGvziS/cp2Qa2w9yxOJDVVkUDkKmI0oXDhZm0=;
 	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=B9vrKTFE8nk304NbwAaQMDOWbseq7deRnYrxZ0duFoMkchrFw2YuZN54XNMyBkEbbIS2Sj9588G83Y3pPw8AElDEpwzfOj1i5Gtrp6UkDIhElSGmip4xx0uZMNXwBoxWcHD6g3hXDF5GQZ9OBYUbcd45HtHVAd7VuGCkvMkj6dM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tavla.de; spf=pass smtp.mailfrom=tavla.de; dkim=pass (2048-bit key) header.d=tavla.de header.i=@tavla.de header.b=PwVpxtuL; arc=none smtp.client-ip=195.10.208.40
+	 In-Reply-To:Content-Type; b=cMyv2cC0pQQ0eJsEwfz/2iLsyL6gVoT4f6JTf6RpQuyVD5RH2wwnAUukVubBB+P+sDuxwwu0SOHbgiG6EJDTPsR7VqKluczsOzqikfBk6Q0fQtSi7/K1Oz8/B9XnpaKWzlrunVKRpzYHKnR/jes5zKWPVRUwd6sbA0B97P/MUC0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tavla.de; spf=pass smtp.mailfrom=tavla.de; dkim=pass (2048-bit key) header.d=tavla.de header.i=@tavla.de header.b=xKWmfMdX; arc=none smtp.client-ip=195.10.208.55
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tavla.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tavla.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=tavla.de header.i=@tavla.de header.b="PwVpxtuL"
-Received: from smtp202.mailbox.org (smtp202.mailbox.org [10.196.197.202])
+	dkim=pass (2048-bit key) header.d=tavla.de header.i=@tavla.de header.b="xKWmfMdX"
+Received: from smtp102.mailbox.org (smtp102.mailbox.org [10.196.197.102])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mout-b-210.mailbox.org (Postfix) with ESMTPS id 4XZj6F6jSpzDvGP;
-	Fri, 25 Oct 2024 14:39:49 +0200 (CEST)
+	by mout-b-110.mailbox.org (Postfix) with ESMTPS id 4XZjJ24mCYz9x54;
+	Fri, 25 Oct 2024 14:48:18 +0200 (CEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tavla.de; s=MBO0001;
-	t=1729859990;
+	t=1729860498;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=fv2gazehRltxwidZ+g44wAixjR782htzqkIG7bP/kSE=;
-	b=PwVpxtuLSL1udZufbDJkXbnoUpEEzs1Mvb7rkMJ8ZjUJ6MB9txMDyfzIpf72t77fkPA4wl
-	PpOBggpy3Xz/vrP6d6+dB4Hohc8yjjlELDHmdxsepNc+0Y56/c1lvNXondyeLQsM77G19+
-	r8XEaP5iCkmoC6FvmJHN74faeSpm7/xVU2geZvhyKxaKlfcBk4U4d4z1wnhw7J91gP6gpq
-	n0bzS8lJ95laeyvKPiN2DhcDOz3nSJahdmVO1avlXMo26jI4+2kOYDi8rAXyXqjMk/WXv6
-	1Iabu9lwfvioPy6xltg1MIJyvMnH7pBw5gvlTU1MC45C9TvvfWd+cBmpP8aD8g==
-Message-ID: <5ba46601-a2fa-4c6d-b9e3-c6425bea119e@tavla.de>
-Date: Fri, 25 Oct 2024 14:39:48 +0200
+	bh=eM+qO/fUM46WMDNzZxaWvRoZ2QDVp+juuhj/OJeNAI0=;
+	b=xKWmfMdXp50ggXz3wSGVIi+bkWweqk21N2jBcmpX3lT7zMKb+eeWr/zZ8MxP65v9kpu1qp
+	vLSLpVaPp/a/fJ9otW3+AAn09xqqSDda7nPBC6tRSu6ggisw9RR11+rn0NauQsH5Oh1ji/
+	zxckqZ5ZI66IKlJx4Kl2KObVs4ze2bJPIE7EbVVB/56ZESQ8hoSmDTClePLsYSMUbP4cXQ
+	RsAnhCzT95Sgl7UftH37qjyYfnNqOR5nAeCggs2c6k9X/9f5Rn/Ytdxq+SaWJ+I8CuJWpG
+	cbdFpp75ADyVdtojE4ShUpO1PTRgulX+BBdoKJrr90RXkTI0nurQfQ9RNHaEog==
+Message-ID: <10eb1927-6dd6-4e73-9acc-2da75cef2078@tavla.de>
+Date: Fri, 25 Oct 2024 14:48:17 +0200
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
@@ -112,11 +112,6 @@ Am 25.10.24 um 14:28 schrieb Martin Petzold:
 > "java.util.concurrent.TimeoutException: DNS timeout 15000 ms"). Maybe 
 > it alternates between Ethernet and WiFi. You will understand better. 
 > Or the network is re-configured all the time.
-
-Happens also on a device here without Ethernet connected. So there is no 
-alternation. Just on-going connects and disconnects.
-
-
 >
 > Here is my local status:
 >
@@ -150,6 +145,52 @@ alternation. Just on-going connects and disconnects.
 >
 > 3 links listed.
 >
+Some additional output from networkd and resolved:
+
+-----
+
+Okt 25 14:29:33 tavla systemd-networkd[248]: eth0: DHCPv6 lease lost
+Okt 25 14:29:46 tavla systemd-networkd[248]: eth0: Gained carrier
+Okt 25 14:29:46 tavla systemd-networkd[248]: eth0: found matching 
+network '/etc/systemd/network/10-eth0.network', based on potentially 
+unpredictable interface name.
+Okt 25 14:38:23 tavla systemd-networkd[248]: eth0: DHCPv4 address 
+192.168.178.178/24, gateway 192.168.178.1 acquired from 192.168.178.1
+Okt 25 14:46:50 tavla systemd-networkd[248]: eth0: Lost carrier
+Okt 25 14:46:50 tavla systemd-networkd[248]: eth0: DHCP lease lost
+Okt 25 14:46:50 tavla systemd-networkd[248]: eth0: DHCPv6 lease lost
+Okt 25 14:47:06 tavla systemd-networkd[248]: eth0: Gained carrier
+Okt 25 14:47:06 tavla systemd-networkd[248]: eth0: found matching 
+network '/etc/systemd/network/10-eth0.network', based on potentially 
+unpredictable interface name.
+Okt 25 14:47:13 tavla systemd-networkd[248]: eth0: DHCPv4 address 
+192.168.178.178/24, gateway 192.168.178.1 acquired from 192.168.178.1
+
+-----
+
+Okt 25 13:52:13 tavla systemd-resolved[306]: Grace period over, resuming 
+full feature set (UDP+EDNS0) for DNS server fd00::3a10:d5ff:fe37:2c79.
+Okt 25 13:53:33 tavla systemd-resolved[306]: Using degraded feature set 
+UDP instead of UDP+EDNS0 for DNS server 192.168.178.1.
+Okt 25 14:08:25 tavla systemd-resolved[306]: Using degraded feature set 
+UDP instead of UDP+EDNS0 for DNS server fd00::3a10:d5ff:fe37:2c79.
+Okt 25 14:16:45 tavla systemd-resolved[306]: Using degraded feature set 
+UDP instead of UDP+EDNS0 for DNS server 192.168.178.1.
+Okt 25 14:16:56 tavla systemd-resolved[306]: Using degraded feature set 
+UDP instead of UDP+EDNS0 for DNS server fd00::3a10:d5ff:fe37:2c79.
+Okt 25 14:36:27 tavla systemd-resolved[306]: Using degraded feature set 
+UDP instead of UDP+EDNS0 for DNS server fd00::3a10:d5ff:fe37:2c79.
+Okt 25 14:36:39 tavla systemd-resolved[306]: Using degraded feature set 
+TCP instead of UDP for DNS server fd00::3a10:d5ff:fe37:2c79.
+Okt 25 14:37:07 tavla systemd-resolved[306]: Using degraded feature set 
+UDP instead of TCP for DNS server fd00::3a10:d5ff:fe37:2c79.
+Okt 25 14:38:45 tavla systemd-resolved[306]: Using degraded feature set 
+TCP instead of UDP for DNS server fd00::3a10:d5ff:fe37:2c79.
+Okt 25 14:42:40 tavla systemd-resolved[306]: Using degraded feature set 
+UDP instead of UDP+EDNS0 for DNS server 192.168.178.1.
+
+-----
+
 >>>
 >>>>
 >>>> We have 100% reproducable builds, test environments (testing 
