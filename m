@@ -1,84 +1,96 @@
-Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mout-b-203.mailbox.org (mout-b-203.mailbox.org [195.10.208.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 960E91BD9D3
-	for <iwd@lists.linux.dev>; Wed, 30 Oct 2024 20:15:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E76241BD9D4
+	for <iwd@lists.linux.dev>; Wed, 30 Oct 2024 20:26:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.10.208.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730319345; cv=none; b=RfrOcELCNEol15FwzlUFTw7NxPkQIbmSPc/tR4AdYWrEJdhIxp1oGihppn0qFULJjxtruk0tBxH8akfnvn+2/hy1yvX6uGcrnw25Id0pxKp5Eox/Pet1BJlEZCQeTLapRnsQL5abfFDQrjMCxhnzWiUC/Pul3sgenBKTWPcRzdA=
+	t=1730319994; cv=none; b=oDN0MAJ7WIY86iCdp4MG0PALNy4y4e4saCTAJEDZOImSiqFMoQO51yPK5xf5u/gLE0+pkaSdanAF/nRvLoDogjfNDAKb1/zNMH1/GIB0b9RwHZ4XpaxVKEO7BQIBgBFj0pPkMDY2sITuG+ngX17hz6Cs5qUBnd30GMaZMgkbSec=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730319345; c=relaxed/simple;
-	bh=qAsmYQok+ZmNqe4dOxI/0kqOAs4+fSisJhVux95Aiik=;
+	s=arc-20240116; t=1730319994; c=relaxed/simple;
+	bh=e0G1x0IK5cjudKiN7dqLFWHefyScX8CV9r0wfbSL5dA=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=FfTAhz0CjXqd1mVdDopquCrimynMs2h+p7My5gP2LomsorwzOVZ4GJJD3e0AAYT27HApDRxeuS0U9apWXgzTAJD6YXzA6yd9f3BTi9/IkwdkRrwWyVvQT9iC6me9/iEED71uX0Ols/ob86nuH67Y9Vsvn/P1pOL7hpUWWx2Q6HM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bjmbhtlw; arc=none smtp.client-ip=209.85.214.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	 In-Reply-To:Content-Type; b=CNtTtEOPixZLxAKIPrcvjcPihmtWPg/35xwZ+hGMzeboMKwquNY0RCqdOaw+FJqEb6jBw9awjPFCnctxN2gn31MI1O8Omy+WrByIdqgRSCJDf4nTJlFDmknsqD1hQLtxq8jlW2A52zVb6a/LyN3H7LFApL1+Nv3n9+FSZsFpea4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tavla.de; spf=pass smtp.mailfrom=tavla.de; dkim=pass (2048-bit key) header.d=tavla.de header.i=@tavla.de header.b=kBLQwOkk; arc=none smtp.client-ip=195.10.208.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tavla.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tavla.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bjmbhtlw"
-Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-20c803787abso2122505ad.0
-        for <iwd@lists.linux.dev>; Wed, 30 Oct 2024 13:15:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1730319343; x=1730924143; darn=lists.linux.dev;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=qAsmYQok+ZmNqe4dOxI/0kqOAs4+fSisJhVux95Aiik=;
-        b=bjmbhtlwkQbQFt6E0N2zj+VJJ5NlRY0bKTHxTg+hH589JZH1fN2RxkXbYQaFE4RWkk
-         blmqPyW26Biip//KXJFBjs7Sej1ufTKHkjlngAPsb6r581nGKtk+5oIRiyRGnAutfS/G
-         oaqg4YsRCicHZ3T3sJ7WNAcJisWyFPhaTNeJDhXtF3AdcKJ93TZcICX//rTa5ecfbIQq
-         P7WFSbgrPTnoztC25kvOK7wyO/KAhb9iIsZ9bQWYHFEbAAE3oh6aDgDxx8RWtiv01Sup
-         tN6Y1Hf6K17wNCqtKs3QAnTiBWDHMoskE36Fo8MC4OXnONPgIK1n+p/Toivf2AIwQ7Mw
-         DGgA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730319343; x=1730924143;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=qAsmYQok+ZmNqe4dOxI/0kqOAs4+fSisJhVux95Aiik=;
-        b=nAlGPwZKBoSgITS8Trx9KRugrAzaiPMjH78T1Jfr4VNdrUu3LswJlVue/B4xO0ZKAb
-         u10wfpPNO2kQ572ZE3cYa+jEILTTnHzSEaTPYExOiDA/SC26Y/yU9lSd8TN0g6rG+HzR
-         Zd84Y8Gb8OYlK2OKRvSOK57xl2dTHpYfraS3Zi91/l6Cwpr5L4QYkwJkPme0Xe5ZNHz5
-         qx6Z+53lSaEiriwb+Pb0GX2PMQWLJwA/pKzcRyiRuEtaV5/5a0t3RKZWT24jNTBfIAGE
-         NM4TprwvhxHr2mNl7BKgLTc3gGMuxx5z27s/hz8EPocqezKRvO/g+Bw+98G9O/0ZYlNQ
-         4D4w==
-X-Gm-Message-State: AOJu0YxhgnEbc9fhP3OXXwNVUFIyZxqtJemM1ZqjEAxo7i4ofkKFEgyK
-	ygkfD+HpU62bE29mWiKSixIbHyGgaRajHdKXaGU2ENwSU2AstNzL
-X-Google-Smtp-Source: AGHT+IFYLd2Wz+swS4w+FIN9AY+a56PlhIRr+RcYpkNGprIXldK+ep60x9WOfFGxPJq/tEvd6x5+Qg==
-X-Received: by 2002:a17:902:e751:b0:20b:db4:d913 with SMTP id d9443c01a7336-210ed3f11demr111265055ad.11.1730319342704;
-        Wed, 30 Oct 2024 13:15:42 -0700 (PDT)
-Received: from [10.100.121.195] ([152.193.78.90])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-210bc01366bsm85608725ad.132.2024.10.30.13.15.41
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 30 Oct 2024 13:15:42 -0700 (PDT)
-Message-ID: <b134a703-6747-4b1a-a022-b61f7e282bfa@gmail.com>
-Date: Wed, 30 Oct 2024 13:15:39 -0700
+	dkim=pass (2048-bit key) header.d=tavla.de header.i=@tavla.de header.b="kBLQwOkk"
+Received: from smtp202.mailbox.org (smtp202.mailbox.org [10.196.197.202])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mout-b-203.mailbox.org (Postfix) with ESMTPS id 4XdzDD5pK2z9vtP;
+	Wed, 30 Oct 2024 21:26:20 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tavla.de; s=MBO0001;
+	t=1730319980;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=EOv9JILfUVEQwImu9ovS7T6bq0bc/v1YGP6klM990uY=;
+	b=kBLQwOkkYU9W61pulGGtPzEX3dJ0c4e/3+XqmLzAZY97LOdr/KiKXBwYNjhu1LGl57OESP
+	mTCIO1N58hmjIFSpmhaDhbwQdhbqDonYccvmmZu6+jXWiwLP8hFLb3GzV45hjkl/Cbhy/w
+	Lr+AcwQ+UC2hDJH/MzmZwOC3v0Ui7i3FxEufLb+IP8ME/xhSHap/J/+yhrdi2f31EX2OzP
+	WYJq8rc7pcJwRMBa9Xg1xPcYvrtu/ZxUzNj/cenpstGyywVevQIDZB4tLPyYlO3TDOJ7WO
+	tmO0p81+WJ6aPj6nfORhmFCt4jxOiX7N06OVHOQTcpUi73YWFI37jEraTB1b+A==
+Message-ID: <5e9122b7-dcee-4e98-8b8f-9c623276a5db@tavla.de>
+Date: Wed, 30 Oct 2024 21:26:19 +0100
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
 Subject: Re: How to disable power save (iwlwifi / brcmfmac)
-To: Martin Petzold <martin.petzold@tavla.de>
+To: James Prestwood <prestwoj@gmail.com>
 Cc: iwd@lists.linux.dev
 References: <3650c0e9-6d4e-45bb-ab44-ce5849d3ffe1@tavla.de>
  <bc387186-dbd6-4ab3-adfa-2a8d0f7bcc71@gmail.com>
  <629def8d-2c7b-483c-8e2d-d73467a14486@tavla.de>
-Content-Language: en-US
-From: James Prestwood <prestwoj@gmail.com>
-In-Reply-To: <629def8d-2c7b-483c-8e2d-d73467a14486@tavla.de>
+ <b134a703-6747-4b1a-a022-b61f7e282bfa@gmail.com>
+Content-Language: en-GB, de-DE
+From: Martin Petzold <martin.petzold@tavla.de>
+Organization: TAVLA Technology GmbH
+In-Reply-To: <b134a703-6747-4b1a-a022-b61f7e282bfa@gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-Hi Martin,
+Hi James,
 
-<snip>
-> Okt 30 21:10:43 tavla iwd[1212]: Wireless daemon version 2.3
-Your using IWD version 2.3 which doesn't support that.
+Am 30.10.24 um 21:15 schrieb James Prestwood:
+> Hi Martin,
+>
+> <snip>
+>> Okt 30 21:10:43 tavla iwd[1212]: Wireless daemon version 2.3
+> Your using IWD version 2.3 which doesn't support that.
+
+Okay, thanks. This was another machine (Intel wifi) with not most recent 
+image.
+
+I have tested "PowerSaveDisable=brcmfmac" option on the machine with IWD 
+2.22+ and it works as expected.
+
+Is this feature actually a IWD featuer or rather a kernel driver 
+feature? Does the brcmfmac driver have something like this, because with 
+modinfo there is no related parameter?
+
+However, on the Intel machine I also wonder why the following doesn't 
+work also:
+
+-----
+
+tavla@tavla:~$ sudo reboot
+[...]
+tavla@tavla:~$ cat /etc/modprobe.d/iwlwifi_power_save.conf
+options iwlwifi power_save=0
+tavla@tavla:~$
+tavla@tavla:~$ sudo iw wlan0 get power_save
+Power save: on
+
+-----
 
 Thanks,
 
-James
+Martin
 
