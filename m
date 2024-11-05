@@ -1,128 +1,93 @@
-Received: from mout-b-210.mailbox.org (mout-b-210.mailbox.org [195.10.208.40])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oa1-f47.google.com (mail-oa1-f47.google.com [209.85.160.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E380920D509
-	for <iwd@lists.linux.dev>; Tue,  5 Nov 2024 20:17:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.10.208.40
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD32429CE8
+	for <iwd@lists.linux.dev>; Tue,  5 Nov 2024 20:34:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730837873; cv=none; b=JbcCBWmv+9fusw1sNwU43SxQOJXVmgXyDYtJNdPKibHp/GdV6czR8Ts07xrpcoZRswJgjaGjDwwp2Ca7g/a8qkDIJyCi8NszbrKPPQai4GhMUpWUJp2q7jw5fsXIHZukTTF2k8sIGV2UtQZvBZ20b/K/g20rMjR/Jy88t66K6CA=
+	t=1730838864; cv=none; b=fGjK2pO8egPYlHvn1MssVClB5rIQGQd5Wfa+Ia9QcrvmIFkv6RXeCly/o2TqVeXoEJNTRS0M/mz1dTcLLpO1WiSXHIQ+rzEwEG7oAbETICXve7iefvEgXvkMnZ6SEnjgSM0Wj/SUArcvWGti9H0+u8bN7G9KOAxiXVdS7h3cxK0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730837873; c=relaxed/simple;
-	bh=jGCf2vMvxfbmVkmjPSerHxdz7+LTLtmkeoaPuoNIWTM=;
+	s=arc-20240116; t=1730838864; c=relaxed/simple;
+	bh=8LeS5eQ1CI30aYWQUsXEgxRzGyRxe/mfTOw9c2V1oog=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Y9o4yAQhqWIePdkNKRPpS9VqV3j08NYIES1Dlvte6vUiyO+JSJNFDXsc5WSkRqQ92k3OpgGLkb/WhqXItw/Uw/3VW55UXAKZ6GS7/MTJXBNjYVoWydLdIQBnOBalsKQaCKwQrW7VpkEryufhl8XWYq9rv+Yc9CVlsPWMHsqm+GM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tavla.de; spf=pass smtp.mailfrom=tavla.de; dkim=pass (2048-bit key) header.d=tavla.de header.i=@tavla.de header.b=NjDH1iw4; arc=none smtp.client-ip=195.10.208.40
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tavla.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tavla.de
+	 In-Reply-To:Content-Type; b=jN8d3b54QCtMTYANDzIG7lS43utbNUx5gUHCSfvQXtcZoBrZZqIRpIFE7Ei59kD8I9jMts0Y+qVpsh9rQmcvWYuI5N6t8LWhYWSFMCHKhOIvC830lXfSYS028fBN1kbKWaDIyLVteB5qXhN1Bo9y/ywzyrLhSm/Mom1ihALUJIg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FVgLGni/; arc=none smtp.client-ip=209.85.160.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=tavla.de header.i=@tavla.de header.b="NjDH1iw4"
-Received: from smtp102.mailbox.org (smtp102.mailbox.org [IPv6:2001:67c:2050:b231:465::102])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mout-b-210.mailbox.org (Postfix) with ESMTPS id 4XjflS2gHTzDvG0;
-	Tue,  5 Nov 2024 21:17:40 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tavla.de; s=MBO0001;
-	t=1730837860;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=U8tEiIGAgKnZcJMhzdg6753xRucTuTzrOSozClKQCmo=;
-	b=NjDH1iw4ieZPkyhWIRkqt8h/GBU14NEkWJArJzcstiOlRBY4gIQen5Veg/sv1L6TWIYz4E
-	ZEdApKwdJrm8KK0xxxhNTKQvUBHRNthes0uda4T5o0fUfy2mAXurCW22xEW7qFont+hTxt
-	AKHv6l5UvqlPiqqciziohWAKeBMs8ppCnk8oQk+rxHRy/rDaybdRlKsmH9xM/Cnvr59FPO
-	OUhMqms43zao2X5sz464e/lhaDcT9aqAF4a0xm1lis2azqJ0IQL1Ph+Zkv7uq2p29Y9eBd
-	MO44cUMfCNhmhxrGihWj+pJgIDBPfFBYzVDDe/6Yqu2SQ6o3qCLP70k+Bx9fCA==
-Message-ID: <bb02480c-97aa-4833-86ac-eea737db4f41@tavla.de>
-Date: Tue, 5 Nov 2024 21:17:39 +0100
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FVgLGni/"
+Received: by mail-oa1-f47.google.com with SMTP id 586e51a60fabf-2884910c846so2610758fac.0
+        for <iwd@lists.linux.dev>; Tue, 05 Nov 2024 12:34:22 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1730838862; x=1731443662; darn=lists.linux.dev;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=D5hV59ckvTBmlwN/Ud+Xw6k28MVgI25rBHv/G8c9J1o=;
+        b=FVgLGni/+x+SOqtxh+6Z2+BrjTJF6j8qaANMTAeQ9zklozGHAHRjayFWXZf9tXDEua
+         K877a53+ZnOPu65nzBh6k6B1UPNJFaMFoGntUnP9r47kWUVjp6+OpAJC/vXfzBNloZil
+         N05+J5Y+B6owjZIrpt96UcHEfcb+eUoo4iYn4eYNX5ESaDPc6DCAwAJk/uLQyg3QIOKa
+         O0DSQq+oC5izsdWBh8KH4R8Mj+/AtBC1V4WYaaB3laqPPg3URAaS+buVv8ZazsjOuqyO
+         CvlB64wDdyYJgGg/KNlWlLi1UmtqAsK1GiUcZ0ISgLxWW00YOSFgg/Z2RcNtw28kdJ4w
+         KVlA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1730838862; x=1731443662;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=D5hV59ckvTBmlwN/Ud+Xw6k28MVgI25rBHv/G8c9J1o=;
+        b=vbhfrWEfXWGpJf2QUeUcO12qjhsVJuuywGMwHeSW4TQgWCxbkVLYFsWuMo/rkeRy5I
+         O9c6N/4BHC8Duj81hdSYmvsxGQALq2VTTETNWnBs+EWrEd8spl3QVYO+pD3ZZqHN5Y5q
+         nO3ulFxQLyolY+GYkly0RPHuH9lwkPSKiieJQBpe6hYq/1+9iMHSbX7MBhx96Joq/ZvL
+         wewGDOI3ThIYT9TvP2jfNpc7GzSjEq0YTVDCRiD+ERHvrqF9TYX2oWjV7W2fvLak5eYp
+         IhUx9348fIbSqiQxyGmjtO3bPG3AwRSLyAaXiTGKYRR6RaXj6OkmNwl99NeYR5nUeSPc
+         sZdA==
+X-Gm-Message-State: AOJu0YxQWhG6p3a9h/vxgkdn2TEZEJ/cgmcA3VcxbTJyBf60sekpEdz8
+	Mh5So0yJ+pyLHX0qPPLs1g7W5VGDR9pDKRrXdLhljYZ8URYINsOovSR7qg==
+X-Google-Smtp-Source: AGHT+IGUkFcW1lRCfAdocDvawgwSyML3gEg7zNfAtX06U4I7dAa6QCxCmP4bXso7kRrtOYQXAVkSXQ==
+X-Received: by 2002:a05:6870:e0ca:b0:288:a00e:92dc with SMTP id 586e51a60fabf-2948442bbe5mr18991846fac.2.1730838861809;
+        Tue, 05 Nov 2024 12:34:21 -0800 (PST)
+Received: from [192.168.1.22] (syn-070-114-247-242.res.spectrum.com. [70.114.247.242])
+        by smtp.googlemail.com with ESMTPSA id 46e09a7af769-7189cbc2b8dsm2625768a34.0.2024.11.05.12.34.20
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 05 Nov 2024 12:34:21 -0800 (PST)
+Message-ID: <62de8616-96e1-431e-b867-b1f1a6c8f14c@gmail.com>
+Date: Tue, 5 Nov 2024 14:34:19 -0600
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
 Subject: Re: timesync when using IWD stand-alone
-To: James Prestwood <prestwoj@gmail.com>
+To: Martin Petzold <martin.petzold@tavla.de>,
+ James Prestwood <prestwoj@gmail.com>
 Cc: iwd@lists.linux.dev, Harry ten Berge <htenberge@gmail.com>
 References: <bb7c6c59-b5f1-4a22-a168-83ccfc5406a3@tavla.de>
  <CAN+yOboCgTLninh255t6Z61S1PaKXjS0yj1HTx5LU9c5dzyS_g@mail.gmail.com>
  <7d815327-bf9b-441f-a736-a2f3a651112d@tavla.de>
  <8958134f-25f4-45c6-8285-51e27afdd8e4@gmail.com>
-Content-Language: en-GB, de-DE
-From: Martin Petzold <martin.petzold@tavla.de>
-Organization: TAVLA Technology GmbH
-In-Reply-To: <8958134f-25f4-45c6-8285-51e27afdd8e4@gmail.com>
+ <bb02480c-97aa-4833-86ac-eea737db4f41@tavla.de>
+Content-Language: en-US
+From: Denis Kenzior <denkenz@gmail.com>
+In-Reply-To: <bb02480c-97aa-4833-86ac-eea737db4f41@tavla.de>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 4XjflS2gHTzDvG0
+Content-Transfer-Encoding: 7bit
 
-Dear James,
+Hi Martin,
 
-Am 05.11.24 um 21:05 schrieb James Prestwood:
-> Hi Martin,
->
-> On 11/5/24 11:22 AM, Martin Petzold wrote:
->> Dear Harry,
->>
->> Am 05.11.24 um 19:23 schrieb Harry ten Berge:
->>> On Tue, 5 Nov 2024 at 19:15, Martin Petzold 
->>> <martin.petzold@tavla.de> wrote:
->>>> Hi all,
->>>>
->>>> if I configured my Ethernet interface via systemd-networkd and 
->>>> there is
->>>> NO carrier (no cable connected). But my wifi is configured, managed 
->>>> and
->>>> connected by IWD (EnableNetworkConfiguration=true). In a typical case
->>>> there is no other NTP server configured in timesyncd.conf. How will
->>>> systemd-timesyncd sync the system time?
->>> Is there a specific reason why you have chosen for IWD to handle the
->>> network configuration?
->>> I use IWD in combination with systemd-networkd all the time, and it
->>> works like a charm. In that case systemd-timesyncd also works
->>> 'out-of-the-box.
->>>
->> Thanks, this may be the best approach then. I will switch back to 
->> that configuration. I changed it because, unfortunately, my chip 
->> (driver) does not work well with IWD.
->>
->> However, the mentioned case should be known as a potential problem, 
->> because for this case timesyncd and IWD may not work together well. I 
->> wonder how NTP should be configured in general, if IWD manages a 
->> single wifi only network (maybe even without any systemd). Maybe 
->> there should be some documentation about this case. The wifi guest 
->> network is nothing uncommon. And there are several sources suggesting 
->> also IWD could take over control.
->
-> I think in general, for the average user, NTP works fine with IWD 
-> doing DHCP because a service like ntpd, chrony, or timesyncd will 
-> still utilize external NTP servers to sync the time. Its only for 
-> firewall'd networks blocking NTP where you would run into problems if 
-> its expected that the client should use the NTP server provided over 
-> DHCP.
-I disagree, a FritzBox guest network is a very common setup (we have 
-several testing sites and this is a selected common setup). Port 123 
-could also be blocked in other guest network setups, seems reasonable. 
-So, it should at least be noted in the documentation (single line). If 
-it is required, no idea. But IMHO stand-alone IWD is then nothing really 
-stable. We are not talking about devices connected by cable at a fixed 
-place. With wifi they can be everywhere, in any potential (common) network.
->
-> I actually don't see IWD/ELL doing anything with the NTP DHCP option 
-> so this may be an area for improvement (i.e. advertise it over DBus). 
-> It appears networkd-timesyncd and systemd-netword are closely coupled 
-> as far as support for using an NTP server from DHCP. ntpd/chrony look 
-> to be only statically configurable. So all in all if IWD wants to work 
-> with timesyncd in this fashion its going to require buy in from both 
-> IWD and timesyncd. I also wonder how common this is, or if most 
-> clients just use an external NTP source and ignore what's in the DHCP 
-> exchange.
+> I disagree, a FritzBox guest network is a very common setup (we have several 
+> testing sites and this is a selected common setup). Port 123 could also be 
+> blocked in other guest network setups, seems reasonable. So, it should at least 
+> be noted in the documentation (single line). If it is required, no idea. But 
+> IMHO stand-alone IWD is then nothing really stable. We are not talking about 
+> devices connected by cable at a fixed place. With wifi they can be everywhere, 
+> in any potential (common) network.
 
-In the case as mentioned, time won't be in sync. This can also effect 
-TLS certificates and other time related systemd services.
+It should be fairly trivial to integrate iwd with timesyncd.  If this is 
+important to you, please consider sending a patch.  Documentation patches are 
+also always welcome.
 
-Best regards,
-
-Martin
-
+Regards,
+-Denis
