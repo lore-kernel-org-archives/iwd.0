@@ -1,136 +1,167 @@
-Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
+Received: from mout-b-203.mailbox.org (mout-b-203.mailbox.org [195.10.208.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 719B313B7BC;
-	Sun, 10 Nov 2024 03:55:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F25D1BE4F
+	for <iwd@lists.linux.dev>; Sun, 10 Nov 2024 15:04:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.10.208.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731210905; cv=none; b=HZ5YCCeoWLPsHN+nSuHPMW5jZ+YCbQE++E9ZVY7tgXeyf/++RpXOqK4SkGcEMuQa6vF/Jb6U5LHaJHEYS5omYliOGmcxBExoNcopQRdnp3qqmU97KKJ4MwPk6QWbQjmXezUl0piBRPmzb/oCxZoIITr/kukv4umfeOzUIodxeFE=
+	t=1731251103; cv=none; b=e9QaCpI+QCMmIGpHMox76H8QPKjAm8PcHG8zjr7GlpZhgr63WhaK5Af9SgxRrr+HvBPhMHux5Gkw80B1cDrw5/6EN6mqkr+aER0rHr14g2JlHl/D0IC8hZZZLXOkowqgBZ2OH8m7hfp9OTPVA5aPqNF0ACnR22DZTa4eJFpY3xU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731210905; c=relaxed/simple;
-	bh=PqQcnyg8V33auMLQwEe0FV6Icgntu0K7aMCbM8f/YFE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HZNYILDl6t790xZymfiBObAr18I9qjmmo1R52nIP3l7bmcK5YIrstnQhr3Skt02FPMK/zE4wwdJX+htBCPNPBLZxeUE9jvwLU5LxrUKXcttGr/oHjeHGZvFjc8cICEy8Fb5NtkOScS6gFomCGd5ejbj8M0rVyBFytuoji9hURfY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=XT9UlygI; arc=none smtp.client-ip=144.6.53.87
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+	s=arc-20240116; t=1731251103; c=relaxed/simple;
+	bh=N/N78eVGK365YY4IPr9fryjneEAlSfQ/LnO+EjPHjvA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:Cc:From:
+	 In-Reply-To:Content-Type; b=CmCYMmkBJKLWbGWBi3V0VAGKrnqqP8G99pRKiMkOgtlEA/VDeN8ajf7E6dkiNh0rwahFMdoZ3wUOxAThBSMAvhdEEuM8CMCOeN+Sv/Rqb9YoFyy8bYgtdcdENp/CHTFPYonCrsnzmNHKDFGgS0cYNr+iwTz1+LwFK5MbOtYy+jA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tavla.de; spf=pass smtp.mailfrom=tavla.de; dkim=pass (2048-bit key) header.d=tavla.de header.i=@tavla.de header.b=vvEF/Ahe; arc=none smtp.client-ip=195.10.208.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tavla.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tavla.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="XT9UlygI"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
-	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=vAeXaCJobgMRM5NV9ES7aAhcrkrC2PYPgXPWsXX2FJQ=; b=XT9UlygI+7N2kfSkx4IbqGvTW3
-	c4dU8cWT2um9LbjA9iCVzAC8DapKkB2thqooqq8wyHdDS6D4WHty6Z89Ll/9G+LA+ruyWCYEi2oUK
-	tghAWei4p6f4bf4a58QSKmvxZZ9Z2rzQrHPTkYORRvyYQUTWF3I2eBRYbGAcczXVnlYDNXN353C7D
-	vbCjP9aqVUyi4w2wOhCnJG+W3OgOAS2qR96N+dOpygnKgQ3zjRsb5JlDMlE1vt499aysJ7cRU5dKs
-	yuwiZxoLR5VR6Gi6Ek5ZAsRiCFVkHsFYb4j9QtY+C+kvDF/JciEcvR/2SBofJgn3JyD2wEHrHRJ5b
-	wgKderzA==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1t9z1o-00FkE1-24;
-	Sun, 10 Nov 2024 11:54:21 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sun, 10 Nov 2024 11:54:20 +0800
-Date: Sun, 10 Nov 2024 11:54:20 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Lukas Wunner <lukas@wunner.de>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Klara Modin <klarasmodin@gmail.com>, klara@kasm.eu,
-	Denis Kenzior <denkenz@gmail.com>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Andrew Zaborowski <andrew.zaborowski@intel.com>,
-	Zoltan Kelemen <zoltan@kelemen.se>,
-	Kevin Jones <vcsjones@github.com>, linux-crypto@vger.kernel.org,
-	keyrings@vger.kernel.org, iwd@lists.linux.dev,
-	Eric Biggers <ebiggers@google.com>,
-	Stefan Berger <stefanb@linux.ibm.com>,
-	Tadeusz Struk <tstruk@gigaio.com>,
-	David Howells <dhowells@redhat.com>,
-	Jonathan Cameron <Jonathan.Cameron@huawei.com>,
-	Ignat Korchagin <ignat@cloudflare.com>,
-	Stephan Mueller <smueller@chronox.de>,
-	Varad Gautam <varadgautam@google.com>,
-	Saulo Alessandre <saulo.alessandre@tse.jus.br>
-Subject: Re: [PATCH cryptodev-2.6] crypto: rsassa-pkcs1 - Reinstate support
- for legacy protocols
-Message-ID: <ZzAubO_g5rKQy8Fv@gondor.apana.org.au>
-References: <6dc2b6afd9c4c5e9577acf2448cdcba41378e859.1730193800.git.lukas@wunner.de>
+	dkim=pass (2048-bit key) header.d=tavla.de header.i=@tavla.de header.b="vvEF/Ahe"
+Received: from smtp1.mailbox.org (smtp1.mailbox.org [10.196.197.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mout-b-203.mailbox.org (Postfix) with ESMTPS id 4XmbZ84gGDz9vCm;
+	Sun, 10 Nov 2024 16:04:48 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tavla.de; s=MBO0001;
+	t=1731251088;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=hGTj6nW1wBfedalwvxtGrdmWHqcceQVkH+TM55xQpTA=;
+	b=vvEF/AheKdeCuKrTpUYFjcm4DCrB/ZTXrf23lungHK/4a/Wx3VuXgUCOwmptRxmhAZI/ML
+	aiQYLWMdwBXkdag/63/8eKmnKZwvqUcCKHoXb13b/L7h0cqtIK+P3Dogaf87oDNPYfYeWH
+	Ll0gf269X/29CURWZtuDQb66flXxWGWeGe2TGLQKxKXmiIGSCqa5in8eE/t/JJMtvzoOn+
+	sD6q91ToVXWs7e+pduxWdZfznAAyJF7YMN3qxN1ZHhe01H9hN9z+R8PI2/hzj6I/+wEhFc
+	8bywSk+y4biSVR+Fi+8Dw8RcIHgzOjLX4d7d9wzjDBTyRJQJSDP5PxH/eH0Wiw==
+Message-ID: <942366c2-98ee-4757-b7c8-b9e6c54532aa@tavla.de>
+Date: Sun, 10 Nov 2024 16:04:47 +0100
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <6dc2b6afd9c4c5e9577acf2448cdcba41378e859.1730193800.git.lukas@wunner.de>
+Subject: Re: Calculation / algorithm of the 5 GHz vs. 2.4 GHz network
+ selection
+To: James Prestwood <prestwoj@gmail.com>
+References: <062550db-0b14-4576-9278-7bbb3c35e84c@tavla.de>
+ <500df14d-6e5c-4c4c-abf4-c435bb382bbb@gmail.com>
+Content-Language: en-GB, de-DE
+Cc: "iwd@lists.linux.dev" <iwd@lists.linux.dev>
+From: Martin Petzold <martin.petzold@tavla.de>
+Organization: TAVLA Technology GmbH
+In-Reply-To: <500df14d-6e5c-4c4c-abf4-c435bb382bbb@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Tue, Oct 29, 2024 at 11:24:57AM +0100, Lukas Wunner wrote:
-> Commit 1e562deacecc ("crypto: rsassa-pkcs1 - Migrate to sig_alg backend")
-> enforced that rsassa-pkcs1 sign/verify operations specify a hash
-> algorithm.  That is necessary because per RFC 8017 sec 8.2, a hash
-> algorithm identifier must be prepended to the hash before generating or
-> verifying the signature ("Full Hash Prefix").
-> 
-> However the commit went too far in that it changed user space behavior:
-> KEYCTL_PKEY_QUERY system calls now return -EINVAL unless they specify a
-> hash algorithm.  Intel Wireless Daemon (iwd) is one application issuing
-> such system calls (for EAP-TLS).
-> 
-> Closer analysis of the Embedded Linux Library (ell) used by iwd reveals
-> that the problem runs even deeper:  When iwd uses TLS 1.1 or earlier, it
-> not only queries for keys, but performs sign/verify operations without
-> specifying a hash algorithm.  These legacy TLS versions concatenate an
-> MD5 to a SHA-1 hash and omit the Full Hash Prefix:
-> 
-> https://git.kernel.org/pub/scm/libs/ell/ell.git/tree/ell/tls-suites.c#n97
-> 
-> TLS 1.1 was deprecated in 2021 by RFC 8996, but removal of support was
-> inadvertent in this case.  It probably should be coordinated with iwd
-> maintainers first.
-> 
-> So reinstate support for such legacy protocols by defaulting to hash
-> algorithm "none" which uses an empty Full Hash Prefix.
-> 
-> If it is later on decided to remove TLS 1.1 support but still allow
-> KEYCTL_PKEY_QUERY without a hash algorithm, that can be achieved by
-> reverting the present commit and replacing it with the following patch:
-> 
-> https://lore.kernel.org/r/ZxalYZwH5UiGX5uj@wunner.de/
-> 
-> It's worth noting that Python's cryptography library gained support for
-> such legacy use cases very recently, so they do seem to still be a thing.
-> The Python developers identified IKE version 1 as another protocol
-> omitting the Full Hash Prefix:
-> 
-> https://github.com/pyca/cryptography/issues/10226
-> https://github.com/pyca/cryptography/issues/5495
-> 
-> The author of those issues, Zoltan Kelemen, spent considerable effort
-> searching for test vectors but only found one in a 2019 blog post by
-> Kevin Jones.  Add it to testmgr.h to verify correctness of this feature.
-> 
-> Examination of wpa_supplicant as well as various IKE daemons (libreswan,
-> strongswan, isakmpd, raccoon) has determined that none of them seems to
-> use the kernel's Key Retention Service, so iwd is the only affected user
-> space application known so far.
-> 
-> Fixes: 1e562deacecc ("crypto: rsassa-pkcs1 - Migrate to sig_alg backend")
-> Reported-by: Klara Modin <klarasmodin@gmail.com>
-> Tested-by: Klara Modin <klarasmodin@gmail.com>
-> Closes: https://lore.kernel.org/r/2ed09a22-86c0-4cf0-8bda-ef804ccb3413@gmail.com/
-> Signed-off-by: Lukas Wunner <lukas@wunner.de>
-> ---
->  crypto/asymmetric_keys/public_key.c |  2 +-
->  crypto/rsassa-pkcs1.c               | 20 +++++++++++---
->  crypto/testmgr.c                    |  6 ++++
->  crypto/testmgr.h                    | 55 +++++++++++++++++++++++++++++++++++++
->  4 files changed, 78 insertions(+), 5 deletions(-)
+Hi James,
 
-Patch applied.  Thanks.
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Am 28.10.24 um 12:35 schrieb James Prestwood:
+> Hi Martin,
+>
+> On 10/26/24 12:28 PM, Martin Petzold wrote:
+>> Dear James,
+>>
+>> could you please point me to the calculation / algorithm of the 5 GHz 
+>> vs. 2.4 GHz network selection.
+>
+> In the future you can still ask anything on the mailing list, that way 
+> others can use this info later on. First we separate network selection 
+> and BSS selection. Network selection is simply a MRU (Most Recently 
+> Used):
+>
+> https://git.kernel.org/pub/scm/network/wireless/iwd.git/tree/src/network.c#n235 
+>
+>
+> Once a network is identified the individual BSS is selected. Each BSS 
+> is given a rank which is heavily based on a theoretical data 
+> throughput calculation. This is based on information the BSS 
+> advertises. Basic rates, HT, VHT, EHT information is all used to 
+> derive an estimated data throughput:
+>
+> https://git.kernel.org/pub/scm/network/wireless/iwd.git/tree/src/wiphy.c#n988 
+>
+>
+> Only then does 5GHz and 2.4GHz come into play. There are configurable 
+> weights that can get applied on top of the final rank including a 
+> preference to 2.4GHz, 5GHz, or 6GHz:
+>
+> https://git.kernel.org/pub/scm/network/wireless/iwd.git/tree/src/scan.c#n1700 
+>
+>
+Thanks, I checked already and will do some more calculations.
+
+
+> The modifiers can be configured to prefer one band over the other in 
+> main.conf:
+>
+> [Rank]
+> BandModifier2_4GHz=1
+> BandModifier5GHz=2
+> BandModifier6GHz=3
+>
+> These values will be multiplied by the calculated rank.
+
+Thanks. However, I am not sure if I understand your suggested values 
+right. Therefore, some questions:
+
+1. Would the stated values be something realistic? Or should it actually 
+be decimals?
+
+2. Does your suggestion mean higher ranking for 6 over 5 over 2.4 GHz? 
+These are not the default values, right?
+
+What we observe and would like to improve:
+
+- We have two devices in a building with an enterprise roaming 
+environment (Aruba) with 2.4 an 5 GHz network on the same SSID
+- The building has very thick and obviously radio blocking walls (e.g. I 
+don't have mobile network with my network provider; others have)
+- We have our device and a recent MacBook Pro as a reference device
+- Both devices are more or less at the same (fixed) place
+
+Now we see, that our device (IWD+brcmfmac) almost always connects to the 
+2.4 GHz network (only once I have seen 5 GHz connection). However, in 
+this network the measured data rate is mostly around only 7-10 Mbit/s 
+(in other setups we have 50 Mbit/s = backbone data rate in 2.4 GHz - so 
+everything is working!). Sometimes there are connection losses, but with 
+the latest patches things seem to be rather stable. In the very seldom 
+cases our device connects to the 5GHz network, we have measured 180 Mbit/s.
+
+The MacBook Pro mostly connects to the 5 GHz network (but also seen it 
+on 2.4 GHz) and there we get measure data rates of crazy 280 Mbit/s 
+(more than ours, because our device only has 1x1 MIMO)! However, if the 
+MacBook Pro connects to the 2.4 GHz, the measured data rate also goes 
+down to around 10 Mbit/s.
+
+We don't know exactly why this happens (because usually 2.4 GHz would go 
+better though walls), but maybe it is simple overloading of the 2.4 GHz 
+bandwidth. But, we are not talking about a heavy crowded place. The 
+infrastructure provider does not see any backbone or structural 
+overload. But they are also not really supportive and precise on my 
+questions.
+
+We will now further improve our logs in order to understand the BSS 
+selection better. But as far as I understand this is not easy because 
+IWD does the initial connection, but brcmfmac could then change the BSS 
+during roaming, which we then don't see in IWD event logs (right?). 
+However, we can read out the connected BSS over time and compare.
+
+3. Now I would actually like to give the 5 GHz network a higher 
+preference, BUT without loosing the connection. I am worried about the 
+device getting into a connection loop if I rank the 5 GHz networks a lot 
+higher and then only connections to those BSS take place and maybe fail 
+all the time (in terms of very bad connection and dropping after a short 
+time). Also if I am right, I cannot really influence what brcmfmac does, 
+right? Or will it only roam to same band BSSes?
+
+4. I wonder, why do you somehow rank 2.4 GHz preferred in the default 
+setup. Shouldn't the 5 GHz network always be preferred, if the signal is 
+more or less okay (because there is far more bandwidth available and 
+mostly all legacy devices fill up the 2.4 GHz)?
+
+Thanks,
+
+Martin
+
