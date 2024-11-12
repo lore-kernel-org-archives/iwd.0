@@ -1,216 +1,262 @@
-Received: from mail-oi1-f180.google.com (mail-oi1-f180.google.com [209.85.167.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mout-b-112.mailbox.org (mout-b-112.mailbox.org [195.10.208.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D25915575E
-	for <iwd@lists.linux.dev>; Mon, 11 Nov 2024 13:26:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00AD620E00C
+	for <iwd@lists.linux.dev>; Tue, 12 Nov 2024 09:15:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.10.208.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731331618; cv=none; b=obnR66etwYX6EC1tdajSaBd9I9sFj/d1J8ZREH1xSRti9OzhYnKDAOzzojHyt6n3kn1SnBcROOvL5jj1b0pJN2zat9qmMfMWpGqC4olUu2a1ajkpGWSZxtvoaeko6rlvacfe0PRenlqTWPHY+Jpm3oV7GXWtfoeMCbTyePekdI0=
+	t=1731402940; cv=none; b=LnDfT4pzbkJxjFn0UF+7tE1GFAqWnDhR3f+gdereuHNnNIeq/rJ88of9vjob4usekAfVhtPC3xfkSy1gj66MJsHKJ4tqhMTzw8HnNe2ZTSj+uqyp15UOx6dkbVeY70SwZUG21BAj6WMKZejS1DLxlNPBXxreqkfNNTF9CYQm7n8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731331618; c=relaxed/simple;
-	bh=HJZ37JY17+QlGdjuUZYhbY9+AZmkVx/8wsKBgP8/wb4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=chtcgxanEpbid6SAYG8IilGyaKpCFuo11DiohsYR2+faoP3ba3ZD4FowYl9V8kMcUfYiHd9fEic9PW/NsV51Uk2akqhUES7fe1ycvf93HL8YJOQCjwKV1mzAwj+43T2eqwq1ZUrqJRWPl5XAzKBYnqusIQ1KNLoh7jVNDhUEBWw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jKT7CPE5; arc=none smtp.client-ip=209.85.167.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1731402940; c=relaxed/simple;
+	bh=Vcv7UpjcGbHBeLkZpODPUAyP7NXhEA3F/G+WlfCMi7k=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=LBS+T+Nn/fKYI4MXUveybLJnPtQvXfyRSMButGtRHOh6tZvtoK1v7DdMoh4BbBbBdGy747h8ZhSnWCL0SXyI+zhIHuKaiUNfRSPYWRtXYgwEsOUjcGES1NzLwnsyXJ5530myFRVSd1lGSl018rLMigCpYkT2TkPBmjjX9ad86oE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tavla.de; spf=pass smtp.mailfrom=tavla.de; dkim=pass (2048-bit key) header.d=tavla.de header.i=@tavla.de header.b=uUeZcPg6; arc=none smtp.client-ip=195.10.208.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tavla.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tavla.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jKT7CPE5"
-Received: by mail-oi1-f180.google.com with SMTP id 5614622812f47-3e60fca5350so2596767b6e.2
-        for <iwd@lists.linux.dev>; Mon, 11 Nov 2024 05:26:56 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1731331615; x=1731936415; darn=lists.linux.dev;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=3QvBrY/18k+fUMB0h11zK7i/tGULB7QD5tLiDtBKxtg=;
-        b=jKT7CPE5BsJ3WPVhpoVyi5KykKWDdXs0YXZGhx3MqynQQJHfLHJ8ip2MiB9N2Gd+sd
-         7fwm2TeHsdfOSATHnyIVEmt69WSRJ4f7aOAcjH3JXtvL1L2VcjdjDkvGvuuoReR62K+M
-         lJ/QgQP0eUKQAWXQnsUmJLDE6adiVpOsYGinvtjG+H61zWRlTRp6HUDpwp+zmQdGoSrR
-         yjoMjyTWeGiUeZy6DEu97QlDH95EkeWuuNaLCW8bdRvl+khA0nsXu7AXYpf/X8O6rxTy
-         DqUKXFYfom2ZkEiZQaYSyDZE/Pn6ebdrMNVbOF4ViDybbG5cXBHEGJcJaNxuVWXeBaqr
-         hPIA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731331615; x=1731936415;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=3QvBrY/18k+fUMB0h11zK7i/tGULB7QD5tLiDtBKxtg=;
-        b=SL3QB+EA5lSMZSi/SgXxC5CD9SUwkEPjkskFmh9L+xxwnjumZOJb2e2yj2eTO/XmY5
-         D+MTqDLRr2ljT9qHBX/LiukfSXwn0EK0rneQKI01EO9Qul/1q5cTiXvwUJRwUYrvlaVb
-         dPdg3sgtki8UAFUSVAHPEtDnOweRvYD5lZUSqeIScgIdvyGQ6p9WUeIs+zK0pPWlBWOU
-         Es0CqzJSnE/vsoG9XNz3Y3xKpgFi9CvV5u+crszeqIY7R8uq8yZu5FtbyGNO4lNYALGH
-         SqixNF7mJliE9hC77REOyTAFy1iUB1YqFOoK1m4X9GzT4X/TlYIy+dF8zhm/c9cj2sxC
-         dFMA==
-X-Gm-Message-State: AOJu0Yw7+lR5Zn5Ad7aWHRJbFY0sS4BbPH2FB23sgaaHwE7eqooATMyx
-	c6GtJ4r3Nl/tcVJ/8XLkVRosfq/SifF7SYipxaElPDc0DEw6NcMFePAkXQ==
-X-Google-Smtp-Source: AGHT+IHx6KRkbONe4Bcsuo+//nFx2f1jQhh4loSG9LlxeYCXcHe0/udbUdj2ClAJTvL8oQjrcHb8Ow==
-X-Received: by 2002:a05:6808:18a0:b0:3e5:fa1c:ca6a with SMTP id 5614622812f47-3e79473b7f6mr10546201b6e.36.1731331615339;
-        Mon, 11 Nov 2024 05:26:55 -0800 (PST)
-Received: from [10.123.55.198] ([4.4.136.218])
-        by smtp.gmail.com with ESMTPSA id 5614622812f47-3e78cca4670sm2072363b6e.22.2024.11.11.05.26.54
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 11 Nov 2024 05:26:54 -0800 (PST)
-Message-ID: <3c07574e-5d85-4874-8268-65a9321546f9@gmail.com>
-Date: Mon, 11 Nov 2024 05:26:53 -0800
+	dkim=pass (2048-bit key) header.d=tavla.de header.i=@tavla.de header.b="uUeZcPg6"
+Received: from smtp102.mailbox.org (smtp102.mailbox.org [IPv6:2001:67c:2050:b231:465::102])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mout-b-112.mailbox.org (Postfix) with ESMTPS id 4Xngk60TJszDtJC;
+	Tue, 12 Nov 2024 10:15:26 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tavla.de; s=MBO0001;
+	t=1731402926;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=3crzGgNFLuUjtKEECmqqvjmdjxUgRPnfkLp8cZNK4kw=;
+	b=uUeZcPg6D1gk7rUB82MHtjiNo9go8zkEp/GNtwZ6R3ABCIybhArN5KuMwrjTsidYDXaHOB
+	9scjqrDQP1MN85wHdI3LCNsGFDI1a4mASChnebhWZZSE+klGF2iv+Q4pE5NqLPpCvWweet
+	PeUbNpYxA+7bT7qoInfuOOSR8Uuo+kb9wZXkIgaILNlFXXlyRfi4eoLrAufle/3dP1b+Wy
+	d0SSiLVYt2G5GK8DRdE9Z8tSB/24QWoTtvo/Zw+DiqO9rgIIRkvuOtGmC2MbpJ5HSl3wY8
+	5f2ng4UOJ2j0qMoGWGrxxgZdvTLqQmSxNRQRBsfmJtFawCbkWuzZPMktRNXWSQ==
+Message-ID: <7fa8c348-9834-4a63-a700-eb3117c4ae89@tavla.de>
+Date: Tue, 12 Nov 2024 10:15:24 +0100
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: Calculation / algorithm of the 5 GHz vs. 2.4 GHz network
- selection
-To: Martin Petzold <martin.petzold@tavla.de>
-Cc: "iwd@lists.linux.dev" <iwd@lists.linux.dev>
-References: <062550db-0b14-4576-9278-7bbb3c35e84c@tavla.de>
- <500df14d-6e5c-4c4c-abf4-c435bb382bbb@gmail.com>
- <942366c2-98ee-4757-b7c8-b9e6c54532aa@tavla.de>
-Content-Language: en-US
-From: James Prestwood <prestwoj@gmail.com>
-In-Reply-To: <942366c2-98ee-4757-b7c8-b9e6c54532aa@tavla.de>
+Subject: Re: Connection loss (IWD HEAD with latest OWE / BSS selection
+ patches) - brcmfmac driver
+From: Martin Petzold <martin.petzold@tavla.de>
+To: James Prestwood <prestwoj@gmail.com>
+Cc: iwd@lists.linux.dev, Arend Van Spriel <arend.vanspriel@broadcom.com>
+References: <1147b5a6-883a-43be-a577-f16e9e6351ef@tavla.de>
+ <7dbbd152-f251-414a-8d00-29c08bbb272e@tavla.de>
+ <02bb45e1-cfef-433d-9a83-2b312c1ae064@gmail.com>
+ <6d384377-ee6c-4a5d-8b67-75f367403acd@tavla.de>
+ <d33154fa-9309-4285-a592-9e377e199f43@gmail.com>
+ <57826e6a-8466-4e45-8906-6cb15968bcc8@tavla.de>
+ <e19e7527-9cc1-4c84-95ac-dcb39f836d58@gmail.com>
+ <78437e50-e6b1-4965-bd03-776fcf3c9801@tavla.de>
+ <a64c4733-9011-448c-ab75-8916ff339ac4@gmail.com>
+ <f9ca5733-7cda-4494-8b6d-7a4de4157da2@tavla.de>
+ <f489d856-c788-47c5-8739-325a11d7ff42@gmail.com>
+ <2d245329-365a-42fa-91d3-5f4da7ab846f@tavla.de>
+ <49b9d8b9-2769-4c65-8f10-4ffafc822885@gmail.com>
+ <43124b6c-cb86-4ac3-b632-01ed9322d685@gmail.com>
+ <cadf648a-2bea-4802-951f-2e3267473704@tavla.de>
+Content-Language: en-GB, de-DE
+Organization: TAVLA Technology GmbH
+In-Reply-To: <cadf648a-2bea-4802-951f-2e3267473704@tavla.de>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: 4Xngk60TJszDtJC
 
-Hi Martin,
+Dear James,
 
-On 11/10/24 7:04 AM, Martin Petzold wrote:
-> Hi James,
+Am 05.11.24 um 16:16 schrieb Martin Petzold:
+> Dear James, dear Arend,
 >
-> Am 28.10.24 um 12:35 schrieb James Prestwood:
+> Am 05.11.24 um 14:14 schrieb James Prestwood:
 >> Hi Martin,
 >>
->> On 10/26/24 12:28 PM, Martin Petzold wrote:
->>> Dear James,
+>> On 11/4/24 3:20 PM, James Prestwood wrote:
+>>> Hi Martin,
 >>>
->>> could you please point me to the calculation / algorithm of the 5 
->>> GHz vs. 2.4 GHz network selection.
+>>> On 11/4/24 2:42 PM, Martin Petzold wrote:
+>>>> Dear James,
+>>>>
+>>>> Am 04.11.24 um 13:36 schrieb James Prestwood:
+>>>>>
+>>>>> On 11/3/24 3:13 PM, Martin Petzold wrote:
+>>>>>> Dear James,
+>>>>>>
+>>>>>> Am 25.10.24 um 17:17 schrieb James Prestwood:
+>>>>>>>
+>>>>>>>>>>>>>>>
+>>>>>>>>>>>>>>>
+>>>>>>>>>>>>>>> I open a new thread for this one: During the last weeks 
+>>>>>>>>>>>>>>> I have seen connection losses for 30+ minutes, sometimes 
+>>>>>>>>>>>>>>> even hours or just now even forever (IWD HEAD with v2 
+>>>>>>>>>>>>>>> OWE / BSS selection patches). Driver is brcmfmac (NXP 
+>>>>>>>>>>>>>>> 6.1.36 kernel) and chip is BCM4339 (Laird LWB5).
+>>>>>>>>>>>>>>>
+>>>>>>>>>>>>>>> It happens in a) single router environment (WPA2-PSK; 
+>>>>>>>>>>>>>>> Touchstone TG3442DE), and b) router + repeater 
+>>>>>>>>>>>>>>> environment (WPA2 CCMP; Fritz!Box + Fritz!Repeater), and 
+>>>>>>>>>>>>>>> maybe also in the WPA3 OWE Transition network (yesterday 
+>>>>>>>>>>>>>>> lost a connection again).
+>>>>>>>>>>>>>>
+>>>>>>>>>>>>>> I lost now again 2 of 10 devices in the WPA3 OWE network 
+>>>>>>>>>>>>>> (with roaming). However, now they don't disappear all 
+>>>>>>>>>>>>>> after a shorter while. It seems to be later.
+>>>>>>>>>>>>>>
+>>>>>>>>>>>>>> I also lost one device in a Router+Repeater WPA2 (CCMP) 
+>>>>>>>>>>>>>> network. It is confirmed here on router side, that the 
+>>>>>>>>>>>>>> device is disconnected. Since more than a day.
+>>>>>>>>>>>>>
+>>>>>>>>>>>>> We can't do anything without logs. If you suspect its the 
+>>>>>>>>>>>>> blacklist you can lower the blacklist time down in main.conf:
+>>>>>>>>>>>>>
+>>>>>>>>>>>>> [
+>>>>>>
+>>>>>> I am still losing devices. Sometimes they come back again, but 
+>>>>>> mostly do not re-connect. I have observed the following:
+>>>>>>
+>>>>>> - Connection exists for several hours until about one day, or 
+>>>>>> two. Then gone for several hours or mostly forever.
+>>>>>> - For FritzBox+FritzRepeater I have seen the connection coming 
+>>>>>> back after like a day (here connection loss was also confirmed on 
+>>>>>> router side!)
+>>>>>> - For the Aruba enterprise environment the connection never came 
+>>>>>> back (until now no AP logs - waiting for an answer)
+>>>>>> - After reboot the connection comes back
+>>>>>> - It occurs only in an environment with multiple APs with same 
+>>>>>> SSID (i.e. roaming environment), however my single AP 
+>>>>>> environments have all strong signal
+>>>>>> - Some devices with identical configuration in this environment 
+>>>>>> DO NOT get lost, those seem to have quite strong signal (maybe 
+>>>>>> they don't roam)
+>>>>>> - Other devices in the same environment work without any problems 
+>>>>>> (Intel+NetworkManager) and the APs are Aruba enterprise grade
+>>>>>> - I see almost the same in the Aruba enterprise environment, but 
+>>>>>> ALSO in a FritzBox + FritzRepeater environment
+>>>>>> - We had a bug in our web socket connection, causing to many IWD 
+>>>>>> requests. However, this was fixed. And why are all the other 
+>>>>>> devices okay? Maybe co-incidence with roaming and anything 
+>>>>>> related to dropping and re-connecting web socket connection.
+>>>>>>
+>>>>>> Please find attached my currently available debug logs (they are 
+>>>>>> a few days old, but I am quite sure this is the connection loss 
+>>>>>> situation). These logs are from the FritzBox+FritzRepeater 
+>>>>>> environment. There are no brcmfmac messages (but also no special 
+>>>>>> debug level configured here)!
+>>>>>>
+>>>>>> I have now also disabled WiFi power saving and will deploy to the 
+>>>>>> environment...hoping the best.
+>>>>>>
+>>>>>> Maybe you could check the logs and have an idea?
+>>>>>
+>>>>> Looks like the same thing as the last logs you sent. IWD tries to 
+>>>>> connect (sends CMD_CONNECT to the kernel) but gets no associated 
+>>>>> CMD_CONNECT event after that which causes IWD to wait indefinitely 
+>>>>> for that event. This, again, appears like a driver problem because 
+>>>>> its expected that the kernel tells userspace the result of the 
+>>>>> CMD_CONNECT request.
+>>>>>
+>>>>> Only similarity I can see between the two sets of logs is there is 
+>>>>> a failed connection just prior to the hang. IWD then attempts to 
+>>>>> connect again but the 4-way handshake is never started and this 
+>>>>> results in a failure with status 16 (group key handshake timeout). 
+>>>>> In your latest set of logs IWD actually again tries to connect to 
+>>>>> a different BSS and gets status 16 before trying yet again and 
+>>>>> hanging.
+>>>>>
+>>>>> This actually seems similar to an issue I encountered with ath10k 
+>>>>> where the network interface would time out being brought up. 
+>>>>> Retrying would succeed but the driver would be in a similar state 
+>>>>> where IWD could authenticate/associate but no data frames (i.e. 
+>>>>> 4-way handshake) would be passed to userspace. Only solution 
+>>>>> (until upstream fixed the bug) was to unload/reload the driver 
+>>>>> when we detected this condition.
+>>>>>
+>>>>> If you are able to physically attach to a device currently in this 
+>>>>> state you may be able to get more info. For example if IWD is 
+>>>>> stuck like this try disconnecting/reconnecting with iwctl or 
+>>>>> restarting IWD to see what happens. If you end up in the same 
+>>>>> state right away I'm 99.9% sure the driver is the entire reason 
+>>>>> your running into this.
+>>>>
+>>>> Are you sure? Maybe you could double-check?
+>>> I'm sure.
+>>>>
+>>>> Because my SOM vendor (Variscite) selling a few hundred thousand of 
+>>>> these do not report any issue with this kernel, firmware, and 
+>>>> NetworkManager (wpa_supplicant)...
+>>>
+>>> Because wpa_supplicant sets internal timers for these commands in 
+>>> case the driver is broken. I would expect you would see this exact 
+>>> behavior with wpa_supplicant, it would just disconnect/reconnect 
+>>> after 5 seconds of no response from the kernel. And something like 
+>>> this either a) goes entirely unnoticed and/or b) works well enough 
+>>> for a hardware vendor to ship it to customers and not care.
+>>>
+>>> This is the commit adding these timers to wpa_supplicant:
+>>>
+>>> commit e29853bbff1eef781099a9108e3b51f26b477ac3
+>>> Author: Ben Greear <greearb@candelatech.com>
+>>> Date:   Thu Feb 24 16:59:46 2011 +0200
+>>>
+>>>     SME: Add timers for authentication and asscoiation
+>>>
+>>>     mac80211 authentication or association operation may get stuck 
+>>> for some
+>>>     reasons, so wpa_supplicant better use an internal timer to 
+>>> recover from
+>>>     this.
+>>>
+>>>     Signed-off-by: Ben Greear <greearb@candelatech.com>
+>>>
+>>> I wish it surprised me that 13 years later this behavior still 
+>>> happens... We don't like adding special driver workarounds like this 
+>>> in IWD because a) it becomes difficult to maintain and b) it just 
+>>> hides the root cause and nobody ever fixes it. But my opinions 
+>>> aside, for a driver like brcmfmac which is very mainstream, I guess 
+>>> we have no choice but to adapt IWD to work around it like 
+>>> wpa_supplicant does.
+>>>
+>>> Thanks,
+>>>
+>>> James
 >>
->> In the future you can still ask anything on the mailing list, that 
->> way others can use this info later on. First we separate network 
->> selection and BSS selection. Network selection is simply a MRU (Most 
->> Recently Used):
->>
->> https://git.kernel.org/pub/scm/network/wireless/iwd.git/tree/src/network.c#n235 
->>
->>
->> Once a network is identified the individual BSS is selected. Each BSS 
->> is given a rank which is heavily based on a theoretical data 
->> throughput calculation. This is based on information the BSS 
->> advertises. Basic rates, HT, VHT, EHT information is all used to 
->> derive an estimated data throughput:
->>
->> https://git.kernel.org/pub/scm/network/wireless/iwd.git/tree/src/wiphy.c#n988 
->>
->>
->> Only then does 5GHz and 2.4GHz come into play. There are configurable 
->> weights that can get applied on top of the final rank including a 
->> preference to 2.4GHz, 5GHz, or 6GHz:
->>
->> https://git.kernel.org/pub/scm/network/wireless/iwd.git/tree/src/scan.c#n1700 
->>
->>
-> Thanks, I checked already and will do some more calculations.
+>> I've sent a patch to the list which sets a timer within IWD in case 
+>> the connect event never arrives. Note that I cannot test this beyond 
+>> manually commenting out code to "trick" IWD into thinking this 
+>> happens. Applying that patch to the brcmfmac client your using is 
+>> going to be the true test.
 >
+> I may be able to test it, however only together with wifi power save 
+> disabled (I also prepared NetworkManager branch, because the customer 
+> will kill me otherwise).
 >
->> The modifiers can be configured to prefer one band over the other in 
->> main.conf:
->>
->> [Rank]
->> BandModifier2_4GHz=1
->> BandModifier5GHz=2
->> BandModifier6GHz=3
->>
->> These values will be multiplied by the calculated rank.
->
-> Thanks. However, I am not sure if I understand your suggested values 
-> right. Therefore, some questions:
->
-> 1. Would the stated values be something realistic? Or should it 
-> actually be decimals?
->
-> 2. Does your suggestion mean higher ranking for 6 over 5 over 2.4 GHz? 
-> These are not the default values, right?
+> @Arent: Maybe you could check all this, as it seems to be related to 
+> some brcmfmac state. Just now I cannot provide logs, and your debug 
+> level for brcmfmac produces a lot lot of data, which I somehow also 
+> need to handle (limited space).
 
-These are not suggested values, just an example. You will have to decide 
-what works for you. IWD will do its normal ranking calculation and come 
-up with some number, R. Then:
+With this patch and power save disabled, we have a better connection, 
+but still carrier losses several times a day (sometimes minutes, 
+sometimes hours). We think this is still due to driver / daemon. We have 
+checked AP logs and the infrastructure is Aruba. We will try to get some 
+more debug logs from that environment.
 
-if (2.4 GHz) {
-    R = R * BandModifier2_4GHz;
-else if (5 GHz) {
-    R = R * BandModifier5GHz;
-...
+My feeling is somehow, there could maybe still be a corner-case related 
+to BSS selection in WPA3 OWE. Or it is about failed roamings of the driver.
+
+We will now a) upgrade to 6.6x kernel (driver) and b) add another wifi 
+chip (NXP IW611) to our board and test that one too.
+
+@James: Do you know if NXP IW611 works well with IWD?
+
+Thanks,
+
+Martin
 
 
->
-> What we observe and would like to improve:
->
-> - We have two devices in a building with an enterprise roaming 
-> environment (Aruba) with 2.4 an 5 GHz network on the same SSID
-> - The building has very thick and obviously radio blocking walls (e.g. 
-> I don't have mobile network with my network provider; others have)
-> - We have our device and a recent MacBook Pro as a reference device
-> - Both devices are more or less at the same (fixed) place
->
-> Now we see, that our device (IWD+brcmfmac) almost always connects to 
-> the 2.4 GHz network (only once I have seen 5 GHz connection). However, 
-> in this network the measured data rate is mostly around only 7-10 
-> Mbit/s (in other setups we have 50 Mbit/s = backbone data rate in 2.4 
-> GHz - so everything is working!). Sometimes there are connection 
-> losses, but with the latest patches things seem to be rather stable. 
-> In the very seldom cases our device connects to the 5GHz network, we 
-> have measured 180 Mbit/s.
->
-> The MacBook Pro mostly connects to the 5 GHz network (but also seen it 
-> on 2.4 GHz) and there we get measure data rates of crazy 280 Mbit/s 
-> (more than ours, because our device only has 1x1 MIMO)! However, if 
-> the MacBook Pro connects to the 2.4 GHz, the measured data rate also 
-> goes down to around 10 Mbit/s.
->
-> We don't know exactly why this happens (because usually 2.4 GHz would 
-> go better though walls), but maybe it is simple overloading of the 2.4 
-> GHz bandwidth. But, we are not talking about a heavy crowded place. 
-> The infrastructure provider does not see any backbone or structural 
-> overload. But they are also not really supportive and precise on my 
-> questions.
-So I would say you might want to modify the BandModifier5GHz value to 
-something like 1.1 or 1.2 (10% or 20% increase in rank for 5GHz 
-networks). Without seeing the actual ranking numbers though, I'm just 
-guessing.
->
-> We will now further improve our logs in order to understand the BSS 
-> selection better. But as far as I understand this is not easy because 
-> IWD does the initial connection, but brcmfmac could then change the 
-> BSS during roaming, which we then don't see in IWD event logs 
-> (right?). However, we can read out the connected BSS over time and 
-> compare.
->
-> 3. Now I would actually like to give the 5 GHz network a higher 
-> preference, BUT without loosing the connection. I am worried about the 
-> device getting into a connection loop if I rank the 5 GHz networks a 
-> lot higher and then only connections to those BSS take place and maybe 
-> fail all the time (in terms of very bad connection and dropping after 
-> a short time). Also if I am right, I cannot really influence what 
-> brcmfmac does, right? Or will it only roam to same band BSSes?
-As far as roaming no, you can't influence brcmfmac. IWD does get 
-notified when the firmware roams, but has no control over it.
->
-> 4. I wonder, why do you somehow rank 2.4 GHz preferred in the default 
-> setup. Shouldn't the 5 GHz network always be preferred, if the signal 
-> is more or less okay (because there is far more bandwidth available 
-> and mostly all legacy devices fill up the 2.4 GHz)?
-Its based on the rank that IWD calculates for each BSS. For two BSS's 
-that advertise the _exact_ same capabilities it comes down entirely to 
-RSSI. Otherwise its heavily influenced by capabilities advertised. 
-Basically the theoretical speed that it can support, which does take 
-RSSI into account. Since 2.4GHz has much better penetration I'm assuming 
-those BSS just have much better RSSI than 5GHz, but I can't say for sure 
-without seeing logs. Its very easy to read the logs and see what IWD 
-ranked each BSS.
->
-> Thanks,
->
-> Martin
->
