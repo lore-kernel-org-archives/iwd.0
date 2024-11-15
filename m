@@ -1,236 +1,116 @@
-Received: from mail-qv1-f47.google.com (mail-qv1-f47.google.com [209.85.219.47])
+Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D21161F892A
-	for <iwd@lists.linux.dev>; Thu, 14 Nov 2024 13:05:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A3B12BB1B;
+	Fri, 15 Nov 2024 01:43:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.75.126.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731589545; cv=none; b=VRTUg2+wAL5hE8c0jcwCqlULFx1Ri8ADIiAGB5XcxUQTomfkmdyoSSptootFjcIzniE8fImafkPXGvUt8Db9m/je10Y5Eb5mfUk2oOz7bmzXfPd7Fq3HeOAMBaJ0o8mWDpMH9I5k8uWqZPUjAcqwaJ4ymBYh225oXLnDX+D5EcI=
+	t=1731634998; cv=none; b=nlojkvi4ec7AINNiWAP/OegM1D9ZP4U0gL8jdXgATcpebScfiETVgjiaqCJgwJHXxiuqDrcJBsphJNh0K7ay20KiQNXVDGVMCVY5NneJydf8dbLxMGbMjkynUgwT2/BLYTuGmR1mzUo0l7hKpM4ba/33jsTwsWdkuNLnr7zoYD8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731589545; c=relaxed/simple;
-	bh=03pVQOsqjc+ihn8R9Go+2ucelPDmfRs09TW2p/sUvi4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Ar+wPP+QN+TT9uqYyuysXmNRi1QKk6JRjYxDoFPRPLyYDBRrolF7jA+aVTy9v7oO4oQhDfpk16ZnjY+Qp9FdsopFGvsZWDWV7EMFczvbF6chRuXnap5M7G5ILYcGQ0RAztBTAo4i33X1bWs91WJq/29OcRH+SNR3IpalwLB+vEA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JacvCYXo; arc=none smtp.client-ip=209.85.219.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1731634998; c=relaxed/simple;
+	bh=GDlt42d7/5pNQcs675FfdtqS5zICZGcrKhjVSsY59Sg=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=aefM0QC0zfbUq5CdQODhAc9NMAXKdGWfX/NbJEf2yvWRUBB+N7TfMMkqdAc80CvElKR5/02doAikxE8TuJZkgjoWMyvGY3kx97R+iG9tdwjuWDDGlzb/ZC1bBu+8YM/fW4Yt6XUwtxDB/8G0lf1Zc6vnR/Y/miTlh/VRY70j7Us=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com; spf=pass smtp.mailfrom=realtek.com; dkim=temperror (0-bit key) header.d=realtek.com header.i=@realtek.com header.b=bFzAC11C; arc=none smtp.client-ip=211.75.126.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=realtek.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JacvCYXo"
-Received: by mail-qv1-f47.google.com with SMTP id 6a1803df08f44-6ce3fc4e58bso3378886d6.0
-        for <iwd@lists.linux.dev>; Thu, 14 Nov 2024 05:05:43 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1731589543; x=1732194343; darn=lists.linux.dev;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=NN8OwI9ZXG1Q3BR0z5YzegWZISJzOoW0OKggYiGEENY=;
-        b=JacvCYXow0w7emkltj42xP+25hsZ6jKjlqfKQIpPqdrA5f8KG9z60Sc8SZhiwkbfw/
-         n5jJD7CwGTVrtn7kFSzjRiZZc4f/kexZ4npHA4wzmABb2lJLr3pcyRXtYk6t5/KnCpc0
-         22tFKldR5i0eiYL2NdC9oUd6iN0oEzQ8L9jIP8vOWExNIZ2Pu0iRjdzSuK1A0HZFcld/
-         CdY4dAjuGewVMOB3MASsPmPX0j1qPQNgeNJU5tlU3J5TurJSBp9Lit3x8jQ/DawJ6D7r
-         xP0EXFKS/bwNF4Xa6A4zYetAzEDlvqaaG6AdcL8hCZxrtmZhhDv45MVybSTU0OCuA5GX
-         CNUQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731589543; x=1732194343;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=NN8OwI9ZXG1Q3BR0z5YzegWZISJzOoW0OKggYiGEENY=;
-        b=wLIwY/nD903YiF4vp9OYk8guK4cGYihrymCOT91XwE/8WQD2cySf/nmxOGfW/DCJrR
-         sf0VU9X2WSfkcfhe+5o4rP59/K4rcaF/yC0QU27NplVR4p+RHePiUqksHkGUQ9az14u1
-         fpfg0KXF6E56LBvjB2yFp4llJ35kA0mTuTrd9CAeX8KIHgYtZZF20x3RLv0cETyAZ9UI
-         qNhNss7j/bvMr1/GMd+8NyVKOamzzHNg8UD88zQFRBOCGWlFkCpMBkN7lQofj/SjRg0T
-         hz5lV7XZjxIFguiShljmX4WO5GL4SXUDY5Gk5tVO2k3nFM4DrprdaU8gqioz6J6wzkRh
-         1zTQ==
-X-Forwarded-Encrypted: i=1; AJvYcCW42VPs4YqVs5O36gwfGhuI7gHB07K4kmhr9+OwIGQhGCQ4jbIiq2fkhYenm7Jd5fyouUc=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yxz02EEg9ZJgn4B+9MeqH2Whuw7654ZW2YjYxDigH6vc/bEtI0f
-	E+GdhlH+ZV0R5sLYIpKf2nE44AXDS6r/wGUI6X0pAsrU3bnvtcoa
-X-Google-Smtp-Source: AGHT+IFiUH5MnyfeW9nYEwRUTtURU1g2uQ8y6dF5acQF9VeFvP/r5AsAqGv70gNbq2g/eHMypq0TSA==
-X-Received: by 2002:a05:6214:5245:b0:6d1:9f1b:587c with SMTP id 6a1803df08f44-6d3dd080505mr76133276d6.46.1731589542684;
-        Thu, 14 Nov 2024 05:05:42 -0800 (PST)
-Received: from [10.100.121.195] ([152.193.78.90])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6d3ee771d69sm5206336d6.15.2024.11.14.05.05.41
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 14 Nov 2024 05:05:42 -0800 (PST)
-Message-ID: <83d2b40c-3c24-47b3-8e76-7f5778f843f5@gmail.com>
-Date: Thu, 14 Nov 2024 05:05:39 -0800
+	dkim=temperror (0-bit key) header.d=realtek.com header.i=@realtek.com header.b="bFzAC11C"
+X-SpamFilter-By: ArmorX SpamTrap 5.78 with qID 4AF1h5t853893230, This message is accepted by code: ctloc85258
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=realtek.com; s=dkim;
+	t=1731634985; bh=GDlt42d7/5pNQcs675FfdtqS5zICZGcrKhjVSsY59Sg=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:Content-Transfer-Encoding:MIME-Version;
+	b=bFzAC11CQeCSkcEE9oc9njI7Dm4ynAl6e8Jj67BKUU9FI1uXzUZCms95RHYmVUZh0
+	 jjaVc+YZ337aYj9DE+ZCvn4brbT4klbU+ouZXsL0PSnwpeVwT9+yb1m7RseCJI+P/p
+	 dy95zngf7C6no85L8RjcEZ1sdMAWNFlZe9+ebmStpUYIzLmJ5kMsn4EDHV7s5nc0DP
+	 vDw5ny1RRSlSb56e1Gkfaj5RYGmz8Djse4qMVYpBWxKaSG9dMkPhSMjFr8Uc/QOyEJ
+	 JXJFlaxD15Tv0p/EURZF+FUSRQ1ceKJA6LvMApuEaQeg4w9C8VJLBMfOvOxcBXgVdM
+	 Un2MWQpqxQRzg==
+Received: from mail.realtek.com (rtexh36506.realtek.com.tw[172.21.6.27])
+	by rtits2.realtek.com.tw (8.15.2/3.06/5.92) with ESMTPS id 4AF1h5t853893230
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 15 Nov 2024 09:43:05 +0800
+Received: from RTEXMBS02.realtek.com.tw (172.21.6.95) by
+ RTEXH36506.realtek.com.tw (172.21.6.27) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Fri, 15 Nov 2024 09:43:06 +0800
+Received: from RTEXMBS04.realtek.com.tw (172.21.6.97) by
+ RTEXMBS02.realtek.com.tw (172.21.6.95) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Fri, 15 Nov 2024 09:43:06 +0800
+Received: from RTEXMBS04.realtek.com.tw ([fe80::2882:4142:db9:db1f]) by
+ RTEXMBS04.realtek.com.tw ([fe80::2882:4142:db9:db1f%11]) with mapi id
+ 15.01.2507.035; Fri, 15 Nov 2024 09:43:06 +0800
+From: Ping-Ke Shih <pkshih@realtek.com>
+To: Philipp Matthias Hahn <pmhahn@pmhahn.de>,
+        "iwd@lists.linux.dev"
+	<iwd@lists.linux.dev>,
+        "linux-wireless@vger.kernel.org"
+	<linux-wireless@vger.kernel.org>
+CC: Kalle Valo <kvalo@kernel.org>
+Subject: RE: rtw89_8852ce + iwd stuck in (dis-)connect/-auth loop
+Thread-Topic: rtw89_8852ce + iwd stuck in (dis-)connect/-auth loop
+Thread-Index: AQHbNnQ/ZUJD8BdTHk+7WdyaMn+QrbK3jqAw
+Date: Fri, 15 Nov 2024 01:43:06 +0000
+Message-ID: <eecdb8b482f947aaabd08a4a02913bfc@realtek.com>
+References: <ZzW9IIrc-HYQuD6-@birdy.pmhahn.de>
+In-Reply-To: <ZzW9IIrc-HYQuD6-@birdy.pmhahn.de>
+Accept-Language: en-US, zh-TW
+Content-Language: zh-TW
+x-kse-serverinfo: RTEXMBS02.realtek.com.tw, 9
+x-kse-antispam-interceptor-info: fallback
+x-kse-antivirus-interceptor-info: fallback
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: rtw89_8852ce + iwd stuck in (dis-)connect/-auth loop
-To: Philipp Matthias Hahn <pmhahn@pmhahn.de>, iwd@lists.linux.dev,
- linux-wireless@vger.kernel.org
-Cc: Ping-Ke Shih <pkshih@realtek.com>, Kalle Valo <kvalo@kernel.org>
-References: <ZzW9IIrc-HYQuD6-@birdy.pmhahn.de>
-Content-Language: en-US
-From: James Prestwood <prestwoj@gmail.com>
-In-Reply-To: <ZzW9IIrc-HYQuD6-@birdy.pmhahn.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+X-KSE-AntiSpam-Interceptor-Info: fallback
 
-Hi Philipp,
-
-On 11/14/24 1:04 AM, Philipp Matthias Hahn wrote:
-> Hello,
->
-> I finally switched from `wpa_supplicant` to `iwd` after having regular
-> issues with connectivity issues, so the following problem is probably
-> not related to `iwd` at all.
->
-> APs:
-> - FRITZ!Box 7490 one
->    - 34:31:C4:27:99:ED (2.4 GHz)
->    - 34:31:C4:27:99:EE (5 Ghz)
-> - FRITZ!Box 7490 two
->    - E8:DF:70:4A:46:AB (2.4 GHz)
->    - E8:DF:70:4A:46:AC (5 GHz)
-> - FRITZ!Powerline 1260E
->    - F0:B0:14:88:AC:43 (2.4 GHz)
->    - F0:B0:14:88:AC:47 (5 GHz)
-> - FRITZ!Powerline 540E
->    - 5C:49:79:E1:C5:94 (2.4 GHz)
->
-> Debian-12-Buster
-> iwd original: 2.3, now: 3.1 self-compiled
-> Linux 6.10.11
-> 04:00.0 Ethernet controller [0200]: Realtek Semiconductor Co., Ltd. RTL8111/8168/8411 PCI Express Gigabit Ethernet Controller [10ec:8168] (rev 15)
->          Subsystem: Hewlett-Packard Company RTL8111/8168/8211/8411 PCI Express Gigabit Ethernet Controller [103c:8b7c]
->          Control: I/O+ Mem+ BusMaster+ SpecCycle- MemWINV- VGASnoop- ParErr- Stepping- SERR- FastB2B- DisINTx+
->          Status: Cap+ 66MHz- UDF- FastB2B- ParErr- DEVSEL=fast >TAbort- <TAbort- <MAbort- >SERR- <PERR- INTx-
->          Latency: 0, Cache Line Size: 64 bytes
->          Interrupt: pin A routed to IRQ 19
->          IOMMU group: 16
->          Region 0: I/O ports at 3000 [size=256]
->          Region 2: Memory at 80804000 (64-bit, non-prefetchable) [size=4K]
->          Region 4: Memory at 80800000 (64-bit, non-prefetchable) [size=16K]
->          Capabilities: <access denied>
->          Kernel driver in use: r8169
->          Kernel modules: r8169
->
-> After a suspend (to RAM) overnight the connection cannot be
-> re-established and `iwd` is stuck in a re-connect/-auth loop:
-Maybe someone more familiar with this driver specifically can comment, 
-but historically on the mailing list I have seen a number of issues 
-surrounding suspend/resume with wifi drivers.
->
-> Nov 14 09:11:35 phahn iwd[179340]: event: state, old: disconnected, new: autoconnect_quick
-> Nov 14 09:11:36 phahn iwd[179340]: udev interface=wlan0 ifindex=14
-> Nov 14 09:11:36 phahn iwd[179340]: event: connect-info, ssid: WBP4a Hahn +491702827535, bss: 34:31:c4:27:99:ee, signal: -78, load: 1/255
-> Nov 14 09:11:36 phahn iwd[179340]: event: state, old: autoconnect_quick, new: connecting (auto)
-> Nov 14 09:11:37 phahn iwd[179340]: event: state, old: connecting (auto), new: connected
-> Nov 14 09:11:46 phahn iwd[179340]: Received Deauthentication event, reason: 4, from_ap: false
-> Nov 14 09:11:46 phahn iwd[179340]: event: disconnect-info, reason: 4
-> Nov 14 09:11:46 phahn iwd[179340]: event: state, old: connected, new: disconnected
-> Nov 14 09:11:46 phahn iwd[179340]: event: state, old: disconnected, new: autoconnect_quick
-> Nov 14 09:11:47 phahn iwd[179340]: event: connect-info, ssid: WBP4a Hahn +491702827535, bss: f0:b0:14:88:ac:43, signal: -62, load: 23/255
-> Nov 14 09:11:47 phahn iwd[179340]: event: state, old: autoconnect_quick, new: connecting (auto)
-> Nov 14 09:11:47 phahn iwd[179340]: event: state, old: connecting (auto), new: connected
-> Nov 14 09:11:50 phahn iwd[179340]: Received Deauthentication event, reason: 4, from_ap: false
-> Nov 14 09:11:50 phahn iwd[179340]: event: disconnect-info, reason: 4
-> Nov 14 09:11:50 phahn iwd[179340]: event: state, old: connected, new: disconnected
-> Nov 14 09:11:50 phahn iwd[179340]: event: state, old: disconnected, new: autoconnect_quick
-> Nov 14 09:11:51 phahn iwd[179340]: event: connect-info, ssid: WBP4a Hahn +491702827535, bss: f0:b0:14:88:ac:43, signal: -56, load: 34/255
-> Nov 14 09:11:51 phahn iwd[179340]: event: state, old: autoconnect_quick, new: connecting (auto)
-> Nov 14 09:11:51 phahn iwd[179340]: event: state, old: connecting (auto), new: connected
-> Nov 14 09:11:56 phahn iwd[179340]: Received Deauthentication event, reason: 4, from_ap: false
-> Nov 14 09:11:56 phahn iwd[179340]: event: disconnect-info, reason: 4
-> Nov 14 09:11:56 phahn iwd[179340]: event: state, old: connected, new: disconnected
-> Nov 14 09:11:56 phahn iwd[179340]: event: state, old: disconnected, new: autoconnect_quick
-> Nov 14 09:11:57 phahn iwd[179340]: event: connect-info, ssid: WBP4a Hahn +491702827535, bss: 5c:49:79:e1:c5:94, signal: -61, load: 27/255
-> Nov 14 09:11:57 phahn iwd[179340]: event: state, old: autoconnect_quick, new: connecting (auto)
-> Nov 14 09:11:57 phahn iwd[179340]: event: state, old: connecting (auto), new: connected
-> Nov 14 09:12:03 phahn iwd[179340]: Received Deauthentication event, reason: 4, from_ap: false
-> Nov 14 09:12:03 phahn iwd[179340]: event: disconnect-info, reason: 4
-> Nov 14 09:12:03 phahn iwd[179340]: event: state, old: connected, new: disconnected
-> Nov 14 09:12:03 phahn iwd[179340]: event: state, old: disconnected, new: autoconnect_quick
-> Nov 14 09:12:04 phahn iwd[179340]: event: connect-info, ssid: WBP4a Hahn +491702827535, bss: f0:b0:14:88:ac:43, signal: -57, load: 33/255
-> Nov 14 09:12:04 phahn iwd[179340]: event: state, old: autoconnect_quick, new: connecting (auto)
-> Nov 14 09:12:04 phahn iwd[179340]: event: state, old: connecting (auto), new: connected
-> Nov 14 09:12:07 phahn iwd[179340]: Received Deauthentication event, reason: 4, from_ap: false
-> Nov 14 09:12:07 phahn iwd[179340]: event: disconnect-info, reason: 4
-> Nov 14 09:12:07 phahn iwd[179340]: event: state, old: connected, new: disconnected
-> Nov 14 09:12:07 phahn iwd[179340]: event: state, old: disconnected, new: autoconnect_quick
-> Nov 14 09:12:08 phahn iwd[179340]: event: connect-info, ssid: WBP4a Hahn +491702827535, bss: f0:b0:14:88:ac:43, signal: -55, load: 40/255
-> Nov 14 09:12:08 phahn iwd[179340]: event: state, old: autoconnect_quick, new: connecting (auto)
-> Nov 14 09:12:08 phahn iwd[179340]: event: state, old: connecting (auto), new: connected
-> Nov 14 09:12:16 phahn iwd[179340]: event: state, old: connected, new: disconnecting
-> Nov 14 09:12:16 phahn iwd[179340]: event: state, old: disconnecting, new: disconnected
->
-> Here's the dump of the kernel log:
->
-> [87572.028075] wlan0: authenticate with 34:31:c4:27:99:ee (local address=40:1a:58:f6:ca:6f)
-> [87572.028079] wlan0: send auth to 34:31:c4:27:99:ee (try 1/3)
-> [87572.031085] wlan0: authenticated
-> [87572.036527] wlan0: associate with 34:31:c4:27:99:ee (try 1/3)
-> [87572.039534] wlan0: RX AssocResp from 34:31:c4:27:99:ee (capab=0x1511 status=0 aid=2)
-> [87572.158153] wlan0: associated
-> [87572.158264] wlan0: Limiting TX power to 20 (23 - 3) dBm as advertised by 34:31:c4:27:99:ee
-> [87581.686018] wlan0: Connection to AP 34:31:c4:27:99:ee lost
-> [87582.508317] wlan0: authenticate with f0:b0:14:88:ac:43 (local address=40:1a:58:f6:ca:6f)
-> [87582.508323] wlan0: send auth to f0:b0:14:88:ac:43 (try 1/3)
-> [87582.517681] wlan0: authenticated
-> [87582.524152] wlan0: associate with f0:b0:14:88:ac:43 (try 1/3)
-> [87582.530272] wlan0: RX AssocResp from f0:b0:14:88:ac:43 (capab=0x1431 status=0 aid=7)
-> [87582.646537] wlan0: associated
-> [87582.646704] wlan0: Limiting TX power to 20 (20 - 0) dBm as advertised by f0:b0:14:88:ac:43
-> [87585.790526] wlan0: Connection to AP f0:b0:14:88:ac:43 lost
-> [87586.681575] wlan0: authenticate with f0:b0:14:88:ac:43 (local address=40:1a:58:f6:ca:6f)
-> [87586.681579] wlan0: send auth to f0:b0:14:88:ac:43 (try 1/3)
-> [87586.684607] wlan0: authenticated
-> [87586.685919] wlan0: associate with f0:b0:14:88:ac:43 (try 1/3)
-> [87586.691733] wlan0: RX AssocResp from f0:b0:14:88:ac:43 (capab=0x1431 status=0 aid=7)
-> [87586.806412] wlan0: associated
-> [87586.811404] wlan0: Limiting TX power to 20 (20 - 0) dBm as advertised by f0:b0:14:88:ac:43
-> [87591.935894] wlan0: Connection to AP f0:b0:14:88:ac:43 lost
-> [87592.828319] wlan0: authenticate with 5c:49:79:e1:c5:94 (local address=40:1a:58:f6:ca:6f)
-> [87592.828324] wlan0: send auth to 5c:49:79:e1:c5:94 (try 1/3)
-> [87592.831876] wlan0: authenticated
-> [87592.834046] wlan0: associate with 5c:49:79:e1:c5:94 (try 1/3)
-> [87592.844654] wlan0: RX AssocResp from 5c:49:79:e1:c5:94 (capab=0x1431 status=0 aid=1)
-> [87592.962487] wlan0: associated
-> [87592.962615] wlan0: Limiting TX power to 20 (20 - 0) dBm as advertised by 5c:49:79:e1:c5:94
-> [87598.534139] wlan0: Connection to AP 5c:49:79:e1:c5:94 lost
-> [87599.413011] wlan0: authenticate with f0:b0:14:88:ac:43 (local address=40:1a:58:f6:ca:6f)
-> [87599.413015] wlan0: send auth to f0:b0:14:88:ac:43 (try 1/3)
-> [87599.416010] wlan0: authenticated
-> [87599.418127] wlan0: associate with f0:b0:14:88:ac:43 (try 1/3)
-> [87599.428534] wlan0: RX AssocResp from f0:b0:14:88:ac:43 (capab=0x1431 status=0 aid=7)
-> [87599.542784] wlan0: associated
-> [87599.542912] wlan0: Limiting TX power to 20 (20 - 0) dBm as advertised by f0:b0:14:88:ac:43
-> [87603.006507] wlan0: Connection to AP f0:b0:14:88:ac:43 lost
-> [87603.894465] wlan0: authenticate with f0:b0:14:88:ac:43 (local address=40:1a:58:f6:ca:6f)
-> [87603.894470] wlan0: send auth to f0:b0:14:88:ac:43 (try 1/3)
-> [87603.897501] wlan0: authenticated
-> [87603.902232] wlan0: associate with f0:b0:14:88:ac:43 (try 1/3)
-> [87603.909625] wlan0: RX AssocResp from f0:b0:14:88:ac:43 (capab=0x1431 status=0 aid=7)
-> [87604.022839] wlan0: associated
-> [87604.022904] wlan0: Limiting TX power to 20 (20 - 0) dBm as advertised by f0:b0:14:88:ac:43
-> [87611.261845] wlan0: deauthenticating from f0:b0:14:88:ac:43 by local choice (Reason: 3=DEAUTH_LEAVING)
->
-> I have seen that "Limiting TX power to …" before with `wpa_supplicant`,
-> which also lead to a disconnect there, which triggered me to try `iwd`
-> now.
->
-> Last time unloading `rtw89_8852ce` and re-loading it did get it, but
-> only after switching Wifi off and on again in NetworkManager.
-Seems like a driver issue to me. As you said, I suspect you would see 
-the exact same behavior with wpa_supplicant as you see here.
->
-> If you need more data, just tell we what you need.
->
-> I'm not afraid of compiling my own Linux kernel if that is needed.
-> I already switched from the regular Debian-12-Buster-Kernel 6.1.115 to
-> Debian's backports kernel 6.11 as the original kernel did not have the
-> `rtw89_8852ce` driver; I tried <https://github.com/lwfinger/rtw89> back
-> then, but did not get it working properly, which prompted me to switch
-> to the bpo kernel, which was easier.
->
-> PS: I'm not subscribed to to both `iwd` and `linux-wireless` lists.
->
-> Thanks in advance
-> Philipp Hahn
->
+UGhpbGlwcCBNYXR0aGlhcyBIYWhuIDxwbWhhaG5AcG1oYWhuLmRlPiB3cm90ZToNCj4gSGVsbG8s
+DQo+IA0KPiBJIGZpbmFsbHkgc3dpdGNoZWQgZnJvbSBgd3BhX3N1cHBsaWNhbnRgIHRvIGBpd2Rg
+IGFmdGVyIGhhdmluZyByZWd1bGFyDQo+IGlzc3VlcyB3aXRoIGNvbm5lY3Rpdml0eSBpc3N1ZXMs
+IHNvIHRoZSBmb2xsb3dpbmcgcHJvYmxlbSBpcyBwcm9iYWJseQ0KPiBub3QgcmVsYXRlZCB0byBg
+aXdkYCBhdCBhbGwuDQo+IA0KPiBBUHM6DQo+IC0gRlJJVFohQm94IDc0OTAgb25lDQo+ICAgLSAz
+NDozMTpDNDoyNzo5OTpFRCAoMi40IEdIeikNCj4gICAtIDM0OjMxOkM0OjI3Ojk5OkVFICg1IEdo
+eikNCj4gLSBGUklUWiFCb3ggNzQ5MCB0d28NCj4gICAtIEU4OkRGOjcwOjRBOjQ2OkFCICgyLjQg
+R0h6KQ0KPiAgIC0gRTg6REY6NzA6NEE6NDY6QUMgKDUgR0h6KQ0KPiAtIEZSSVRaIVBvd2VybGlu
+ZSAxMjYwRQ0KPiAgIC0gRjA6QjA6MTQ6ODg6QUM6NDMgKDIuNCBHSHopDQo+ICAgLSBGMDpCMDox
+NDo4ODpBQzo0NyAoNSBHSHopDQo+IC0gRlJJVFohUG93ZXJsaW5lIDU0MEUNCj4gICAtIDVDOjQ5
+Ojc5OkUxOkM1Ojk0ICgyLjQgR0h6KQ0KDQpJJ20gbm90IGZhbWlsaWFyIHdpdGggdGhlc2UgQVAg
+YnJhbmRzLiBBcmUgdGhleSBhbGwgdGhlIHNhbWUgYnJhbmQ/DQpDYW4geW91IHRyeSBhbm90aGVy
+IEFQIGJyYW5kPyBFbXBpcmljYWxseSBzb21lIEFQIHNlbmQgYmVhY29uIHdpdGggbGFyZ2VyDQp2
+YXJpYW50IHRpbWluZyB0aGF0IFdpRmkgYWRhcHRlciBjYW4ndCByZWNlaXZlIGJlYWNvbiBhdCBj
+b3JyZWN0IG1vbWVudC4gDQoNCj4gDQo+IERlYmlhbi0xMi1CdXN0ZXINCj4gaXdkIG9yaWdpbmFs
+OiAyLjMsIG5vdzogMy4xIHNlbGYtY29tcGlsZWQNCj4gTGludXggNi4xMC4xMQ0KPiAwNDowMC4w
+IEV0aGVybmV0IGNvbnRyb2xsZXIgWzAyMDBdOiBSZWFsdGVrIFNlbWljb25kdWN0b3IgQ28uLCBM
+dGQuIFJUTDgxMTEvODE2OC84NDExIFBDSSBFeHByZXNzIEdpZ2FiaXQNCj4gRXRoZXJuZXQgQ29u
+dHJvbGxlciBbMTBlYzo4MTY4XSAocmV2IDE1KQ0KDQpUaGlzIGlzIEV0aGVybmV0IG5vdCB3aXJl
+bGVzcyBhZGFwdGVyLCBidXQgSSBjYW4gc2tpcCB0aGlzIGluZm9ybWF0aW9uIGZvciBub3cuDQoN
+Cj4gDQo+IFs4NzU3Mi4wMjgwNzVdIHdsYW4wOiBhdXRoZW50aWNhdGUgd2l0aCAzNDozMTpjNDoy
+Nzo5OTplZSAobG9jYWwgYWRkcmVzcz00MDoxYTo1ODpmNjpjYTo2ZikNCj4gWzg3NTcyLjAyODA3
+OV0gd2xhbjA6IHNlbmQgYXV0aCB0byAzNDozMTpjNDoyNzo5OTplZSAodHJ5IDEvMykNCj4gWzg3
+NTcyLjAzMTA4NV0gd2xhbjA6IGF1dGhlbnRpY2F0ZWQNCj4gWzg3NTcyLjAzNjUyN10gd2xhbjA6
+IGFzc29jaWF0ZSB3aXRoIDM0OjMxOmM0OjI3Ojk5OmVlICh0cnkgMS8zKQ0KPiBbODc1NzIuMDM5
+NTM0XSB3bGFuMDogUlggQXNzb2NSZXNwIGZyb20gMzQ6MzE6YzQ6Mjc6OTk6ZWUgKGNhcGFiPTB4
+MTUxMSBzdGF0dXM9MCBhaWQ9MikNCj4gWzg3NTcyLjE1ODE1M10gd2xhbjA6IGFzc29jaWF0ZWQN
+Cj4gWzg3NTcyLjE1ODI2NF0gd2xhbjA6IExpbWl0aW5nIFRYIHBvd2VyIHRvIDIwICgyMyAtIDMp
+IGRCbSBhcyBhZHZlcnRpc2VkIGJ5IDM0OjMxOmM0OjI3Ojk5OmVlDQo+IFs4NzU4MS42ODYwMThd
+IHdsYW4wOiBDb25uZWN0aW9uIHRvIEFQIDM0OjMxOmM0OjI3Ojk5OmVlIGxvc3QNCg0KSSBmZWVs
+IHRoZSBjb25uZWN0aW9uIGxvc3QgYmVjYXVzZSBvZiBiZWFjb24gbG9zdCBjYXVzaW5nIGJ5IHBv
+d2VyIHNhdmUuDQpQbGVhc2UgdHJ5IA0KICAgIHN1ZG8gaXcgd2xhbjAgc2V0IHBvd2VyX3NhdmUg
+b2ZmDQp0byBzZWUgaWYgaXQgY2FuIGdldCBzdGFibGUuIA0KDQo+IA0KPiBJIGhhdmUgc2VlbiB0
+aGF0ICJMaW1pdGluZyBUWCBwb3dlciB0byDigKYiIGJlZm9yZSB3aXRoIGB3cGFfc3VwcGxpY2Fu
+dGAsDQo+IHdoaWNoIGFsc28gbGVhZCB0byBhIGRpc2Nvbm5lY3QgdGhlcmUsIHdoaWNoIHRyaWdn
+ZXJlZCBtZSB0byB0cnkgYGl3ZGANCj4gbm93Lg0KDQpJIHRoaW5rIHRoZSBtZXNzYWdlIGlzIG5v
+dCByZWxhdGVkIHRvIHRoaXMgcHJvYmxlbSwgYmVjYXVzZSBkcml2ZXIgaGFzIGl0cw0Kb3duIFRY
+IHBvd2VyIG1hbmFnZW1lbnQuIA0KDQo+IA0KPiBMYXN0IHRpbWUgdW5sb2FkaW5nIGBydHc4OV84
+ODUyY2VgIGFuZCByZS1sb2FkaW5nIGl0IGRpZCBnZXQgaXQsIGJ1dA0KPiBvbmx5IGFmdGVyIHN3
+aXRjaGluZyBXaWZpIG9mZiBhbmQgb24gYWdhaW4gaW4gTmV0d29ya01hbmFnZXIuDQoNClRvIGJl
+IGNsZWFyLi4uIGlzIGl0IHdvcmsgb25seSBhZnRlciBzd2l0Y2hpbmcgV2lGaSBvZmYvb24/IEl0
+IGRvZXNuJ3Qgd29yaz8NCklmIHNvLCBzZWVtaW5nbHkgc29tZSBzZXR0aW5ncyBhcmUgc3RpbGwg
+cGVyc2lzdGVudCB3aGVuIFdpRmkgb2ZmLg0KDQoNCg==
