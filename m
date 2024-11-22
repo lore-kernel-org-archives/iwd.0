@@ -1,66 +1,66 @@
-Received: from mail-qv1-f54.google.com (mail-qv1-f54.google.com [209.85.219.54])
+Received: from mail-qv1-f48.google.com (mail-qv1-f48.google.com [209.85.219.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CE621DF99E
-	for <iwd@lists.linux.dev>; Fri, 22 Nov 2024 15:16:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DCF91DF27E
+	for <iwd@lists.linux.dev>; Fri, 22 Nov 2024 15:16:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732288574; cv=none; b=UOSLKKjNQSL4zPlxNQMLJXRHEM8Vv0aaOTcEz/A17bous/cBGVQiATbdwAyVqcMl+ZQi4To+/PcV2qRf2ZpSoRrYCSYi1AtB3BNuztFMtmIKnUwtdfJdHyT7AmM5wjQ83+rhvkrzGXJzvC1ryYP6v0Uo/AnZ6MKUHuG99zs+3jk=
+	t=1732288576; cv=none; b=QQt61RqnK3nmoOUCv1u7eBSFgVAckAg750BNhqvsCqivIeLPSTRCo3YkIZOcCaK2zRvPHKNf/edkMr3w0t5cImDGxHvyDhKtHPDroQtdqTv2ArT3FYIsXA/sMD1Ca6mpcqgXlwlAfeuoIFWLYI7lcvP3gAGJfQKAQeuTyzaPZ0w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732288574; c=relaxed/simple;
-	bh=r4P8q139hjoAa4Omu3oa5TeH/RnzK6yAGa+FRHnh1Hg=;
+	s=arc-20240116; t=1732288576; c=relaxed/simple;
+	bh=zrMZF1KWO93JDNcBPSsnDLOcds00UlA1nFhqaowfTs8=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=BGeLPWFZELUs4UrkZq3Jjkp1w0IAnn2ttb38rB9EoVBxoSJ+T7XIB/nqHxdouOEQwWSFJ5pHEZJWGmZaQlL11f556eQgGwQgfVeZPZkW8jsXNcqX1Q/Z0uGLYui5Xw+pEgynarexmCVW67RCRddjPWWRUIPCEO36f4ufKax2H1Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CI4yJIG4; arc=none smtp.client-ip=209.85.219.54
+	 MIME-Version; b=WVIZmDVGS6hELM+LG7L0egMm+wyR3iDWKUfKKeTLQ/nBoS5sdrXhZWubdVfBASLxTMarSM5mbEp5I8hQTpZvLsN+0F6TeJ7DBBQQYBjQBqC9Tj1oqmTDgIx3+dBoqXxNxh0OnafH67UAapMuCZweoZQMsZmi5/Ka37RALfAYjKw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bU1cnser; arc=none smtp.client-ip=209.85.219.48
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CI4yJIG4"
-Received: by mail-qv1-f54.google.com with SMTP id 6a1803df08f44-6d4241457b7so12728716d6.2
-        for <iwd@lists.linux.dev>; Fri, 22 Nov 2024 07:16:13 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bU1cnser"
+Received: by mail-qv1-f48.google.com with SMTP id 6a1803df08f44-6d41176505fso19058786d6.2
+        for <iwd@lists.linux.dev>; Fri, 22 Nov 2024 07:16:14 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1732288572; x=1732893372; darn=lists.linux.dev;
+        d=gmail.com; s=20230601; t=1732288573; x=1732893373; darn=lists.linux.dev;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=p1op6WaQ6eSX7k/vlLsIm129sQQqpo51cEuN6bTvB8s=;
-        b=CI4yJIG4jD0MgSFnpAvnEwWUJh+oB2hZTMBRMjt1Jw3mADwGQn+f73dys5YYFPCkRx
-         VoxHmfCMXf47JU08TtMjYS7fvmG3Fo+pY9YbP/1yvQiPxa2d8mGbB69Or9MTq7BnHSbA
-         PoTQPTrY4mSTjnUiq5UPpG+/RqRQD5KkTY+U4klrP0JkFk30NOWyN9gDunJx1s4M1K8F
-         otulJ0QXOPdw7LgtxvHz3UpaqW0jN24GaRZIP2g4zWYGNJiP/OSY+x8hom8Yvgf40Czk
-         hhlFksLNljnQK/4iJ6CJF/4h6gRHtcIzP5quYp0QER0pBxnJG0eFHca9KiIFfLCrw6YL
-         t5SQ==
+        bh=5j//uCjCp/01QAwP2eyAX/It1NsC6Kx58kuQzSAfbLI=;
+        b=bU1cnserdV1DIocmm1KUx3WWleJC4r/n4fpKaXjqC0fMf1SKcDhEyMPgbsdgjOnqdo
+         iagePjUMwexeR4kq8kurO/csG17zFJm3+noRqnihFEiU3bAukqdFixOPPGJDC0orspOU
+         7Umtt3aXYw3JY3w55MX3Rs/HO9gljSZSM/DnCP4awE+LIXRcuttZeD6bZjhayH1JtPrR
+         igndPDe2mpL1P1yS+ZDNB0OHubLRnOimz3R0sxI/1E41xdJtTD0EvCznzeO84S7nJ0Z5
+         nfTZT0JgIvSY1RbjYowNBfNmKiITUZGvw4HWApYQfCkjewOl2YYqu63R7Rg6Qzaq0HF8
+         LagA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732288572; x=1732893372;
+        d=1e100.net; s=20230601; t=1732288573; x=1732893373;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=p1op6WaQ6eSX7k/vlLsIm129sQQqpo51cEuN6bTvB8s=;
-        b=exMuNxPk64A/UGxPEB4y4/S3jvXQPOIIFSa+vLIid5wyZ38WE//iGhTtnw7oW3hR37
-         LuYLa9M40YDvVA4fvvT5uspV51P1fcyMZDjAbfKNqG6VrjigeifzONbbadooYa62wXt8
-         RLheyCyaAYhW1Voz0qI5LhV95WQbPaJ1vn9rd+i0GzSzGO6GVG93wk8PkqHpE/wcdER0
-         Q5aKWLKJgnGMhW8ZJWAb5XR+2UI8CViQiaqsMzURpx7sRXMmr/8qtaQkJ3mQJUQEE0jq
-         6iMfzcj4C0OgG+JUtpW2gNgKjEg0cjh8MR801XGL3Mo9VlqxuyBPGMZeWectcx3IMDqv
-         pgmA==
-X-Gm-Message-State: AOJu0YzHl+EsRP3RdzT/FFaJAxmi9vGFE2KihmhRb3EWP3XkkZOqNcZ0
-	il8EEAaUmw7W4nQfTQFAJ/Hjh/3LOuqAtFK+MqsQ8YODl2CG6JljoTN0fA==
-X-Gm-Gg: ASbGncuJ/1PPaWiNa3frxVJutfbVaxR4X9EaBYB3usZMRtnSIBzJpx8T+DnY5giw+8e
-	31KqTqrApNAg1cyJzptJ9T/v5zk4cA0LVp+wRCyv6SSOCTWWQIUZsZT14BYAxmypY9VWKYsEZhw
-	Cul7fuz5tBB98O1lshY6Lp3neuT1AeNnnUp9sq7Qlwu6YkHUe4VC3hh0aw99gIJPUlBykVp3Gpv
-	JxMqRpxP3xqFu3q6jySHGZp5MeLhNy6U4xuAaoCB/2qVhjwlqNjQyYEjMdg
-X-Google-Smtp-Source: AGHT+IHIv0rnOwSkHitp1/WmOxqr4CAzwu4SO4nAQhyjQABn+uFmUZ5Do61kQukuLJK5uU6P4kRYug==
-X-Received: by 2002:ad4:5ba9:0:b0:6d4:20fa:83f0 with SMTP id 6a1803df08f44-6d451358550mr44185146d6.41.1732288570466;
-        Fri, 22 Nov 2024 07:16:10 -0800 (PST)
+        bh=5j//uCjCp/01QAwP2eyAX/It1NsC6Kx58kuQzSAfbLI=;
+        b=SCEYctNl7vU0F0KdGZOauVNVqVucgEdkRRt4B93uiiG7uDrtiNSGiv/uYh7OLYYDst
+         oc1E99Wyn5Y2O2xny2ydTnayRRXle3WBDyWgmkBtlmiGJjFfQdt/4jE4qGW8f2ZAAczD
+         H040R/kxOwwpQ0njtZOGiTi1QshR8ln8bipeNg7XV0kZVFXlDVGCahotAZJZLfeXWARA
+         4IzpG5fezFfu58BSnLcnGoTXrzzQOWsKebnolWE+NseUPN22omWY7QxLHd6HBKphvreF
+         rDAzcRY7eIrixT3rhHTlDIZ3YxNN77+Tp481sMN1peVyg/86BKeKmd/HtwHl+M6Bd/zE
+         LJSQ==
+X-Gm-Message-State: AOJu0YxZwWIyeQwLkJJ6SJkOM7nocqNHV46H3ajq2jTykvx10A7FTKpn
+	RGIuGHKdEq7ZuBPbTxYDaaveKDBlquc8C1TZ9MmVY/uNsXERZdv1Vi5/tw==
+X-Gm-Gg: ASbGncuK39aBF6aezNWoqN2gzUAijXjqPidr3kjoVsza0iSfqRmUZUj+UzH/EyU1bFc
+	FKC/c4S9WZPeVWIhVH2QTh7XMkIVUQeNIKjfDTNtiwHA3hKls3wsksamea5IjNxljN6idr9dE/R
+	Ai/9spWNsnAvS4JdFQp2DagUwyyo9ymKbUvTsEA3Rxw/o9DYDhWB8O93XOYYakBP/Cl8JXx0T5J
+	GaDXdHgAk1shhtuRguJ1pVAFUAbpmEiYTO7EJTOZUgN5EbADm07pEHjqkMC
+X-Google-Smtp-Source: AGHT+IE9l1t6rg+RRXulLnlBKxKJAqwutpFnEjC4/iFXlk5I5xZzRqGbZeikX7OiFwmNN12So0VEcg==
+X-Received: by 2002:a05:6214:5183:b0:6d4:ca5:7bfb with SMTP id 6a1803df08f44-6d450e6d219mr50686256d6.9.1732288573054;
+        Fri, 22 Nov 2024 07:16:13 -0800 (PST)
 Received: from LOCLAP699.localdomain ([152.193.78.90])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6d451a9a720sm10722706d6.50.2024.11.22.07.16.09
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6d451a9a720sm10722706d6.50.2024.11.22.07.16.11
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 22 Nov 2024 07:16:09 -0800 (PST)
+        Fri, 22 Nov 2024 07:16:12 -0800 (PST)
 From: James Prestwood <prestwoj@gmail.com>
 To: iwd@lists.linux.dev
 Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 10/15] handshake: add handshake_state_remove_pmksa
-Date: Fri, 22 Nov 2024 07:15:46 -0800
-Message-Id: <20241122151551.286355-11-prestwoj@gmail.com>
+Subject: [PATCH 12/15] station: hold reference to handshake object
+Date: Fri, 22 Nov 2024 07:15:48 -0800
+Message-Id: <20241122151551.286355-13-prestwoj@gmail.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20241122151551.286355-1-prestwoj@gmail.com>
 References: <20241122151551.286355-1-prestwoj@gmail.com>
@@ -72,51 +72,96 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This is needed in order to clear the PMKSA from the handshake state
-without actually putting it back into the cache. This is something
-that will be needed in case the AP rejects the association due to
-an expired (or forgotten) PMKSA.
+To prepare for PMKSA support station needs access to the handshake
+object. This is because if PMKSA fails due to an expired/missing
+PMKSA on the AP station should retry using the standard association.
+This poses a problem currently because netdev frees the handshake
+prior to calling the connect callback.
 ---
- src/handshake.c | 16 ++++++++++++++++
- src/handshake.h |  1 +
- 2 files changed, 17 insertions(+)
+ src/station.c | 28 ++++++++++++++++++++++++++++
+ 1 file changed, 28 insertions(+)
 
-diff --git a/src/handshake.c b/src/handshake.c
-index a93143d1..f73f91d1 100644
---- a/src/handshake.c
-+++ b/src/handshake.c
-@@ -1280,3 +1280,19 @@ void handshake_state_cache_pmksa(struct handshake_state *s)
- 	if (L_WARN_ON(pmksa_cache_put(pmksa) < 0))
- 		l_free(pmksa);
+diff --git a/src/station.c b/src/station.c
+index c1c7ba9d..09193eed 100644
+--- a/src/station.c
++++ b/src/station.c
+@@ -135,6 +135,8 @@ struct station {
+ 	unsigned int affinity_watch;
+ 	char *affinity_client;
+ 
++	struct handshake_state *hs;
++
+ 	bool preparing_roam : 1;
+ 	bool roam_scan_full : 1;
+ 	bool signal_low : 1;
+@@ -1771,6 +1773,11 @@ static void station_enter_state(struct station *station,
+ 			station->affinity_watch = 0;
+ 		}
+ 
++		if (station->hs) {
++			handshake_state_unref(station->hs);
++			station->hs = NULL;
++		}
++
+ 		break;
+ 	case STATION_STATE_DISCONNECTING:
+ 	case STATION_STATE_NETCONFIG:
+@@ -2487,6 +2494,9 @@ static void station_preauthenticate_cb(struct netdev *netdev,
+ 		handshake_state_unref(new_hs);
+ 		station_roam_failed(station);
+ 	}
++
++	handshake_state_unref(station->hs);
++	station->hs = handshake_state_ref(new_hs);
  }
-+
-+bool handshake_state_remove_pmksa(struct handshake_state *s)
-+{
-+	struct pmksa *pmksa;
-+
-+	if (!s->have_pmksa)
-+		return false;
-+
-+	pmksa = handshake_state_steal_pmksa(s);
-+	if (!pmksa)
-+		return false;
-+
-+	l_free(pmksa);
-+
-+	return true;
-+}
-diff --git a/src/handshake.h b/src/handshake.h
-index cf7dc48c..e4a00531 100644
---- a/src/handshake.h
-+++ b/src/handshake.h
-@@ -310,6 +310,7 @@ int handshake_state_verify_oci(struct handshake_state *s, const uint8_t *oci,
  
- bool handshake_state_set_pmksa(struct handshake_state *s, struct pmksa *pmksa);
- void handshake_state_cache_pmksa(struct handshake_state *s);
-+bool handshake_state_remove_pmksa(struct handshake_state *s);
+ static void station_transition_start(struct station *station);
+@@ -2691,6 +2701,9 @@ static bool station_try_next_transition(struct station *station,
+ 		return false;
+ 	}
  
- bool handshake_util_ap_ie_matches(const struct ie_rsn_info *msg_info,
- 					const uint8_t *scan_ie, bool is_wpa);
++	handshake_state_unref(station->hs);
++	station->hs = handshake_state_ref(new_hs);
++
+ 	return true;
+ }
+ 
+@@ -3721,6 +3734,15 @@ int __station_connect_network(struct station *station, struct network *network,
+ 	struct handshake_state *hs;
+ 	int r;
+ 
++	/*
++	 * If we already have a handshake_state ref this is due to a retry,
++	 * unref that now
++	 */
++	if (station->hs) {
++		handshake_state_unref(station->hs);
++		station->hs = NULL;
++	}
++
+ 	if (station->netconfig && !netconfig_load_settings(
+ 					station->netconfig,
+ 					network_get_settings(network)))
+@@ -3747,6 +3769,7 @@ int __station_connect_network(struct station *station, struct network *network,
+ 
+ 	station->connected_bss = bss;
+ 	station->connected_network = network;
++	station->hs = handshake_state_ref(hs);
+ 
+ 	if (station->state != state)
+ 		station_enter_state(station, state);
+@@ -5039,6 +5062,11 @@ static void station_free(struct station *station)
+ 		l_queue_destroy(station->owe_hidden_scan_ids, NULL);
+ 	}
+ 
++	if (station->hs) {
++		handshake_state_unref(station->hs);
++		station->hs = NULL;
++	}
++
+ 	station_roam_state_clear(station);
+ 
+ 	l_queue_destroy(station->networks_sorted, NULL);
 -- 
 2.34.1
 
