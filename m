@@ -1,66 +1,66 @@
-Received: from mail-qv1-f53.google.com (mail-qv1-f53.google.com [209.85.219.53])
+Received: from mail-pg1-f179.google.com (mail-pg1-f179.google.com [209.85.215.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C8B91DED7F
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FEA61DF976
 	for <iwd@lists.linux.dev>; Fri, 22 Nov 2024 15:16:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.53
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732288562; cv=none; b=fMB860+a0Sd5qOwmounxx//dgy60Vsh9nIlHGOwn7jJ+6/IJJShij8Mz5Ua9ECJXB3VKRfRB+GYRmmioYtgj2PYhDISxz+dpZZf+RNottgr3Vr7BM3y/jGb/xIYctPqG0YHLAmXrFhqLNpQhrs+T5OtYMn2pkMVy+1q5ib+n0XU=
+	t=1732288563; cv=none; b=iCOcEX9sroAbOM+awPkBf53b6LdtCW/q2kxD49dzYJRZXTgPuuVOKqS5T+EEEM4TXCBJNohtO6v1ynTN/9bUgqVjq8w0Q7403a4LCJpy9u098M4YbPe44E6P9X9EOFF39JJkzJSFEjt0llvZFfrvssT+Tilj61BGSrZazSlDNqo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732288562; c=relaxed/simple;
-	bh=T7EzbGP0zQxKW3CZyanatbIG6gM6n0XcTvl0ip0rhj4=;
+	s=arc-20240116; t=1732288563; c=relaxed/simple;
+	bh=230tCrv6eS/YKazBZPgfJnsYDXGXQokhPPwmyy0C2r0=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=UqUbjBp4T9XYX+O8+hxdYmhKN/pbh8qmGef16heLhnXaNPAg3RxQhx5PuEtXFDyBOthDlVHHx5KzMpC+03PIYesjKSdg2xzK0pv1SQcBi6r6S4I7H1nbHIUm6M3Xc3+Su2Ktb21yNru4ExuqpcMAmsXCwtZgm7nI16lytfl8WQQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JfrwWoSy; arc=none smtp.client-ip=209.85.219.53
+	 MIME-Version; b=AmcBcOCXUpTAN0po8j3TnZUJtcH47p94ynelcWc213Vtehx4zO1wNkf5O/um1TtnCJ3QmdTcmueAwrV8xPYcwH1K+XCDaAgA2wwNzH77nGC7COwk9hjpMlM7LCUsBvNGMHz4c3XOt7n6kdap+vs6gIO85oQQfwkokJGvuqLBXL0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IDLkMFWJ; arc=none smtp.client-ip=209.85.215.179
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JfrwWoSy"
-Received: by mail-qv1-f53.google.com with SMTP id 6a1803df08f44-6d41f721047so14779056d6.1
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IDLkMFWJ"
+Received: by mail-pg1-f179.google.com with SMTP id 41be03b00d2f7-7e6cbf6cd1dso1573465a12.3
         for <iwd@lists.linux.dev>; Fri, 22 Nov 2024 07:16:00 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1732288559; x=1732893359; darn=lists.linux.dev;
+        d=gmail.com; s=20230601; t=1732288560; x=1732893360; darn=lists.linux.dev;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=QAqtQzo2z/Xd6xeFf3E/w3pqkrQp9PxiPvRFri9XqHU=;
-        b=JfrwWoSyc4AjoUD78xh/q8+a+AoOPcyN0J+B7cocEVxDKyqJDQ0yn8TC1+k5C9JAYn
-         417sMo8RsEJsf/m90b6aEgzz25JgTk7z73khytcgOwP4FeiVeyRNf/VIAtfYnaXsiMsv
-         y3InT5lDz0V+Eaj0X3roYpY8Vtw0BQVd1k5TkKcK5klTX4l+eXgrBh4QhG03dp9xTJlp
-         7ZRVdoBjbnmG5JsViiNljArn1gVbCRqmFr+bin5MKmsjJHj8f1/9Tc/ttQ8CGBBXtJgS
-         5Yy3R7bgSchZC2sz80IEzanFJoYGlqFeQZHLp2jNSbB0uGKz7u+ELfhCbaOZpZDWTdLM
-         xf+w==
+        bh=cAgHWR+yJqfwD2qesQmtXh6fgB90YeAcv/lCztwTggw=;
+        b=IDLkMFWJETXtOk8dfSBN1dgLDqYMW10Uz+KiTBL4Ql5vw/axoQ7dDs4VxGufZGQZQN
+         e6RRbhRCh4dnmLs2Wj6k8SgDLqgEkUwhfPPrjLcGSrIUNBvw2aUl6rBl+wF4h65yqFqa
+         500K2+O7iz5v4juUJpvh1hvAsUT8DVN6TEJFd5H8iqZoJV+k8D7MFHHHvpYIQy26qftZ
+         0tq/cpZ13sfm0qEqK57T3X1hh0RB7SnArpO6odgJPV+6ESHdbvefNHr6J8xL+OsEELqO
+         WsgQlaf7PbZxEmt4+9WcLbgKx4uoGsRfQavJFIz/Vu35NnEkXqKaBTBf0Uhb+eMWFQBm
+         ovfw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732288559; x=1732893359;
+        d=1e100.net; s=20230601; t=1732288560; x=1732893360;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=QAqtQzo2z/Xd6xeFf3E/w3pqkrQp9PxiPvRFri9XqHU=;
-        b=HvZDyqmoSVqPPIkEUrTWnNWKFlb0F7ko06zMsgNJlqOB4s4sHtV8YUGG7Uy3Xm7Ems
-         GthiFX/zi0sam8bPs2j/VszzY/SPS2BAzDC7Wbn6AIOfHKyOL+9wRkUUjn+g/36jAAgF
-         oWhoX28uMYmkmIfe+1znRRNLcRlmSNSfxmCCUMKtK7yfY0mwnnTjTQI58Ksrz7acGDGi
-         6mq2xlcEJjI7B1j8wehucUieHao29rK//kuyW/Kwngz0bkG7n29fj1A+2ohksgf8Ml/X
-         lpSA/QCtzThkC/EjPokeImNSaLDbUK7JyxGFPWFUX3lEG6l9EiH7nx00UvQXMhaVEjio
-         Zxng==
-X-Gm-Message-State: AOJu0YzMAJWD5jRECJEly5PsyjOlnJMXULCLGrMbOQs3q7y0RbpZhrDq
-	6hURgLg9X2Ob4YFuTQZKFwAlYUWq//fHs9f6J8/gZSkg43zzuVtr+8g9rw==
-X-Gm-Gg: ASbGnctQhN/Hvr43Skj69ljQakndg96yZBmtavzIzehdbGKEfSesix4RWTmcky/Kk+a
-	fG+7n2LQgFgZHKayaKVGhD4Y0T6dHsRhwkLDYY85LgeJ+ZMYdgfRfeNXwadPaTYd+EHtAG43l3D
-	OTXDMiNfdEZI7S2mKAFfOWPpqPsCqRgQJfgtbd2fdhQ8l18s++Te++ogNZLo58J3t/nGaWvjO8r
-	PtAPSgdoFKU3DxXUsWymyiixHupX8hMUeCgN9r/nK87dAZ27SnpwafDfocC
-X-Google-Smtp-Source: AGHT+IH5oWGSC7IXnxDMWH5VoFtWkBkYhi91/nHtkwYn/B/TW3IYm7XrwkOa4l29dNdcsiOvAcz8NQ==
-X-Received: by 2002:a05:6214:2267:b0:6cb:eba0:267f with SMTP id 6a1803df08f44-6d450eb6858mr48548286d6.16.1732288558796;
-        Fri, 22 Nov 2024 07:15:58 -0800 (PST)
+        bh=cAgHWR+yJqfwD2qesQmtXh6fgB90YeAcv/lCztwTggw=;
+        b=SCih/pDiU5HSgqF3xpRX6BBtCEkDm7EyK1RTAij/XICDwWkEobTtFwcMtuYt/gffjA
+         w4oxgSjF6RlFnth7lIouAAq4NiaEWbAbs2MH8DvK2rmgdLT5b8WEGPUO+1KYvs8+3ZrD
+         weDCXUevtIYOjZwCQJBlb3GWwXFHSqh++SXfiNckloIytS6Dd+TuBHKsnlWfwYQSJj6i
+         D6eA6Lv2RV9/7RwQ38YF4mMjdaVodxMhthBZKvkGBeF79LQJc34CD8a2IwLF9mt9+bhj
+         OaKQuZ51rC8Y61b7oEWKO5FimAKOq6nSQ0xL/H73oV2WjtdqAeEavJXuS0nELLXZe5BO
+         YebA==
+X-Gm-Message-State: AOJu0YxobSLJo4o/t4z27OdunBO4FkOoLGmn6pIawk+6RG+R+pnAXKsn
+	EOxC6qwVrRINUAnm8MRYDHXZFpyrKZwvq3lkxiF52PP8MG4g6sqEvsT+HQ==
+X-Gm-Gg: ASbGncuYYZOQA53zVDiBrgFxeWdXo7wcxvya4TU3R6ahq9ALiCPYTfG3xRGk/EXtcY9
+	7gvSvbWZB+UPwFH78i4qgmSVXLBovAUbmBe6ijmIUPhaH8x3kL3iENce8dX17E9aNHlyVLYV3fm
+	qYF7YRAsZgX2CBUmPY7HxRHtavUn+gQ563IyfdmqIzklcM71EDHHrm9RwUP0UDixsnQ6QxsNGrH
+	FO2wnAhcgoP3fGTAL10s34CLFznvWarpgVTXk8PjDQJCZFMi5aBsjf2Kg+g
+X-Google-Smtp-Source: AGHT+IH/ue5LLjXgmtDujGDJLEH1X5jYObbw8R7TtqnbYaoUKW7jfcB0vhfaV78pqONedV1SGXYeYA==
+X-Received: by 2002:a05:6a21:3399:b0:1d9:78c:dcf2 with SMTP id adf61e73a8af0-1e09e5ff718mr3898615637.43.1732288559981;
+        Fri, 22 Nov 2024 07:15:59 -0800 (PST)
 Received: from LOCLAP699.localdomain ([152.193.78.90])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6d451a9a720sm10722706d6.50.2024.11.22.07.15.57
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6d451a9a720sm10722706d6.50.2024.11.22.07.15.59
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 22 Nov 2024 07:15:58 -0800 (PST)
+        Fri, 22 Nov 2024 07:15:59 -0800 (PST)
 From: James Prestwood <prestwoj@gmail.com>
 To: iwd@lists.linux.dev
 Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 01/15] handshake: add ref counting to handshake_state
-Date: Fri, 22 Nov 2024 07:15:37 -0800
-Message-Id: <20241122151551.286355-2-prestwoj@gmail.com>
+Subject: [PATCH 02/15] unit: update use of handshake_state with ref/unref
+Date: Fri, 22 Nov 2024 07:15:38 -0800
+Message-Id: <20241122151551.286355-3-prestwoj@gmail.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20241122151551.286355-1-prestwoj@gmail.com>
 References: <20241122151551.286355-1-prestwoj@gmail.com>
@@ -72,224 +72,262 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This adds a ref count to the handshake state object (as well as
-ref/unref APIs). Currently IWD is careful to ensure that netdev
-holds the root reference to the handshake state. Other modules do
-track it themselves, but ensure that it doesn't get referenced
-after netdev frees it.
-
-Future work related to PMKSA will require that station holds a
-references to the handshake state, specifically for retry logic,
-after netdev is done with it so we need a way to delay the free
-until station is also done.
 ---
- src/adhoc.c     |  4 ++--
- src/ap.c        |  2 +-
- src/handshake.c | 12 +++++++++++-
- src/handshake.h |  9 ++++++---
- src/netdev.c    |  5 +++--
- src/p2p.c       |  2 +-
- src/station.c   |  8 ++++----
- src/wsc.c       |  2 +-
- 8 files changed, 29 insertions(+), 15 deletions(-)
+ unit/test-eapol.c | 38 +++++++++++++++++++++-----------------
+ unit/test-sae.c   | 15 ++++++++-------
+ unit/test-wsc.c   | 10 ++++++----
+ 3 files changed, 35 insertions(+), 28 deletions(-)
 
-diff --git a/src/adhoc.c b/src/adhoc.c
-index e787dab1..930240ae 100644
---- a/src/adhoc.c
-+++ b/src/adhoc.c
-@@ -94,13 +94,13 @@ static void adhoc_sta_free(void *data)
- 		eapol_sm_free(sta->sm);
+diff --git a/unit/test-eapol.c b/unit/test-eapol.c
+index 5317f9ad..0e01bfa5 100644
+--- a/unit/test-eapol.c
++++ b/unit/test-eapol.c
+@@ -94,6 +94,7 @@ static struct handshake_state *test_handshake_state_new(uint32_t ifindex)
  
- 	if (sta->hs_sta)
--		handshake_state_free(sta->hs_sta);
-+		handshake_state_unref(sta->hs_sta);
+ 	ths->super.ifindex = ifindex;
+ 	ths->super.free = test_handshake_state_free;
++	ths->super.refcount = 1;
  
- 	if (sta->sm_a)
- 		eapol_sm_free(sta->sm_a);
+ 	return &ths->super;
+ }
+@@ -2199,7 +2200,7 @@ static void eapol_sm_test_ptk(const void *data)
+ 	assert(verify_step4_called);
  
- 	if (sta->hs_auth)
--		handshake_state_free(sta->hs_auth);
-+		handshake_state_unref(sta->hs_auth);
- 
- end:
- 	l_free(sta);
-diff --git a/src/ap.c b/src/ap.c
-index 562e00c8..d52b7e55 100644
---- a/src/ap.c
-+++ b/src/ap.c
-@@ -230,7 +230,7 @@ static void ap_stop_handshake(struct sta_state *sta)
- 	}
- 
- 	if (sta->hs) {
--		handshake_state_free(sta->hs);
-+		handshake_state_unref(sta->hs);
- 		sta->hs = NULL;
- 	}
- 
-diff --git a/src/handshake.c b/src/handshake.c
-index fc1978df..7fb75dc4 100644
---- a/src/handshake.c
-+++ b/src/handshake.c
-@@ -103,7 +103,14 @@ void __handshake_set_install_ext_tk_func(handshake_install_ext_tk_func_t func)
- 	install_ext_tk = func;
+ 	eapol_sm_free(sm);
+-	handshake_state_free(hs);
++	handshake_state_unref(hs);
+ 	eapol_exit();
  }
  
--void handshake_state_free(struct handshake_state *s)
-+struct handshake_state *handshake_state_ref(struct handshake_state *s)
-+{
-+	__sync_fetch_and_add(&s->refcount, 1);
+@@ -2263,7 +2264,7 @@ static void eapol_sm_test_igtk(const void *data)
+ 	assert(verify_step4_called);
+ 
+ 	eapol_sm_free(sm);
+-	handshake_state_free(hs);
++	handshake_state_unref(hs);
+ 	eapol_exit();
+ }
+ 
+@@ -2332,7 +2333,7 @@ static void eapol_sm_test_wpa2_ptk_gtk(const void *data)
+ 	assert(verify_gtk_step2_called);
+ 
+ 	eapol_sm_free(sm);
+-	handshake_state_free(hs);
++	handshake_state_unref(hs);
+ 	eapol_exit();
+ }
+ 
+@@ -2399,7 +2400,7 @@ static void eapol_sm_test_wpa_ptk_gtk(const void *data)
+ 	assert(verify_gtk_step2_called);
+ 
+ 	eapol_sm_free(sm);
+-	handshake_state_free(hs);
++	handshake_state_unref(hs);
+ 	eapol_exit();
+ }
+ 
+@@ -2467,7 +2468,7 @@ static void eapol_sm_test_wpa_ptk_gtk_2(const void *data)
+ 	assert(verify_gtk_step2_called);
+ 
+ 	eapol_sm_free(sm);
+-	handshake_state_free(hs);
++	handshake_state_unref(hs);
+ 	eapol_exit();
+ }
+ 
+@@ -2721,7 +2722,7 @@ static void eapol_sm_wpa2_retransmit_test(const void *data)
+ 	l_free(ptk);
+ 
+ 	eapol_sm_free(sm);
+-	handshake_state_free(hs);
++	handshake_state_unref(hs);
+ 	eapol_exit();
+ }
+ 
+@@ -3141,7 +3142,7 @@ done:
+ 	if (sm)
+ 		eapol_sm_free(sm);
+ 
+-	handshake_state_free(hs);
++	handshake_state_unref(hs);
+ 	eapol_exit();
+ 	eap_exit();
+ }
+@@ -3424,7 +3425,7 @@ static void eapol_sm_test_eap_nak(const void *data)
+ 				sizeof(eap_failure), false);
+ 	assert(ths->handshake_failed);
+ 
+-	handshake_state_free(hs);
++	handshake_state_unref(hs);
+ 	eapol_exit();
+ 	eap_exit();
+ }
+@@ -3510,7 +3511,7 @@ static void eapol_ft_handshake_test(const void *data)
+ 	assert(verify_step4_called);
+ 
+ 	eapol_sm_free(sm);
+-	handshake_state_free(hs);
++	handshake_state_unref(hs);
+ 	eapol_exit();
+ }
+ 
+@@ -3609,6 +3610,7 @@ static struct handshake_state *test_ap_sta_hs_new(struct test_ap_sta_data *s,
+ 
+ 	ths->super.ifindex = ifindex;
+ 	ths->super.free = (void (*)(struct handshake_state *s)) l_free;
++	ths->super.refcount = 1;
+ 	ths->s = s;
+ 
+ 	return &ths->super;
+@@ -3692,8 +3694,10 @@ static void eapol_ap_sta_handshake_test(const void *data)
+ 
+ 	test_ap_sta_run(&s);
+ 
+-	handshake_state_free(s.ap_hs);
+-	handshake_state_free(s.sta_hs);
++	l_info("freeing in eapol_ap_sta_handshake_test()");
 +
-+	return s;
-+}
-+
-+void handshake_state_unref(struct handshake_state *s)
- {
- 	__typeof__(s->free) destroy;
++	handshake_state_unref(s.ap_hs);
++	handshake_state_unref(s.sta_hs);
+ 	__handshake_set_install_tk_func(NULL);
  
-@@ -117,6 +124,9 @@ void handshake_state_free(struct handshake_state *s)
- 		return;
- 	}
+ 	assert(s.ap_success && s.sta_success);
+@@ -3753,8 +3757,8 @@ static void eapol_ap_sta_handshake_bad_psk_test(const void *data)
  
-+	if (__sync_sub_and_fetch(&s->refcount, 1))
-+		return;
-+
- 	l_free(s->authenticator_ie);
- 	l_free(s->supplicant_ie);
- 	l_free(s->authenticator_rsnxe);
-diff --git a/src/handshake.h b/src/handshake.h
-index d1116472..6c0946d4 100644
---- a/src/handshake.h
-+++ b/src/handshake.h
-@@ -170,6 +170,8 @@ struct handshake_state {
- 	bool in_event;
+ 	test_ap_sta_run(&s);
  
- 	handshake_event_func_t event_func;
-+
-+	int refcount;
- };
+-	handshake_state_free(s.ap_hs);
+-	handshake_state_free(s.sta_hs);
++	handshake_state_unref(s.ap_hs);
++	handshake_state_unref(s.sta_hs);
+ 	__handshake_set_install_tk_func(NULL);
  
- #define HSID(x) UNIQUE_ID(handshake_, x)
-@@ -186,7 +188,7 @@ struct handshake_state {
- 					##__VA_ARGS__);			\
- 									\
- 			if (!HSID(hs)->in_event) {			\
--				handshake_state_free(HSID(hs));		\
-+				handshake_state_unref(HSID(hs));	\
- 				HSID(freed) = true;			\
- 			} else						\
- 				HSID(hs)->in_event = false;		\
-@@ -194,7 +196,8 @@ struct handshake_state {
- 		HSID(freed);						\
- 	})
- 
--void handshake_state_free(struct handshake_state *s);
-+struct handshake_state *handshake_state_ref(struct handshake_state *s);
-+void handshake_state_unref(struct handshake_state *s);
- 
- void handshake_state_set_supplicant_address(struct handshake_state *s,
- 						const uint8_t *spa);
-@@ -316,4 +319,4 @@ void handshake_util_build_gtk_kde(enum crypto_cipher cipher, const uint8_t *key,
- void handshake_util_build_igtk_kde(enum crypto_cipher cipher, const uint8_t *key,
- 					unsigned int key_index, uint8_t *to);
- 
--DEFINE_CLEANUP_FUNC(handshake_state_free);
-+DEFINE_CLEANUP_FUNC(handshake_state_unref);
-diff --git a/src/netdev.c b/src/netdev.c
-index e86ef1bd..4dccb78a 100644
---- a/src/netdev.c
-+++ b/src/netdev.c
-@@ -376,6 +376,7 @@ struct handshake_state *netdev_handshake_state_new(struct netdev *netdev)
- 
- 	nhs->super.ifindex = netdev->index;
- 	nhs->super.free = netdev_handshake_state_free;
-+	nhs->super.refcount = 1;
- 
- 	nhs->netdev = netdev;
  	/*
-@@ -828,7 +829,7 @@ static void netdev_connect_free(struct netdev *netdev)
- 	eapol_preauth_cancel(netdev->index);
+@@ -3825,8 +3829,8 @@ static void eapol_ap_sta_handshake_ip_alloc_ok_test(const void *data)
+ 	assert(s.sta_hs->subnet_mask == s.ap_hs->subnet_mask);
+ 	assert(s.sta_hs->go_ip_addr == s.ap_hs->go_ip_addr);
  
- 	if (netdev->handshake) {
--		handshake_state_free(netdev->handshake);
-+		handshake_state_unref(netdev->handshake);
- 		netdev->handshake = NULL;
- 	}
+-	handshake_state_free(s.ap_hs);
+-	handshake_state_free(s.sta_hs);
++	handshake_state_unref(s.ap_hs);
++	handshake_state_unref(s.sta_hs);
+ 	__handshake_set_install_tk_func(NULL);
  
-@@ -4239,7 +4240,7 @@ int netdev_reassociate(struct netdev *netdev, const struct scan_bss *target_bss,
- 		eapol_sm_free(old_sm);
+ 	assert(s.ap_success && s.sta_success);
+@@ -3889,8 +3893,8 @@ static void eapol_ap_sta_handshake_ip_alloc_no_req_test(const void *data)
+ 	assert(!s.ap_hs->support_ip_allocation);
+ 	assert(!s.sta_hs->support_ip_allocation);
  
- 	if (old_hs)
--		handshake_state_free(old_hs);
-+		handshake_state_unref(old_hs);
+-	handshake_state_free(s.ap_hs);
+-	handshake_state_free(s.sta_hs);
++	handshake_state_unref(s.ap_hs);
++	handshake_state_unref(s.sta_hs);
+ 	__handshake_set_install_tk_func(NULL);
  
- 	return 0;
+ 	assert(s.ap_success && s.sta_success);
+diff --git a/unit/test-sae.c b/unit/test-sae.c
+index 04783d18..2e564133 100644
+--- a/unit/test-sae.c
++++ b/unit/test-sae.c
+@@ -101,6 +101,7 @@ static struct handshake_state *test_handshake_state_new(uint32_t ifindex)
+ 
+ 	ths->super.ifindex = ifindex;
+ 	ths->super.free = test_handshake_state_free;
++	ths->super.refcount = 1;
+ 
+ 	return &ths->super;
  }
-diff --git a/src/p2p.c b/src/p2p.c
-index 676ef146..7d89da21 100644
---- a/src/p2p.c
-+++ b/src/p2p.c
-@@ -1497,7 +1497,7 @@ static void p2p_handshake_event(struct handshake_state *hs,
- static void p2p_try_connect_group(struct p2p_device *dev)
+@@ -183,7 +184,7 @@ static struct auth_proto *test_initialize(struct test_data *td)
+ 
+ static void test_destruct(struct test_data *td)
  {
- 	struct scan_bss *bss = dev->conn_wsc_bss;
--	_auto_(handshake_state_free) struct handshake_state *hs = NULL;
-+	_auto_(handshake_state_unref) struct handshake_state *hs = NULL;
- 	struct iovec ie_iov[16];
- 	int ie_num = 0;
- 	int r;
-diff --git a/src/station.c b/src/station.c
-index 1238734f..c1c7ba9d 100644
---- a/src/station.c
-+++ b/src/station.c
-@@ -1394,7 +1394,7 @@ static struct handshake_state *station_handshake_setup(struct station *station,
- 	return hs;
+-	handshake_state_free(td->handshake);
++	handshake_state_unref(td->handshake);
+ 	l_free(td);
+ }
  
- not_supported:
+@@ -459,8 +460,8 @@ static void test_bad_confirm(const void *arg)
+ 	assert(td1->tx_assoc_called);
+ 	assert(td2->status != 0);
+ 
+-	handshake_state_free(hs1);
+-	handshake_state_free(hs2);
++	handshake_state_unref(hs1);
++	handshake_state_unref(hs2);
+ 
+ 	ap1->free(ap1);
+ 	ap2->free(ap2);
+@@ -544,8 +545,8 @@ static void test_confirm_after_accept(const void *arg)
+ 	assert(auth_proto_rx_associate(ap1, (uint8_t *)assoc, frame_len) == 0);
+ 	assert(auth_proto_rx_associate(ap2, (uint8_t *)assoc, frame_len) == 0);
+ 
+-	handshake_state_free(hs1);
+-	handshake_state_free(hs2);
++	handshake_state_unref(hs1);
++	handshake_state_unref(hs2);
+ 
+ 	auth_proto_free(ap1);
+ 	auth_proto_free(ap2);
+@@ -621,8 +622,8 @@ static void test_end_to_end(const void *arg)
+ 	assert(auth_proto_rx_associate(ap1, (uint8_t *)assoc, frame_len) == 0);
+ 	assert(auth_proto_rx_associate(ap2, (uint8_t *)assoc, frame_len) == 0);
+ 
+-	handshake_state_free(hs1);
+-	handshake_state_free(hs2);
++	handshake_state_unref(hs1);
++	handshake_state_unref(hs2);
+ 
+ 	auth_proto_free(ap1);
+ 	auth_proto_free(ap2);
+diff --git a/unit/test-wsc.c b/unit/test-wsc.c
+index 8b130f45..8022ebf6 100644
+--- a/unit/test-wsc.c
++++ b/unit/test-wsc.c
+@@ -61,6 +61,7 @@ static struct handshake_state *test_handshake_state_new(uint32_t ifindex)
+ 
+ 	ths->super.ifindex = ifindex;
+ 	ths->super.free = test_handshake_state_free;
++	ths->super.refcount = 1;
+ 
+ 	return &ths->super;
+ }
+@@ -2093,7 +2094,7 @@ static void wsc_test_pbc_handshake(const void *data)
+ 					eap_fail, sizeof(eap_fail), false);
+ 	assert(verify.eapol_failed);
+ 
 -	handshake_state_free(hs);
 +	handshake_state_unref(hs);
- 	return NULL;
+ 	eapol_exit();
+ 	eap_exit();
  }
+@@ -2216,7 +2217,7 @@ static void wsc_test_retransmission_no_fragmentation(const void *data)
+ 						sizeof(eap_fail), false);
+ 	assert(verify.eapol_failed);
  
-@@ -2484,7 +2484,7 @@ static void station_preauthenticate_cb(struct netdev *netdev,
- 	}
- 
- 	if (station_transition_reassociate(station, bss, new_hs) < 0) {
--		handshake_state_free(new_hs);
-+		handshake_state_unref(new_hs);
- 		station_roam_failed(station);
- 	}
- }
-@@ -2687,7 +2687,7 @@ static bool station_try_next_transition(struct station *station,
- 	}
- 
- 	if (station_transition_reassociate(station, bss, new_hs) < 0) {
--		handshake_state_free(new_hs);
-+		handshake_state_unref(new_hs);
- 		return false;
- 	}
- 
-@@ -3734,7 +3734,7 @@ int __station_connect_network(struct station *station, struct network *network,
- 				station_netdev_event,
- 				station_connect_cb, station);
- 	if (r < 0) {
--		handshake_state_free(hs);
-+		handshake_state_unref(hs);
- 		return r;
- 	}
- 
-diff --git a/src/wsc.c b/src/wsc.c
-index f88f5deb..44b8d3de 100644
---- a/src/wsc.c
-+++ b/src/wsc.c
-@@ -393,7 +393,7 @@ static int wsc_enrollee_connect(struct wsc_enrollee *wsce, struct scan_bss *bss,
- 		return 0;
- 
- error:
 -	handshake_state_free(hs);
 +	handshake_state_unref(hs);
- 	return r;
+ 	eapol_exit();
+ 	eap_exit();
  }
+@@ -2335,6 +2336,7 @@ static struct handshake_state *test_ap_sta_hs_new(struct test_ap_sta_data *s,
  
+ 	ths->super.ifindex = ifindex;
+ 	ths->super.free = (void (*)(struct handshake_state *s)) l_free;
++	ths->super.refcount = 1;
+ 	ths->s = s;
+ 
+ 	return &ths->super;
+@@ -2535,8 +2537,8 @@ static void wsc_r_test_pbc_handshake(const void *data)
+ 
+ 	test_ap_sta_run(&s);
+ 
+-	handshake_state_free(s.ap_hs);
+-	handshake_state_free(s.sta_hs);
++	handshake_state_unref(s.ap_hs);
++	handshake_state_unref(s.sta_hs);
+ 	__handshake_set_install_tk_func(NULL);
+ 	l_settings_free(ap_8021x_settings);
+ 	l_settings_free(sta_8021x_settings);
 -- 
 2.34.1
 
