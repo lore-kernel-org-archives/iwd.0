@@ -1,66 +1,66 @@
-Received: from mail-qk1-f174.google.com (mail-qk1-f174.google.com [209.85.222.174])
+Received: from mail-qv1-f41.google.com (mail-qv1-f41.google.com [209.85.219.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EE801DF99E
-	for <iwd@lists.linux.dev>; Fri, 22 Nov 2024 15:16:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28A231DFD82
+	for <iwd@lists.linux.dev>; Fri, 22 Nov 2024 15:16:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732288577; cv=none; b=t9JbQiGOfKDnRuPr3YkM883He23wX8gE+BnguUm01arsa1bzNFRk3zZjg0O9n+eoNi2kuqIhboosXeAxqhNcagNRL5aPhciredaSL0cD/Hq+15WLQy34AhDOAclKw72lPrwpMNkeQpXE3SRiQ8LelM413s8gFXzxN5GYa4iz3Ow=
+	t=1732288579; cv=none; b=HGKQ3LxIazA2lDx5wu/TdTgnBV33ST1OPydSYTtFvueF0aPZUdWaiE9S9VORKtWqT7Tctbe6wDxF6+o1eu9d/2JSIEf2nIwx5zaQlU2kqdcMUpe8gpLXGfSjhGJpbH50lQ+jwQ9QTLOo92uDd6tDUovDuiMt2nObJdX7kqBi8XQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732288577; c=relaxed/simple;
-	bh=OWTe4bcMifh1PpNVFFL5ewEB+HErvlf7qJPYQvhLI1U=;
+	s=arc-20240116; t=1732288579; c=relaxed/simple;
+	bh=7v8Hwh12tAfXG/QCBDDX3k5jeAJphvtI3VBhMujUpu4=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=Vsc8Bld85DjdCoad+5yaR7OBiHwZPKiPlj6pDZk/rmUeswjo1pVj9J8WMDaYAwVMDBvRHk1ZwaLjqhFsWdXsvZ++ccsb6N1bkQ0CzQDkhoJ6DgjYCm3XbOQmoZTlf3bp92beK5wnXYcz3pnQh0aN1d8omYVH09NnjhAhAxce9yg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JHQBAL+Q; arc=none smtp.client-ip=209.85.222.174
+	 MIME-Version; b=DgRWchImXHikoE6tIf8SkMuvKiXkbTn6dhP0h0tgruoDoM1HLqDRCRfloo4zwgLHv3tMfQvYzxZsRhrc1dHSlAxJUD4h8n60XEObWKbGHbS5nTzTEmQZc7dh2Ye+NcUlVTYDlyeJVtZKbsuXbkoiVbEIxowAxV3S0oXNQGklgdA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ACyl9GjQ; arc=none smtp.client-ip=209.85.219.41
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JHQBAL+Q"
-Received: by mail-qk1-f174.google.com with SMTP id af79cd13be357-7b154f71885so144395985a.0
-        for <iwd@lists.linux.dev>; Fri, 22 Nov 2024 07:16:15 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ACyl9GjQ"
+Received: by mail-qv1-f41.google.com with SMTP id 6a1803df08f44-6d41b1e842aso11191416d6.2
+        for <iwd@lists.linux.dev>; Fri, 22 Nov 2024 07:16:18 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1732288574; x=1732893374; darn=lists.linux.dev;
+        d=gmail.com; s=20230601; t=1732288577; x=1732893377; darn=lists.linux.dev;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=vsa58RXp9lDeRDF1l2cBmiNv/WDJwW0rSNFj1Jebv68=;
-        b=JHQBAL+QrDfiso/uAVGSkl9v4f6gxF7WwyVgOYX7NNc5/7eWxzguIoUKevxtCWMzMJ
-         +eC4tOBZ6fk62nOI/tp/kgzw2ukhILTTfW8tLlF8MlTbgKpPNcR1+v2yclr/ZGlLiF/2
-         V++XjCX1BONOXqYwvBUKHXohaS3TlRHOhgP6ERfZ3e24iV5QsM3XE0y1Ekn5/bzNhWNY
-         bymxIOnNBuwPbtzbclUlX2KJMnBU71520ZPp31CPW2p6WhcfNn7l5+DkdnpgxxLHBC4Y
-         cMOtOQB9NeMNgTApd7WcURIZXfxN6+mX0iPraaFVxa5nLzEbqDLrKOJlSrANY6Vtr+fD
-         NTgg==
+        bh=XpxfYQAAiMUJiaqQWHacvkMcUU2odSK4tYwWww3Hs5A=;
+        b=ACyl9GjQZ+kT0CPaQTPZAC0IQAwqIS9brO35ujgAoooSjan5zSEQUrUDY0uKE/hww3
+         jX/YQhoz7svhC35oursIS8GmrS7Ugn9QdGYzPeznKYiRZTahYE571hZSTfg6XXb6zeGu
+         zSDrCKiv+5nk0GreBLGGYPhZjyv7e7GGnY7b32drhIzorLYK47qFHFgwsEdKRsRTUdgJ
+         lG+D4XXWtwq7XFseoRmBby2hk6fZaH+5YQ3CXoaLJ+eDdxLwaVmB5xzYCZQRCOh/8/Wu
+         xXaYsUAebP/v1rw+o3T1kIsxtGPZgfMKu3VQvjH8p3sYrPECpluJSdy8x5HGQAUrgTsY
+         bbkg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732288574; x=1732893374;
+        d=1e100.net; s=20230601; t=1732288577; x=1732893377;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=vsa58RXp9lDeRDF1l2cBmiNv/WDJwW0rSNFj1Jebv68=;
-        b=sFGS/9tBhMHsvlTQlAdsNVO08ZELKD9q0+of+csxWI0yl0S6CEmS2MbUM6Ae50GQ0z
-         uy6Ox9EkBes5Xc7F3KLBlgE4En11TF4/iyZ2gUj23g52vTyAS+Nt2I/R0bBtGOIOx/HS
-         Lv8kX81V4t/VOOFYrucr2mM1HwbY+GjLVPmOk1I+l7MDY31eGrWeLuslnMzHPJ3Fj08c
-         vJ0Ecf2WR490l9UcxAUhLjdonw1nLUiIyVYUC/Ku1iiLp+GqzwNmM0JKMfNFFKQldzCA
-         XbW3o7sd2ir5o3dXIDJNcmTWG2SC/9vwyzcfLD3Rk1ShOGtxOk3Snbh3ODm6DsjFqst/
-         1GxQ==
-X-Gm-Message-State: AOJu0Yz760IJkTPv0tg/SZHmkVhdf9KNYBiCYxeleB24KtX+QibDurOy
-	pRfuAUVI2Cv1Cw5nvAnWCIg2SrUIDPNUoQRGr/RfO7sQWsg19Ez4X/Mwuw==
-X-Gm-Gg: ASbGncvq31HdiFi1JOo7sNA1DSGacG/2R2sbnsb5VpmYLtYM8ia4NbEijwHdI390CJ3
-	gd53RQX5ZFoqv3GETpOisP3H/bjkODJT8ddjSiveInKALnU2UurypevQVJB34fmOBzx3VB2+aCR
-	mgHb/lhqEHTnF8rBfSGSj1ZbYdRJH/bQemAy8Wb1miyGM6yVr0VKLcwQy741lOLlQOmOWBYthpv
-	aKaf5xiQY6m9ry6P5F/xYJ020q30CFHhfXp70ZyZiSr5Er+sN9ThbpyCz7/
-X-Google-Smtp-Source: AGHT+IGy4ViIbSXCdTsvshx/bRK/8/jQuXWcIJQF7nznwFDLV4WiNQM19sDSY/BtyKa+9f9SMwm6KQ==
-X-Received: by 2002:a05:6214:19c6:b0:6d4:e46:b438 with SMTP id 6a1803df08f44-6d450eed1edmr51696686d6.23.1732288574199;
-        Fri, 22 Nov 2024 07:16:14 -0800 (PST)
+        bh=XpxfYQAAiMUJiaqQWHacvkMcUU2odSK4tYwWww3Hs5A=;
+        b=mikXt93HPezCVcOfgibdjuPTr5sn6z3EpplcE83ERrEOMh9YEaEV08uyNIl47GZrbR
+         L9xkL5RS0Q3MpfkaUawQwb5f0JPBL4oBmFrn/uO8m4fnkFI+yKQXJdShUT95MMyh//Zq
+         XQGNwAXS7BUO4rJ2kLzIjUuvsapQ4tmfdaRCCjn5pX0PVcCymoNoQ45FtnI2G8BLg1Gu
+         990VQ0vVj37uLTRof667mGQEMvd6ozWTOYXLkvyKhpCddQLpz4uefl+1dmSPk7uqGmem
+         l7mkUns3MJ2bcSIHlDfsyZ4ucPBaj1TbeLHmr4amA+5B/2u8a3i67I5VaZUCccnD1SVK
+         pV1Q==
+X-Gm-Message-State: AOJu0Yz3M7qeN2OuPUC9FZpyGqHWiTxRrKikk7/yzZ3M2S95xnEkAC3v
+	ie6q1HndTUwaAZtXE+yL26TabCr4dOMWjSpTTTpYD9yfHg0CsQSCGCS4Qw==
+X-Gm-Gg: ASbGncvaOlci2QxZzo3rAqasE+7TlN7E1+7KWIo704J8VPX3L6PDiDGCzZwJ1tFJcB3
+	8j3MedvF8ScDLYMJh2sndO4J6VKMnmvf4BPGZH7bbD+VXq+QWAtkCxW5yyiEcxhW3vxHZboRS99
+	tuAO9UbBmATovIAdqleMS+PdFwfZjz4d52fiUkk0REixIBJDykAS/iKR58nCxL7Uy21+Xsq5oTw
+	yonLLpWcCJdfP+Q78+phwdvS/x+MfGgDtFu28oARGnMzegwbZg/0d6QXzQW
+X-Google-Smtp-Source: AGHT+IEg+gQZezp3OFp8hyTuJ+AZb9kdX/Lln8j42vnJi0dF21cL3npB5zPBqRn8pFXGqwBICEvYMA==
+X-Received: by 2002:a05:6214:cc4:b0:6d4:1d6f:8fb9 with SMTP id 6a1803df08f44-6d451362880mr59087186d6.47.1732288576862;
+        Fri, 22 Nov 2024 07:16:16 -0800 (PST)
 Received: from LOCLAP699.localdomain ([152.193.78.90])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6d451a9a720sm10722706d6.50.2024.11.22.07.16.13
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6d451a9a720sm10722706d6.50.2024.11.22.07.16.15
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 22 Nov 2024 07:16:13 -0800 (PST)
+        Fri, 22 Nov 2024 07:16:16 -0800 (PST)
 From: James Prestwood <prestwoj@gmail.com>
 To: iwd@lists.linux.dev
 Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 13/15] station: support PMKSA connections
-Date: Fri, 22 Nov 2024 07:15:49 -0800
-Message-Id: <20241122151551.286355-14-prestwoj@gmail.com>
+Subject: [PATCH 15/15] doc: document DisablePMKSA option
+Date: Fri, 22 Nov 2024 07:15:51 -0800
+Message-Id: <20241122151551.286355-16-prestwoj@gmail.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20241122151551.286355-1-prestwoj@gmail.com>
 References: <20241122151551.286355-1-prestwoj@gmail.com>
@@ -72,136 +72,25 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The actual connection piece of this is very minimal, and only
-requires station to check if there is a PMKSA cached, and if so
-include the PMKID in the RSNE. Netdev then takes care of the rest.
-
-The remainder of this patch is the error handling if a PMKSA
-connection fails with INVALID_PMKID. In this case IWD should retry
-the same BSS without PMKSA.
-
-An option was also added to disable PMKSA if a user wants to do
-that. In theory PMKSA is actually less secure compared to SAE so
-it could be something a user wants to disable. Going forward though
-it will be enabled by default as its a requirement from the WiFi
-alliance for WPA3 certification.
 ---
- src/station.c | 54 ++++++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 53 insertions(+), 1 deletion(-)
+ src/iwd.config.rst | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-diff --git a/src/station.c b/src/station.c
-index 09193eed..5403c332 100644
---- a/src/station.c
-+++ b/src/station.c
-@@ -63,6 +63,7 @@
- #include "src/eap.h"
- #include "src/eap-tls-common.h"
- #include "src/storage.h"
-+#include "src/pmksa.h"
+diff --git a/src/iwd.config.rst b/src/iwd.config.rst
+index 1cb4b05d..7530aae0 100644
+--- a/src/iwd.config.rst
++++ b/src/iwd.config.rst
+@@ -225,6 +225,11 @@ The group ``[General]`` contains general settings.
+        request is just a 'hint' and ultimately left up to the kernel to set the
+        country.
  
- #define STATION_RECENT_NETWORK_LIMIT	5
- #define STATION_RECENT_FREQS_LIMIT	5
-@@ -78,6 +79,7 @@ static bool supports_drop_gratuitous_arp;
- static bool supports_drop_unsolicited_na;
- static bool supports_ipv4_drop_unicast_in_l2_multicast;
- static bool supports_ipv6_drop_unicast_in_l2_multicast;
-+static bool pmksa_disabled;
- static struct watchlist event_watches;
- static uint32_t known_networks_watch;
- static uint32_t allowed_bands;
-@@ -1157,6 +1159,7 @@ static int station_build_handshake_rsn(struct handshake_state *hs,
- 					struct network *network,
- 					struct scan_bss *bss)
- {
-+	struct netdev *netdev = netdev_find(hs->ifindex);
- 	const struct l_settings *settings = iwd_get_config();
- 	enum security security = network_get_security(network);
- 	bool add_mde = false;
-@@ -1167,6 +1170,7 @@ static int station_build_handshake_rsn(struct handshake_state *hs,
- 	uint8_t *ap_ie;
- 	bool disable_ocv;
- 	enum band_freq band;
-+	struct pmksa *pmksa;
- 
- 	memset(&info, 0, sizeof(info));
- 
-@@ -1300,6 +1304,17 @@ build_ie:
- 			IE_CIPHER_IS_GCMP_CCMP(info.pairwise_ciphers))
- 		info.extended_key_id = true;
- 
-+	if (IE_AKM_IS_SAE(info.akm_suites) && !pmksa_disabled) {
-+		pmksa = pmksa_cache_get(netdev_get_address(netdev), bss->addr,
-+					bss->ssid, bss->ssid_len,
-+					info.akm_suites);
-+		if (pmksa) {
-+			handshake_state_set_pmksa(hs, pmksa);
-+			info.num_pmkids = 1;
-+			info.pmkids = hs->pmksa->pmkid;
-+		}
-+	}
++   * - DisablePMKSA
++     - Value: **false**, true
 +
- 	/* RSN takes priority */
- 	if (bss->rsne) {
- 		ap_ie = bss->rsne;
-@@ -3391,6 +3406,39 @@ try_next:
- 	return station_try_next_bss(station);
- }
- 
-+static bool station_pmksa_fallback(struct station *station, uint16_t status)
-+{
-+	/*
-+	 * IEEE 802.11-2020 12.6.10.3 Cached PMKSAs and RSNA key management
-+	 *
-+	 * "If the Authenticator does not have a PMKSA for the PMKIDs in the
-+	 * (re)association request or the AKM does not match, its behavior
-+	 * depends on how the PMKSA was established. If SAE authentication was
-+	 * used to establish the PMKSA, then the AP shall reject (re)association
-+	 * by sending a (Re)Association Response frame with status code
-+	 * STATUS_INVALID_PMKID. Note that this allows the non-AP STA to fall
-+	 * back to full SAE authentication to establish another PMKSA"
-+	 */
-+	if (status != MMPDU_STATUS_CODE_INVALID_PMKID)
-+		return false;
++       Disable PMKSA support in IWD
 +
-+	if (L_WARN_ON(!station->hs))
-+		return false;
-+
-+	if (!IE_AKM_IS_SAE(station->hs->akm_suite) || !station->hs->have_pmksa)
-+		return false;
-+
-+	/*
-+	 * Remove the PMKSA from the handshake and return true to re-try the
-+	 * same BSS without PMKSA.
-+	 */
-+	handshake_state_remove_pmksa(station->hs);
-+
-+	station_debug_event(station, "pmksa-invalid-pmkid");
-+
-+	return true;
-+}
-+
- /* A bit more concise for trying to fit these into 80 characters */
- #define IS_TEMPORARY_STATUS(code) \
- 	((code) == MMPDU_STATUS_CODE_DENIED_UNSUFFICIENT_BANDWIDTH || \
-@@ -3414,7 +3462,7 @@ static bool station_retry_with_status(struct station *station,
- 	if (IS_TEMPORARY_STATUS(status_code))
- 		network_blacklist_add(station->connected_network,
- 						station->connected_bss);
--	else
-+	else if (!station_pmksa_fallback(station, status_code))
- 		blacklist_add_bss(station->connected_bss->addr);
- 
- 	iwd_notice(IWD_NOTICE_CONNECT_FAILED, "status: %u", status_code);
-@@ -5830,6 +5878,10 @@ static int station_init(void)
- 				&anqp_disabled))
- 		anqp_disabled = true;
- 
-+	if (!l_settings_get_bool(iwd_get_config(), "General", "DisablePMKSA",
-+				&pmksa_disabled))
-+		pmksa_disabled = false;
-+
- 	if (!netconfig_enabled())
- 		l_info("station: Network configuration is disabled.");
+ Network
+ -------
  
 -- 
 2.34.1
