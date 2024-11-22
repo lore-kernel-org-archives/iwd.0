@@ -1,66 +1,66 @@
-Received: from mail-qk1-f176.google.com (mail-qk1-f176.google.com [209.85.222.176])
+Received: from mail-qv1-f41.google.com (mail-qv1-f41.google.com [209.85.219.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7FBC1DF97C
-	for <iwd@lists.linux.dev>; Fri, 22 Nov 2024 15:16:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38F591DF27E
+	for <iwd@lists.linux.dev>; Fri, 22 Nov 2024 15:16:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732288564; cv=none; b=QXnMeeCT8IAYLoJ8eCQMlwWbQiiLLpk+2Vx0CAiB2+bEBU1Oc2gs3RJOuKSArHUI+CLq0y95bJG80emzlKIYRqVAFpT7ezlighwQK7jKjQshV7xhgxWxI32vaSa2hH/VQIzwaQ6ft2j9K//CUPy+AB9UcQ8NnQ/m4yjPOjfOxBE=
+	t=1732288565; cv=none; b=SF9GxfmxvoiSrVrFEDlMF7jsOfpnV6cTdb3XJeo3s8Urbn6BpSAoS+KVvdrUbi3EV34XWUhzHkVrHEcZPQ3qkn2l/aLZW3MJA5DKapFYYFKVQNc0fJUMX078JjeQKaYq5xbNkURYac/F5DkqUUv99ClpxNmpjwelPUQXL6ALV6M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732288564; c=relaxed/simple;
-	bh=lz42EzFJGWQ8+rQb+j+gOzZplkzxcGWyNyolwtaV3kA=;
+	s=arc-20240116; t=1732288565; c=relaxed/simple;
+	bh=F+ZINwdxUv1j8363e0TcjXdQkq8wX3RLY8HtOMevR9Q=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=ZGQ++ejN52axqnzJxAA9it0Yyv/27/RaWgrXuIzSi1ahI72twv5Gh+6ZL4WoCTHO+7nRZiUGWixIHvaCv0kOp25vaP3bZDaEPiuQCn47uKqiL3+w9n8MCNsyTBg13jAYJ8hBYnFqmq1QbyFG15DkXnc0pnkmF3rHBlhnIIEpVz0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=R7oaKcsA; arc=none smtp.client-ip=209.85.222.176
+	 MIME-Version; b=jvsOQh90wkbMmVvJdEvS+Uu7a8w+Xl+unrOEWkzksr6bGX8Hh7snAlx3rXxoKYVvX1h4PXYagnOLFLu+mFjYabQHm3Pm/LP6sqiHTU8r1YX1lTlnzY3UH5BowY4nShq48BHqE/5KQSGLiNqofT12j63NZv/3GScCeQyWCGS+0is=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SIgIz61G; arc=none smtp.client-ip=209.85.219.41
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="R7oaKcsA"
-Received: by mail-qk1-f176.google.com with SMTP id af79cd13be357-7b15d7b7a32so143370385a.1
-        for <iwd@lists.linux.dev>; Fri, 22 Nov 2024 07:16:02 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SIgIz61G"
+Received: by mail-qv1-f41.google.com with SMTP id 6a1803df08f44-6d408e38561so12958546d6.2
+        for <iwd@lists.linux.dev>; Fri, 22 Nov 2024 07:16:03 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1732288561; x=1732893361; darn=lists.linux.dev;
+        d=gmail.com; s=20230601; t=1732288563; x=1732893363; darn=lists.linux.dev;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=aeqantfww0CyY6LtbLG/AePT/EJjBBFmJzhCfNYHwDA=;
-        b=R7oaKcsA+2P7qhpCJ+nV8zf9tOMn+u3aTCDrgar2e9dB4Amf/p+NvNCxVYWhZmvV4C
-         f1zHBPKOa/Hcop6VGofAi7FkjwLcrA5iggVacI/KS2Zw2tP98W72yUPRb1Ql9iuJNNA3
-         BYmnDhVOjZMdsGUk/+qTLR5Yv04zZy1RMP+7ndr4WN3tPHy72CIkMRWsVPVM4JOHVLjG
-         gEtVTs53QAiJ6guXG0R+/Trl1FwcJCvJvgz81Fyhxh8mildK4cpGcSEwna/SrtVpbADV
-         s0FF8Yp3XLt0Hzmv2An6U5jWSn7Ks0O79yYpYVqbW7r0ExlG4nqLWh/4s8UerXH5Rz3V
-         GadQ==
+        bh=w9fJp+iP2ienHIhxJqavPfR0kha9omAdAWoA2nuKMPo=;
+        b=SIgIz61GGv/pNwBs80J0SkE1fEBf5Cm/VQa2CZknpgc88zcsXDZzneqjdBa++jPytV
+         FUeT2UDqJ/fXTA/sg129Wb3c2u0DLJiaVhEYKNk66RiXdWZ9llljMEG4S18UubT/ul02
+         oE/tQYdPuELtuctC5wIqPYaUNjie0jYQ9stwlLwnJqR+Tw9b2vTqourshTd16LrWsa7u
+         SvYFYRbP+4RyDnXxa27sN33nCxiEc/33FSEYSjuthzbZFQkri2NcwEPRl8EX1pdYDaLm
+         JZWItO0GSBI1shwhnrcRg8MrhPXg1PCf0fYjSvkS9KiSR3ZzEB84HwbpzLA7XNkm+i6p
+         JAjw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732288561; x=1732893361;
+        d=1e100.net; s=20230601; t=1732288563; x=1732893363;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=aeqantfww0CyY6LtbLG/AePT/EJjBBFmJzhCfNYHwDA=;
-        b=HIUAinV97atZSSA0HqBXYeZ+p8EH1VS+iweQc2VZTJ6kPkzdzF6u1JheRDSnxK/r9Q
-         L6wDDAv1mStWXlpwqOM8LZopiLVynN4YfVPAlNTx3M9OxpWoeAUk4sxtAqDlFLZTVPBO
-         /yr9+hiOAhNCSYwnG1IG7sWK6DdcOtkE7ej0QZZVFFgbV5dHXJOWwSwwd5TzP4DKMM5S
-         /BoRzfAgC8MHOVE421POt6ofF+/5bMqZP8iBmbIAPdzXcqevDT/QRYd+WisD28p87J14
-         zCsRbZoO/HAbkOByBmGF8tEiC/iCzY19DED/G+TZXuFq1tZYPDWdjEb8N1KyB2EtCMII
-         YD0w==
-X-Gm-Message-State: AOJu0Yyq6/iFv0nwn9bCQv0RoBfyp7jBVK6RjJ13Glq+AbELlhtr1pta
-	hZjyTPfbAT29CQzpYZwZVKZ8SIMzysuzehWvW7ndwlRRFU2SVOEKlOFZ3A==
-X-Gm-Gg: ASbGnctubjLtM2I3YhpeB+yQKDTj23osrRZj2/ex3mmiq3GrDEhxF6W4CXDLFanrZ7t
-	Gx5q6lKc0Ay7tDorUkD+Fi4pLNGWd9K9uJ2b3HnpuNDAJU+R+AFIhUiAQtpdbEIpOZSDeQa7cbn
-	IsM2Vtij7vYwjrQjdYEzX2dtdZT3qh1xx4sjTXXfp1Jynp2fUFCsLp9FPwaeVMtCvKPXK5yCNFG
-	MWXeNKs0bmsulXkSkn2R98PgsnIbgz/67mbH/JRaFq+wFZ4QRjRafRv0OPd
-X-Google-Smtp-Source: AGHT+IFQfeFXhHxwV2bRxqSx+juZZ4Rdrz6QFNGGdV+ohlAd/3w1p3uny/NvDu/y5aNJrSI95wmkGA==
-X-Received: by 2002:a05:6214:20ea:b0:6d4:76a:d96a with SMTP id 6a1803df08f44-6d451393387mr40205276d6.48.1732288561237;
-        Fri, 22 Nov 2024 07:16:01 -0800 (PST)
+        bh=w9fJp+iP2ienHIhxJqavPfR0kha9omAdAWoA2nuKMPo=;
+        b=qbZvgV5MUn7XjPhIP6msoHsUpCS9bQ8WH7mkKj6zlRuvP0pDSejMOICW/KkrbITGbF
+         OP4NKhGkJ8RsISEMHZKPsrhX/r6szHvQndFZIrWdl9VQX2/zZyr8Yv0ikVJlKglHH+jU
+         bebOUbecDYs549bvh1+FC+iEM9NhzT6/PQ/vLF9ZAmu1Xz2u+HOAKO7YQnFUuBRKURro
+         PzgkVseA2tt9PT2WZOMzidnAFaGnA5HjYgs2W5Pw6fbkl8Bd1ad+78PnT4SLO8M+ta0e
+         FOcLOGImfT9C6pbtgIGKmL45yraDy9SEFwUCnEyFuSHQaP/3PatzWgVhhzpUodz7HfJV
+         T3WA==
+X-Gm-Message-State: AOJu0YyFFAQd7EEVILGQnszNmMHcY3jaENYqUG+J1wdRm69tjqWV594L
+	F88JJJNIktd5x/3W1353YtLexUu3apbemAxsenSR+meN4YtVox2ciYNbVg==
+X-Gm-Gg: ASbGncv8QuWye7lCFqh54GdchlHpw016809NzIovYn38QyQou/3BFjZTTrd6dlKNCwi
+	7KGMSUyTo0w0DI4LIDS9AqQ7Yf5i01cOp7KAoLAPk1ajI0CvSiZHMBYwJcKX5/5T/PILf94tYQo
+	4sIS0tWhfwDNVFFfPdEBItWL64/qE0yhYtJhGkU82g65rBbn1EiX3rZs0h3Q7H2V4WvNGfrQtIU
+	6E0k51JvaLkmXmpumzKM1QO/6gWGtymMZ+Hd+q1OfY2MMejTXf3wD6HSwIW
+X-Google-Smtp-Source: AGHT+IGZk7RyCXPwpdE4MyiDAqgGkq/2/dBkcXrasPdiY1zJ3XSkbCaY8ADr1ZQk2iOIEyrkrTInRA==
+X-Received: by 2002:a05:6214:1d0a:b0:6cd:ec00:205e with SMTP id 6a1803df08f44-6d450df104cmr55223036d6.0.1732288562614;
+        Fri, 22 Nov 2024 07:16:02 -0800 (PST)
 Received: from LOCLAP699.localdomain ([152.193.78.90])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6d451a9a720sm10722706d6.50.2024.11.22.07.16.00
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6d451a9a720sm10722706d6.50.2024.11.22.07.16.01
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 22 Nov 2024 07:16:00 -0800 (PST)
+        Fri, 22 Nov 2024 07:16:02 -0800 (PST)
 From: James Prestwood <prestwoj@gmail.com>
 To: iwd@lists.linux.dev
 Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 03/15] auto-t: always initialize StationDebug in Device class
-Date: Fri, 22 Nov 2024 07:15:39 -0800
-Message-Id: <20241122151551.286355-4-prestwoj@gmail.com>
+Subject: [PATCH 04/15] auto-t: add pmksa_flush() to hostapd module
+Date: Fri, 22 Nov 2024 07:15:40 -0800
+Message-Id: <20241122151551.286355-5-prestwoj@gmail.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20241122151551.286355-1-prestwoj@gmail.com>
 References: <20241122151551.286355-1-prestwoj@gmail.com>
@@ -72,40 +72,22 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Since IWD doesn't utilize DBus signals in "normal" operations its
-fine to lazy initialize any of the DBus interfaces since properties
-can be obtained as needed with Get/GetAll.
-
-For test-runner though StationDebug uses signals for debug events
-and until the StationDebug class is initialized (via a method call
-or property access) all signals will be lost. Fix this by always
-initializing the StationDebug interface when a Device class is
-initialized.
 ---
- autotests/util/iwd.py | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ autotests/util/hostapd.py | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/autotests/util/iwd.py b/autotests/util/iwd.py
-index e9101d75..9091807a 100755
---- a/autotests/util/iwd.py
-+++ b/autotests/util/iwd.py
-@@ -450,13 +450,15 @@ class Device(IWDDBusAbstract):
-         self._wps_manager_if = None
-         self._station_if = None
-         self._station_props = None
--        self._station_debug_obj = None
-         self._dpp_obj = None
-         self._sc_dpp_obj = None
-         self._ap_obj = None
+diff --git a/autotests/util/hostapd.py b/autotests/util/hostapd.py
+index e5e35a96..611d8a63 100644
+--- a/autotests/util/hostapd.py
++++ b/autotests/util/hostapd.py
+@@ -368,3 +368,7 @@ class HostapdCLI(object):
+             others = [h for h in args if h != hapd]
  
-         IWDDBusAbstract.__init__(self, *args, **kwargs)
- 
-+        self._station_debug_obj = StationDebug(object_path=self._object_path,
-+                                                    namespace=self._namespace)
+             hapd._add_neighbors(*others)
 +
-     @property
-     def _wps_manager(self):
-         if self._wps_manager_if is None:
++    def pmksa_flush(self):
++        cmd = self.cmdline + ['pmksa_flush']
++        ctx.start_process(cmd).wait()
 -- 
 2.34.1
 
