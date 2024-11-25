@@ -1,98 +1,90 @@
-Received: from mail-qt1-f172.google.com (mail-qt1-f172.google.com [209.85.160.172])
+Received: from mail-oi1-f170.google.com (mail-oi1-f170.google.com [209.85.167.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6AE4C1B21B5
-	for <iwd@lists.linux.dev>; Mon, 25 Nov 2024 15:06:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDE4EEACE
+	for <iwd@lists.linux.dev>; Mon, 25 Nov 2024 17:48:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732547193; cv=none; b=s/PHxipWvYwE+5BpGkKmvR7ChWOXzoEMuIXKuFvep1Zsrdt2/IMy81POX8ofQy20FCphwsdwT81r9sJaAVwt2LRFfMNyCnKL3ptMGL1v/S1rWzEsKyhtpA4OGwIFOT3dS9JA8nFIQ2U/bvR/Qeujv5hIbZqzvl/cmvp/4N60uZ4=
+	t=1732556899; cv=none; b=eYDbEPa5Tv251LneksNLPyZkOi1c+gpCFkY3M7RU1jFTOxXc77KX1DXaYz1e8ZOv6EEBXo+osSVdYebdHnzvl4sNSAA4/7Yh80pHK/WUxIMGg5v0nQMnQiEPNdnWk6QvInde+StWIz6OlM7D1165rhEDQboT7zuDSTP+dBF5Dec=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732547193; c=relaxed/simple;
-	bh=+UEpCRih6j2aTuGKq6/22ZcuMoXLtUQwKeK5WSdrf7o=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=nyouYUHupEqa1GLijEQ3dp50/roPPxodFPWYMc3gEX5AuhuDjoR3+6TPFiBXkKfKi4vMds64fYy9WIgl/KDaENysuc5ACvOy2iA0e6Ug+QjmiOaqNhD6wibOsstl9DElo6VKAv7E9BGmCiVjlBJ39wBQPPie3eoNUc48+AMm88Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XrC/Ui/a; arc=none smtp.client-ip=209.85.160.172
+	s=arc-20240116; t=1732556899; c=relaxed/simple;
+	bh=82rsToba9PWuEE39mKE8idyZq6TUhNzUcZmWElKNdcE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=r6NTP/26wWQxDJ+Kz2KzmOSE+AaeGdM+wvVDTytXWZwa/XIRDQu+Nuk4PMD3fVfMeUnaohrtMbwmZap2RvX5BA6bZ0PsZX3KMncNWnCL6b9VATsxeYmXvyE9LRHocxIxiVyEyalHU6g+dzSiouWDu5jZtcnhqjL/5NlrjP82cN8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ybe6x18f; arc=none smtp.client-ip=209.85.167.170
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XrC/Ui/a"
-Received: by mail-qt1-f172.google.com with SMTP id d75a77b69052e-4669eecd88dso2720631cf.0
-        for <iwd@lists.linux.dev>; Mon, 25 Nov 2024 07:06:32 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ybe6x18f"
+Received: by mail-oi1-f170.google.com with SMTP id 5614622812f47-3e5f6e44727so2700717b6e.0
+        for <iwd@lists.linux.dev>; Mon, 25 Nov 2024 09:48:16 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1732547191; x=1733151991; darn=lists.linux.dev;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=+fFrJDAMUyrgQNE5F6mYZPxOkSEe90ITMyZgCx6NFDQ=;
-        b=XrC/Ui/aDW6k2RhQo0p4472xfmIG6++OrkNHYn7tnKkC0S779enZgjAGzrVNAdZWTl
-         MlAHZ8T6cEn+KOQdQuGONNeoU6SxHx9xp1Oq29iVkEAg/CTh+GlWiOp+YEv3ime5LwCC
-         yB/ftTfaaMLwsYbjhSYYEi3xifI4tRhYoWchEo7uAi//ete5rZ2cID+nvPugv0XynPM0
-         IZOEOIky8ji++32zknx+oGcywlY1ifUbaRKPgaat+8yNYJpj8u91O9H9N1akKixWU7nb
-         32XdaVrCzG4swa5x+cmXNjRXZwbLxEXJelP0oh5vBz2csZvHMRQbYfbHWxa9I2QEEV5F
-         XpXA==
+        d=gmail.com; s=20230601; t=1732556896; x=1733161696; darn=lists.linux.dev;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:to:subject:user-agent:mime-version:date:message-id:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=kYgY7XAD9j9fsGd/5ShB8tYD9YJnqNlMGOS26RfLY/s=;
+        b=Ybe6x18fBbuN1bOy1Ur2gQuBjnv4eAojbAInyKNBRO3jA2GcpeL69Mii3y+wosiHg2
+         xWJ/sS+RYfvu4eFs62f0T+rd4ALQJ5oEQeEiUXy1VQu2QwCblCSChzSOu7VcJAgSQPAN
+         89tzbdb/hIK235L/Jedgqol+m0SLrCdhCr38d06qTlFBLtHlP/fDyNI6Kqm6X9bKLoQa
+         Ghewpas4/EE4MBGpQMu7zGVzUIJ443ILn0NFW1HMh2P9vDBt2aDENzosqh+C1PEkBOPl
+         im+L4MVYrH+359mO9jPFe/em7Js6Vo2PKhqyfw/6KiXdMK+oSq763gvwZ2nyxnIwomcb
+         ofVw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732547191; x=1733151991;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=+fFrJDAMUyrgQNE5F6mYZPxOkSEe90ITMyZgCx6NFDQ=;
-        b=XL4DVmzLVVnVAAx9DJH322qpz3S6dG+1rSi0KBBIIhfsT/rGj7Ys4ZC9XRkDmq9uTs
-         JaSrXem03PFZofxOHIbSWglkWYj2/xIzI4K5+MyfPC1sMEW5OcTxsFLJLcxoAhE9Tk9K
-         3u99xlzqOnPWrNwKUvfLz5zaqOkULan6Ev51rzv/dSJ03FObKW14Zc0wvxu0BZxhulXJ
-         b/KfPyfOiIbXjd1h7qbWph1BlIC+YtA6djAxRJmDwLCIZ6zBSSwnc1SdKy9sByrQb9Ls
-         9B8BT+tONQhRgJ6KtNShAbkGALrRM67xTM3MBNk52NngDc/bG475R0blh+UTGTydWwoQ
-         VMWA==
-X-Gm-Message-State: AOJu0YzpusHYS8ygn4KSQy8OWbLCbckv8dZUtai+3PevhzeePvT6K30O
-	E6DyyNg+LVRnrgY742XaOTmZ2Rd8f4HoQbg+xXsfs8z10bQand5oSZK79Q==
-X-Gm-Gg: ASbGncvADa3noX7k4OZevVqd0rx29jvYSxgjXENE7f2ZT+krQjoG7uZP+lOLSHaBUTp
-	WTPufw5r/AQ8r21XXPcfej0reE9dR1nv811XUPIDHPqAlh1WaHcOKIxhNUQ9t2PVJZx8dzvzDHX
-	vebvU9Ck5O3pUk/t7yCy6ye7l1CrwAZ/ou1gfdBntnuPepMV6rDZWWuLq9PdnK+Qi2d1UupaN2t
-	Pbx1KNvDGPOvT0wFaWe7iWNQiMX23hPElSAsiFKmZBUqCrlekEywvsEwb5s
-X-Google-Smtp-Source: AGHT+IE6rE9CDTRWseZQM6/zUiGT+e9po6ZwiqiJSvbdeg1wDTph/LU+HB85MtApzHtEtRrozZlIAA==
-X-Received: by 2002:a05:6214:767:b0:6d4:25c4:e763 with SMTP id 6a1803df08f44-6d450e6d997mr223886816d6.5.1732547191059;
-        Mon, 25 Nov 2024 07:06:31 -0800 (PST)
-Received: from LOCLAP699.localdomain ([152.193.78.90])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6d451ab5cc3sm43569136d6.66.2024.11.25.07.06.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 25 Nov 2024 07:06:30 -0800 (PST)
-From: James Prestwood <prestwoj@gmail.com>
-To: iwd@lists.linux.dev
-Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 4/4] doc: document [DriverQuirks].MulticastRxDisable
-Date: Mon, 25 Nov 2024 07:06:23 -0800
-Message-Id: <20241125150623.1014890-4-prestwoj@gmail.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20241125150623.1014890-1-prestwoj@gmail.com>
-References: <20241125150623.1014890-1-prestwoj@gmail.com>
+        d=1e100.net; s=20230601; t=1732556896; x=1733161696;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=kYgY7XAD9j9fsGd/5ShB8tYD9YJnqNlMGOS26RfLY/s=;
+        b=sPQ5Fp8pr4uuvCLTVT8WNoDPs/zaNPIsBzJtDwCEWpUZbQvPy8B1af5mZK5MrkeqZx
+         ZHGFmBs8BYC8vab8P1qHy/tyEXAJBE/yxStv5Bnor0hgjljCixBHdklgtN/mQT/kd/h5
+         PqUPVNTh5lE5LLwbjQZPdYQSoFW2j3Tc7LI71jKDnpixlfzWAoUF4UY0nhZPpI25AYGP
+         NhJyoIam+kBQZHjeS3yyRDme+zTXPaxyr1YNuiInFUSS2Wefo1rzulg4UTJrYHIfHt76
+         hXiQpub6Y4p6Kfl7ALhq/8o9k0I0sAKwpmnJFpO0O7i7ZsxNpNilrBT0LtCcr9u7XH1k
+         J/PA==
+X-Forwarded-Encrypted: i=1; AJvYcCVrV/p3dYP0YszBkrWnJt0SmYJQYbH5i+BV1yMs1I9052LgKFNwWPNrbL6wRFvU/ijFOOA=@lists.linux.dev
+X-Gm-Message-State: AOJu0YzazDgpp1WSGNd/CuQ3E7WAuFrk3NRPqalOx8TfnWb/b7il2Pbn
+	VBX7TT+PD4tqcuaEkwpZS6/SWtUK2fq4ms02IG85E1RXX9Mpk9rg
+X-Gm-Gg: ASbGncsfymWRsGdMBJ0XDNJVq8UBvcahKg5YSo3Ara0PwDEZJm9hwU0PtbhdQdWYeF3
+	f//T3gf74StS3Zb9D5MUD0V5C/pbHyufxixzP9vgkiaXPFDANPU7h9q7reg4nM8KYzklcaUWc/3
+	uUMf0+QimG7YMfeHYL0PGySpq/6GN8Hnr+baTZT5po3dUPPTlajnmTxgmnxesfuhLeZ3nx4J4yD
+	wtpqWKCQr7TXDYWyAtu1L5NEtbnrdDp7EWTWp3DLJ0OhvS0wcUTbzrBQldncPNFO1MLxvudPBdu
+	YdjiSUhcFaLGNss=
+X-Google-Smtp-Source: AGHT+IHyZrllhKUJ51LMM7w/fTXzY4RWPQsqJ4v8gQYokeKdEbcSwJJJgD0YQA8iJt0NiISCGmauHA==
+X-Received: by 2002:a05:6808:2007:b0:3e7:60bd:8b06 with SMTP id 5614622812f47-3e915823f38mr12054431b6e.16.1732556895880;
+        Mon, 25 Nov 2024 09:48:15 -0800 (PST)
+Received: from [192.168.1.22] (syn-070-114-247-242.res.spectrum.com. [70.114.247.242])
+        by smtp.googlemail.com with ESMTPSA id 5614622812f47-3ea55d17002sm155507b6e.30.2024.11.25.09.48.14
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 25 Nov 2024 09:48:15 -0800 (PST)
+Message-ID: <778363dc-248c-48e9-bd9a-d52b0dc0d7cd@gmail.com>
+Date: Mon, 25 Nov 2024 11:48:14 -0600
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/4] wiphy: make "wiphy" const in wiphy_has_ext_feature
+To: James Prestwood <prestwoj@gmail.com>, iwd@lists.linux.dev
+References: <20241125150623.1014890-1-prestwoj@gmail.com>
+Content-Language: en-US
+From: Denis Kenzior <denkenz@gmail.com>
+In-Reply-To: <20241125150623.1014890-1-prestwoj@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
----
- src/iwd.config.rst | 6 ++++++
- 1 file changed, 6 insertions(+)
+Hi James,
 
-diff --git a/src/iwd.config.rst b/src/iwd.config.rst
-index 1cb4b05d..c031b8dc 100644
---- a/src/iwd.config.rst
-+++ b/src/iwd.config.rst
-@@ -454,6 +454,12 @@ are buggy or just don't behave similar enough to the majority of other drivers.
- 
-        If a driver in user matches one in this list power save will be disabled.
- 
-+   * - MulticastRxDisable
-+     - Values: comma-separated list of drivers or glob matches
-+
-+       If a driver in use matches one in this list, multicast RX will be
-+       disabled.
-+
- SEE ALSO
- ========
- 
--- 
-2.34.1
+On 11/25/24 9:06 AM, James Prestwood wrote:
+> ---
+>   src/wiphy.c | 2 +-
+>   src/wiphy.h | 2 +-
+>   2 files changed, 2 insertions(+), 2 deletions(-)
+> 
 
+All applied, thanks.
+
+Regards,
+-Denis
