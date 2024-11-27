@@ -1,66 +1,66 @@
-Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
+Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 694DE1E1041
-	for <iwd@lists.linux.dev>; Wed, 27 Nov 2024 17:33:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12891201037
+	for <iwd@lists.linux.dev>; Wed, 27 Nov 2024 17:33:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732728816; cv=none; b=kEXBcGY8eBngsJQ4OsL9aOFE0lSwdq37oTQn9fKxpSfJaqAdHQDvtfa620YUQgS0qzHJuYnb7TuN7MGjTPKRmNtrQl/eKVt0WosZ1QudcFXtChaHEYwIVStB3ALsmOveJzuqpbNcYulJ+YFKEhZG7wlbZiw9xF0a9NDWwkJsJJg=
+	t=1732728818; cv=none; b=KvED4W+ij3jg55nU/GPhPBuZtmRordMXjt03v12hSUBI3p6XzvcZFAW4Tcr2/Jr3URJIoMFRSjzI5zzYVdgmDeJZ9HDIaZCvTeAlvr1MHtlaCPxtSWETqY/zFMfHgXWasI5n9QKfh4UvPPGlz6PgWZMmZlTmqOSuZYiL/IWA7vA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732728816; c=relaxed/simple;
-	bh=2Zi4/vqFtxByKs/3VxDoJnY99JyExLX1mp2WF7lSBr8=;
+	s=arc-20240116; t=1732728818; c=relaxed/simple;
+	bh=sgHJqk2K0PbFz0AYqC5yqWXOqGHbBqv9Cjrl/te2as8=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=RKRaGE2LS5QNtr2QwVdIOoqYn3dNFdKVLfbCTLEjztH+gr3oPX4zg0zr0+q+nQgJRp9FwJfHHQLrDmzHlTQGROvzLE7krzEbMPWL/lY67oJDjjLQ8TSmU8ik7gFPCRnzm1rjUTTKCk2HqrGuYragfBcZV+j6rsxR0xEZkyB/kKY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BCOOv19E; arc=none smtp.client-ip=209.85.214.178
+	 MIME-Version; b=F+CztsNI0zATeeBBngBpfScwKOwfws11RExwuvuxPCHY28MD90YNbU9zSlZubosoCMCJV78BCtDyPxeNUaQmATrzbulgYWBYZM5wbcsAp7LSKPLnfzLvs8KYjvyQwT2pBkKD2rEflTjIdnEkx3dbmZgyowWArRR6y+/VZmZdL04=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TGsTZin7; arc=none smtp.client-ip=209.85.214.169
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BCOOv19E"
-Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-2126408cf31so51311595ad.0
-        for <iwd@lists.linux.dev>; Wed, 27 Nov 2024 09:33:35 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TGsTZin7"
+Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-212874cd62cso47912525ad.3
+        for <iwd@lists.linux.dev>; Wed, 27 Nov 2024 09:33:36 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1732728814; x=1733333614; darn=lists.linux.dev;
+        d=gmail.com; s=20230601; t=1732728816; x=1733333616; darn=lists.linux.dev;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=NTf38Av7Y42HfeDckzjvAA0AbIrAstHrD8Hg1EQv/xY=;
-        b=BCOOv19EKmzALAUqJ1MLQK3fB2JDqi0EOXB4571ooKtoIPHYYMNFk7UEXvtUfyi3oA
-         DR/Z7tIcNGs8vJ0oWj52+MwOmMlM2BsKgHaDsmx+IKUDHxUsHtCGO4VC3qDb9b7XFH3a
-         DpCAbpggQQ4FQusn11uPNtj63K0VTjYrBaP3obV9M7USGvnefxKCJ5zt9tdB8n+WGTlT
-         VWUyaj6UI4UrOEM3jOzM7/nJjMRjXiVszibRJ//H6y8vfaVyDudELZ+GqawzzeJie2BI
-         +f37VSi+Kh6DImCaS7/3EgQBSHC6PwunVoafw7+hKoT9Q1ajqv7f7xIca6GEqKWaoNzY
-         XngA==
+        bh=s5krJwb9f6bvgnmf4pJNPCk0tRIJeDHDucoiutJFm1I=;
+        b=TGsTZin7M7jdBIxBa8dSqOWErHpCsyPqsa93lSnO7Yly/MalInFpDhPW+FZ7YVXupz
+         3XqxX/eTQFNKkTMxGVdnaTM3zxXwyh3DyFEy0Co89nrORjKrwPPQ6ykf+5VNY/gCBumk
+         G+p3fTANJZIXHlMVkTwGBtvU0lmRZ3NGqvN6Zx9kzfD29pUtgyEjVz3p71FtXXx2FNiv
+         Bw5C+vrJQXIabypS1hcYpjLVtCRoJHHv0cmnFXtNr2kYyrgvivXlZNbr57GqMFdDVQ0P
+         gmithMys4+tM/cZsanlGi+d+dqqzPDMQZywMKTDBXwkjDehpgShH4YJirUFB3xMeGDli
+         B9tw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732728814; x=1733333614;
+        d=1e100.net; s=20230601; t=1732728816; x=1733333616;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=NTf38Av7Y42HfeDckzjvAA0AbIrAstHrD8Hg1EQv/xY=;
-        b=tSevsqcqZYOO+YHz/hCGbGBxWtYvg54I3iQQtf+T65S6WYxUGW+E+7Rj+r9gvX7O8w
-         1qY6MBcocRzoMpnIJ8XwaLiZGaMPoV2/CRY4DIGxQRHLaafZ6ANkGAsuvDsmIqQ4eV4J
-         sPznbyRd12x0/3pncY87+x2U8yDy9ue9g3bRqf9hN5zDrUfzwLvxBN4Ok3Zg8nZMD3yX
-         Kclgsm2PFaud3BRVzqmqUfdpFpYpP6GwCIQipqUa0Pmqf7rRb8u3vlbwE2TO6ld690wi
-         17OgTbSgHhxPWPHA8PiElMYZy3QbdmKaPr61+YG9ZVXnKYe2bFgl+T+RtgkUl2RqERAk
-         fqtw==
-X-Gm-Message-State: AOJu0YxjvCsjcaTAMeteoaxwyCMA534liBkul8TGtcINUg7fwa/DHchG
-	JK67Mr0Nz4eE0M9jG6l12E0QtTq0omxPi3l787DyrELq9Ns4goUumGNRvQ==
-X-Gm-Gg: ASbGncuh6+rujv9GG14jSPxJTraWAzK9xV9qnRK6Mg2Zgu+AvFWkDwh0DG/hHW+tS0N
-	vm16hl0C2Fpn1VlKJFZIrwAshUjeEFFSYqA+IXGwwUeZFjW/+FeJ1P/pLU2CA4MS6LLwa9aDH1r
-	yZss8/zqcTBHZ1Hdwg1Yjo8+5EVpw7iYaYf5EPVjKMjHbOTG8AuXYBCsEhL6ycAAI42lkYrdJ23
-	/Q671MHdURjBcclPD+5pb03sUSWQ7V9zs9oR6LqZ3/zcBPdW9HgUjWMSJdl
-X-Google-Smtp-Source: AGHT+IHkvGYa6Gd5O36r4wejFYGYsZm78OXyXoMqGPrPxhlq/D748qqp8nxMNcAQs+DnB5Uu6TKyuQ==
-X-Received: by 2002:a17:902:d501:b0:212:9b1:e56b with SMTP id d9443c01a7336-21501b5a270mr41895425ad.42.1732728814494;
-        Wed, 27 Nov 2024 09:33:34 -0800 (PST)
+        bh=s5krJwb9f6bvgnmf4pJNPCk0tRIJeDHDucoiutJFm1I=;
+        b=wvGAAZlixmNW6HlnN8j/ojvY5jRwjbuTXKx2QD+7FFPg0czEslxXrv3QcaxBotzw4U
+         F2HXOGti3joaGh9i7Ov/PEDmwy7OgaAsNoXoKbkNap6pn0KPlXqFjnU8vy9cqWoIdxSD
+         WCzcgVU3h3X5FN3L58kOgi8zGRwcf+jMEvlC4LlRx++HM6WxSjF6+DIlfndYYNFxbSkq
+         WjayZy9O3C9XNx3SVimdNlCztL6EuW6E/l4gfpLR5iZ57i/mzwHM/dlOEi6HNqOWDqtz
+         vCnTI5Fj9d+jV8NO/1iwpN3oizEjEfwtupDEVEpUjP+ikHvXTF/b6oXeGy2HELgwJ63D
+         lFlw==
+X-Gm-Message-State: AOJu0YzwFz3fll2lmOzHcUlDUfsIpcRg9gchkYCPQNDeQWEIzBTbkhfc
+	yikQPctdQjW0yzV5DEewCeyhjvZMNXCIN04fwi+ZhMYUphb/HK34BwFdxg==
+X-Gm-Gg: ASbGncuoAzFC08tmhMrqmv4mpg/aLkCViRiZTkV5tODK3H6AUx/JQh2mqtZCEiBzdGu
+	BYLz7qj7lGzz/S6Utx9+6UKnHu4Duova+wkpq13GkGacpnIy3kSMnjEAhklMNt6Y9mdOpxDkKMi
+	UjoAw9lw+PEkwBLm0jNm09HE4/zwxN5kDOtmjYNJwopI0kwLXWpUgQFRDXFZc+hW/+PIIMo0rij
+	Dl+NX8t+FDSX3zaon5xcJ0FzVXaNHkb7WIED9+mWqBSSF9O+NAzzVIDD3Mr
+X-Google-Smtp-Source: AGHT+IGQbk+Jw7rdBFq8Tilvc+xWTBhvW9PgkYzdP1GhSMtOZYkmEU6yme/ny2Hn+8NFJ2BCzH9S3A==
+X-Received: by 2002:a17:902:d4cb:b0:20f:ab4a:db2e with SMTP id d9443c01a7336-2150175cbe9mr59071485ad.29.1732728816039;
+        Wed, 27 Nov 2024 09:33:36 -0800 (PST)
 Received: from LOCLAP699.localdomain ([152.193.78.90])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2129dba3022sm105487305ad.65.2024.11.27.09.33.33
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2129dba3022sm105487305ad.65.2024.11.27.09.33.34
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 27 Nov 2024 09:33:34 -0800 (PST)
+        Wed, 27 Nov 2024 09:33:35 -0800 (PST)
 From: James Prestwood <prestwoj@gmail.com>
 To: iwd@lists.linux.dev
 Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 2/4] monitor: track current PCAP size
-Date: Wed, 27 Nov 2024 09:33:26 -0800
-Message-Id: <20241127173328.158354-2-prestwoj@gmail.com>
+Subject: [PATCH 3/4] monitor: add support for limiting PCAP size/count
+Date: Wed, 27 Nov 2024 09:33:27 -0800
+Message-Id: <20241127173328.158354-3-prestwoj@gmail.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20241127173328.158354-1-prestwoj@gmail.com>
 References: <20241127173328.158354-1-prestwoj@gmail.com>
@@ -72,66 +72,192 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This will come into play when support for rolling captures is
-added to iwmon.
----
- monitor/pcap.c | 10 ++++++++++
- monitor/pcap.h |  1 +
- 2 files changed, 11 insertions(+)
+This implements support for "rolling captures" by allowing iwmon to
+limit the PCAP file size and number of PCAP's that are created.
+This is a useful feature when long term monitoring is needed. If
+there is some rare behavior requiring iwmon to run for days, months,
+or longer the resulting PCAP file would become quite large and fill
+up disk space.
 
-diff --git a/monitor/pcap.c b/monitor/pcap.c
-index fb29eea8..b13a29f3 100644
---- a/monitor/pcap.c
-+++ b/monitor/pcap.c
-@@ -60,6 +60,7 @@ struct pcap {
- 	bool closed;
- 	uint32_t type;
- 	uint32_t snaplen;
-+	size_t size;
+When enabled (command line arguments in subsequent patch) the PCAP
+file size is checked on each write. If it exceeds the limit a new
+PCAP file will be created. Once the number of old PCAP files reaches
+the set limit the oldest PCAP will be removed from disk.
+---
+ monitor/nlmon.c | 83 +++++++++++++++++++++++++++++++++++++++++++++++--
+ monitor/nlmon.h |  4 +++
+ 2 files changed, 85 insertions(+), 2 deletions(-)
+
+diff --git a/monitor/nlmon.c b/monitor/nlmon.c
+index 4ecbc5f0..d5f8634e 100644
+--- a/monitor/nlmon.c
++++ b/monitor/nlmon.c
+@@ -43,6 +43,7 @@
+ #include <linux/genetlink.h>
+ #include <linux/rtnetlink.h>
+ #include <linux/filter.h>
++#include <linux/limits.h>
+ #include <ell/ell.h>
+ 
+ #ifndef ARPHRD_NETLINK
+@@ -94,6 +95,8 @@
+ #define BSS_CAPABILITY_APSD		(1<<11)
+ #define BSS_CAPABILITY_DSSS_OFDM	(1<<13)
+ 
++#define BYTES_PER_MB			1000000
++
+ struct nlmon *cur_nlmon;
+ 
+ enum msg_type {
+@@ -115,6 +118,11 @@ struct nlmon {
+ 	bool noies;
+ 	bool read;
+ 	enum time_format time_format;
++
++	char *file_prefix;
++	unsigned int file_idx;
++	unsigned int max_files;
++	unsigned int max_size;
  };
  
- struct pcap *pcap_open(const char *pathname)
-@@ -152,6 +153,8 @@ struct pcap *pcap_create(const char *pathname)
- 		goto failed;
- 	}
- 
-+	pcap->size += len;
-+
- 	return pcap;
- 
- failed:
-@@ -188,6 +191,11 @@ uint32_t pcap_get_snaplen(struct pcap *pcap)
- 	return pcap->snaplen;
+ struct nlmon_req {
+@@ -7388,6 +7396,64 @@ static bool nlmon_req_match(const void *a, const void *b)
+ 	return (req->seq == match->seq && req->pid == match->pid);
  }
  
-+size_t pcap_get_size(struct pcap *pcap)
++/*
++ * Ensures that PCAP names are zero padded when needed. This makes the files
++ * sort correctly.
++ */
++static void next_pcap_name(char *buf, size_t size, const char *prefix,
++				unsigned int idx, unsigned int max)
 +{
-+	return pcap->size;
++	unsigned int ndigits = 1;
++
++	while (max > 9) {
++		max /= 10;
++		ndigits++;
++	}
++
++	snprintf(buf, size, "%s%.*u", prefix, ndigits, idx);
 +}
 +
- bool pcap_read(struct pcap *pcap, struct timeval *tv,
- 		void *data, uint32_t size, uint32_t *len, uint32_t *real_len)
- {
-@@ -279,5 +287,7 @@ bool pcap_write(struct pcap *pcap, const struct timeval *tv,
- 		return false;
- 	}
- 
-+	pcap->size += written;
++static bool check_pcap(struct nlmon *nlmon, size_t next_size)
++{
++	char path[PATH_MAX];
 +
- 	return true;
++	if (!nlmon->pcap)
++		return false;
++
++	if (!nlmon->max_size)
++		return true;
++
++	if (pcap_get_size(nlmon->pcap) + next_size <= nlmon->max_size)
++		return true;
++
++	pcap_close(nlmon->pcap);
++
++	/* Exausted the single PCAP file */
++	if (nlmon->max_files < 2) {
++		printf("Reached maximum size of PCAP, exiting\n");
++		nlmon->pcap = NULL;
++		l_main_quit();
++		return false;
++	}
++
++	next_pcap_name(path, sizeof(path), nlmon->file_prefix,
++			++nlmon->file_idx, nlmon->max_files);
++
++	nlmon->pcap = pcap_create(path);
++
++	if (nlmon->max_files > nlmon->file_idx)
++		return true;
++
++	/* Remove oldest PCAP file */
++	next_pcap_name(path, sizeof(path), nlmon->file_prefix,
++		nlmon->file_idx - nlmon->max_files, nlmon->max_files);
++
++	if (remove(path) < 0)
++		printf("Failed to remove old PCAP file %s\n", path);
++
++	return true;
++}
++
+ static void store_packet(struct nlmon *nlmon, const struct timeval *tv,
+ 					uint16_t pkt_type,
+ 					uint16_t arphrd_type,
+@@ -7396,7 +7462,7 @@ static void store_packet(struct nlmon *nlmon, const struct timeval *tv,
+ {
+ 	uint8_t sll_hdr[16], *buf = sll_hdr;
+ 
+-	if (!nlmon->pcap)
++	if (!check_pcap(nlmon, sizeof(sll_hdr) + size))
+ 		return;
+ 
+ 	memset(sll_hdr, 0, sizeof(sll_hdr));
+@@ -7522,6 +7588,9 @@ struct nlmon *nlmon_create(uint16_t id, const struct nlmon_config *config)
+ 	nlmon->noies = config->noies;
+ 	nlmon->read = config->read_only;
+ 	nlmon->time_format = config->time_format;
++	nlmon->max_files = config->pcap_file_count;
++	/* Command line expects MB, but use bytes internally */
++	nlmon->max_size = config->pcap_file_size * BYTES_PER_MB;
+ 
+ 	return nlmon;
  }
-diff --git a/monitor/pcap.h b/monitor/pcap.h
-index 1705b33d..5b797cf3 100644
---- a/monitor/pcap.h
-+++ b/monitor/pcap.h
-@@ -36,6 +36,7 @@ void pcap_close(struct pcap *pcap);
+@@ -8549,13 +8618,20 @@ struct nlmon *nlmon_open(uint16_t id, const char *pathname,
+ 	struct nlmon *nlmon;
+ 	struct l_io *pae_io;
+ 	struct pcap *pcap;
++	char path[PATH_MAX];
  
- uint32_t pcap_get_type(struct pcap *pcap);
- uint32_t pcap_get_snaplen(struct pcap *pcap);
-+size_t pcap_get_size(struct pcap *pcap);
+ 	pae_io = open_pae();
+ 	if (!pae_io)
+ 		return NULL;
  
- bool pcap_read(struct pcap *pcap, struct timeval *tv,
- 		void *data, uint32_t size, uint32_t *len, uint32_t *real_len);
+ 	if (pathname) {
+-		pcap = pcap_create(pathname);
++		if (config->pcap_file_count > 1)
++			next_pcap_name(path, sizeof(path), pathname,
++					0, config->pcap_file_count);
++		else
++			snprintf(path, sizeof(path), "%s", pathname);
++
++		pcap = pcap_create(path);
+ 		if (!pcap) {
+ 			l_io_destroy(pae_io);
+ 			return NULL;
+@@ -8568,6 +8644,7 @@ struct nlmon *nlmon_open(uint16_t id, const char *pathname,
+ 
+ 	nlmon->pae_io = pae_io;
+ 	nlmon->pcap = pcap;
++	nlmon->file_prefix = l_strdup(pathname);
+ 
+ 	l_io_set_read_handler(nlmon->pae_io, pae_receive, nlmon, NULL);
+ 
+@@ -8590,5 +8667,7 @@ void nlmon_close(struct nlmon *nlmon)
+ 	if (nlmon->pcap)
+ 		pcap_close(nlmon->pcap);
+ 
++	l_free(nlmon->file_prefix);
++
+ 	l_free(nlmon);
+ }
+diff --git a/monitor/nlmon.h b/monitor/nlmon.h
+index bbc5d250..fa027021 100644
+--- a/monitor/nlmon.h
++++ b/monitor/nlmon.h
+@@ -37,6 +37,10 @@ struct nlmon_config {
+ 	bool noies;
+ 	bool read_only;
+ 	enum time_format time_format;
++
++	/* File size in MB */
++	uint32_t pcap_file_size;
++	uint32_t pcap_file_count;
+ };
+ 
+ struct nlmon *nlmon_open(uint16_t id, const char *pathname,
 -- 
 2.34.1
 
