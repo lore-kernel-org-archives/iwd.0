@@ -1,141 +1,82 @@
-Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
+Received: from mail-pf1-f173.google.com (mail-pf1-f173.google.com [209.85.210.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F9CF20B7E4
-	for <iwd@lists.linux.dev>; Mon,  2 Dec 2024 14:54:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1AB771DF991;
+	Mon,  2 Dec 2024 23:55:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733151291; cv=none; b=OBv5nWdJKw8iiGh9BNrSJziNKLGc04F+B3EvXB8VzNVDy6vauCRAqVVA1nSOKsPGBnfV2mWeUj+fkg2Jrkewy+xBjgQj80DsoS21USY/l7OUvPTJ1N3Fix3AngbzmOmXdJsS4iaGA4l1/Jlfwv9SaWaySOm907HMEwi83dIg0bE=
+	t=1733183719; cv=none; b=aRnKtSHlKOS0cX1aEgmDX/3FUtollfSznSKc2kNulvNl1bbV1w+gDq59w4aClShM4l3QdYnnSmE2ZQ6oDeUBLoXw16+Xs9O+Uqj9rHpjGLpaj56vVWb7iUH8+04ETVFoCzEZkt4m2jKoGDCB1Lkmy3w38Vyw6K+LHdjrWm793u4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733151291; c=relaxed/simple;
-	bh=G63noPF0CmFLEGQEvGhXroPWXXsDVAPupvvbH1Aslh0=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=M13tcbrkWPdYgzt6m0b7Uc3MeA0IOxGWnsYsToyoV1KVCnfrRWYUXGOAl2Dny3BITdhU1HIDNsWCzksFO+olcWqEOxKQqQLqR7ZLyYv1HliYuL1tXLhbmX+G2HQCO2tiQzp1kWJt3KMuYR4sxJCYcq9pH/GqKd1iKWruR8/Kd14=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eqed2TmY; arc=none smtp.client-ip=209.85.210.174
+	s=arc-20240116; t=1733183719; c=relaxed/simple;
+	bh=LrFGcjl6A5pKWxPrIHvga7JXdxjA9CAxtv0mffI13M8=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Content-Type; b=BcEzpCHSuw2bC9TcSZmxwbD6GQ8ZkBNFY3f3QGq69cBPJMZx8oC8pe9jL6ELR73P9jTFFYwK8781F33MNYkH79yPa0Sje8Ml1pJ8jGxd9JoqewXrd3lL03IkD+Zuj/Xeve6KPTHyD0ZShSvL1y+a8SZ4EMY6kbPZW+wNmmS5I94=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GC+rYgvB; arc=none smtp.client-ip=209.85.210.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eqed2TmY"
-Received: by mail-pf1-f174.google.com with SMTP id d2e1a72fcca58-7251331e756so4136456b3a.3
-        for <iwd@lists.linux.dev>; Mon, 02 Dec 2024 06:54:49 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GC+rYgvB"
+Received: by mail-pf1-f173.google.com with SMTP id d2e1a72fcca58-724d8422dbaso4071078b3a.0;
+        Mon, 02 Dec 2024 15:55:17 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1733151289; x=1733756089; darn=lists.linux.dev;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=sqQbg3z767lkylc4fof21EsyCBDqgw3MsPqrXDPxyBU=;
-        b=eqed2TmYdeBjXgM0BL3d+GBHvmWhV0MFidck8gn+fPAC7H2q7wYeC7Rh2m+YANLLbk
-         ypPzEeKAR/qFb1LhGYov2aeA7InquYtNeA862R6UKkcz0O4/F8Hq4xGujrWlSRTzcljF
-         2LgepkkLas+95JVRvSNpUGNEjLRSGCCkn97/1e0uuKCMIcJRcav5KUZgdVjf2ekzvrdu
-         A/gnVu+1JxWZgqcMN9+albfsyvDU9kQHqr8+Nb339iHZa/hfbtrtD5syg2LivugjufqF
-         48EJf/0TTlzhF6+GzAeKN7A5PasC/NBN4lteDufFZ0dF23AGx9bbbxOWKy8KKNkdZHhf
-         rYuQ==
+        d=gmail.com; s=20230601; t=1733183716; x=1733788516; darn=lists.linux.dev;
+        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=6ns+YkfSIbX8LS6u01Nuhq7AUQUdAwLeALoNrZL3mzo=;
+        b=GC+rYgvBNdu+SxuXb4qR3Jk725Gan7LwkOfEzD/9Ekmwj2Qhu6A5CvAhcCakcA0rrN
+         IFxEGhcCYiIFHqXudqQfmFFX0nqCW4tqVK4Z55oNtZTY/4vFy3hGk3HYSbsX3qu16B0y
+         HlHok9PjeXmUfqgtwj6LhOUDLs5fFRYJvpi5Cr6xdlZDkil7mO6lmbQJQqX0scNZYMqo
+         8QXxJRCqdgcU0lF1ZFD2i84rKd03LDvjaEqDYIpJPWymQqmnaSq3Fb1b4zpuYW/aN64L
+         0FO8pS/cACrfJIoAOTVn6CM9DamjaKd2VWjycwxEILg5NcVQMpzvXXiVpBEmASFnFAEi
+         zqww==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733151289; x=1733756089;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=sqQbg3z767lkylc4fof21EsyCBDqgw3MsPqrXDPxyBU=;
-        b=OX1aCP6Uxft3SRSguzp7E4MYI4Fl0SXGH3VPG+bkokd6+6oJddSYP3uRMddW8TdPxE
-         bNqcSoo6s7oFOxWJkU1NKUkMt/eGUDEWYuz0SelKD0oZe4LKytK8URrqRkN7Y0NhGiVW
-         V7yDyOBeG8bxWx/DnVK03q6dGgsk1YWDIMg1oj+efTIm+He1Ujs1KajELf4U+A9ydLkc
-         pQLgrqC5IAHhFYWtRbO07UU1CTtBjU508f/2Gt38PY6Q/k8xavvtQ0hmKDwYfeMUc657
-         vsa5DnNhwi4018KlIqrsjNuqRQhXJUARTe3OrEYe1SkXGGdCBui1Myfzsch/quRYsqgh
-         RAWQ==
-X-Gm-Message-State: AOJu0YwOKXTkNKuBwATMt7jmNfK9Q++mSIQWjI+WKxMVnveVmbE57h1R
-	ERzNeptjAObOvNOAe6R3PzXLvz2MX+H6uE6cdX111o1tkWD+3lw3SEtM7g==
-X-Gm-Gg: ASbGnctiehPcuK2UNGAfiefJa1PmyjEBvGGSJE8Tw5ilUcdY/GYKIXqcsO+DQ1yve/j
-	4DqjcpyTdm6TpXsJs6Ks93+nsNFiIAkCR4WO8KLX/NN4d+Q/Kk2wY2BtFhKxQ6LnTcpdS14dfj4
-	b6J5DSKqMAOKnQe1Xf6h5ClDAMh0N9xTKV78/oDkC5eCmbCjugigNc+HGfFdR3RUmGbp3FCslGF
-	pcMh7789GInnHe34GtJPuW/kRXaoe84Si000mi11P4bgcfDxK7Wmpe1d2cn8M7KB7i7f/glqas8
-	isD6SQJJ
-X-Google-Smtp-Source: AGHT+IFOuGrzM5vTaSSSuufEgyK3XJFeXkuq3jdFTLrbdVqtQJESSh7SOMKDU9ebLQmTMza/XZ+g+g==
-X-Received: by 2002:a17:90b:35d0:b0:2ee:c059:7de3 with SMTP id 98e67ed59e1d1-2eec0598100mr6408553a91.18.1733151288638;
-        Mon, 02 Dec 2024 06:54:48 -0800 (PST)
-Received: from LOCLAP699.locus-rst-dev-locuspark.locus ([152.193.78.90])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2ee6cec695csm5592474a91.2.2024.12.02.06.54.47
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 02 Dec 2024 06:54:48 -0800 (PST)
-From: James Prestwood <prestwoj@gmail.com>
-To: iwd@lists.linux.dev
-Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH v2 4/4] monitor: add --pcap-size,--pcap-count
-Date: Mon,  2 Dec 2024 06:54:38 -0800
-Message-Id: <20241202145438.282998-4-prestwoj@gmail.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20241202145438.282998-1-prestwoj@gmail.com>
-References: <20241202145438.282998-1-prestwoj@gmail.com>
+        d=1e100.net; s=20230601; t=1733183716; x=1733788516;
+        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=6ns+YkfSIbX8LS6u01Nuhq7AUQUdAwLeALoNrZL3mzo=;
+        b=rgIsIF0cR+W5Q880jpGHX30MSq50RTsggOmt33SxXm6Zoc/vphbSUJ9w/QDeUQ/0a5
+         lbY80SveJKZ/o2J0S2fXxZRk/0x1g8PMMURsiGiujNw+Z/eqnXNdVGwvPMqvRoL7m/XN
+         VVYukqethpTnnvXlmgX4/mzgvjSTBB212Q23cYx2oOEUjSz4yMjCr7h5fvN/49Vnp5km
+         3j0Hqdi7MoFSZ8HDzuCYcnrggr0qchMC8Kc3I+SkRyJ5MElq7M6WQCGeC4h5WvzM+Dea
+         WgHUAWB8CfURQOI5fT8ZrlwvZEF0gaEWBBsQ4CXg6rdVh23yipFnmIw5s7S6sKEUowAi
+         UteA==
+X-Forwarded-Encrypted: i=1; AJvYcCX5dBuG7qiFqEmd3DVrkt78zUoKJSZ1NGuhCPkmpbrRgPs3MkfIBKCzxaSyqJ6vl0uhW+4=@lists.linux.dev
+X-Gm-Message-State: AOJu0YxqZ9fAhk0UUNAf8N6tRtQiSOhqJtFWTNGgIFWirBjyPfnkxWAO
+	jZjRTVUN7PofmusRnBoiRyupnuYbbAzKh4TJj7GL/p1rEJ1BT9j3BCfpVBXu3qQ6ZuM/L8egFKR
+	1htlO00PPcq1nHjSmO90xTiUmuyG6PxnZ
+X-Gm-Gg: ASbGncuId/hwSY/eX7sD9PSD5fjDOtUFOd4SKL4+7ozHRZvqM0NcTpmRRLIsnQIzLld
+	YjKWehoxJKh5zWwiaT4tvHQBM0cMOw1mYNg==
+X-Google-Smtp-Source: AGHT+IFBzhxBdlEpNqVmXBQE/riWK8nZoCiDUFPxUiULIuxKtilrf5KONVgBcyapWJMA2oj2MMfzW1yt0KcpUF5YWZ8=
+X-Received: by 2002:a17:90a:ec87:b0:2ee:f19b:86e5 with SMTP id
+ 98e67ed59e1d1-2ef0120125cmr753746a91.14.1733183716581; Mon, 02 Dec 2024
+ 15:55:16 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: KeithG <ys3al35l@gmail.com>
+Date: Mon, 2 Dec 2024 17:55:05 -0600
+Message-ID: <CAG17S_PQBh2ONe8Jv91rosrKj-Lx99U-i11dh_dpQB6qspCypg@mail.gmail.com>
+Subject: Captive portal connection with connman
+To: connman@lists.linux.dev, iwd@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
 
-The user can now limit the size and count of PCAP files iwmon will
-create. This allows iwmon to run for long periods of time without
-filling up disk space.
----
- monitor/main.c | 24 +++++++++++++++++++++++-
- 1 file changed, 23 insertions(+), 1 deletion(-)
+I am trying to use connman to connect to a captive portal. I think I
+know the web page I need to navigate to to get the connection
+information set, but every time I try to connect via connmanctl, I
+get:
+connmanctl> services
+    GI-Guest             wifi_b827eb52ccd0_47492d4775657374_managed_none
+connmanctl> connect wifi_b827eb52ccd0_47492d4775657374_managed_none
+Error /net/connman/service/wifi_b827eb52ccd0_47492d4775657374_managed_none:
+Input/output error
+this is with this connman and iwd:
+connman-git/now 1.43.r2.g6bd97592-1 arm64 [installed,local]
+iwd-git/now 3.1.r0.gccd91fe5-1 arm64 [installed,local]
 
-diff --git a/monitor/main.c b/monitor/main.c
-index fe40e301..11077cee 100644
---- a/monitor/main.c
-+++ b/monitor/main.c
-@@ -728,6 +728,8 @@ static void usage(void)
- 		"\t-e, --noies                Don't show IEs except SSID\n"
- 		"\t-t, --time-format <format> Time format to display. Either\n"
- 						"\t\t\t\t   'delta' or 'utc'.\n"
-+		"\t-W,--pcap-count            Maximum number of PCAP files\n"
-+		"\t-C,--pcap-size             Maximum size (MB) of PCAP files\n"
- 		"\t-h, --help                 Show help options\n");
- }
- 
-@@ -742,6 +744,8 @@ static const struct option main_options[] = {
- 	{ "noscan",      no_argument,       NULL, 's' },
- 	{ "noies",       no_argument,       NULL, 'e' },
- 	{ "time-format", required_argument, NULL, 't' },
-+	{ "pcap-count",  required_argument, NULL, 'W' },
-+	{ "pcap-size",   required_argument, NULL, 'C' },
- 	{ "version",     no_argument,       NULL, 'v' },
- 	{ "help",        no_argument,       NULL, 'h' },
- 	{ }
-@@ -757,7 +761,7 @@ int main(int argc, char *argv[])
- 	for (;;) {
- 		int opt;
- 
--		opt = getopt_long(argc, argv, "r:w:a:i:t:nvhyse",
-+		opt = getopt_long(argc, argv, "r:w:a:i:t:W:C:nvhyse",
- 						main_options, NULL);
- 		if (opt < 0)
- 			break;
-@@ -798,6 +802,24 @@ int main(int argc, char *argv[])
- 				return EXIT_FAILURE;
- 			}
- 
-+			break;
-+		case 'W':
-+			if (l_safe_atou32(optarg,
-+					&config.pcap_file_count) < 0 ||
-+					config.pcap_file_count == 0) {
-+				printf("Invalid file count '%s'\n", optarg);
-+				return EXIT_FAILURE;
-+			}
-+
-+			break;
-+		case 'C':
-+			if (l_safe_atou32(optarg,
-+					&config.pcap_file_size) < 0 ||
-+					config.pcap_file_size == 0) {
-+				printf("Invalid file size '%s'\n", optarg);
-+				return EXIT_FAILURE;
-+			}
-+
- 			break;
- 		case 'v':
- 			printf("%s\n", VERSION);
--- 
-2.34.1
+Is this what is supposed to happen? I expected a connection then I
+would need to manually open a browser then go to the captive portal
+website...
 
+Keith
