@@ -1,245 +1,175 @@
-Received: from mail-pf1-f179.google.com (mail-pf1-f179.google.com [209.85.210.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-008cba01.pphosted.com (mx0a-008cba01.pphosted.com [148.163.135.235])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4AA542AA6
-	for <iwd@lists.linux.dev>; Thu, 12 Dec 2024 14:33:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.179
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734014026; cv=none; b=kb3pb/ikfesEi+x+XOohz9504/qmKnIR1KLGUhhRrjt3D10ioQebIbul5JQ6YYRSWD+FleUIb90KRbDBdH7DGTFVTQzM1FQuFgo1NTRRwk6H7jCWFuHWuTIR1nyI5Bjt2P/M/hsgs1SLDDTR68g1LD2QLNVabKULpeYsxQptYH4=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734014026; c=relaxed/simple;
-	bh=VFmc8+q3KajFKgMA7WSssgdtAzz/QyZ8jNm3ALQPGQc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ipWwPVxs+USK8UhuI8pkBZCg3qeW/mSOJBme8R1qi09nFnNolQw6tJA6s5a+AVuDEAKzsXVvRyNjCoT/RPhERTEd/393FcKNA3sS0gZMQAjmUYLwvDIRkeP8fjQtM+/KNr2GUsBJKqzZsY6nAm5VDwpavrA1PwviolZoIyAp8VQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MnzysBVe; arc=none smtp.client-ip=209.85.210.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7B801E32C5
+	for <iwd@lists.linux.dev>; Fri, 13 Dec 2024 14:59:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=148.163.135.235
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1734101990; cv=fail; b=oLwyOJjQo17GxdxGiom7/QVlXZj2/KEHBjVbbBceluXGcu9ANKqVQfN80Vhms6yxFlk2dQHQ7jCjaAMEqvUvbvQtfBd1IaIru8LeDMyWfqeKaRzqXlo0wxq6b7xS0zhzPJupWciPkQJatp4wnejYVlnFGYZjpszYYsNPCxY203E=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1734101990; c=relaxed/simple;
+	bh=yC4ZJHmGk7f478xFzgdp2GMX3NmL5Sz7Y5nyyjVlizg=;
+	h=From:To:Subject:Date:Message-ID:Content-Type:MIME-Version; b=o0xENe82XlOBCOaNDZKfxIo86YVzc5WQds5RNQbae6mzLztGpsiTAoDAszCfJC6k68S7YuJnS0tseHJPebVIy17n0WE/GpsmmrFOEyQx32uysHjAxWpwrEUlxQhAv2atLooVOcP/VOy+5ZvH7ajMBSFZEs/tvFW+HwzzqWuapHA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=midmark.com; spf=pass smtp.mailfrom=midmark.com; dkim=pass (2048-bit key) header.d=midmark.com header.i=@midmark.com header.b=Ljo7V6Eo; arc=fail smtp.client-ip=148.163.135.235
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=midmark.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=midmark.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MnzysBVe"
-Received: by mail-pf1-f179.google.com with SMTP id d2e1a72fcca58-728f1525565so787175b3a.1
-        for <iwd@lists.linux.dev>; Thu, 12 Dec 2024 06:33:44 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1734014024; x=1734618824; darn=lists.linux.dev;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=BBrLvr6HjGJp1yu9lITtpnsyc7AP2jr7FHUKP3kY8YQ=;
-        b=MnzysBVe8kLn6hAOBBavMRG7JjKZioeZbXSBUqdlOSwBd51LSKfHPCUOupZXeJbXVB
-         m2pWEeihcaUe1Jzy/YvHy7Y0t7ZlbbX+eiumxHy9rAWB/wIf5DRu7TQsfUTw4NZfH9mA
-         8p6YD/sjFXWj6ljGci2b5tJ/Tpa6CtdTZv8GSgYg3dPWsfjfw7OmuFOrgiIAuogS8EUD
-         k9ozSC1PnxeLAfUX+G3xblkkkMN+bsoBFwSbI46P1yHdAIf7XxaNSIBd6n7KGi6uDzjW
-         7OWzirhk9HN/qiNfEiJyUbIxHcpgdqLT686ip514z/B8NdOev/vlG/cQgJzHlNdUX3PX
-         ymDQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734014024; x=1734618824;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=BBrLvr6HjGJp1yu9lITtpnsyc7AP2jr7FHUKP3kY8YQ=;
-        b=nA5erIaLedke/xHYRaReOi3nJPZorI3wdqeRbGeyF/RiFV3hyLT33SVrxTsSTW8Abq
-         EYS9ZVtZy0Q8DKj8ArlZaP5zJJzFxQL4nm6YOVR6AfR69NLbdiYLZlHwuPTHt6gOufEQ
-         WeQ+upptOc8BionuHlkuG/b3bYC2RWEFn2Je6BPmblqedTejYrfoqm8bMe/wCXhSMM5k
-         cPoS7QSVc7qdauLcftRDQoy+SiWbZ1efRfLckGX4ece6xtwq6h+Sx9jAYZoGpmP+VgRg
-         rZ7gp+OFvZme8xP+3GpkvIRfxqdfBaJJ1o/JjJP9RIF+qEdR77/ykXVF1rP76D2aq71E
-         46Sg==
-X-Forwarded-Encrypted: i=1; AJvYcCWeGSBcUaZ3kLLeli7U8vFNPYmNpk0X8XiKgmrar5B+lwQyGVFlxyHAAdKgBNOlUAUSCYM=@lists.linux.dev
-X-Gm-Message-State: AOJu0YwlgyZ4nZBQ0uEOHyGtJqr8nflepudYQakqo8HYZJY0IGsnRhwB
-	IcNKUrcSBIIhg1d7uloR0Mkqr/WI5/mZcHqShiHfTcIBvvxmlwc96ETFzPwu6KMfq/Jf4lIeVbK
-	FtaMEOsgk7SSIQmxzuREvIR4o1a4=
-X-Gm-Gg: ASbGncsx/FzkU87iCUVqngi68yvzE1XgR/X/SWHo7PHdbgkVKuYfYSJOyZP0gqX/Y4N
-	tWLFxmDRzpILDPuO9CYVcv1BCpGc14yPm3X+ZE+gW
-X-Google-Smtp-Source: AGHT+IEGyOfDwaeaPcpHLyQfqqLRNdKbkFq6oaFmpugL4yAgyc8NGVu2Nj7UtCSLRptDqyUG8HK7XdV0lxuliAGqeCU=
-X-Received: by 2002:a05:6a00:1887:b0:726:c23f:4e5c with SMTP id
- d2e1a72fcca58-72906940b73mr768871b3a.1.1734014024105; Thu, 12 Dec 2024
- 06:33:44 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=midmark.com header.i=@midmark.com header.b="Ljo7V6Eo"
+Received: from pps.filterd (m0372073.ppops.net [127.0.0.1])
+	by mx0a-008cba01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4BDB06TA022219
+	for <iwd@lists.linux.dev>; Fri, 13 Dec 2024 09:56:08 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=midmark.com; h=
+	content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=pps1; bh=yC4ZJHmGk7f478xFzgdp2GMX3Nm
+	L5Sz7Y5nyyjVlizg=; b=Ljo7V6EofH6CqWHUYlpHTsw/kft0p7ZZJi8JwfQSTKc
+	7cMo/fBrGRNQiAnHckLjNU0a7TetJiimHSmo6OyVMad5A2BAFS0TONXjfaTROkfG
+	wBN1+HY/QgB8Wfu3dJK+RpmmQ055NUcODMQ0s0DvBPUFPapXrMyIrJffa+L/k9hi
+	f50aAGUQfTz0TgDGRfUBCgSCdUWIQejd/QKYsW9nVwjMJDmksZnm3xkWCgVnZnJX
+	mY1wZQhAmQEsCiajf3tCK8xCnGIZDyiJmUUB7Z9lsTuh1tWAneHVAKvERTfoOPZB
+	bUCDvpJuftMSmw7Z7+8pYWXN5rkUn0nkS+Hhz252Ibw==
+Received: from nam12-dm6-obe.outbound.protection.outlook.com (mail-dm6nam12lp2173.outbound.protection.outlook.com [104.47.59.173])
+	by mx0a-008cba01.pphosted.com (PPS) with ESMTPS id 43d5f5mepg-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <iwd@lists.linux.dev>; Fri, 13 Dec 2024 09:56:08 -0500 (EST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=FhZ/mPh1A+zr7ahVuWIxLtncJmCKOXxKGlqQ4Ql9wlW5F8RwJJkaIj8M/tsaNMemCX6dJoqMuXcS96BOLr837VODvdDAzXkq2nupBvc6CKKfhpS80hQ9xP8KyllaCDhfjlKtiCVF5aqnLMdc7uxyfeiDfxflvJ+ectquRBmHBfbfQ3cgPi9eDIfK7WFoWdEyzprR86M3jFNxq+0CVu069UlN3QIYW1jd+HZZBh6Axy5zOkMh07tJln3bdWgJLEyARuLkT7KxUpt4eqr1CbLQdqcVIGbDQx5wp3dVBfOoJZPSKDzUu8Mr+69nM6IjYERu/p9nPK182EKgjnyW6UmCCw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=yC4ZJHmGk7f478xFzgdp2GMX3NmL5Sz7Y5nyyjVlizg=;
+ b=FJPJEJGGE0Awrg4f7CYLjL5ic9fGPLtbsVWK6blEAfERuS1uey+CpkznciEdfegXbpSgaWuLvGBFqXmM//PSeaVlzaz/LdBKvHbVLgWZGr7tsuGZxw7+YTgC6brDJnkFvwqknkUu3mygFBHglUVzqEkUBAGIyUzJnKr+kWAsjd2H01gs8FjEoc8fpa0OTIz7udp6g6e4oi/UPnH+P4/LudKQwpdn9l1iSR8nxGSvkWjQXaFQKGrjUHNRKUQEQfnmGyUV1jIBaVVs5vMbfzqJP8DhZN0OqTIre5fm4u7Q0xDAvlVuoG8LmdeUXa1y5/TEPbub2i+0SV5oVI0qlp4S3Q==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=midmark.com; dmarc=pass action=none header.from=midmark.com;
+ dkim=pass header.d=midmark.com; arc=none
+Received: from LV8PR08MB9350.namprd08.prod.outlook.com (2603:10b6:408:1f9::14)
+ by DM8PR08MB7334.namprd08.prod.outlook.com (2603:10b6:8:31::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8251.15; Fri, 13 Dec
+ 2024 14:56:03 +0000
+Received: from LV8PR08MB9350.namprd08.prod.outlook.com
+ ([fe80::7973:5566:a047:872b]) by LV8PR08MB9350.namprd08.prod.outlook.com
+ ([fe80::7973:5566:a047:872b%5]) with mapi id 15.20.8251.015; Fri, 13 Dec 2024
+ 14:56:03 +0000
+From: Michael John <MJohn@midmark.com>
+To: "iwd@lists.linux.dev" <iwd@lists.linux.dev>
+Subject: Question on documentation for Enterprise network configuration
+Thread-Topic: Question on documentation for Enterprise network configuration
+Thread-Index: AQHbTW7Ev/4y+ObjA0GeZ6USJp7VKg==
+Date: Fri, 13 Dec 2024 14:56:03 +0000
+Message-ID:
+ <LV8PR08MB9350F57066DF7E632045D03DAE382@LV8PR08MB9350.namprd08.prod.outlook.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+msip_labels:
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: LV8PR08MB9350:EE_|DM8PR08MB7334:EE_
+x-ms-office365-filtering-correlation-id: 5507f49c-2489-45c1-6608-08dd1b8643f4
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|366016|1800799024|376014|38070700018;
+x-microsoft-antispam-message-info:
+ =?iso-8859-1?Q?KNgi/N5YVUxA0u6/gIGFvPFnS/DzKyaY51vDb4lzvZ+bACQw8fjBxZ78p8?=
+ =?iso-8859-1?Q?ikWe5Ml2Myc8rH+1RW3HmL8Dq8R8F9JqGwXunSIn7aSsjFXty4qImb/IOz?=
+ =?iso-8859-1?Q?BzuNGokBrnZgtzpzS8l+55w7X4rQU9uJEPYbt0p20FhJTDWpANarUmZA17?=
+ =?iso-8859-1?Q?r6KlfE8qXBu9STsV4AGg5kIQAsfk/cEYVMLYvPx3ufcsO7jERyG+i8E5QH?=
+ =?iso-8859-1?Q?BUQ3VeeAe97eHWTOp55oLlKTLZQ/55zH4P+Lj2N2uFoWhKdGvLcpX0+1oj?=
+ =?iso-8859-1?Q?6tiuTTWGkzZuPZMueePfuoHSZBv/U2ZPoWdipVrSG7W879/jJBixDX6iJk?=
+ =?iso-8859-1?Q?jKVLJR62u6XmbLoIsjySlxIUy6hzBl4u+BAbrKm7j3/QB6QqWv33Gsdz4e?=
+ =?iso-8859-1?Q?MGq7e6HaA4uhAyoCpibrLSv5qaYGnL+PbI9cNBHCqKaKbZ7G3zX+Cl3EFb?=
+ =?iso-8859-1?Q?6zq9FiqY1vEl1JyWXwHOOFFqdt0R4dObsbJ30ipEOtpmThRz0TVnZgFrhJ?=
+ =?iso-8859-1?Q?7GWPC3b4djB2NvSBuhnFd+yZzvWF+oRNdObk7igzax0dwMTzPKHPs+ZLvu?=
+ =?iso-8859-1?Q?ZxcS3PgGCdq1PiiLSOYAEMXByafrw3pujp0833N62I3DjeouYI0SuiuHxQ?=
+ =?iso-8859-1?Q?Cm6f93unG1UL2z3S8/Vv4R2h424AswCeUm4aV3ARhAuhcuUP+XEX2DHV2m?=
+ =?iso-8859-1?Q?qHTotv1GxsfH9+tJULSYsBD5CtUdMl4yq5Km6dyFI/0rAKzGc0Tsim8koz?=
+ =?iso-8859-1?Q?G6UUVhKRoNbOhdkx9hLDclvRZIby8BRi7wQbRXEGvtvysvZ8IEwlCMFrPR?=
+ =?iso-8859-1?Q?mDKFmvZwGO+NJqH3cqxmkI5S8I1N5ZpMP2CRt9K2jIkFLQuRvyg7Opy9c9?=
+ =?iso-8859-1?Q?BVoktbK7MYM99ohE58JrifMZQcrtmxWDBUDJ9+Hkz0/VIQGeFWfh6fxJpf?=
+ =?iso-8859-1?Q?LQarMF7eUUZ6bBFh9iYzrofSSPqkh35JSUrWyIaR/0Bc5tpoWxxcVFwZF7?=
+ =?iso-8859-1?Q?139vn4rZv6g0mnlWr+D+r73D/m6fjdrMiDPvKo5PK0mwxflZK0gF3V5n7H?=
+ =?iso-8859-1?Q?Cm4WXOjySETFuqhm3r/PE1srDvgJ/u9WKvB8VLTpYnq4OX30SoXa9OSEeY?=
+ =?iso-8859-1?Q?UYG95yAtvXNqBDyQyqCt8FukM8OL4IDZ8NjAL0KygUIZvV/V538tRCaJGH?=
+ =?iso-8859-1?Q?rxTbmzXjVffM0BMoQ3m7KWl7MlRz1EeBHE75jMaQr7BxUURiqOyjBxjRZz?=
+ =?iso-8859-1?Q?AUa8pxs8iC/6BM43bA+hF6ad0EmvyfAd6YnWCgl4aW67OKj8gt7Qr4y2Ao?=
+ =?iso-8859-1?Q?uc6L3+FUvdYT//Wd/2sECp0TJwWg25KrhNu8lmQ6CqK3QuvecCsNwqaEh5?=
+ =?iso-8859-1?Q?4JIcWyA2S63IByalN5J1mE382kN5AbBDE3lqli/dCdoANUv34wmmAdeveZ?=
+ =?iso-8859-1?Q?m0QSeS64lg8sWKQ3V3kloGnd/uj9/JLsqFhIvQ=3D=3D?=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV8PR08MB9350.namprd08.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(38070700018);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?iso-8859-1?Q?q1oEqoyL3GbmDVVjaluwr+cnTiE5UlWWwfaCjo+0x/LZbhntdoV60Dk//r?=
+ =?iso-8859-1?Q?FMj93oWyLkWPqM0GCFeOzoSturp4Xc+pN/CFcpZWmqEpgwvGywAp+kr6UJ?=
+ =?iso-8859-1?Q?HBT7bWpRYTMXcdV/6nlvCrAQf+dVphynkst0YbsFsny9d/HITIw7PlczBF?=
+ =?iso-8859-1?Q?MOsTP3n4jnyW/enJm56YTe34aTlhyTottykS+RWFx5SUyOdNX4qYPE8Cbi?=
+ =?iso-8859-1?Q?FySj11ZO50Cv6pgJOD6BynRogef3tNqIJGcPglbi2pc7nynhmLbrlwPe9U?=
+ =?iso-8859-1?Q?bIQ0wmEiCr16Q2cGiIG8XKY3c01NaPBgbobUo9LdbRBjB8hT4u9omsZ/3X?=
+ =?iso-8859-1?Q?yNJH7HX7O3GxsxaOtY3KP52AIeb5dQJExn0AjoKKuNuw7Xh2bKHPKBNPUj?=
+ =?iso-8859-1?Q?zPo2XPHET8j8MGv9grg9H/0oKza4a3xS2iDqSF+RxIzOZb3UMJBMyM7dYr?=
+ =?iso-8859-1?Q?ElltPRGXhD9KSSTwjAl+DqiaQCzXJboyYBEMH7X+nHsiYiBFkcB9i1nRMp?=
+ =?iso-8859-1?Q?r1Z3sxljK74NhZ4SnBRngauOf5Lr3yN7yT6p7SFB7jIRNlWWM1R5yue/vD?=
+ =?iso-8859-1?Q?HCVha2CcZ15wxVHSZx6NhHNrkZVB6Jk0V57EL5yguNA8DOp86zrBwMVvpb?=
+ =?iso-8859-1?Q?qItujoYaP7A4Q1yVDksiPBo2vzGFQ1mTzaFfOPNG7IXi1jn9zdlRC5aZ8h?=
+ =?iso-8859-1?Q?/BSTMnI05X+PEUdZ/Hib4xYmql5HjiWq9zf2vVaV3ypBpBR/DeYvd234EC?=
+ =?iso-8859-1?Q?YchZfK2X9tgrv9SIhNyynu5lHsDmrJy9RJH6CR0g60Z/T+EZ850hyiInnr?=
+ =?iso-8859-1?Q?wprm1Oi9PeU13pQKZQIAuLx4XnFNOk89Ns57dxe5quYa1KQeLdSUUUsk1p?=
+ =?iso-8859-1?Q?mCy+7RYfjmjRpVdE/ISI7gC5xatw2hNzJzjgd+LG6EqSDJiM128sO/BYHi?=
+ =?iso-8859-1?Q?o9Xfr+ofi0SWjN5GlFpW8x7m/8Wc3U3qHxS10Mhjm+909ODWMO7SJocEq5?=
+ =?iso-8859-1?Q?es6IrM5vt3lwu/bIbJZhR1Rtth8HxBdVEsEhAn21MK/1dyLGREWgq5Yyd/?=
+ =?iso-8859-1?Q?QXaClPwh1wdTcyxZLVluLw4uZfUQE4V+ajgJw2R2xRzHWL7U5jCB411t5n?=
+ =?iso-8859-1?Q?hMudxYCn3JIKmw/9JGFHmTrKIBHz0bLRm3Q3clQcbHKyw8dbrsLvCEon+L?=
+ =?iso-8859-1?Q?TQ1zTU/VWwAvKkO7KvCH4Ejfvn8Zh8jRG+ajuExOnhjPM8QVJECYzwnHxC?=
+ =?iso-8859-1?Q?bOHE+cbxNkQCsSdY2XuDKl4X6Fly4dF4P5v1lWDsviUDco0EamGciD/jaU?=
+ =?iso-8859-1?Q?AttqXt+dhi5JyatsBaX5ijsHX3166XcHVAv1dKtCsp1SgdwYWTeez5dQl5?=
+ =?iso-8859-1?Q?4febUuKEppCSn9FOVE05ec1rRbGaoeomdDVmcOwOwFEAdWGnNGXXtHLNfF?=
+ =?iso-8859-1?Q?GFGQWFBb2AGK3tyHfuPYOdL2GogkZdbMeXL6zO7nC6G8dRG01RVozgj1BE?=
+ =?iso-8859-1?Q?WFFFgT1CuxcpPQdvJxV38vUsISKfSnktT/dVLCcHFSgxZFELvwllO/piVo?=
+ =?iso-8859-1?Q?GiY5QYSED65h5rxoU94T8jH1MAVfAI7tI+wNk5QeyZO9pCBoGRw8xiYgt4?=
+ =?iso-8859-1?Q?CuQGzougQ6eJI=3D?=
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20240823174220.498594-1-denkenz@gmail.com> <20240921185902.170612-1-yshuiv7@gmail.com>
- <ba78a253-de77-4427-85c3-d876ef9fdd8a@gmail.com> <1921859cb98.279b.9b12b7fc0a3841636cfb5e919b41b954@broadcom.com>
- <CAG17S_PAm0NsA+oRho5Qt-Y8MowB4nkeOnugzaE==pWLSpGYpg@mail.gmail.com>
- <1921a891f18.279b.9b12b7fc0a3841636cfb5e919b41b954@broadcom.com>
- <CAG17S_O1njCdiFaWUSh8N11DhiRBKhvnigCpLiNfkCp+JwuGJA@mail.gmail.com>
- <CAG17S_MVSrnyz_ctW8CU1HMvkzcU2ZYOzpTjKXzXESaSmzeEAw@mail.gmail.com> <CAE+F7TFpuoVEbY9eZzo=0d50bnjzstsypdoWeF0g8H7wP=o8=w@mail.gmail.com>
-In-Reply-To: <CAE+F7TFpuoVEbY9eZzo=0d50bnjzstsypdoWeF0g8H7wP=o8=w@mail.gmail.com>
-From: KeithG <ys3al35l@gmail.com>
-Date: Thu, 12 Dec 2024 08:33:32 -0600
-Message-ID: <CAG17S_NLzmx6USBvD8SQrhQQ8iXBU7QgFUROA=hXmixD5N6_dQ@mail.gmail.com>
-Subject: Re: [RFC PATCH v1 0/2] External Auth support
-To: Jeremy Blum <jeremy@shapertools.com>
-Cc: Arend Van Spriel <arend.vanspriel@broadcom.com>, Denis Kenzior <denkenz@gmail.com>, 
-	Yuxuan Shui <yshuiv7@gmail.com>, iwd@lists.linux.dev, prestwoj@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-OriginatorOrg: midmark.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: LV8PR08MB9350.namprd08.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5507f49c-2489-45c1-6608-08dd1b8643f4
+X-MS-Exchange-CrossTenant-originalarrivaltime: 13 Dec 2024 14:56:03.5622
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 3c2a020d-f343-4ca1-b6ef-91768380352f
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: ruPvpdbBpH8wEIZWP1Afb9lwo6ei/GypKNPOjCCFCuOCgoo2TKG5hJ3qH2uC7iwag0q0jKf72gpRg6mQ9h/Kig==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM8PR08MB7334
+X-Proofpoint-GUID: 64Ta_zb4DG5I8e-dps173O6QpmW85icT
+X-Proofpoint-ORIG-GUID: 64Ta_zb4DG5I8e-dps173O6QpmW85icT
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
+ definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
 
-On Wed, Dec 11, 2024 at 5:00=E2=80=AFPM Jeremy Blum <jeremy@shapertools.com=
-> wrote:
->
-> Infineon has just released updated firmware for the 43455 chipset, and
-> and updated brcmfmac driver. May be relevant to this conversation
-> about getting IWD supporting WPA3 with the brcmfmac SAE offload
-> implementation.
-> https://community.infineon.com/t5/AIROC-Wi-Fi-and-Wi-Fi-Bluetooth/Cypress=
--Linux-WiFi-Driver-Release-FMAC-2024-11-21/td-p/902888
->
->
-> On Thu, Oct 10, 2024 at 8:38=E2=80=AFAM KeithG <ys3al35l@gmail.com> wrote=
-:
-> >
-> > Arend,
-> >
-> > Is there anything I can help with on this effort to get External Auth
-> > working on a kernel that more of us are using? RPiOS is currently at
-> > 6.6.51.
-> >
-> > Keith
-> >
-> > On Sun, Sep 22, 2024 at 11:29=E2=80=AFAM KeithG <ys3al35l@gmail.com> wr=
-ote:
-> > >
-> > > On Sun, Sep 22, 2024 at 11:20=E2=80=AFAM Arend Van Spriel
-> > > <arend.vanspriel@broadcom.com> wrote:
-> > > >
-> > > > On September 22, 2024 5:36:53 PM KeithG <ys3al35l@gmail.com> wrote:
-> > > >
-> > > > > On Sun, Sep 22, 2024 at 1:09=E2=80=AFAM Arend Van Spriel
-> > > > > <arend.vanspriel@broadcom.com> wrote:
-> > > > >>
-> > > > >> On September 22, 2024 5:35:03 AM Denis Kenzior <denkenz@gmail.co=
-m> wrote:
-> > > > >>
-> > > > >>> Hi Yuxuan Shui,
-> > > > >>>
-> > > > >>>>
-> > > > >>>> I tested this on an RPi5 too, and indeed I am having the same =
-problem as KeithG
-> > > > >>>> as well. However I managed to get some debug information from =
-brcmfmac when
-> > > > >>>> running wpa_supplicant. Interestingly wpa_supplicant gets the =
-same -52 error as
-> > > > >>>> well, which it reports as an authentication timeout. But if I =
-ask it to try
-> > > > >>>> again, it will connect successfully, and there is no external =
-auth related log
-> > > > >>>> the second time around.
-> > > > >>>
-> > > > >>> Yep.  It looks like wpa_s puts the resulting PMKSA into the ker=
-nel cache even
-> > > > >>> though the initial connection using external auth fails.  I've =
-only seen
-> > > > >>> 2.10 do
-> > > > >>> this, not 2.11.  Either way, it is a bug / lucky coincidence.
-> > > > >>>
-> > > > >>>>
-> > > > >>>> So I suspect this is a firmware bug, but it should be relative=
-ly easy to
-> > > > >>>> workaround I think? Basically we also add a timeout and retry.
-> > > > >>>
-> > > > >>> It would be far nicer if the brcmfmac firmware + driver combina=
-tion worked
-> > > > >>> properly :)
-> > > > >>
-> > > > >> Indeed it would. So what's in the mix? What kernel is used? Upst=
-ream or RPi
-> > > > >> kernel? What firmware capabilities are listed in debugfs?
-> > > > >>
-> > > > >> Recently I submitted patches upstream to add external auth suppo=
-rt. As I
-> > > > >> ported downstream patch the results you see do not make me optim=
-istic that
-> > > > >> my patch is ready. Maybe you could help testing it?
-> > > > >>
-> > > > >> https://patchwork.kernel.org/project/linux-wireless/list/?series=
-=3D891248&state=3D*
-> > > > >>
-> > > > >> Regards,
-> > > > >> Arend
-> > > > > Arend,
-> > > > >
-> > > > > I tried to apply the patch set to kernel 6.6.44-v8 and was unable=
- to patch it:
-> > > > >
-> > > > > $ patch -p1 <
-> > > > > RFT-v2-1-3-wifi-brcmfmac-support-per-vendor-cfg80211-callbacks-an=
-d-firmware-events.patch
-> > > > > patching file drivers/net/wireless/broadcom/brcm80211/brcmfmac/cf=
-g80211.c
-> > > > > Hunk #1 FAILED at 6752.
-> > > > > 1 out of 1 hunk FAILED -- saving rejects to file
-> > > > > drivers/net/wireless/broadcom/brcm80211/brcmfmac/cfg80211.c.rej
-> > > > > patching file drivers/net/wireless/broadcom/brcm80211/brcmfmac/co=
-mmon.c
-> > > > > Hunk #1 succeeded at 524 (offset 33 lines).
-> > > > > patching file drivers/net/wireless/broadcom/brcm80211/brcmfmac/co=
-re.c
-> > > > > Hunk #1 FAILED at 1359.
-> > > > > 1 out of 1 hunk FAILED -- saving rejects to file
-> > > > > drivers/net/wireless/broadcom/brcm80211/brcmfmac/core.c.rej
-> > > > > patching file drivers/net/wireless/broadcom/brcm80211/brcmfmac/fw=
-eh.c
-> > > > > Hunk #1 succeeded at 74 (offset -1 lines).
-> > > > > Hunk #2 succeeded at 336 (offset -70 lines).
-> > > > > patching file drivers/net/wireless/broadcom/brcm80211/brcmfmac/fw=
-vid.h
-> > > > > Hunk #1 FAILED at 15.
-> > > > > Hunk #2 succeeded at 47 with fuzz 1 (offset -9 lines).
-> > > > > 1 out of 2 hunks FAILED -- saving rejects to file
-> > > > > drivers/net/wireless/broadcom/brcm80211/brcmfmac/fwvid.h.rej
-> > > > >
-> > > > > I did not try the other patches as this attempt failed. Do I need=
- to
-> > > > > use a newer kernel? The latest kernel from RPiOS is 6.6.47.
-> > > >
-> > > > I did major rework to support multiple vendors with differing firmw=
-are
-> > > > APIs. So I can imagine you would need other patches that were submi=
-tted
-> > > > earlier. Easiest would be to use the backports project which allows=
- running
-> > > > latest driver like wireless-next on older kernels.
-> > > >
-> > > > I can try. Do you have a URL of the RPiOS kernel repo?
-> > > >
-> > > > Regards,
-> > > > Arend
-> > > > > Keith
-> > > >
-> > > >
-> > >
-> > > Arend,
-> > > It is either here as a git clone:
-> > > git clone --depth=3D1 https://github.com/raspberrypi/linux
-> > >
-> > > or here as a gzip:
-> > > https://github.com/raspberrypi/linux/archive/refs/tags/stable_2024052=
-9.tar.gz
-> > >
-> > > Keith
-Jeremy,
+Hello,
 
-I tried this new firmware with the existing driver in the 6.6.xx
-kernel on the Rpi3b+ over the weekend. It almost works. I posted a log
-and such to the brcm80211, linux-wireless lists. I think those are the
-best fit, but just let me know if I should send it elsewhere. I can
-patch and test the brcm80211 driver as I have a kernel build ready to
-add it to.
+I'm looking for configuration information for WPA-Enterprise networks and I=
+ found this
+page on the wiki but notice the banner at the top says this is out of date.
 
-The error seems to be something with BCME, though I have no idea what that =
-is:
+https://archive.kernel.org/oldwiki/iwd.wiki.kernel.org/networkconfiguration=
+settings.html
 
-brcmfmac: brcmf_fil_cmd_data Firmware error: BCME_BADADDR (-21)
-brcmfmac: brcmf_fil_iovar_data_get ifidx=3D0, name=3Dsta_info, len=3D296, e=
-rr=3D-52
-ieee80211 phy0: brcmf_cfg80211_get_station: GET STA INFO failed, -52
-brcmf_fil_cmd_data Firmware error: BCME_UNSUPPORTED (-23)
-brcmf_fil_iovar_data_get ifidx=3D0, name=3Dtdls_sta_info, len=3D296, err=3D=
--52
-brcmfmac: brcmf_fil_cmd_data Firmware error: BCME_BADADDR (-21)
-brcmfmac: brcmf_fil_iovar_data_get ifidx=3D0, name=3Dsta_info, len=3D296, e=
-rr=3D-52
-ieee80211 phy0: brcmf_cfg80211_get_station: GET STA INFO failed, -52
+Where could I find current documentation?
 
-Keith
+Thanks,
+
+Michael John
+Midmark Corporation
+
+CONFIDENTIALITY NOTICE: This message, including any attachments, contains c=
+onfidential information intended for a specific individual and purpose. If =
+you are not the intended recipient, you should delete this message and any =
+disclosure, copying, or distribution of this message, or the taking of any =
+action based on it, by you is strictly prohibited.
