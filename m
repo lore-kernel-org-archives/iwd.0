@@ -1,95 +1,102 @@
-Received: from mail-oa1-f41.google.com (mail-oa1-f41.google.com [209.85.160.41])
+Received: from mail-qt1-f172.google.com (mail-qt1-f172.google.com [209.85.160.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86F6F15665D
-	for <iwd@lists.linux.dev>; Mon,  6 Jan 2025 15:27:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E171A44C7C
+	for <iwd@lists.linux.dev>; Mon,  6 Jan 2025 15:34:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736177253; cv=none; b=IdrsnNYsx54iMsnuF3Vss1SGbv58El1W0U73XXjcWlbHx3OmcKk3o3o8hVS5HJgcJXa9LdAdis4xpDhfrwFTNBmo/R4KGdt5T+ZW4/ruHA5mFSEGpBWUztfK7AQdu06GRut4NR2N5rY21PaLQXVJ3TVWzdVc8Ug6g4VA4Fg43DM=
+	t=1736177677; cv=none; b=OHT+FGB+ZX23scTy4hmjywwphqHUiVfNVb6yD6YJqYOUkOYHGnU97JTaKXjuh2Rf0cc0p9CWpR4f+1AKYS+dy0NEsD1PdJdW5BL0KGyM6UCRfAMZcssze13w4qXHIFbjnwfExZxOEQSjYMC8m2UZGYkWihSEFsZTm6hhvOtGLQw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736177253; c=relaxed/simple;
-	bh=qerr9y/kH23X5GK565U0xsyQxdRlOYHSIkQM2/Axgco=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=Uh3wRu4+X4wT+aCf5LbULsxK74xW/Akyn6crrcV5ypGR9cU7EzjSeBhtKFK/zZ1lD83JtsV2ph5PC+t4EV3LaPGliU4ZGvWZUXDybn5P+Lk6V7JMFfSQ/naiKRv8vYY0ledaOGftnDENoRQ5JtKir2VtzmdBXiYeNR8UmRmojqE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dz0DKrf6; arc=none smtp.client-ip=209.85.160.41
+	s=arc-20240116; t=1736177677; c=relaxed/simple;
+	bh=WQe2CofyA0AU5qgoj463zU77VgVu8wZsHrLeOYCrRUE=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=bCBnJEwK9IY1sS2CTVcjzKi5gi9qJ+JLSXp6VryKqKBWfx3lJ7PPpbFMwvURBh5LOTDjVZ5Z3OP4pL0vVq0g+HQ7hNViJrE8WsLI5zapyyOmAeh6qPStk+V/VT4XRIoxYDAH3M/UGj8IUoLSZKnGj4xOwcZXwNcmrWDB+aMuteQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GWUlXdaM; arc=none smtp.client-ip=209.85.160.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dz0DKrf6"
-Received: by mail-oa1-f41.google.com with SMTP id 586e51a60fabf-29e65257182so6733176fac.2
-        for <iwd@lists.linux.dev>; Mon, 06 Jan 2025 07:27:31 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GWUlXdaM"
+Received: by mail-qt1-f172.google.com with SMTP id d75a77b69052e-467725245a2so96480041cf.3
+        for <iwd@lists.linux.dev>; Mon, 06 Jan 2025 07:34:35 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1736177250; x=1736782050; darn=lists.linux.dev;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=RtcGfEbOhBfEBQp4Bsw4G7/F1CO1iF23Bj79pDFI4SM=;
-        b=dz0DKrf6opsHUqZAo++UK4l0K8jcJYMeB/mZZ2tixvnzUBtAksmjnPthUmlfOxBqzb
-         IIGbUKLhAsNrr0hdU8uWh6EPm4mDPB7k5ZyOyJ8xRGMmRRWix4/jeEIRvwr+aoLidRQF
-         wx3qauEUVIkOqKQb7KEdDPS5LoTxAgdX+sCps0nW9X7+HfKYB/j//A9gpAixmX9zCDEE
-         3MUs5CwgmmRMCFnLd4tlOuYLubtZvdiw87wmZl3T2T++XXLlSkzzcbSLhiyuLA5VaeTm
-         0+MTvHqowEztrVqOJQrkRX0p6gWE8DIyKeb8Cnohbr4uw6j647zW+xXwnmONudHbyXfs
-         q/jQ==
+        d=gmail.com; s=20230601; t=1736177674; x=1736782474; darn=lists.linux.dev;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=irHvVh81pThMMJqVAmyAGs+lPfcZMrl9SYS3CgwCrKo=;
+        b=GWUlXdaMY9E95ziGX8y9/YTNVe9TMHOaPUVrG1nyr7g0cd7Tl7wDexqVZQt1ETMwMy
+         fJYUBYWgijcM5yZi95Wr1XEbvOLIytDNJVI9sBsKOh+1jpuF2by9WMQWXU5gA5PxGQwH
+         WSh1twV3H7U31etGLOjJDayrJE4gk6jtjdGYCUt19L3sI1GIOBqUu6hTJzNuHxu28RBK
+         ifGQATSP8i/YwfJh+LLoIgx+CRx4h6v5Z7V62rociTIWYdFQagK34mPN4K9He/j2YwN+
+         lt2auLWKnwzagvbquwLZ1rHSfoXHaIpQrj0xDzDdEiYuXXsplnizEOrIytSgTUcGvjQH
+         cTkg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736177250; x=1736782050;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=RtcGfEbOhBfEBQp4Bsw4G7/F1CO1iF23Bj79pDFI4SM=;
-        b=a7cpfdjuYyAaNnEiW2Jym0Xc7tiWpz9j8pavMzjRW0u8pUJ4stOwPlNz6nvN48/mPt
-         Od13oeSFq1yt20RNxy/bCI9JtiTP5UbQ/kYcYAHl6MZxKFm7yatplm7Ouez7czUMnhGk
-         y4q0w7Ds3mXesPj04yF3XZoR4CXQLclnHfvPsTre4kH59591PLJAJEEkqf/g3FBBgpNP
-         Dq8GwsxNph/AHo+If8o0wZdwUcssvbW2LzFfxqWIYtPxpJzmu3tsMoTd8oDxGhLQQqqo
-         fLKtI74I8SN1qjFxOteKyOXIfs2/ngHssiSuGJCAihMzV4+jqr3IMUsT9x2StdCRRpsw
-         MyYQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUN0jpEKaEDY7/NBi3Mfd2Vwgr4zCzfIj6TYvVR77AzELbpm6QUeLa+a6CoDuVPgNcKs1E=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yzbc/7RjlWQbimXFcoM4e6xrx68hzvnUVpfR8kaHH1c63fuY2px
-	s4aJQNm0J+FpJvlVIHVEF8J1BKnk7Wt+9BLXOeM0xzSokfIva3tykBxjvQ==
-X-Gm-Gg: ASbGnctlJEvhvvss05o/RUU7aCsat6rEDPqiy1/7bCgrSK//6e123yoeCInUrQA6X0F
-	DVTi4FAA8OH/NUd/ylfPvaArbEeFfBa6JxC2MimplH9ktlNrEcjIux2hyspkT94xR7Bu4JSRAu+
-	r3pRtSnBUwy/N2fbkT/XUSMfuAAb3sfoSwoAZEpSMTmieM5F5aJB5x/985fzQOZiYhtsMs3gB44
-	N1dcekvXIoVIfbIDW6nRSHZwjsU3xz+ZafeV2MzOLCObvT6+p22SUzR9m3SXUPjgTei20RodfFH
-	8b4qPSL27QlmNjW0FFK4rw==
-X-Google-Smtp-Source: AGHT+IF7yGbsykZhEQTpBatWsGUE4RhedlLdv5dLI7Zp9sGI7aZ22RHhg5XVlKMFoqumhxzgyN5P2g==
-X-Received: by 2002:a05:6871:3141:b0:270:1884:9db1 with SMTP id 586e51a60fabf-2a7fb00aeb6mr27586403fac.7.1736177249084;
-        Mon, 06 Jan 2025 07:27:29 -0800 (PST)
-Received: from [192.168.1.25] (syn-070-114-247-242.res.spectrum.com. [70.114.247.242])
-        by smtp.googlemail.com with ESMTPSA id 586e51a60fabf-2a7d745411csm11660980fac.6.2025.01.06.07.27.28
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 06 Jan 2025 07:27:28 -0800 (PST)
-Message-ID: <092b1528-96d8-4995-99b5-efde7883cde1@gmail.com>
-Date: Mon, 6 Jan 2025 09:27:27 -0600
+        d=1e100.net; s=20230601; t=1736177674; x=1736782474;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=irHvVh81pThMMJqVAmyAGs+lPfcZMrl9SYS3CgwCrKo=;
+        b=iVoAr53BW2pWTFBAYxk8dxrSHkRkuhL9vo+CupL8TgufsYbZYAQjeaEJXlRvhe6ToJ
+         12vJptLtWLH6Ab5VryRin1UzHPCBtNuk1c0zYntoJZfTpmVDRtoBlBgYb2L9rPvJRsN+
+         5cmqElgklGYld7LTZOBqc0iPqE/wgtSaI/DaeAKQ7Bxh9CByagei8WBkfxrWYxb8CxFm
+         Mkn+13acVnU5UjDxWBXgWkrk+HBW4BsUNuxEJzs/MbyCrZNXiiXdD95jGvsuwok9rygb
+         Cif8eNEX3Zy4cBi0qXMeF7QF1riPkbHzU2HvUY14XtK4d+dkVwKsG3MGnTe1O9CTHgSg
+         TUdw==
+X-Gm-Message-State: AOJu0YxtjTGpK8oL2N/WtdohrDlcXd8u9JtVMImg6ffyiM8v96xfSSN1
+	umlrN9D77x4N48TW3scmX8r08lelljjyX8qv8TQpafnW0JwhCEOv4Qezjw==
+X-Gm-Gg: ASbGncts8Gq6I1kZs8JeTonhO6BGEmU1YIjd/kcOhhFvvp/YPeXzPAs3klSjqKOZ02g
+	f2+ggj4q+tp/n4l8Qg20mKbP3LykznghJyRTmbWa5oKiGxVv4emQZHSQGUyPYpT0ApXyofQMXna
+	kDR2Gu6oPsOHAGEP9EFRuO6GsoSpHRkTrlpannGvsgPjmtRJFeb/nFNfs71TH7ogDrPE/uhAbq0
+	MfZ2NTqYlfzhHa4TYfzN6Fo7U59POfETgL0xEBj889800cZzS2mkMIeSv1mn2ryfCh8TwwYZSC8
+	4ik6zDhxuUXw7tw=
+X-Google-Smtp-Source: AGHT+IHe53LJ1SigwBYaX2Fu9z44aFBYo1kdkFJODOXJ5cuu+KPAPPo7DHlYil6LtkL0NsE9mIRSqQ==
+X-Received: by 2002:a05:622a:347:b0:467:84df:92ee with SMTP id d75a77b69052e-46a4a9a69f8mr975045181cf.40.1736177674416;
+        Mon, 06 Jan 2025 07:34:34 -0800 (PST)
+Received: from LOCLAP699.locus-rst-dev-locuspark.locus ([152.193.78.90])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-46a3e6a60bfsm176334001cf.47.2025.01.06.07.34.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 06 Jan 2025 07:34:34 -0800 (PST)
+From: James Prestwood <prestwoj@gmail.com>
+To: iwd@lists.linux.dev
+Cc: James Prestwood <prestwoj@gmail.com>
+Subject: [PATCH v2] handshake: add more debugging around PMKSA caching
+Date: Mon,  6 Jan 2025 07:34:30 -0800
+Message-Id: <20250106153430.132452-1-prestwoj@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] handshake: don't print NULL pmksa pointer
-To: James Prestwood <prestwoj@gmail.com>, iwd@lists.linux.dev
-References: <20250106134606.115334-1-prestwoj@gmail.com>
- <9bbdd1b7-8fc4-497f-8ac8-80871df4a8dc@gmail.com>
- <759fcc78-4ea7-4d74-8ee8-dc2704f3fed5@gmail.com>
-Content-Language: en-US
-From: Denis Kenzior <denkenz@gmail.com>
-In-Reply-To: <759fcc78-4ea7-4d74-8ee8-dc2704f3fed5@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-Hi James,
+Instead of just printing the PMKSA pointer separate this into two
+separate debug messages, one for if the PMKSA exists and the other
+if it does not. In addition print out the MAC of the AP so we have
+a reference of which PMKSA this is.
+---
+ src/handshake.c | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
 
- >>
->> Why is this behavior undefined? Would it not just print 0x0000...?
-> 
-> I had a brain fart, I was thinking for some reason it was using %s not %p. So 
-> yes, this is a valid input to the %p formatter.
-> 
-> I can alter the commit description, but I do think it still makes sense to move 
-> the print, or at least modify it to make it clear no PMKSA was cached, rather 
-> than just printing "nul" or "nil" or "0x0000".
+diff --git a/src/handshake.c b/src/handshake.c
+index f73f91d1..bee31beb 100644
+--- a/src/handshake.c
++++ b/src/handshake.c
+@@ -1272,10 +1272,12 @@ void handshake_state_cache_pmksa(struct handshake_state *s)
+ {
+ 	struct pmksa *pmksa = handshake_state_steal_pmksa(s);
+ 
+-	l_debug("%p", pmksa);
+-
+-	if (!pmksa)
++	if (!pmksa) {
++		l_debug("No PMKSA for "MAC, MAC_STR(s->aa));
+ 		return;
++	}
++
++	l_debug("Caching PMKSA for "MAC, MAC_STR(s->aa));
+ 
+ 	if (L_WARN_ON(pmksa_cache_put(pmksa) < 0))
+ 		l_free(pmksa);
+-- 
+2.34.1
 
-Sure, that makes sense.
-
-Regards,
--Denis
