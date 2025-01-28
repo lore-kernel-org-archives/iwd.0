@@ -1,137 +1,181 @@
-Received: from mail-pj1-f47.google.com (mail-pj1-f47.google.com [209.85.216.47])
+Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 566801B4248
-	for <iwd@lists.linux.dev>; Tue, 28 Jan 2025 18:04:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28C241AA1D2
+	for <iwd@lists.linux.dev>; Tue, 28 Jan 2025 18:06:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738087484; cv=none; b=VxGCcHx/BqAtv4Uq4fj1gB9hQ3OCjGs2vi0/CNwLibT6uKwvs4Gj23HEguoe28+v9E4KGAXq17NxLR3zqGTFViBz5UiQsc4lAxnXTLFuBvtNCeW8KTXYIgZUs3BWZot8NeyZ75/lc2YI73PaK8pWaKzfttAaOLL+LlaMoBcpYwI=
+	t=1738087578; cv=none; b=gvLXkOmzuLieCfsYjHlD1GvjnF4UiMSEAclaOP5EJ+xkzE5QTdcaJMsZjtcvHpqJsddsBd5drqWYsxdXyzfyneMo+lzMpKevFRzR0/tVBJYtxwTtmjRzgBvdRwGgNTFS/hl0TjfHiXQYRQvwZpurbbp008ib2neFRakHxR5KWtA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738087484; c=relaxed/simple;
-	bh=jTFAw7pxpALJLwsy1fuz3aDufCzZOPRtxgABH7mhVyA=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=qJv3W4Xt68t7Rrqdp1vvgJZl10/CVBONii3rntftv6loJTABrAlPs3EjB7TO1nBO0FvfEhATYY/jnopWuMAi8gEZ3BtX0hFTAZVpOSrF9t9u4s0vkYIO58/K5DYOsd0st0sxy069VIk5hBUTPoUlqHjK7x/N7sG3RTOUjBOWGyQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=I89hXd52; arc=none smtp.client-ip=209.85.216.47
+	s=arc-20240116; t=1738087578; c=relaxed/simple;
+	bh=b+7ilEyNSBscXwvwTOgsdy004Z9/0inwR9wDoHjamOk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=T4mrofdMDJsl8xz0CYy0Sz2un2o4zyOungbNI6FHUEpfBS4QPbzUYEen1JQaVzS5IvKqSHe8RCdQRX+39w9176ZzkdE0yFOClf2vsbbNPtYt4QL0IPYVzQCnCiFgLzQEEnIyC3qHbtvlWyNqkOk7QcZTkCPNr2ixRuoGySj1gMU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=f1Uus9vV; arc=none smtp.client-ip=209.85.214.169
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="I89hXd52"
-Received: by mail-pj1-f47.google.com with SMTP id 98e67ed59e1d1-2ee76befe58so10230747a91.2
-        for <iwd@lists.linux.dev>; Tue, 28 Jan 2025 10:04:41 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="f1Uus9vV"
+Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-21c2f1b610dso139662105ad.0
+        for <iwd@lists.linux.dev>; Tue, 28 Jan 2025 10:06:15 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1738087481; x=1738692281; darn=lists.linux.dev;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=OHFHl2NpHUx7c5ppbJjZ/IWSP1CwdKQlZrbC3J7Z7qM=;
-        b=I89hXd52i1VajvB8dDosU1NuYepSRDEV4riWAvC8YFjMHZmjYrZELdliUFP1DI1z6B
-         wZUZZwQggc+CDplUb6ivYX1upQiH83E9i0neOWChCJr4rLuyohLWDM86MFy6VpnyhKRt
-         85GLLVCglGyYwy15+7Zq89mZVS4g3pFsRRBB3MecVSL8lkkMLyNCXiwkCcEuHE1KJJvH
-         MBc5S9e4XakSTIZ6JvhaikAYIKCKOhN02jMsw/6awWn+Q2KR5M/RWf5od1h9NsKxMAEi
-         Wm5SZ+jU7ifV4saLVz/8GYjB1V5Tu5+jsDHZtUd20O8fe2A3onUWBqYh+vAG8c1meKpz
-         Ggzw==
+        d=gmail.com; s=20230601; t=1738087575; x=1738692375; darn=lists.linux.dev;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=HuZAFXSXpQ09K/j+v7WPJ8gLc97nXaSiimvECzvWmgA=;
+        b=f1Uus9vVpiOuoBCvuX2fWObV55m7w1qcVu2Bhc9DCVZoj5SZeB0fiol6mDZGht7uhd
+         vFP0lAJpBXa4FxwLDnF7ruotq8X/TQiEOLCLsB6NNgdZ2AhOX5l0XNE86arZK/7FneOa
+         IVlh5VKIZgF/A1DD5hKvTdi9MJKoMp75wilIF3MMcljRuoPwqcqovyowH0o1jDQn+wYi
+         HOgvi27zLMgx3I2zS6n58rd6kHCD+LqLorG2DGtpLSw5MfrA+FcOhhFE+RJ4RTAFkwRr
+         u7jiwIYUnjxdMSpLwcDZOfVM/AkYYnksLnY9r8Q31d1HXvUoZmjcyTrD74y3sUMvhSSV
+         Glaw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738087481; x=1738692281;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=OHFHl2NpHUx7c5ppbJjZ/IWSP1CwdKQlZrbC3J7Z7qM=;
-        b=PnHspXS6T3MmjsC/vyUYini8Kqk8bQdgq1kU6hU3MrZ5NiV4sY+eGxY7Xsihw4fHXV
-         +RDiR+jSDPk845g961BetpBIew4Pq+GPTJY0TvFiCkmvxyBofQVYVYmlKkKpKHPT4C8o
-         JhJZMQhwHF9n2P+inUBH9g5x9rFDsLRcfhjY5zGPEa8LvB+Wa4uvgDU6RSYMJCHZiHlb
-         HQJoBfpzHwW8OawqHB/9tLVZuKqRVIQXpWurp21APXY9rM7l+XAPOHdSzUqs8Mod3FHE
-         q3NjpE9gXh3xsb15CDpCaA66GbR8MniIy9wopWhpUO4Fc6goHfCu/tTWBWZNVy0uLpvp
-         zs6w==
-X-Gm-Message-State: AOJu0YyS2wx5jfJIP8D3e4pSZRA2/aqXj+k6eWmyYddeuT/0YMBNTC/2
-	+rCQaaalYLYHwnB70HoCzzAvuDMEgAsEkRhEISQ5rbvxHAtri+GqL6Zv3w==
-X-Gm-Gg: ASbGnct/ToR+6FH1Bcn2k537V9+9gbAGzInoT05w+555zyUucSjn+endBnScTqiAM+q
-	R4r6Q39IuoZXyqVPK74U+aDVOoGuvr1NAZRHAdRJ2/3iWVINppnBUFEPe2lMGUYKKocz+umonrF
-	jgNrEh3u2Tkmnny1dUmXnx2NFw7jkb/GxGU+j4V3hucxYlu/PzXfOmdIgu25eCh2k3C3D5WO/vq
-	trcOo8caN0wUeN5De429qsz2Klxv/vDQ5SutpigGOi9DqH0XtqX23QVXspdt996v5o9m9HlazkP
-	94leNsOPh/LwWW8lrLdceLask8tBX+kB+ACYHEiGrEOuSEmltqhd6hymkVjn4u6uOtyii7M7Ee3
-	01A==
-X-Google-Smtp-Source: AGHT+IHnG9B7WnLAvugJ0nKdOd4IoFgWmbT9esTySQw0yr+3uIIR9eEZxomJVDeiDsT3Xd/64CCD5w==
-X-Received: by 2002:a05:6a00:2302:b0:72a:bc6a:3a85 with SMTP id d2e1a72fcca58-72fd0c72bbbmr110162b3a.22.1738087481126;
-        Tue, 28 Jan 2025 10:04:41 -0800 (PST)
-Received: from LOCLAP699.localdomain (h69-130-12-20.bendor.broadband.dynamic.tds.net. [69.130.12.20])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-72f8a77c969sm9499289b3a.150.2025.01.28.10.04.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 28 Jan 2025 10:04:40 -0800 (PST)
-From: James Prestwood <prestwoj@gmail.com>
-To: iwd@lists.linux.dev
-Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [RFC] netdev: avoid PMKSA for fullmac drivers
-Date: Tue, 28 Jan 2025 10:04:38 -0800
-Message-Id: <20250128180438.65113-1-prestwoj@gmail.com>
-X-Mailer: git-send-email 2.34.1
+        d=1e100.net; s=20230601; t=1738087575; x=1738692375;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=HuZAFXSXpQ09K/j+v7WPJ8gLc97nXaSiimvECzvWmgA=;
+        b=V4pj6Sb3QWV6CMbXDT9fREjzWnSgBRWfVDvbXhwjAI2rc26Y1pWZQHCauavhGb6Kym
+         E39GKhJb4mEz61a8L054FXEFQ2Mv1p15Bv6ekxPc965DTAnl7HE2re/4mR7QteN5AMo7
+         zDzjH76jkiRzrGpUUb7BawKTuv5Z4MQp2p19yQxiquGzT9n+cHpVQSvJ9aQ98F7eegsG
+         IznL6pi1cH45AgLhoTu7RoenNPiSUFh0Al7URBNk4hDxleSv8EhbXmem6StW01reuvoW
+         96gso6GCVyuyek6zLfFvZlc2Qa8sn9O2ZOUMAbK4uWWmiy8lkmnxAzZl+phRx+wIEOmp
+         bY8w==
+X-Forwarded-Encrypted: i=1; AJvYcCVEeFDoAe0i2uUkzDWnWzV2X7gfVdlh1IPm85CLYFdzzv3MwlqnJYBjQo8ZHGUzDebYPys=@lists.linux.dev
+X-Gm-Message-State: AOJu0Ywwcv2xSvF0oY5OYC9CTAxobvTiDguJdhI+9U6ePPROkzAIu7pV
+	ScFdeiranVTn7M04BdngQXVFZcBvle4k0xm90fDWAs4yjFcCk/QzBeVXdw==
+X-Gm-Gg: ASbGnctze/fmtE/9WIhGkpjJBr5P3xZHi4JHigLP2v7qBEL3tkAdvIjx45hm5O/lhlx
+	RHf3rkQE6jPMhY/lzx72UqhUpQIZPKm009HkP9mAxWGgRBp9W+XqSgJrvx1IELI1b1aOkPhQkO/
+	JA6oVrorH/m7VTCm9T78QfdtbBvQIAunJZteMJ8FtpwRlojIiNmtJgxVp8gMeu2z4/pLBa24zrG
+	9s+W7xGZZH/mKOHiGy5MONo+fY6NJbQymWGsCMBXvKei+pfC37z6ZKcHg0CP17Nudn8N4ptlABi
+	y4h9JdUZxQJp6j9c9HL1rhmrgbkaAFIEo9oYLqhTfqIrlZfBCUith2cH/MjeOkMNPx+CWg==
+X-Google-Smtp-Source: AGHT+IHhtL9UluJP8kuzisQzFLp+uJHnbs9Yl2OYm1q4MnoGkg4ph8okdIouYZmIqfdGHFmfYjo2Iw==
+X-Received: by 2002:a17:902:fc4b:b0:215:72aa:693f with SMTP id d9443c01a7336-21dd7c44298mr620335ad.9.1738087575309;
+        Tue, 28 Jan 2025 10:06:15 -0800 (PST)
+Received: from [192.168.1.164] (h69-130-12-20.bendor.broadband.dynamic.tds.net. [69.130.12.20])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-21da424d65asm83936055ad.246.2025.01.28.10.06.14
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 28 Jan 2025 10:06:14 -0800 (PST)
+Message-ID: <fdc44a38-27d4-4dd5-993f-318c8ce52202@gmail.com>
+Date: Tue, 28 Jan 2025 10:06:13 -0800
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: brcmfmac SAE/WPA3 negotiation - Part 2
+To: KeithG <ys3al35l@gmail.com>
+Cc: Denis Kenzior <denkenz@gmail.com>, iwd@lists.linux.dev
+References: <CAG17S_OwtNxetb7XzsxkZcygH_CWkZx15evQZkThb3WjqpiKTQ@mail.gmail.com>
+ <CAG17S_NdA9LdwmA_XfvPOVrhCdqp+BOtAssH0=RE-VSjg=WFnA@mail.gmail.com>
+ <CAG17S_O6Bpc+JhhUuDvE70a+ef9wt9D7jG1gMJDNo1qZCUOg8w@mail.gmail.com>
+ <194115affe0.279b.9b12b7fc0a3841636cfb5e919b41b954@broadcom.com>
+ <CAG17S_O7HbPFB0gubWWP9P-Oecps8K_LG0Y7YDo5DbNGKSLjpA@mail.gmail.com>
+ <CAG17S_MwJC+h7O-htyUxEgB4zHKeGf+9B4QaQ6ZLiVStU_Egkw@mail.gmail.com>
+ <CAG17S_NfqFjjaWj6vGS1HXux6JDy0QKcg8aQAR=aOzNGhO0a3w@mail.gmail.com>
+ <eace9233-1b65-4793-8abe-abd3c640dba8@gmail.com>
+ <CAG17S_MfQ+FjWQJoiNs30rt4u1O9Z_FXFB7BiS6RAQsG9ReNkA@mail.gmail.com>
+ <CAG17S_OigLj3j=tS2BKYpoKOWKVs=XOBS-YFn26SzF9r+ZpLzA@mail.gmail.com>
+ <CAG17S_Pj6UaA-yaGDUCwr8+M+L760PU0NvB1sAzGGNCp4xKatg@mail.gmail.com>
+ <8c36a8c0-0246-4009-b79b-890e1f0a7aaa@gmail.com>
+ <CAG17S_NNtyU0eXzsWgrjJEjcqDHPLrbSkvnEboSg-fZebdV3dg@mail.gmail.com>
+ <76b2f0b5-641d-43e6-9c6d-4073fbc61dd8@gmail.com>
+ <CAG17S_MxYjoYBGmNDPPuVUTBfRmksfiJ4X==SAPF+6Hz3j8eKg@mail.gmail.com>
+Content-Language: en-US
+From: James Prestwood <prestwoj@gmail.com>
+In-Reply-To: <CAG17S_MxYjoYBGmNDPPuVUTBfRmksfiJ4X==SAPF+6Hz3j8eKg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-The fullmac drivers need additional support to correctly work with
-PMKSA. This can be disabled via main.conf, but to avoid extra user
-configuration avoid the use of PMKSA for fullmac drivers
-automatically.
----
- src/netdev.c | 22 +++++++++++++++++++---
- 1 file changed, 19 insertions(+), 3 deletions(-)
+Hi Keith,
 
-diff --git a/src/netdev.c b/src/netdev.c
-index 2a6d94fc..7af3c39a 100644
---- a/src/netdev.c
-+++ b/src/netdev.c
-@@ -1518,7 +1518,8 @@ static void try_handshake_complete(struct netdev_handshake_state *nhs)
- 
- 		l_debug("Invoking handshake_event()");
- 
--		handshake_state_cache_pmksa(&nhs->super);
-+		if (nhs->type != CONNECTION_TYPE_FULLMAC)
-+			handshake_state_cache_pmksa(&nhs->super);
- 
- 		if (handshake_event(&nhs->super, HANDSHAKE_EVENT_COMPLETE))
- 			return;
-@@ -2455,6 +2456,19 @@ static void netdev_driver_connected(struct netdev *netdev)
- 		eapol_register(netdev->sm);
- }
- 
-+static bool netdev_handshake_can_use_pmksa(struct netdev_handshake_state *nhs)
-+{
-+	/*
-+	 * Do not use PMKSA if this is a fullmac driver as they need additional
-+	 * support (SET_PMKSA) in order to function properly. Until this support
-+	 * is added fullmac drivers will not utilize PMKSA.
-+	 */
-+	if (nhs->type == CONNECTION_TYPE_FULLMAC)
-+		return false;
-+
-+	return nhs->super.have_pmksa;
-+}
-+
- static struct l_genl_msg *netdev_build_cmd_connect(struct netdev *netdev,
- 						struct handshake_state *hs,
- 						const uint8_t *prev_bssid)
-@@ -2473,7 +2487,8 @@ static struct l_genl_msg *netdev_build_cmd_connect(struct netdev *netdev,
- 	 *       0 (open) for FT Initial Mobility Domain Association over
- 	 *         PMKSA caching
- 	 */
--	uint32_t auth_type = IE_AKM_IS_SAE(hs->akm_suite) && !hs->have_pmksa ?
-+	uint32_t auth_type = IE_AKM_IS_SAE(hs->akm_suite) &&
-+					!netdev_handshake_can_use_pmksa(nhs) ?
- 					NL80211_AUTHTYPE_SAE :
- 					NL80211_AUTHTYPE_OPEN_SYSTEM;
- 	enum mpdu_management_subtype subtype = prev_bssid ?
-@@ -4053,7 +4068,8 @@ static void netdev_connect_common(struct netdev *netdev,
- 	 * If SAE, and we have a valid PMKSA cache we can skip the entire SAE
- 	 * protocol and authenticate using the cached keys.
- 	 */
--	if (IE_AKM_IS_SAE(hs->akm_suite) && hs->have_pmksa) {
-+	if (IE_AKM_IS_SAE(hs->akm_suite) &&
-+					netdev_handshake_can_use_pmksa(nhs)) {
- 		l_debug("Skipping SAE by using PMKSA cache");
- 		goto build_cmd_connect;
- 	}
--- 
-2.34.1
+On 1/27/25 8:47 PM, KeithG wrote:
+> James,
+>
+> I patched the latest iwd-git. First time after reboot, it will
+> connect. If I remove the config in connman:
+> connmanctl
+> config wifi_blah_blah --remove
+> then try again:
+> connect wifi_blah_blah
+> it will not connect and I get the error:
+>
+> Jan 27 22:24:01 Pi4 kernel: ieee80211 phy0:
+> brcmf_cfg80211_external_auth: External authentication failed: status=1
+>
+> It will not get a DHCP address.
+>
+> When I add the directive in the main.conf, even with this patch, it
+> seems to connect every time.
+> DisablePMKSA=true
 
+Thanks for testing this. I've got yet another patch which should avoid 
+the need to use DisablePMKSA anymore. If you have a chance to try it out 
+to confirm that would be appreciated. Again, remove the DisablePMKSA 
+option for this test and IWD _should_ be able to connect/reconnect 
+without an issue.
+
+Thanks,
+
+James
+
+>
+> Keith
+>
+> On Mon, Jan 27, 2025 at 10:21 AM James Prestwood <prestwoj@gmail.com> wrote:
+>> Hi Keith,
+>>
+>> On 1/27/25 7:09 AM, KeithG wrote:
+>>> I just tried this and it connected 2x once from a saved key and a
+>>> second time from a new key.
+>>> Will continue testing and let you know, but this may be it!
+>>> Thanks so much for all the support.
+>> Would you mind testing the latest RFC patch I put on the mailing list?
+>> Please remove the DisablePMKSA option in main.conf with that patch. I'd
+>> like to see if PMKSA will actually function with brcmfmac without
+>> external auth, or if we're stuck disabling it entirely.
+>>
+>> Thanks,
+>>
+>> James
+>>
+>>> On Mon, Jan 27, 2025 at 8:29 AM James Prestwood <prestwoj@gmail.com> wrote:
+>>>> Hi Keith,
+>>>>
+>>>> On 1/25/25 8:37 AM, KeithG wrote:
+>>>>
+>>>> <snip>
+>>>>>> With wpa_supplincant, before the AP sends the 'PAE:', we get this
+>>>>>> which is not in any of the iwmon logs with iwd:
+>>>>>> < Request: Set PMKSA (0x34) len 92 [ack]                              14.561627
+>>>>>>        Interface Index: 3 (0x00000003)
+>>>>>>        PMKID: len 16
+>>>>>>            05 cb 9d 0d 9a c6 7c 42 77 b5 d2 23 f0 62 f7 4d  ......|Bw..#.b.M
+>>>>>>        MAC Address D8:3A:DD:60:A3:0C
+>>>>>>        Unknown: 287 len 4
+>>>>>>            c0 a8 00 00                                      ....
+>>>>>>        Unknown: 288 len 1
+>>>>>>            46                                               F
+>>>>>>        PMK: 254 len 32
+>>>>>>            35 28 07 cb 94 de 82 e7 0a 5c 73 d3 e4 1f 88 ae  5(.......\s.....
+>>>>>>            74 84 82 66 86 8d b5 aa 79 cb 75 d9 75 8d da 3a  t..f....y.u.u..:
+>>>>>>> Response: Set PMKSA (0x34) len 4 [0x100]                            14.562171
+>>>>>>        Status: Success (0)
+>>>>>>
+>>>>>> Is there any more info or help I can provide?
+>>>> Looks like the only difference between IWD working and not working is
+>>>> when it includes the PMKID. This is due to the new PMKSA feature which
+>>>> looks like it requires some extra work on brcmfmac (using SET_PMKSA).
+>>>> Try disabling PMKSA in main.conf with:
+>>>>
+>>>> [General].DisablePMKSA=true
+>>>>
+>>>> This should hopefully get IWD reliably connecting.
+>>>>
+>>>> Thanks,
+>>>>
+>>>> James
+>>>>
