@@ -1,70 +1,66 @@
-Received: from mail-qt1-f180.google.com (mail-qt1-f180.google.com [209.85.160.180])
+Received: from mail-qv1-f54.google.com (mail-qv1-f54.google.com [209.85.219.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42F472690E5
-	for <iwd@lists.linux.dev>; Tue, 11 Feb 2025 19:27:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35BA0265626
+	for <iwd@lists.linux.dev>; Tue, 11 Feb 2025 19:59:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739302028; cv=none; b=JtWQEPx8pwLTqLcnpAUS0PqK7nOkgJciFbMch0bUZ3YXwj/d6OIC4+/pp6gU21nbUUVuGET4KQOXb21/192KyQcLSk+HFq1BcEsGDZVZZ00P577Z+1tDfXtBdbG8LnPZreMW2VyOJWxLKCL76Ct3iNvIbHhiYl3q8adJB2dpWGQ=
+	t=1739303943; cv=none; b=TcYu3KINW5v7BGq63ukBDeKSTMuwP17z7BysV9lgcoNHLj2CKQIpalCQG47FlA7m30al7K5+MwC6ZQUTYGLoe5zmGjtCE4+QyMepuKUsg5gxvyJvOwMLVBwDVmp0jWSTCp2jtReZrsP3zyynygjoqlVE0Q9fW/Aw8yzayeCdIeM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739302028; c=relaxed/simple;
-	bh=4cFaCZGk/mNUOHMz+1CjVC5YD8greqN2nSXGRn3l2Vc=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=sV1/ZTbGGy7dO+iwXGy6vG6IjVEsgONIpOFpd0SkV/C+O0m0jxjfpD933N1PjiPrNgAOTwgflhKp47dWD5TTRf5woA5WZfofg/cCdiDN/NsgAmNJ7pzPc0DKMnrfLbH/XZorH0NQhRqcBxrrXHE8JhUKZ5aEfRoSGax/XRCvcGk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IpR8u1Xh; arc=none smtp.client-ip=209.85.160.180
+	s=arc-20240116; t=1739303943; c=relaxed/simple;
+	bh=lGh0L1YMdGrtH/xyjZcTWb0vxSsHjJDlkmjnWzvUjQ8=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=suS1NjRdksB9ymCQ0oa4XOovP/lPSwjL4TfOfQnTyYPYGmE9aCR9P0BEB69ZtDvEN8c5VjtDiZ2q180DcTYK/keufRL3EoIMsPOs5Z5OTUcrXAdbRbSs9cJ+19wzSixg98/4RY8Y2mCY41BofnOh0D+5noDZic34TcVVsIl2pE8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fL4UodUI; arc=none smtp.client-ip=209.85.219.54
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IpR8u1Xh"
-Received: by mail-qt1-f180.google.com with SMTP id d75a77b69052e-47191bcb2afso19324791cf.2
-        for <iwd@lists.linux.dev>; Tue, 11 Feb 2025 11:27:06 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fL4UodUI"
+Received: by mail-qv1-f54.google.com with SMTP id 6a1803df08f44-6e440e64249so66887026d6.3
+        for <iwd@lists.linux.dev>; Tue, 11 Feb 2025 11:59:01 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1739302026; x=1739906826; darn=lists.linux.dev;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=bPcsjCWv5c/c8BcJz5XeSG7LjKcJh+rzqMCdB5oDJ60=;
-        b=IpR8u1XhnxeY11nR8UIWKZH1cqkg4V/o4QRmj2bIH63D+NXhJ/sd8KzK6tgj5n+rRH
-         tZQ5OovztidE3vWNRBCjcKDCTW1WUfYCPa+AMhzTOBcmwnU3SdKGpk6VdO/VBe47Wyb+
-         lEyuc72IkxjTck9QB1l9Pk9GbMCpe6RFlvzCVvlZGV79gjFdtsry8BUPhcrTPBNXDBXo
-         y7QOa9qDi5+7wkTXDqErYvvP3eMkLdeGFsV+X45U3hPDdopp9y+VA56Lykf4FRYL1YAU
-         EMFpIaOvL362tXb1oZIp3lB4j65kV+3LCxDHKtnBprI0vgMcgXRnu+/zf++nPqoQRN52
-         JGkw==
+        d=gmail.com; s=20230601; t=1739303941; x=1739908741; darn=lists.linux.dev;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=c5izq2huXCM+mQqALzawLxTNOVGttXRL9q+QlyIezRk=;
+        b=fL4UodUIAPTS1Ew8gm6HD6S/MXUoP65t/wEjHJh/l6WYvX9uHi5GpGgw0EwBoG8Vqk
+         faZ8Ps3ztQDwsmgZX8Eh5RBshH/JZrWnvtThcfGdMSwIxZPIUsvkjqfTkmOcEhImHxsJ
+         8EnSFkeMcoFB9yYOjxUqPGtX1cJnpt/lbeUhMH7Ww3w7FNJ7JS1z4iLBmy94OjiArS/4
+         DM8AeogHjb5E27ethjstc+eyleX7rOaKyb0roSk+eJE12IWHJfnmkqG2BqemIZ7sinfO
+         GQteDWo4zIqwSc0eUaCWqCyf/63V+Pl1y64dP2pw36agiCQen8jomLK1Xb3AvtRtt+VT
+         NwXg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739302026; x=1739906826;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=bPcsjCWv5c/c8BcJz5XeSG7LjKcJh+rzqMCdB5oDJ60=;
-        b=Yoh+CK4rI7B3KWeLKUmczK+3KSovjxtKEVjS3VpLACGKxoI//Xkd82bI0/XKBpuZY2
-         eyssUbFNhroDKGOcbqPHdVaTdRqCRyCE3RhsKGrmsulITPI+0WFs2JL87OwiagyTSLDw
-         6C6JsLfPMRBboVs13t2kah2iDRE5TdnGdsoXOICutqoKjyD+/odb3hqV3M8rI36Pwju3
-         w+4hqwMR4cm7uE2f+Cy/12dHxlQx3qhJzCxy193qU0iNq0XSNjT8DUZ/ioggmV/MXyR6
-         +SwiZDzgNE3R/tUuOHcIGDqFs4jSX/4ISQ6/oeHiQHGLfhRZzuWdaZJqry/hYwa1SNxo
-         fUfQ==
-X-Gm-Message-State: AOJu0YwZHQpjzWICodTlw8FJTSoyJSpyXuP1t0EI37H8W7R43w1juU2P
-	Gvavrm+/wKxE0rnYfAh5r603iTASYkgkgccvjvnbGe13A61ZPcIW7SLxdQ==
-X-Gm-Gg: ASbGncvqlfFaVauVoVIsJhsP0VRJOWROdALt9sJA8/zDcCqw2cQfkSH9Opeq7pqOHkm
-	kVZT8S0BFIJE5+r4KNfdZ2S92DuH+thWUwYdaG3IjgGioHox+IHUe1upzZNebN+ycduUkMs6/BS
-	tRRzfjlNE6Q9x16pw9/zvODsI4QQipTqvr36Wt66vOWa6i4GIhCKxZObEaUTcrUsV44F1diVjcq
-	DW3bp1dB3YE3tMQmQhZMWHKx1PxRlQu2nay7FG/ByCeiZGC/HvrF9814njAkGtWMvzjBlQ8CGtd
-	F8cUzXbwW+cRcE+o8tw9meKD54iBBwtxD3Kdxlt+y5HjXUw54Q==
-X-Google-Smtp-Source: AGHT+IHGN5C3FZNsgEZ+ooY03kHW8PH8qeCSlkE18R7Cxu2kS5ghJ+sEG/Djj3MsXl3DUitRhieb/w==
-X-Received: by 2002:ac8:59ce:0:b0:471:9f06:aebe with SMTP id d75a77b69052e-471afedf725mr5731571cf.41.1739302025970;
-        Tue, 11 Feb 2025 11:27:05 -0800 (PST)
+        d=1e100.net; s=20230601; t=1739303941; x=1739908741;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=c5izq2huXCM+mQqALzawLxTNOVGttXRL9q+QlyIezRk=;
+        b=kZG2yb5Lp/5xUhHjMpuvKrL+b2j5In6Li+N4oJlBb3UXgYKFmYUsiK5YbwOzH1CSBx
+         nBPuOkh55iEZHGqyKHisVs/aOt+WCva8xAkR3oGkOaeKNt3zIp6P1DjcHO2S1Bf8j02l
+         NJuoTL96dZrBpyNvTaSiS5owUNmdxKQPzVeKpF4x1yRaG8PWg0hUsXeozdFFZt8syMht
+         F/V3Z7DKMBrBV3UjeswmiMBq8SP4HS36t6IHC8yYfylCirPSGXjJW8PWD3s5NpcIFsOn
+         R/IBBQgpBo83dQj/JLS/dMh0+E0w2ig3O8bRMDnwdzSyiCI6yOuJcDDcz03m/fxh2QY1
+         quEA==
+X-Gm-Message-State: AOJu0YyDsEh9CirrFz1zupo1yJDvcV2N/vlvPIxKQgO4SuR5QMtbihkl
+	FB5YVBlgxD/lJXFvwIkc1UBN49wC1PRzk6fHX0OqWYubgm+z731U7oEOmg==
+X-Gm-Gg: ASbGncuBGzrAkNgWkejGjx/opAyd4o9sQjlzgNPQ1PEZTOQ8RCuq35jSMPBx/UPL3BA
+	jWWdIKj9AdZoeo//bDeUkzDRv/zhVkNafzid0Ps4rdGS17BEsQG+XPiWj/ask3T0kkmN95sFTbF
+	9L9eX/p4acGa7tvaEYXH5CMaFhIKEXg0DZJBtfNiLzOxtxKrXWWglBp53ppOUSletluSYR+q/pN
+	Cuf5Y6kMLINTytE9zOFCa+CTE+MNcd1bEqPnW3tjEI9LSK17I95orZZwAumpCtqugvGT/pZPO6K
+	xQtppS4yMGK5lEO5ZKdnrKcIeeXX99kno5joej4ITr9/RI0ROA==
+X-Google-Smtp-Source: AGHT+IHt3ZY844cgpzXZkQDmMiD5WKpFR0HJBa7nNgKf0ORBHQk3boVnbhaw6wISb/iKj6qC7s5yqA==
+X-Received: by 2002:ad4:5e88:0:b0:6e2:481c:3713 with SMTP id 6a1803df08f44-6e46edb5319mr11210156d6.37.1739303939461;
+        Tue, 11 Feb 2025 11:58:59 -0800 (PST)
 Received: from LOCLAP699.locus-rst-dev-locuspark.locus ([152.193.78.90])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4719dab7aadsm18681601cf.51.2025.02.11.11.27.04
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6e44df787e8sm49690426d6.113.2025.02.11.11.58.58
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 11 Feb 2025 11:27:05 -0800 (PST)
+        Tue, 11 Feb 2025 11:58:59 -0800 (PST)
 From: James Prestwood <prestwoj@gmail.com>
 To: iwd@lists.linux.dev
 Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 4/4] station: print security of network when connecting
-Date: Tue, 11 Feb 2025 11:26:56 -0800
-Message-Id: <20250211192656.83157-4-prestwoj@gmail.com>
+Subject: [PATCH 1/2] wiphy: add driver quirk to disable SAE
+Date: Tue, 11 Feb 2025 11:58:54 -0800
+Message-Id: <20250211195855.85360-1-prestwoj@gmail.com>
 X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20250211192656.83157-1-prestwoj@gmail.com>
-References: <20250211192656.83157-1-prestwoj@gmail.com>
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
@@ -73,35 +69,57 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-After removing the debug log in wiphy_select_akm we still should
-log this information. Now it will just be logged once per connection
-attempt.
+SAE/WPA3 is completely broken on brcmfmac, at least without a custom
+kernel patch which isn't included in many OS distributions. In order
+to help with this add a driver quirk so devices with brcmfmac can
+utilize WPA2 instead of WPA3 and at least connect to networks at
+this capacity until the fix is more widely distributed.
 ---
- src/station.c | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
+ src/wiphy.c | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
 
-diff --git a/src/station.c b/src/station.c
-index 5403c332..bb6debb9 100644
---- a/src/station.c
-+++ b/src/station.c
-@@ -3809,11 +3809,15 @@ int __station_connect_network(struct station *station, struct network *network,
- 	}
+diff --git a/src/wiphy.c b/src/wiphy.c
+index c7df648a..46f7a6d9 100644
+--- a/src/wiphy.c
++++ b/src/wiphy.c
+@@ -74,6 +74,7 @@ enum driver_flag {
+ 	POWER_SAVE_DISABLE = 0x4,
+ 	OWE_DISABLE = 0x8,
+ 	MULTICAST_RX_DISABLE = 0x10,
++	SAE_DISABLE = 0x20,
+ };
  
- 	iwd_notice(IWD_NOTICE_CONNECT_INFO, "ssid: %s, bss: "MAC", "
--					"signal: %d, load: %d/255",
-+					"signal: %d, load: %d/255, "
-+					"security: %s",
- 					network_get_ssid(network),
- 					MAC_STR(bss->addr),
- 					bss->signal_strength / 100,
--					bss->utilization);
-+					bss->utilization,
-+					diagnostic_akm_suite_to_security(
-+								hs->akm_suite,
-+								hs->wpa_ie));
+ struct driver_flag_name {
+@@ -106,7 +107,8 @@ static const struct driver_flag_name driver_flag_names[] = {
+ 	{ "ForcePae",           FORCE_PAE },
+ 	{ "PowerSaveDisable",   POWER_SAVE_DISABLE },
+ 	{ "OweDisable",         OWE_DISABLE },
+-	{ "MulticastRxDisable", MULTICAST_RX_DISABLE }
++	{ "MulticastRxDisable", MULTICAST_RX_DISABLE },
++	{ "SaeDisable",         SAE_DISABLE },
+ };
  
- 	station->connected_bss = bss;
- 	station->connected_network = network;
+ struct wiphy {
+@@ -202,6 +204,9 @@ uint16_t wiphy_get_supported_ciphers(struct wiphy *wiphy, uint16_t mask)
+ 
+ static bool wiphy_can_connect_sae(struct wiphy *wiphy)
+ {
++	if (wiphy->driver_flags & SAE_DISABLE)
++		return false;
++
+ 	/*
+ 	 * WPA3 Specification version 3, Section 2.2:
+ 	 * A STA shall not enable WEP and TKIP
+@@ -1368,6 +1373,9 @@ static void wiphy_print_basic_info(struct wiphy *wiphy)
+ 		if (wiphy->driver_flags & MULTICAST_RX_DISABLE)
+ 			flags = l_strv_append(flags, "MulticastRxDisable");
+ 
++		if (wiphy->driver_flags & SAE_DISABLE)
++			flags = l_strv_append(flags, "SaeDisable");
++
+ 		joined = l_strjoinv(flags, ' ');
+ 
+ 		l_info("\tDriver Flags: %s", joined);
 -- 
 2.34.1
 
