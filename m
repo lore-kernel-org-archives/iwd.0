@@ -1,66 +1,70 @@
 Received: from mail-qv1-f54.google.com (mail-qv1-f54.google.com [209.85.219.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35BA0265626
-	for <iwd@lists.linux.dev>; Tue, 11 Feb 2025 19:59:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8ABEB2641E2
+	for <iwd@lists.linux.dev>; Tue, 11 Feb 2025 19:59:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739303943; cv=none; b=TcYu3KINW5v7BGq63ukBDeKSTMuwP17z7BysV9lgcoNHLj2CKQIpalCQG47FlA7m30al7K5+MwC6ZQUTYGLoe5zmGjtCE4+QyMepuKUsg5gxvyJvOwMLVBwDVmp0jWSTCp2jtReZrsP3zyynygjoqlVE0Q9fW/Aw8yzayeCdIeM=
+	t=1739303945; cv=none; b=BCslB9Vcxk9FsVP3RZS/cUidW+iLQ3OZ2N1nQ4Ix6R3ASQ3+pLYyZhVpNjLD85njeNByJcdZDp6OWXkvvGohCoZC1ylYyWkxIi53JEyTHOLzAIEVsZQC1nusnZaM7ydrCCCF/X9e4nZtc6eq/tplE6Xb9XyaL8v0XuV+uS4fYoU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739303943; c=relaxed/simple;
-	bh=lGh0L1YMdGrtH/xyjZcTWb0vxSsHjJDlkmjnWzvUjQ8=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=suS1NjRdksB9ymCQ0oa4XOovP/lPSwjL4TfOfQnTyYPYGmE9aCR9P0BEB69ZtDvEN8c5VjtDiZ2q180DcTYK/keufRL3EoIMsPOs5Z5OTUcrXAdbRbSs9cJ+19wzSixg98/4RY8Y2mCY41BofnOh0D+5noDZic34TcVVsIl2pE8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fL4UodUI; arc=none smtp.client-ip=209.85.219.54
+	s=arc-20240116; t=1739303945; c=relaxed/simple;
+	bh=SmMIHAX17Zrc8wmDDwGsd9SWC/y50usL3iErX4o08Xc=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=g3mXxcAtVkUl6MKacdnvETluY1ivrP1Q0EpX3PyLIlxpbhAH7QWEk1Xmnl1CFE11l967Bgk8IOI5KizDqU7zIfONbkYFkjH5C9EuRMbS4AcdD3OUTiO1zz6hdwvqVGj+WkkEpezF2hyCnBbCGWOEa+UrcGyd/SJE2o6MKRD1My4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Yjc2+MCz; arc=none smtp.client-ip=209.85.219.54
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fL4UodUI"
-Received: by mail-qv1-f54.google.com with SMTP id 6a1803df08f44-6e440e64249so66887026d6.3
-        for <iwd@lists.linux.dev>; Tue, 11 Feb 2025 11:59:01 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Yjc2+MCz"
+Received: by mail-qv1-f54.google.com with SMTP id 6a1803df08f44-6e454a513a6so26630126d6.3
+        for <iwd@lists.linux.dev>; Tue, 11 Feb 2025 11:59:03 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1739303941; x=1739908741; darn=lists.linux.dev;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=c5izq2huXCM+mQqALzawLxTNOVGttXRL9q+QlyIezRk=;
-        b=fL4UodUIAPTS1Ew8gm6HD6S/MXUoP65t/wEjHJh/l6WYvX9uHi5GpGgw0EwBoG8Vqk
-         faZ8Ps3ztQDwsmgZX8Eh5RBshH/JZrWnvtThcfGdMSwIxZPIUsvkjqfTkmOcEhImHxsJ
-         8EnSFkeMcoFB9yYOjxUqPGtX1cJnpt/lbeUhMH7Ww3w7FNJ7JS1z4iLBmy94OjiArS/4
-         DM8AeogHjb5E27ethjstc+eyleX7rOaKyb0roSk+eJE12IWHJfnmkqG2BqemIZ7sinfO
-         GQteDWo4zIqwSc0eUaCWqCyf/63V+Pl1y64dP2pw36agiCQen8jomLK1Xb3AvtRtt+VT
-         NwXg==
+        d=gmail.com; s=20230601; t=1739303942; x=1739908742; darn=lists.linux.dev;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=SXINKhAqZ6pkPuZznZu5QodMlL06p6ADrLTv++i36bQ=;
+        b=Yjc2+MCzR75/LAw97yDFtgIYBC6kCwXCy85HLsFphPQKU9fd2DGItk/KwfKdYtZ2k4
+         Do9ZPO6hrUYhSbocgjhLZ+cXIJZX7KZ99VJxr0iOA+nWcLdsHqNCmoqGg2mb49uReOZ2
+         Wanw8+Ot3dTJcbgu/Vs/OkkT4fWO14GgOJlo96btgUABAw6UhNzmyJFhsESrXDMT9LQu
+         U4P/S0m72HZYN86Le/KwryRwd7mm/gVy760/mpKgDFmkFJYXhQ0x5J0f8RvO6YGkhB6X
+         gcTkxJkRvuVfeN6pLyAVwzbJWti8pnsT6Xo2aM67t8dE3mtJ+o2pjCtnEjmo6+WUWdoB
+         jaqQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739303941; x=1739908741;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=c5izq2huXCM+mQqALzawLxTNOVGttXRL9q+QlyIezRk=;
-        b=kZG2yb5Lp/5xUhHjMpuvKrL+b2j5In6Li+N4oJlBb3UXgYKFmYUsiK5YbwOzH1CSBx
-         nBPuOkh55iEZHGqyKHisVs/aOt+WCva8xAkR3oGkOaeKNt3zIp6P1DjcHO2S1Bf8j02l
-         NJuoTL96dZrBpyNvTaSiS5owUNmdxKQPzVeKpF4x1yRaG8PWg0hUsXeozdFFZt8syMht
-         F/V3Z7DKMBrBV3UjeswmiMBq8SP4HS36t6IHC8yYfylCirPSGXjJW8PWD3s5NpcIFsOn
-         R/IBBQgpBo83dQj/JLS/dMh0+E0w2ig3O8bRMDnwdzSyiCI6yOuJcDDcz03m/fxh2QY1
-         quEA==
-X-Gm-Message-State: AOJu0YyDsEh9CirrFz1zupo1yJDvcV2N/vlvPIxKQgO4SuR5QMtbihkl
-	FB5YVBlgxD/lJXFvwIkc1UBN49wC1PRzk6fHX0OqWYubgm+z731U7oEOmg==
-X-Gm-Gg: ASbGncuBGzrAkNgWkejGjx/opAyd4o9sQjlzgNPQ1PEZTOQ8RCuq35jSMPBx/UPL3BA
-	jWWdIKj9AdZoeo//bDeUkzDRv/zhVkNafzid0Ps4rdGS17BEsQG+XPiWj/ask3T0kkmN95sFTbF
-	9L9eX/p4acGa7tvaEYXH5CMaFhIKEXg0DZJBtfNiLzOxtxKrXWWglBp53ppOUSletluSYR+q/pN
-	Cuf5Y6kMLINTytE9zOFCa+CTE+MNcd1bEqPnW3tjEI9LSK17I95orZZwAumpCtqugvGT/pZPO6K
-	xQtppS4yMGK5lEO5ZKdnrKcIeeXX99kno5joej4ITr9/RI0ROA==
-X-Google-Smtp-Source: AGHT+IHt3ZY844cgpzXZkQDmMiD5WKpFR0HJBa7nNgKf0ORBHQk3boVnbhaw6wISb/iKj6qC7s5yqA==
-X-Received: by 2002:ad4:5e88:0:b0:6e2:481c:3713 with SMTP id 6a1803df08f44-6e46edb5319mr11210156d6.37.1739303939461;
-        Tue, 11 Feb 2025 11:58:59 -0800 (PST)
+        d=1e100.net; s=20230601; t=1739303942; x=1739908742;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=SXINKhAqZ6pkPuZznZu5QodMlL06p6ADrLTv++i36bQ=;
+        b=gxigdgRQFwigR3jxPSAOIkLxu53oPx8hPCHxiITWfISvwYEz616gaiubXMQXiOn7ar
+         JizCdWVh5P6UnvSLugzkUSkrxbNlI+X0x0RCDOhUx/pDKgEboBREJCBBjyJoc5gncQQr
+         i9vJ4rjGOCn5cHdzvWxAnRDjtWKsoiE/p6AxbO3H3uq/LBt+XvaA8ilm0M7WmG/cnP7m
+         pjfif8B53OKlugaue74MiyxPFLYo0Bxq2D45WU/BCfVbzEgFPr3434JGR2qnNBpm5JyU
+         9Z9loiHiRyJcm1gWNXrliqi16gpekNfGn63bcauv4bZuULZ5/MDdfKxCFhv5YjFDV4Ji
+         Sr5Q==
+X-Gm-Message-State: AOJu0YxvmhLiAvOroTa88uO87A028Iw+0aDjip6HXI8dTlihcrpUljjM
+	NPIMTGJIoeATXB+EMyg/KLQQkMbRfuGi7YRDicFT6Xepa0KHEG6IsaW5KQ==
+X-Gm-Gg: ASbGncvEpjuCNd7+HxG7WWCl0DgALCnmTeI1NhAJ8YZ7CZCFl53YGts3vgRLi1IpNOK
+	9yNaa/Q+aylJXqVyjC8sScHNR7Tw4LZB/oMrn8SeKauwyB4OQzCMg9tNf+ndEbbkUDxkGiotnXE
+	bw+pS1/Esgl3duIUyo1Vrw1j6v8kOqw+gWhmZaaDfIeo8PrcdgBkk9MiV4ocGIMSOdtjVjf7OU7
+	rYBGiI7eL4XD+TkDpfkei0nPjNS4tLDzIyckPMfhl05MZN5kfCJ/XBQvPKT0V/saQumwgZ7ryEg
+	7Lnf+PpuIKrVJsV8HytcLCT6X1L2jgkSIT/yitwc90+vxLLOwA==
+X-Google-Smtp-Source: AGHT+IFCQ/P+9UIb9AOFBpHjxVJwA8/F9KaJ983fxUrFvNYhsj0hZ0BtsiTBQ/Y5ne7+mJVIHmpx0g==
+X-Received: by 2002:ad4:5ba7:0:b0:6e4:3e5e:56d5 with SMTP id 6a1803df08f44-6e46ed77e88mr9422566d6.5.1739303940522;
+        Tue, 11 Feb 2025 11:59:00 -0800 (PST)
 Received: from LOCLAP699.locus-rst-dev-locuspark.locus ([152.193.78.90])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6e44df787e8sm49690426d6.113.2025.02.11.11.58.58
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6e44df787e8sm49690426d6.113.2025.02.11.11.58.59
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 11 Feb 2025 11:58:59 -0800 (PST)
+        Tue, 11 Feb 2025 11:59:00 -0800 (PST)
 From: James Prestwood <prestwoj@gmail.com>
 To: iwd@lists.linux.dev
 Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 1/2] wiphy: add driver quirk to disable SAE
-Date: Tue, 11 Feb 2025 11:58:54 -0800
-Message-Id: <20250211195855.85360-1-prestwoj@gmail.com>
+Subject: [PATCH 2/2] doc: document [DriverQuirks].SaeDisable
+Date: Tue, 11 Feb 2025 11:58:55 -0800
+Message-Id: <20250211195855.85360-2-prestwoj@gmail.com>
 X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20250211195855.85360-1-prestwoj@gmail.com>
+References: <20250211195855.85360-1-prestwoj@gmail.com>
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
@@ -69,57 +73,29 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-SAE/WPA3 is completely broken on brcmfmac, at least without a custom
-kernel patch which isn't included in many OS distributions. In order
-to help with this add a driver quirk so devices with brcmfmac can
-utilize WPA2 instead of WPA3 and at least connect to networks at
-this capacity until the fix is more widely distributed.
 ---
- src/wiphy.c | 10 +++++++++-
- 1 file changed, 9 insertions(+), 1 deletion(-)
+ src/iwd.config.rst | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-diff --git a/src/wiphy.c b/src/wiphy.c
-index c7df648a..46f7a6d9 100644
---- a/src/wiphy.c
-+++ b/src/wiphy.c
-@@ -74,6 +74,7 @@ enum driver_flag {
- 	POWER_SAVE_DISABLE = 0x4,
- 	OWE_DISABLE = 0x8,
- 	MULTICAST_RX_DISABLE = 0x10,
-+	SAE_DISABLE = 0x20,
- };
+diff --git a/src/iwd.config.rst b/src/iwd.config.rst
+index 0dd9d978..4ba7b4e7 100644
+--- a/src/iwd.config.rst
++++ b/src/iwd.config.rst
+@@ -465,6 +465,14 @@ are buggy or just don't behave similar enough to the majority of other drivers.
+        If a driver in use matches one in this list, multicast RX will be
+        disabled.
  
- struct driver_flag_name {
-@@ -106,7 +107,8 @@ static const struct driver_flag_name driver_flag_names[] = {
- 	{ "ForcePae",           FORCE_PAE },
- 	{ "PowerSaveDisable",   POWER_SAVE_DISABLE },
- 	{ "OweDisable",         OWE_DISABLE },
--	{ "MulticastRxDisable", MULTICAST_RX_DISABLE }
-+	{ "MulticastRxDisable", MULTICAST_RX_DISABLE },
-+	{ "SaeDisable",         SAE_DISABLE },
- };
- 
- struct wiphy {
-@@ -202,6 +204,9 @@ uint16_t wiphy_get_supported_ciphers(struct wiphy *wiphy, uint16_t mask)
- 
- static bool wiphy_can_connect_sae(struct wiphy *wiphy)
- {
-+	if (wiphy->driver_flags & SAE_DISABLE)
-+		return false;
++   * - SaeDisable
++     - Values: comma-separated list of drivers or glob matches
 +
- 	/*
- 	 * WPA3 Specification version 3, Section 2.2:
- 	 * A STA shall not enable WEP and TKIP
-@@ -1368,6 +1373,9 @@ static void wiphy_print_basic_info(struct wiphy *wiphy)
- 		if (wiphy->driver_flags & MULTICAST_RX_DISABLE)
- 			flags = l_strv_append(flags, "MulticastRxDisable");
- 
-+		if (wiphy->driver_flags & SAE_DISABLE)
-+			flags = l_strv_append(flags, "SaeDisable");
++       If a driver in use matches one in this list, SAE/WPA3 will be disabled
++       for connections. This will prevent connections to WPA3-only networks, but
++       will allow for connections to WPA3/WPA2 hybrid networks by utilizing
++       WPA2.
 +
- 		joined = l_strjoinv(flags, ' ');
+ SEE ALSO
+ ========
  
- 		l_info("\tDriver Flags: %s", joined);
 -- 
 2.34.1
 
