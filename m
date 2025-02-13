@@ -1,206 +1,185 @@
-Received: from mail-qk1-f176.google.com (mail-qk1-f176.google.com [209.85.222.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from EUR02-AM0-obe.outbound.protection.outlook.com (mail-am0eur02on2052.outbound.protection.outlook.com [40.107.247.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 009171D516D
-	for <iwd@lists.linux.dev>; Wed, 12 Feb 2025 16:27:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.176
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739377644; cv=none; b=NQX+XsarhLUPSK4a6r4qejRcohW4dI6l/AsAjradVDFw1s4RIhuqYPyqxKBPEn/Asb2Cu44goEuD4bXONUII+KsRltU+TwCpFq65B1ZNywSrXYojxQRLbbFCdHX02dH429BcRgAEqg8xo8fkuEbDQZ86jVgcTLf0nx4dYBuEJ5Y=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739377644; c=relaxed/simple;
-	bh=iEwga+0JC5PauPLBQYwPR6cFa/UivIV1o6CP1LiS2NU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=aAljXvvnSsYujf9qleNHKPPKhxZcQ3Q0Irc1TbvUqMCMwl5izBnqLVgbM/hzRjDiv9fPc4wVhEHHRF+aVAUawl1aSiBnCEs6XhwkxEz+HKqGDDBlebMCMtrW+ME0v/CJiUKQHmnVcQXqzmidMl9XMTuVVIH7cMDiCjMVMhN5FnM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hKgLOuHp; arc=none smtp.client-ip=209.85.222.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93515149C55
+	for <iwd@lists.linux.dev>; Thu, 13 Feb 2025 15:01:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.247.52
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1739458877; cv=fail; b=MhWQkG8ERLIGdxxPU+sqhWqlFFNawKR7DpvoB4OC44fC4olPhW0ZokLY1/gO58gOJ0EVLwcx9/54ZQ5XbhABKTX2T3D0IrFXy5wp+hH5v2eRxCNQWLDxQdxJQr4kfUMhdPwQrPpWRKrDFyQUDsv8OJq0DJ+T1mvq56HIGd6hK+E=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1739458877; c=relaxed/simple;
+	bh=Jw3XL7Qa0LDQo0/d08ERFPCZGlN0z5P/zURCzHQ8/qw=;
+	h=Message-ID:Date:From:Subject:To:Content-Type:MIME-Version; b=fOTN02AGd6N6JsNpp+7YaZLvcH1CKbqvCM3WW+ZUQodxNjWh8Piz3ZzPkI+3rHKYcR9u0FiduMERxCDbB3WqHmteUcbnTnoz2WrnKVFEheTAHYs/SKtY/uRpPQsOA7zrvrgJFcykcVLj9GWd6ZU3h8nsMprfLggvDqg4bITsP/o=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=axis.com; spf=pass smtp.mailfrom=axis.com; dkim=pass (1024-bit key) header.d=axis.com header.i=@axis.com header.b=F9M0mBhO; arc=fail smtp.client-ip=40.107.247.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=axis.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=axis.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hKgLOuHp"
-Received: by mail-qk1-f176.google.com with SMTP id af79cd13be357-7c05b700b78so370473485a.2
-        for <iwd@lists.linux.dev>; Wed, 12 Feb 2025 08:27:22 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1739377642; x=1739982442; darn=lists.linux.dev;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=vnmHvS/HFxbHqB5KUaCXmV7wZxe0DaC0jRPcb3ZwFn8=;
-        b=hKgLOuHpV4B4TiqZIvkZbwuaEmtKMlA2nGBDkuEYlizoY5Ppox0In+sh5xSII/NkZ0
-         zF4e5jZG8e3cQkIvXPI3oPVt0j/XFBJYVzRpnt2ZxcSqGNiNXW9qvmes2ObszRsrLDPD
-         4t+sjfkIKfpNMNbLUa1uFEnwLLqE/nepgFazvGsNw1C5cNJT2/BLyPnSeOfzuPdKFuqC
-         jVSke+14Du4VZhZc+yb08d4ARH13xoRXozHIBw8la/gk96bcLFalzfPG49bRv1FK554H
-         LNsUvNCOhitm9FkHiUREUrMWMZ+t3hQ3Z8nXtPTOf7f4a2BfyzGZaNUTphWww3Xs7fpX
-         +SQQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739377642; x=1739982442;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=vnmHvS/HFxbHqB5KUaCXmV7wZxe0DaC0jRPcb3ZwFn8=;
-        b=rFmCN0zF2lrcYweO6R36BswtDabMFCYElkh2AKCm9MMQqucsJ41aJgZWi6wzFQyK1q
-         STgSQTY/FKwfvQJCqvm7aChdTc9+LAcN6xHbiUEOb4xud3Q5tSLSmEe+cqVC9p84F9DU
-         J0OXVyLBEHUVjJrAbt6peVPjUJ3PThOCk6xBQYvLhLlBJni0QuVPMRPYAvt/f1zmX2nF
-         gFT0OcJj2YIp0vfLibJFQE/5LulSwHS1mlkd59p2uddPUI4k/4i65VJw8JTYQq16XNt/
-         BrN71q/fJgf6awXewIErGWwtpx8oc/xVTyVGWaG4va0TSglXMrvpqWHLM/ubn46cOZzq
-         PM2w==
-X-Gm-Message-State: AOJu0Yzg1e8ethYJEpGAMHGxPtmRhMx4XA1hMecnpO/BGQ7omI+dbOw1
-	qGk7XnoMG44ulWB8VXVqHQtWXb1U0TZu2xtxWUD5UddNam6vP7YWVKg1cw==
-X-Gm-Gg: ASbGncuUmLimauRSvewrK6OR4YSw3OELVqASlgJcA/1s0r7HVAsuobMJOZvP//Y6ZqP
-	EszGKp89XGb+TWJIz/2J2jKMA95+53ZD38nrD6FuqFkji49q2DhV3GrzinX2AUKXSGZRA8tWCH0
-	7FsuZ2WRJoU4FvZcUmf44J8VyQqAaa/aQxCQLE1F4NDDVWa4EkXKI5+PDDFP7YboWu3nU8WTT82
-	k6HwBZJnxMFKHkh4wwk+z03sgr1NmOCT42SHvnFenbwfAZ/yf0LakC9DF8Bi7L3D/zvygCBiQZ3
-	1cS9qufErfQWnvyT1II=
-X-Google-Smtp-Source: AGHT+IFspA34aksGqe8tVApNiuV2dqfYs/4CG1VxglrFKvArbIa0ujBg1qqtnr+NuP14Lgw3gejGmw==
-X-Received: by 2002:ad4:5d66:0:b0:6d4:215d:91b9 with SMTP id 6a1803df08f44-6e46ed7e57fmr54340196d6.11.1739377641694;
-        Wed, 12 Feb 2025 08:27:21 -0800 (PST)
-Received: from [10.100.121.195] ([152.193.78.90])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6e43baacb52sm80823416d6.89.2025.02.12.08.27.20
-        for <iwd@lists.linux.dev>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 12 Feb 2025 08:27:21 -0800 (PST)
-Message-ID: <a50a50d6-100b-45f3-972e-3f3aa63c5ee8@gmail.com>
-Date: Wed, 12 Feb 2025 08:27:19 -0800
+	dkim=pass (1024-bit key) header.d=axis.com header.i=@axis.com header.b="F9M0mBhO"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=OFPEAa/tFtY+w1DBoKQpbFF37NzVKJhufAAIvZx4Px836ja57TWP+dUg1iU5G3AoqEvGER2OzLZbLJ2A/GYDbGmvuaVS1P7i/tBxgXUZBE3igFWkdUnvqm3in4ojFgdRqSpF3RF0I3Mi4OPVuiSM7VSrUtmOQ7NIHbYRRD8Q1qzemMS3IhlxRPt5P118Pi/8du5X9Su6FZ0BYINV5Bo1pd5THOV99HVGzwkjJAVlEfwRw/oRYrqBOgwu6vBgg3AILTQuv5IIVnEgbXlkwpfzQ2w9RsETF6N6vC4SzyviAYkGjmmK2UAB8FsmAfrwQuq8coevB1cs+e8qsL/rM4pJRw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=u7I/Z2vpaeifMZi6d6eZLGcIr11iGtBrsQwcMGy+RG0=;
+ b=FmBq5V7V/ZBYEBJIVmzNjo4/aeqca65PKQu2HfJebxXdt3ZZWSNMQ3xLdSvWhoTvrpbgJM+7COiKMJ/3lkk461HIpaofNEfoe+pZ++Ug+MMg9HGblIqepVPoxG3i6pfXjb0GLRyH8nkGn++lhwfKxFus/bTi/tYfkgtJg2IvtzdXHUXpRLBD80EpZIFUW7EwPi/depJz1gbgvCaNW9q59J4DbvPDRud/KAqCGS2D0MA/7iCdNIwB05391yBK5G8qJ88Wt4k/BchhrqDazTUXUUcsL/7e7TyDX5e/UNGTgpNE2GeHn/et09BvDkn0WBC7vDlDsCzO3voilk2iGJ5Flw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=axis.com; dmarc=pass action=none header.from=axis.com;
+ dkim=pass header.d=axis.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=axis.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=u7I/Z2vpaeifMZi6d6eZLGcIr11iGtBrsQwcMGy+RG0=;
+ b=F9M0mBhOGCKU9BFcHCef1B65GP7WjoMCp0oxMnJDNrPgQMklIGvJz8h9lrrMLiXyVAW7iuzZphj4Cizx2axxMxhq9H3QXD8wtkBpheGkCemUT+dfw9wfWbeIM/epLJzSVgfPdCfV3Hb8MFx0KEdxVi+/2EPMOa3VoDaBAT19+pI=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=axis.com;
+Received: from GVXPR02MB8256.eurprd02.prod.outlook.com (2603:10a6:150:6e::14)
+ by DU0PR02MB7991.eurprd02.prod.outlook.com (2603:10a6:10:352::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8422.18; Thu, 13 Feb
+ 2025 15:01:12 +0000
+Received: from GVXPR02MB8256.eurprd02.prod.outlook.com
+ ([fe80::6044:5761:b269:8f3f]) by GVXPR02MB8256.eurprd02.prod.outlook.com
+ ([fe80::6044:5761:b269:8f3f%4]) with mapi id 15.20.8445.011; Thu, 13 Feb 2025
+ 15:01:11 +0000
+Message-ID: <7b7d342f-0487-423b-86d0-fbbf5987ecfd@axis.com>
+Date: Thu, 13 Feb 2025 16:01:10 +0100
+User-Agent: Mozilla Thunderbird
+From: Alexander Ganslandt <alexanga@axis.com>
+Subject: Roaming questions
+To: iwd@lists.linux.dev
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: MM0P280CA0013.SWEP280.PROD.OUTLOOK.COM
+ (2603:10a6:190:a::19) To GVXPR02MB8256.eurprd02.prod.outlook.com
+ (2603:10a6:150:6e::14)
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 3/4] netdev: implement PMKSA for fullmac drivers
-To: iwd@lists.linux.dev
-References: <20250212162401.130792-1-prestwoj@gmail.com>
- <20250212162401.130792-4-prestwoj@gmail.com>
-Content-Language: en-US
-From: James Prestwood <prestwoj@gmail.com>
-In-Reply-To: <20250212162401.130792-4-prestwoj@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: GVXPR02MB8256:EE_|DU0PR02MB7991:EE_
+X-MS-Office365-Filtering-Correlation-Id: 87715a50-14e3-4041-7926-08dd4c3f4139
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|366016|1800799024;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?YVJsR0tCejBuZlA2aE5MWTZqVFBoQ0M1V0lTZmdKVFFDWjFxdjVGTUN1cnow?=
+ =?utf-8?B?NVR2aEk3bkZ4SlFidzE2SEsxL3huTmZOamoyR1R0M3YybFE0UkpHMnUwb1J3?=
+ =?utf-8?B?aWZMb2x2NXNzaTl5b3JjVFBCL1pJcEE0UExVeFEyTnlKZWw3OTRhM1l0bzNi?=
+ =?utf-8?B?Y09WbDRLNHY0dlZIYkF5aU1OdHpOdTQwcE15WThFaDJqMVdJY2ZWbUQvRG41?=
+ =?utf-8?B?VTEwSkF4RlJKRW9adzdJVHp5MWJQdEFYaWVOYkt2VWUxQW9KTFBqUWFQUGdm?=
+ =?utf-8?B?RDBTam9OUGw2NzROYjFmcXQyQmFJYkUwKzl4NlVtUlo2WWhIVU0wbmV4WlI4?=
+ =?utf-8?B?d1oyUmM2VGpWb1FPRTJIWHNaVy91ZGNNdWxqSTdEMnl3eG5MYzY5ckNBaGdN?=
+ =?utf-8?B?Uno2WEZJRnAvcFJCcXQwcXJNam1NSTJKR080alJGd05MdVV1MjVISUpjTlht?=
+ =?utf-8?B?NkQ1NFNQRzFsWjFVK0lHS0pKbUE0a2dMU0NHSmJ2NlF4TnVvRi9rM2VWREtm?=
+ =?utf-8?B?SXlVbWZwV0JkbVdUQ3pkWjlHdERMTVlmcFo1OG0yUG9WQzRua04wRWtTTHg4?=
+ =?utf-8?B?Wk0wVXgyZ0VkZTNrOE44ZkVjV2FMQ0tjWS9RdFE4TC9HbWxRRmFKay83YXNS?=
+ =?utf-8?B?aFlQRG5ZWDVzT0g5eWZSRzdUb2U0cENIUUw4cEpPVDdKUVJGYWpDakRXRHFQ?=
+ =?utf-8?B?NFl6YTJXTys5bG9uS0JUZFcxNTEwRHg4VE5IYm1sb3NjMXRTZWg1Mk9lTjI3?=
+ =?utf-8?B?RmF0UFBCamIwdm0wV2EzeFo4dHFkNTN6WU5MWTI5TnhXTHcyT29EWkZsSWtU?=
+ =?utf-8?B?RU9mQmgycEhmbXpjc0hSeFUwcnpVUUE2MWwvbkZIUkJWVjZCMUpCaFFzVkxF?=
+ =?utf-8?B?QmZaN1gxQlA2Q1I0RjlnT0liVllKNk15NGJaREN5SWhCYkIvODREaHhEUTdQ?=
+ =?utf-8?B?ek1GWGdiSWptU1VxVHp4dnZ4d1NJZ2xSWENSWkU4bGNscndGa0xObDNDU0Fq?=
+ =?utf-8?B?cmpkaklXL1RNWExBRGwxYVV1dDdDOG9jLyt4d3BDbGc0cDJHWDJHSHRPTnUr?=
+ =?utf-8?B?N1psblpFay9GTzhkUW1pUW1lbnVjYTFIMnhIZ0pNVnlBYzdiRCt6aW55N2ov?=
+ =?utf-8?B?eVEzQ3MwTlpjODVWTFRmakYzM3BRV283UWNjY3ZMakVMYjR1T0JPQ3B4Tjdr?=
+ =?utf-8?B?RUErR2lvbTh3VTJDMlRZUG4xNEZQc0Zoc25DaC96K0kySE5pVlNMcXdWa2xj?=
+ =?utf-8?B?RUtCY3hMWUdBNjNsR2EyVnlYa2pDM0hsQm0rblJSalVhYkwyc0VjWGx6K1dW?=
+ =?utf-8?B?aFd0ZUZRL3VMRXVKSGxUQ2txdi91dTFjb2hMTjRSNzB0eVJWaU1vbFpiRHVq?=
+ =?utf-8?B?RFpvS3IyWkhYaW14MUtRbXJVeC92VTJpa09vbGRnQVZBODlEM1h6U0ZxdlJI?=
+ =?utf-8?B?ckpJZTJEcjFjVFBVTlBVVzhSSGUzcE1PNGpkK0xqRWxrNzJZaWUrQ0VpUkk5?=
+ =?utf-8?B?U3A2TGRkMktiK0J1OVZveWw4V2tONnZmbkZtRUhUSkVVbEsrZnNpN3lqRTVB?=
+ =?utf-8?B?TlNCclRrRnBiVkJjZ1k2SEk3SFlVcE1jd2ljbTIxYVRRNzFPd3JpZ3hMNWpy?=
+ =?utf-8?B?WFFPcURyckZOcE9VNmc5UzJPbTJ0YnZENFRKNTNXUExiTHM5NVFoZ015bWQ5?=
+ =?utf-8?B?UGg0cFJKaGRxWnhxQmM0akdxc2F3UUZrWHJyRXJ0Z2czb0NoWGtObXdlTUha?=
+ =?utf-8?B?TVdRSll5SDR0Y1laaU9lZ0RTL210U0lmb05NajAzMjI2VlF1NWpHWlZXUWtp?=
+ =?utf-8?B?cjQxRUZ5SFZwRElvQldvZjdDZlFpTy9INmR5L0habVBzdHJySS9WZjl1ZlZ2?=
+ =?utf-8?Q?/7RAUBcpDgiV5?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:GVXPR02MB8256.eurprd02.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(1800799024);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?K3ZnR21HWUJzSkc0bVR1R0ZmdUZwaU0rVEcvdmlkZ2dOQ3FHaDJqdHBZeFAr?=
+ =?utf-8?B?em5XYlIvSkYxNTFGNnJjbFlGaVpxTElZUEFiNGpDVjd1QnlVdFJ5S1o0MjFK?=
+ =?utf-8?B?UTJ0QzB2cDBvc0ZrZWs0UjdhZlhHNDlWL2ZzTnpnQnFURGttUFdtcGlsbzBu?=
+ =?utf-8?B?bFAxa2NOOUVndXhKbStoNWorbUl2OHorY3RMVzNzcTY2eTdPK0wyRFRueWhW?=
+ =?utf-8?B?aDhsRGkrZjlQQlNOU1lDTk5PMXhwVGI0d1AwWEROOEVycktlcUtiM3JJTmwy?=
+ =?utf-8?B?cHRVTnJSejJaZEFEeUZmMGpyYzQ4VWZ4QUIyNGtrcHRkK0s3cUMvWHlBZU5o?=
+ =?utf-8?B?Z3pJWjlicVA3aUUyd3dYWVQxWEZXbGVSSXZrUVFNL2lJUVRnUWU5M25Yd0hu?=
+ =?utf-8?B?VkpkQ1JaQTZKajJPKzFIeFVMU1BkNTFCUWg5eVNlM0ZBdmcyWG1rMGJ0QXc4?=
+ =?utf-8?B?aUpsWU0zRDFPOHpyUTFBd001QXN4VmhVN0hDQmhaZnhXcTlWSlJ4bldIM1BM?=
+ =?utf-8?B?NWVzeHoxUnFLSHNJWFNHWUtMNzhWeEhDZVA2R3RCMjZ3aWRTb0dlQjFqclhw?=
+ =?utf-8?B?bWY4L3ljRU94ZXY5dHJ1SXVKWHNnLzlpZ0lEYjVPcUNjWHU0VVdzekUyRXcz?=
+ =?utf-8?B?SzBsK0tTUUd2VEFKNnkzMCtKZGZKMFk3VUJTS1pwbDN0ZjVrVTljS0FISWs2?=
+ =?utf-8?B?Umo5ZFRmU0pucmJOVjU3QVMxYktYaGthUHB5R0xZOWV3VjAzdkJRWS9vdFdj?=
+ =?utf-8?B?elcraUw0TXJwQXhQMWtsbitRdWVQTHJPVU5KdUlwNWdEY0EzaEtlT09zUWpz?=
+ =?utf-8?B?VmwwMVl5OFM2bkt4TSsrUFhYMjZMQ200aEpDeU14KzB0cURjTENIMzRRb0xD?=
+ =?utf-8?B?SEsxYTF6cTZYUjhkUmxtWHdmZkc4Z2NMSG9Hd3lLVnpIU296ZTExRWJUai9q?=
+ =?utf-8?B?S29hbUZrU2t5eVY3OEJxZHRIbTRoZ1lRd3dZVVdtYW9ZQXgvdngrU1dFdzdV?=
+ =?utf-8?B?dmFBSzZRSk45QUttZFphc05VT08xM1FzK2tGTzNFWEdtb0hsMTdOaGtpTkYw?=
+ =?utf-8?B?Mk9yRDlpYnFEQnVCbklSU0N2dlNWeGxIZ0FPd2hmYzhPaW5wK0lORWpCYkpn?=
+ =?utf-8?B?NmlacGREWHJpU3lQOTB4a003N1Z3a3RlVjI1dW5uWC96ejJ6aElzQU9Gdllz?=
+ =?utf-8?B?VVhraGVJUGVOcnV5T01uNmc5OWdTazFpSGQvelAvTHpHODZ4eWU0R1M0b2V5?=
+ =?utf-8?B?MURnZlVhTVdRYkcrc1hZdWhGNzA1U0JTUWs0aUJuekZmK014bTNhUTVlc2VO?=
+ =?utf-8?B?M2ptUWdFT1ViZVk3cVdXVjBCRXpxV0hKRHpsbWpOaFdRblB5dk9EVUVNbktU?=
+ =?utf-8?B?dlo0c05RWlFTSDZ5WitCTURWU3hwcmpHMnhPSkxhclhIZDdJcmFDd1ZkTXU0?=
+ =?utf-8?B?Ym9hUVRUdllVOUk2bGZnSEYrK3dzMS9OVjdDWFc2S0p3aytaaUlZTmhlSEg1?=
+ =?utf-8?B?aW5UUFBKcnRZbkFGOTRFRHFzNnhuSzFMNXZ3WEpNUGRHVnJsdEJQSXNRYWJ6?=
+ =?utf-8?B?WmcxNUFkWEFSQWYyYWJmei9QcmdNblZSMXcvQTJFc05MV0JyQ28rYUttZm1p?=
+ =?utf-8?B?SFFLczdCTTUxR1k2NkFrZms3ZHdDK25lM2xOMEdNYzFHTHRtcHhQanExS01h?=
+ =?utf-8?B?czljSVVLUnZ6NE1NeTZpWWtjenRTZGdGZitCdXh4WVQwVGlZckZmYkwxSTlX?=
+ =?utf-8?B?RTNwOEZFTjhxbzhFQVZlVXQ2YWZhd3dPa2VBaEgyTEl4eS9uMlA5WXNiTVlO?=
+ =?utf-8?B?YkN5cHhiVzFzY0prc3JycS9NY21hdUM2OWFNS2JVVWtLVGpvUVBxS3lWRlp1?=
+ =?utf-8?B?bVFteHV6NWxxWGZuMGQ5ejNrWW5DdW9TL0VHdmpGWVBDKzVvQkhvd3BGVWt4?=
+ =?utf-8?B?TlI2NWJiUUhJS2Z4ekc2QlNFbEJBbUdFVGlNd1QvVk1oaFpocVRIZGtqcHE5?=
+ =?utf-8?B?bDVybXFtSUFsRkNjTE91a0YyTGtyQ2pwdU9rS1paaGJmT0Z2T0JvYkRxY0J3?=
+ =?utf-8?B?S0RPSWc4emhSeUdKelIvNHF6L2pGU1JOSWs4TGR5RVBoNnJtV0FpTkNpZ2NQ?=
+ =?utf-8?Q?OCmCIoVeDI3G0WOpwV1Z33RsW?=
+X-OriginatorOrg: axis.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 87715a50-14e3-4041-7926-08dd4c3f4139
+X-MS-Exchange-CrossTenant-AuthSource: GVXPR02MB8256.eurprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Feb 2025 15:01:11.8784
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 78703d3c-b907-432f-b066-88f7af9ca3af
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: UntB9uzcKNLmMDkKGrRsAKht/rNu3Utn9NQ4eHrOPPx9UV7D7W3DN2/DpcTryH8Pk4I7Z2j8o0OvFbwBT1lckw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DU0PR02MB7991
 
+Hello,
 
-On 2/12/25 8:24 AM, James Prestwood wrote:
-> Supporting PMKSA on fullmac drivers requires that we set the PMKSA
-> into the kernel as well as remove it. Since station has a removal
-> path netdev_remove_pmksa needed to be added which station will
-> call. This will handle both removing IWD's PMKSA cache as well as
-> in the kernels.
->
-> On addition its similar, we add to both IWDs cache and the kernels.
-> ---
->   src/netdev.c | 68 ++++++++++++++++++++++++++++++++++++++++++++++++++++
->   src/netdev.h |  2 ++
->   2 files changed, 70 insertions(+)
->
-> diff --git a/src/netdev.c b/src/netdev.c
-> index 06282c2a..42fb6a4b 100644
-> --- a/src/netdev.c
-> +++ b/src/netdev.c
-> @@ -1498,6 +1498,52 @@ static void netdev_setting_keys_failed(struct netdev_handshake_state *nhs,
->   	handshake_event(&nhs->super, HANDSHAKE_EVENT_SETTING_KEYS_FAILED, &err);
->   }
->   
-> +static void netdev_set_pmksa(struct handshake_state *hs)
-> +{
-> +	struct l_genl_msg *msg;
-> +	uint32_t expiration = (uint32_t)hs->expiration;
-> +
-> +	if (!hs->have_pmkid)
-> +		return;
-> +
-> +	msg = l_genl_msg_new(NL80211_CMD_SET_PMKSA);
-> +
-> +	l_genl_msg_append_attr(msg, NL80211_ATTR_IFINDEX, 4, &hs->ifindex);
-> +	l_genl_msg_append_attr(msg, NL80211_ATTR_PMKID, 16, hs->pmkid);
-> +	l_genl_msg_append_attr(msg, NL80211_ATTR_MAC, ETH_ALEN, hs->aa);
-> +	l_genl_msg_append_attr(msg, NL80211_ATTR_SSID, hs->ssid_len, hs->ssid);
-> +	l_genl_msg_append_attr(msg, NL80211_ATTR_PMK_LIFETIME, 4, &expiration);
-> +	l_genl_msg_append_attr(msg, NL80211_ATTR_PMK, hs->pmk_len, hs->pmk);
-> +
-> +	if (!l_genl_family_send(nl80211, msg, NULL, NULL, NULL))
-> +		l_error("error sending SET_PMKSA");
-> +}
-> +
-> +void netdev_remove_pmksa(struct netdev *netdev)
-> +{
-> +	struct l_genl_msg *msg;
-> +	struct handshake_state *hs = netdev->handshake;
-> +	struct netdev_handshake_state *nhs = l_container_of(hs,
-> +					struct netdev_handshake_state, super);
-> +
-> +	handshake_state_remove_pmksa(netdev->handshake);
-> +
-> +	if (nhs->type != CONNECTION_TYPE_FULLMAC)
-> +		return;
-> +
-> +	/* Fullmac cards need to set/remove the PMKSA within the kernel */
-> +
-> +	msg = l_genl_msg_new(NL80211_CMD_DEL_PMKSA);
-> +
-> +	l_genl_msg_append_attr(msg, NL80211_ATTR_IFINDEX, 4, &netdev->index);
-> +	l_genl_msg_append_attr(msg, NL80211_ATTR_PMKID, 16, hs->pmkid);
-> +	l_genl_msg_append_attr(msg, NL80211_ATTR_MAC, ETH_ALEN, hs->aa);
-> +	l_genl_msg_append_attr(msg, NL80211_ATTR_SSID, hs->ssid_len, hs->ssid);
-> +
-> +	if (!l_genl_family_send(nl80211, msg, NULL, NULL, NULL))
-> +		l_error("error sending DEL_PMKSA");
-> +}
-> +
->   static void try_handshake_complete(struct netdev_handshake_state *nhs)
->   {
->   	l_debug("ptk_installed: %u, gtk_installed: %u, igtk_installed: %u",
-> @@ -1518,6 +1564,9 @@ static void try_handshake_complete(struct netdev_handshake_state *nhs)
->   
->   		l_debug("Invoking handshake_event()");
->   
-> +		if (nhs->type == CONNECTION_TYPE_FULLMAC)
-> +			netdev_set_pmksa(&nhs->super);
-> +
->   		handshake_state_cache_pmksa(&nhs->super);
->   
->   		if (handshake_event(&nhs->super, HANDSHAKE_EVENT_COMPLETE))
-> @@ -6469,6 +6518,23 @@ static void netdev_get_link(struct netdev *netdev)
->   	L_WARN_ON(netdev->get_link_cmd_id == 0);
->   }
->   
-> +static void netdev_flush_pmksa(struct netdev *netdev)
-> +{
-> +	struct l_genl_msg *msg = l_genl_msg_new(NL80211_CMD_FLUSH_PMKSA);
-Just noticed this is leaking memory. I'll fix after reviews.
-> +
-> +	/*
-> +	 * We only utilize the kernel's PMKSA cache for fullmac cards, so no
-> +	 * need to flush if this is a softmac
-> +	 */
-> +	if (wiphy_supports_cmds_auth_assoc(netdev->wiphy))
-> +		return;
-> +
-> +	l_genl_msg_append_attr(msg, NL80211_ATTR_IFINDEX, 4, &netdev->index);
-> +
-> +	if (!l_genl_family_send(nl80211, msg, NULL, NULL, NULL))
-> +		l_error("Failed to flush PMKSA");
-> +}
-> +
->   struct netdev *netdev_create_from_genl(struct l_genl_msg *msg,
->   					const uint8_t *set_mac)
->   {
-> @@ -6544,6 +6610,8 @@ struct netdev *netdev_create_from_genl(struct l_genl_msg *msg,
->   
->   	netdev_get_link(netdev);
->   
-> +	netdev_flush_pmksa(netdev);
-> +
->   	return netdev;
->   }
->   
-> diff --git a/src/netdev.h b/src/netdev.h
-> index 6299934e..0c7d7550 100644
-> --- a/src/netdev.h
-> +++ b/src/netdev.h
-> @@ -218,6 +218,8 @@ int netdev_get_all_stations(struct netdev *netdev, netdev_get_station_cb_t cb,
->   
->   void netdev_handshake_failed(struct handshake_state *hs, uint16_t reason_code);
->   
-> +void netdev_remove_pmksa(struct netdev *netdev);
-> +
->   struct netdev *netdev_find(int ifindex);
->   
->   uint32_t netdev_watch_add(netdev_watch_func_t func,
+I'm looking into different roaming solutions and currently evaluating 
+iwd, which seems promising so far! My use-case is a device live 
+streaming video while moving around large areas, and the goal is to do 
+so without hiccups in the live stream. I have a few questions:
+
+Looking at station_roam_failed(), it will schedule a full scan if the 
+previous limited scan failed to find a better BSS to roam to. A full 
+scan on our chip takes about 7 seconds, which is often enough time for 
+the signal to get low enough to deauthenticate the station when you're 
+moving. It seems to me that a better approach would be to schedule a 
+scan for either the "known frequencies", or all non-DFS frequencies 
+(since passive scanning takes extra time) or some other popular group of 
+frequencies that won't take long to scan. If we're lucky there is a good 
+BSS in that scan, otherwise we schedule a scan for the rest of the 
+frequencies. In the worst case, this should be identical to a full scan 
+with minor extra overhead. Do you have any thoughts about this from your 
+side? Is it something that could be accepted into iwd or could it cause 
+issues for other use-cases?
+
+Another question is about the "CriticalRoamThreshold". There seems to be 
+a config for this and some functions for lowering and raising the roam 
+threshold, but I can't see that they're called from anywhere? It seems 
+to me that only "RoamThreshold" is used, or am I missing something? 
+There's also a hardcoded delay of 5 seconds from the point where the 
+roam threshold is passed before a scan is started, is that just a 
+"hysteresis" to not immediately start a scan if the signal temporarily 
+drops, or does it have some other function?
+
+Thanks in advance!
+
+Best regards,
+Alexander
