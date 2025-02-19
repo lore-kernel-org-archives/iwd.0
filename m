@@ -1,137 +1,223 @@
-Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
+Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2F0861FF2;
-	Tue, 18 Feb 2025 13:38:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3CD51F2BA7
+	for <iwd@lists.linux.dev>; Wed, 19 Feb 2025 20:42:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739885905; cv=none; b=bM6ASAKuvWO9j/5hvR+QPe6jovVj5rJ0aZgumUV0oqaNNJh/zxoCOOukarTCTNaxMikDrJPUkKL4qlVwWJB7VUTFw3E2Dm4e5LFBO3q9mqH8aTMzDlon6EvewCLwYyP8dbLxiTCwWcVWSj5qgOS5hSchVrEfIXs46zuRErcUoLg=
+	t=1739997738; cv=none; b=exvZdcKqBZGalvdXScyBjCNo3DlV1FDcijYMQd1Gkc0WH3/gBhWA6+t9IPxEPJVOrtBTFVLiYtelUOMBLTzvT3U0TnMwFT9NQzdQwDlXgkMJFwIybfiJl+oAx3huxSJDNiZW6frKuSKRku1Rg7Wk6J9xA4iu+JLY7rFfrrEcJMU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739885905; c=relaxed/simple;
-	bh=2XKbEAgYnwWPhKmL/LkPAoXfN5b0mjdilOCCYBkmGzQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=Bow+oScDzEkvaPlqCtO1DG7Aic/OIJBm6i3J36D3bPc26NCunWZJfEAXl6K/MMqlkmUtm5cGEd0xE31s83i5dNLeljezOrp9yfAtZxr+dfDG8HzLZRJzABbdVLdqrNGhMiNR9J4P9TGyQ7G3F3imGLqOx3fEgX5MSEUVEvetByQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bGxc/T5b; arc=none smtp.client-ip=209.85.214.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1739997738; c=relaxed/simple;
+	bh=LNzK0ysxHvSKz+pc9kchBVw2otcLEzkBMOPI1ARskFA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ak6/ptAXwChazKNP9ms6KXH57hHYU/9Fx6iu2V5uQRHmb/Kea6fwNsNdq+bDPAGBWd7ydAtvBMt4wQihT6f32BDLBt8fJkSvc89/vkavJmQAc8wojsFN1KKnnEyA6U3c4GaMRi2bisG7Lhdx1N0Jwh/Eg2KwQX7BY3Yk3jHPgaM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dgtlrift.com; spf=fail smtp.mailfrom=dgtlrift.com; dkim=pass (2048-bit key) header.d=dgtlrift-com.20230601.gappssmtp.com header.i=@dgtlrift-com.20230601.gappssmtp.com header.b=pWkgnIJT; arc=none smtp.client-ip=209.85.128.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dgtlrift.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=dgtlrift.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bGxc/T5b"
-Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-220d132f16dso78723025ad.0;
-        Tue, 18 Feb 2025 05:38:23 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=dgtlrift-com.20230601.gappssmtp.com header.i=@dgtlrift-com.20230601.gappssmtp.com header.b="pWkgnIJT"
+Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-4397e5d5d99so1096725e9.1
+        for <iwd@lists.linux.dev>; Wed, 19 Feb 2025 12:42:14 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1739885903; x=1740490703; darn=lists.linux.dev;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=auTI5dXbycHff+E4W3Qu7UL/cwI8cRPKhbQmpXRdjxQ=;
-        b=bGxc/T5b7AIKfEeODnB32mqOapt2OZmZNm0wo51TTfnKhAifuyq6iOrK3VbKpmn4RV
-         ljZ/tdKjfgz1b4jNYd1xmXNZAuwM/FqVO+pJkSNMi9MzEYBmrQ33V3IPqETZ7Ekpwxwn
-         87FI7d4iz+CLpb9dVWcZQ76BE5CFsRLvKRMRFEE4HhioN0pwLyU0QDEZCOiyOLcgxhGA
-         dYWnaW2jqXg3Q+uQjQ4njYY8PkmIZNTPLzNiHrWtH5JIz+w/SGwlQFzTT8HFbGsgK64H
-         SY7cIJjxxagsyItbpb2ovVPPBRoWMG/xhCgQsXZwpi/+UCg4Rhopx3RBjEhLD+PGB6i6
-         bS3g==
+        d=dgtlrift-com.20230601.gappssmtp.com; s=20230601; t=1739997733; x=1740602533; darn=lists.linux.dev;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=slYGDCki8AjCNnwrKSocQkDf+3FVdvomZBhGE7Fp89Y=;
+        b=pWkgnIJTV0G06nU9U/4JCOuYRFm12DzG9/l48iUxLdmMpxvu5B6wtbQw3jbm2hd+pI
+         teHxqKIuEXFVH5E9Z5YMnm1UMb22lFKSYj49yQsHf9AmMxc19zPecDDez5i9SMAaJsAH
+         vo9ZPnFgZlxBFh9RnPUkRIU6eikXqQox4ElyAH8HfM+B4ikapie4JhA9CD7mjvzdbqPp
+         upYbdwu4aH7CbBEjda3/sAnOMtdQR5T1yu/F3qIMTcbEsnwCwezgXp/otDFmG+WzSGB9
+         MKXCvAdMexLmT/CNaRQFpaGauSzs5JeNJhRpUtbNlVw1sAS8WGXnFw07PFWwm6jt6wvR
+         Gyfg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739885903; x=1740490703;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=auTI5dXbycHff+E4W3Qu7UL/cwI8cRPKhbQmpXRdjxQ=;
-        b=bq3oPLHYta2DehsJm9OXFo39f6B+NJWSeDI3+UxqSLUkxySahjXd7N/bhtA8j3R3sj
-         +Hg690WHxGqq+sGvfz1VcUeGInuJ5j5T94xIpjx+m/sHf+ZWrwqxdtZEy++NxGETd8+/
-         6qqsZAHY3OGKPxqlKCFdjHsE6R977dGUEm4tYzR5G4/rWuOjJfacFf8nDvUVG0gYqr2k
-         KXZgmMFN/yVyIyHWhcva/Z1oxR57vcx+uPyzRDLhaF8xXEc4mdWpmkox5rmtn1pksjnN
-         D9HQlufpeF/6E74mZUR7SuBkRBkDyshOLywP+GpthaF3+nfg9qNS755zXlVj6AWtL1M8
-         Mfug==
-X-Forwarded-Encrypted: i=1; AJvYcCWPC3BL7znOCAOVBlLWLVJTi6bB4Xx1+yhyUlSpD+FYlyY8D10dmeJt6yRgcRbyYTIMaeeZLNWX@lists.linux.dev, AJvYcCXOn5LlqKEAlpy/Oir12zt99VKr73Hu2VtBPQpQYF9NSCIaCn18npOQsjezYxnXl3/FX7Qg@lists.linux.dev
-X-Gm-Message-State: AOJu0Yze5AsMUFvWQZSMXYQ40Olxl3ULNgZPQEFO8fBWYc0M9AMJrEe6
-	16Q1EbZYnhf0xG28frknS3ooeEt8LwnMvzoGkY4rp3qDTBYxqYdB
-X-Gm-Gg: ASbGncvrnwa3TqMXj1GmdBdqL2oci8++5yL+DHCgWAGzRRhkwMiqhu81EAH/TEQJh0o
-	xp3b96M8MfVeU6RNugppx4p3qtlgXK/w2lAq4u4n/W0MZBCeNqXbqiTKej8fF9Y1xXa8daegPhG
-	hE6HnZ31UsPutE0CycGDhsqtTfv24QOi7Ia5yp7MMzqvZ+IgEbAjucJ+/ByMqVNhC2g23GMmhFR
-	s6xOmkfVG/dcwo3WfbjuT88vwAqJ6ulhpLi3Ke738furpAkmFAdB1Wrki+OjugOVjcZJkZyxgXe
-	hOm7xbT0mvCM84Xqttb1xEG2t4TOzrT7fl4oI+VdyqFdCrzf9cy/Hcue17uEHqghnTh1Aw==
-X-Google-Smtp-Source: AGHT+IGGmEkeYZXD9vOqv4XZp/rT5zFCtsIvIIHItw+gtmhfozNXjAnTaxKvHSbg+a9lODg+MoL7sg==
-X-Received: by 2002:a05:6a21:2d87:b0:1ee:73ee:bcf4 with SMTP id adf61e73a8af0-1ee8caac9e4mr24128384637.2.1739885903056;
-        Tue, 18 Feb 2025 05:38:23 -0800 (PST)
-Received: from [192.168.1.164] (h69-130-12-20.bendor.broadband.dynamic.tds.net. [69.130.12.20])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-73271a02648sm5232199b3a.107.2025.02.18.05.38.22
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 18 Feb 2025 05:38:22 -0800 (PST)
-Message-ID: <af619c24-18c2-488e-ba0d-69bb2d517ba7@gmail.com>
-Date: Tue, 18 Feb 2025 05:38:22 -0800
+        d=1e100.net; s=20230601; t=1739997733; x=1740602533;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=slYGDCki8AjCNnwrKSocQkDf+3FVdvomZBhGE7Fp89Y=;
+        b=XXz72ohPEiZhDjULRSzu5nLvyUG/WN5sx8sJ0C+cxQhcUaDMILmDjNapJex5KNEMna
+         0sUucpmNBThXJw4orMFJS1es7Szpvgc7dIZKi9DnS57ZJTe1x+BisNWa2UzFPYnuaJqD
+         vu8iSdj5WpqBQHChE7hoI9qOA8kuFLnPOmFBh8KsEAW7BfJ0YniWLZIhaqB3xpz4IXP0
+         /eDCO4yXA9KMshi76brrU1JiH+sHWS7lLpFYSK2tCh8o4y0A2TX9tE+gGZD1/OUPyksC
+         kfKlp3DpgrdCBrT/W5I/UOo607W+OQm0BeWzFaj2KzBJ7xuFyPJjypIWaNekxEUOQ/E2
+         lbjg==
+X-Gm-Message-State: AOJu0YwGOb2ud5IP48DPwkuEDWFq7WczpMSRHmWyGoPYUNxeDFU0CWDN
+	vp6+KLK5sAwAUbZpqA5z2dtqSwAi4wRIaym2UJH1nca3yF7K5rILndQRh3SSpTTpRocTsirDJet
+	poot5mNYorc6Lrj3M7DEWAuQnWTxy0wgj72yPc/LZrP3C5skCAz0E
+X-Gm-Gg: ASbGncvVfgcVxNLbWerj2aVacjqRdJ9KCGSUBYF0p3ZWgehXxELVsGmBcPCp2i7+Daj
+	3SNUHvpoforcuk2ed+mi7giVEiEatKZ4GVDjEMjhGDB/j8jUFsN3UqnV/ptOdvh+EYSFO4eMQ
+X-Google-Smtp-Source: AGHT+IGvKsMmJOTK0XmhiSdb5VLmw2kdDpCQRNiVMd7ytXx9Q/rWFqae18MkyIApPUNnKqYt9ia7MZ5J9a8GzcZ626g=
+X-Received: by 2002:a05:600c:354c:b0:439:9595:c8e8 with SMTP id
+ 5b1f17b1804b1-4399595cb04mr88144705e9.0.1739997732748; Wed, 19 Feb 2025
+ 12:42:12 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: How to elegantly engage/disengage AP mode
-To: KeithG <ys3al35l@gmail.com>, iwd@lists.linux.dev, connman@lists.linux.dev
-References: <CAG17S_Nkb6jH_aBfAzWiqVqY7PUZ5rQJsHo3WzvfPtBa0E57iA@mail.gmail.com>
-Content-Language: en-US
-From: James Prestwood <prestwoj@gmail.com>
-In-Reply-To: <CAG17S_Nkb6jH_aBfAzWiqVqY7PUZ5rQJsHo3WzvfPtBa0E57iA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+References: <CAF++6AMG1Jj8cWS0rmSgLPZqCAgRU1o1wgrUaBsOvhGJvrtzYQ@mail.gmail.com>
+ <97112988-3681-4192-abb2-9a9ee6d9552d@gmail.com>
+In-Reply-To: <97112988-3681-4192-abb2-9a9ee6d9552d@gmail.com>
+From: James Hanley <jhanley@dgtlrift.com>
+Date: Wed, 19 Feb 2025 15:42:01 -0500
+X-Gm-Features: AWEUYZkbY-es-ye3fsQ6gYUNXojcMx_F5sa_X55XifLDBJfOh_Z5EsbNq-LBPuc
+Message-ID: <CAF++6AMYxXJZg_im3z_4PDgUj0tr7t4Ag0KFetoTu-SKuYcYVQ@mail.gmail.com>
+Subject: Re: Exposing bssid information
+To: James Prestwood <prestwoj@gmail.com>
+Cc: iwd@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Keith,
+Thanks - this is really helpful for direction. I was going to
+initially brute force load all the attributes into a new interface,
+but it seems the preferred course from your suggestion is to gather
+the ESSID information and query each node individually for the BSSID
+information and populate that method with the associated details?
 
-On 2/17/25 4:58 PM, KeithG wrote:
-> Hi. I am soliciting ideas on how to elegantly engage/disengage AP mode
-> when configuration is needed on a headless device.
+One point that I'm stumbling on in testing the pristine codebase is
+accessing the ExtendedServiceSet property:
+test-wifi/test# dbus-send --system --type=3Dmethod_call --print-reply
+--dest=3Dnet.connman.iwd /net/connman/iwd/0/2/53-elided-53_psk
+net.connman.iwd.Network.ExtendedServiceSet
+Error org.freedesktop.DBus.Error.NotFound: No matching method found
+
+When I query for the available interfaces and methods, I am able to see:
+test-wifi/test# dbus-send --system --type=3Dmethod_call --print-reply
+--dest=3Dnet.connman.iwd /net/connman/iwd/0/2/53-elided-53_psk
+org.freedesktop.DBus.Introspectable.Introspect
+method return time=3D1739996534.609643 sender=3D:1.1090 ->
+destination=3D:1.1474 serial=3D2631 reply_serial=3D2
+   string "<!DOCTYPE node PUBLIC "-//freedesktop//DTD D-BUS Object
+Introspection 1.0//EN"
+"http://www.freedesktop.org/standards/dbus/1.0/introspect.dtd">
+<node>
+        <interface name=3D"org.freedesktop.DBus.Introspectable">
+                <method name=3D"Introspect">
+                        <arg name=3D"xml" type=3D"s" direction=3D"out"/>
+                </method>
+        </interface>
+        <interface name=3D"net.connman.iwd.Network">
+                <method name=3D"Connect">
+                </method>
+                <property name=3D"Name" type=3D"s" access=3D"read"/>
+                <property name=3D"Connected" type=3D"b" access=3D"read"/>
+                <property name=3D"Device" type=3D"o" access=3D"read"/>
+                <property name=3D"Type" type=3D"s" access=3D"read"/>
+                <property name=3D"KnownNetwork" type=3D"o" access=3D"read"/=
 >
-> What we do now: We use connman as our connection manager with iwd
-> handling wlan duties. At first boot our headless RPi based appliance
-> checks to see if it has a valid ethernet address on either the wlan or
-> the ethernet. If not, it creates an AP on a made up MAC address and
-> launches (with either IWD or Hostapd) an AP to allow a connection to
-> configure the internet. This works fine and we can use this to
-> configure the RPi and when we select a valid SSID with connman and
-> type in the password, it brings the AP down and connects to the SSID.
-> All good.
+                <property name=3D"ExtendedServiceSet" type=3D"ao" access=3D=
+"read"/>
+        </interface>
+        <interface name=3D"org.freedesktop.DBus.Properties">
+                <method name=3D"Get">
+                        <arg name=3D"interface_name" type=3D"s" direction=
+=3D"in"/>
+                        <arg name=3D"property_name" type=3D"s" direction=3D=
+"in"/>
+                        <arg name=3D"value" type=3D"v" direction=3D"out"/>
+                </method>
+                <method name=3D"Set">
+                        <arg name=3D"interface_name" type=3D"s" direction=
+=3D"in"/>
+                        <arg name=3D"property_name" type=3D"s" direction=3D=
+"in"/>
+                        <arg name=3D"value" type=3D"v" direction=3D"in"/>
+                </method>
+                <method name=3D"GetAll">
+                        <arg name=3D"interface_name" type=3D"s" direction=
+=3D"in"/>
+                        <arg name=3D"props" type=3D"a{sv}" direction=3D"out=
+"/>
+                </method>
+                <signal name=3D"PropertiesChanged">
+                        <arg name=3D"interface_name" type=3D"s"/>
+                        <arg name=3D"changed_properties" type=3D"a{sv}"/>
+                        <arg name=3D"invalidated_properties" type=3D"as"/>
+                </signal>
+        </interface>
+        <node name=3D"d8-elided-95"/>
+        <node name=3D"d8-elided-55"/>
+        <node name=3D"d8-elided-15"/>
+        <node name=3D"d8-elided-95"/>
+        <node name=3D"d8-elided-55"/>
+        <node name=3D"d8-elided-95"/>
+</node>
+"
+
+Is there something I'm missing in attempting to access this detail
+from dbus-send?  Ultimately this is only for testing, but I do plan on
+using the DBusConnection c-api and getting it right with dbus-send
+will help me in defining the code flow.
+
+-Jim
+
+On Sat, Feb 15, 2025 at 3:29=E2=80=AFPM James Prestwood <prestwoj@gmail.com=
+> wrote:
 >
-> The problem: What happens if the SSID goes away either because we
-> moved the Pi or the SSID goes away? What we would like is it to scan
-> for a known SSID and reconnect if it finds one, (which it already
-> does) and if ones does not appear, to restart AP mode so we can
-> connect to it. If it finds an SSID while we are connecting, continue
-> to set up, but if the SSID reappears and no-one has connected, to then
-> shut down AP and re-connect to the SSID.
+> Hi Jim,
 >
-> Question: Are there any elegant ways of doing this? We currently use
-> scripts and such to look at connmanctl and iwctl, but could start
-> digging into dbus, to monitor what is going on if needed. We thought
-> this may have been solved previously and wanted to ask here.
+> On 2/15/25 12:10 PM, James Hanley wrote:
+> > Hi,
+> > I=E2=80=99m looking to access (and/or expose) via dbus scanned informat=
+ion on
+> > bssid. Specifically, information as follows:
+> >
+> > {
+> >    "wifiAccessPoints": [
+> >   {
+> >    "macAddress": "f0:d5:bf:fd:12:ae",
+> >    "signalStrength": -43,
+> >    "signalToNoiseRatio": 0,
+> >    "channel": 11,
+> >    "age": 0
+> > },
+> > {
+> >    "macAddress": "3c:37:86:5d:75:d4",
+> >    "signalStrength": -35,
+> >    "signalToNoiseRatio": 0
+> > },
+> > {
+> >    "macAddress": "30:86:2d:c4:29:d0",
+> >    "signalStrength": -35,
+> >    "signalToNoiseRatio": 0
+> > }
+> >   ]
+> > }
+> >
+> > This would be for geolocation services such as skyhook or google
+> > https://developers.google.com/maps/documentation/geolocation/requests-g=
+eolocation
+> > to allow a device to estimate its location. It seems that what is
+> > exposed is ESSID information with the strongest AP, or does is this
+> > information already exposed in iwd and which module/interface should
+> > be used? If not exposed, which model would be the most appropriate to
+> > add this to - scan, station, or another - and what interface for dbus
+> > should the method be exposed through?
 >
-> Any ideas? This seems like something that would be useful for just
-> about any headless internet connected device.
-
-I'm not too sure there is anything more that IWD could really do to 
-support this use case. At the moment I think your main limiting factor 
-is trying to use command line utilities + scripts to create this 
-application. These tools aren't API stable and never will be so your 
-always going to have maintenance if something changes. DBus on the other 
-hand is API stable and you can rely on the APIs to stay consistent 
-between IWD releases.
-
-Based on other smart devices I have used, this is what I would do:
-
-  - Device starts up, check if there are any known network profiles.
-
-     - If yes, let autoconnect do its thing. At this point your "done" 
-already.
-
-     - If no, start AP mode and wait for a connection/configuration.
-
-- Have a "reset" button on the device and when pressed/held down erase 
-the known network profile and reboot
-
-Doing the above you don't have to handle any special logic of the 
-configured AP disappearing. Once the profile is configured that is the 
-network and the device should connect to it unless reset.
-
-Thanks,
-
-James
-
+> Take a look at the ExtendedServiceSet property [1] on the network
+> objects. This contains a list of BasicServiceSet object [2] paths. At
+> the moment the BasicServiceSet objects only contain the BSSID as this
+> was all I really needed for the affinity functionality, but I'm not
+> opposed to additional info being added such as signal strength/channel
+> etc. If you need any pointers for this let me know, but it should be
+> relatively straight forward to add extra properties in the interface
+> setup [3].
+>
+> iwctl also supports showing the BSS object paths/properties via:
+>
+> "station wlan0 get-bsses"
+>
+> [1]
+> https://git.kernel.org/pub/scm/network/wireless/iwd.git/tree/doc/network-=
+api.txt#n54
+> [2]
+> https://git.kernel.org/pub/scm/network/wireless/iwd.git/tree/doc/basic-se=
+rvice-set.txt
+> [3]
+> https://git.kernel.org/pub/scm/network/wireless/iwd.git/tree/src/network.=
+c#n2196
+> >
+> > -Jim
+> >
