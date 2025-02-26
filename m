@@ -1,134 +1,114 @@
-Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
+Received: from mail-yw1-f174.google.com (mail-yw1-f174.google.com [209.85.128.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E65E224896
-	for <iwd@lists.linux.dev>; Wed, 26 Feb 2025 18:26:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53AA92222CF
+	for <iwd@lists.linux.dev>; Wed, 26 Feb 2025 18:35:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740594397; cv=none; b=D8oy4TJxT/aXPR5dWeHoiNsk+Q9ALgc60GX6Sdflbja/XabmVMPfhipQhrr9/Tal8NoYOUZTRkR5xO7ot5ywFDcIaIOnaT4JoWFR30MeuDawnCSytituReuSinM4X0U4v4Bje8FKwV2dxWvH+g7mR6sDUqQwBd0lDTTPY2dDX7g=
+	t=1740594902; cv=none; b=IabYUcQXAjkaqBTwy6dnWzjCp5hZQTRTtNMZut0Z+K6ot/UEF2ogZ86MSogT4cCAy80lZH7v1aIitZ/RJ0x216p9WQg/UHD7xUxlDFZwZ5cPqr12fnOYttsapa3jIGddPqwasGEpETC6BOwBeHSP9yqiPaHtWDZNFFky0TxMkaQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740594397; c=relaxed/simple;
-	bh=R8eCMsxFSSwUhJp+o21+1kWxu2c9gijxCgshWvcc1fM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=oeCLU229fZHiCPlUvSfSAzOFZ/hwQHAunvJqemXJqwr1ej9a0XAZv3fwz4VowkpFArtsEIt8+gY/BQxGLoTwuh0sa91xPBAk13yBmEfxSfPIcARIvEIuQHIhRXJTn3m3BwgUL2flHdUFnaqFSiyV1DyrS5EHLe/tYXgacmPZ7K4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Q9u9/TvD; arc=none smtp.client-ip=209.85.214.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+	s=arc-20240116; t=1740594902; c=relaxed/simple;
+	bh=Qbl/VX1UTk31SYakY3Fui+OTKv9IUSvjcyyeq0UhAdA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Hat//MZ7nvC6JCPfT0YPtX9ulbTfzF4KgUi3yRf+U79bptvN7MJ731EYTz9fOUjIfzc4JAHJYx85CGb7Wgfy6NRvcaepx13yDTT+3Q9b96qoRRAhXmT0r1mUcFSEA5+hy6WwREX8WQq8+8mXrIk4Gbkpawymf9rHoxYm/4OU7FY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=redpinelabs.com; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.128.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=redpinelabs.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Q9u9/TvD"
-Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-2230c74c8b6so2004765ad.0
-        for <iwd@lists.linux.dev>; Wed, 26 Feb 2025 10:26:35 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1740594395; x=1741199195; darn=lists.linux.dev;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=SpIUZBVMury9XQpmzhuieMSLmyiyRlaa6VfWZem2ZCw=;
-        b=Q9u9/TvDv6tLHUxJyjyGu5C/D+32XNuJ55LgcgyUlN2RmWpW3Oz4NwxQ9NKGHeAFrQ
-         P/WdL56ciQy547uBt0ellQUC8KZCjvFZJDma+3hSYQC0lY9LkIx/FdFiiefHQ7lITDgT
-         wFCfBuW4UV/2MCOkCyW3/09LGQAhuy1j9BjdZxNnxumIw8voKaKq1FzGtBFIl0deEcY6
-         OsjM7yV9hr52hC6kvGMdCz9dORmHaaFLGHJ43g3eVHhe5zia/pnz8jhR53ssF5Mbkg4q
-         0zCSVODzzhHLAPRurhOtD9wPF1Yy2b4/aU0LX7tc2m+a7tWZUaSovFIaVBE2M+5cZOXl
-         M/yg==
+Received: by mail-yw1-f174.google.com with SMTP id 00721157ae682-6f679788fd1so1140297b3.2
+        for <iwd@lists.linux.dev>; Wed, 26 Feb 2025 10:35:00 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740594395; x=1741199195;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=SpIUZBVMury9XQpmzhuieMSLmyiyRlaa6VfWZem2ZCw=;
-        b=dudAyXPQwxrhsfY5083pygRusWGKCHuAmwDSsE/t0M6YpUOKBktQI9STAIluFBK6Wv
-         TaLtCKnzLyFWuDO5WXSDfCBPAj9SSJ3Y+Hmgk7Rj/WHFBu37jo/9Jhm5VO+M50QWFUK7
-         vbcbhF2rkmKrqTaSgp07VFI0vk+AjxT1c0TG1rwBA1XTTh8oj/m2KC5/CRx51jP4NvVI
-         WbAlAEGAJvuev+tKKUq00hA+MFRSNO7MFVrx79mM20W0kjVmb+hpnIz/0luYaYGwk7GE
-         aaGtiTImM1vLbSOd8dW1X/TbU1hEJ8PYolq3AsruZTeMmbUPxEE19gvTs8aftYGk9yZH
-         wHNw==
-X-Gm-Message-State: AOJu0YxADvSoRovozog7awhX3m98rC9PRXYKgTsmtmoNUft2wFsjoJkg
-	NNTY3OyjU7FC2gTP6+lBUz2s6Q/9Kl3R3G6Je0bm+wXoUCp+fr3T2GuZ5g==
-X-Gm-Gg: ASbGnctFu1eeCTXgcVRPIJs0a1N6m0aHmxXUlApvKKSLxf7vzDa8585SOlSMp6Tz9ce
-	WjucKhyrBtAkexgAs8ja6kiwYeUyIlE/bEDIIuAmDOA41Xg8zhKEi+gP0avROEIFn59TeIn1rpg
-	QVpcdTqPq37uOHXRUgZKZVd1dd79SLLjuJMGpBeptVYLsYHhoTh/P6PqGkvWy6Q6rEvUncEjVuA
-	BCS1yWLI6PNy+ATcAnaKjtmtQEjJmU+otV44IaDNoZvaosb+XBvzTKJWqRU/mOKc6XkNekEkbmE
-	YhmhAlm2SCp8UoxIkwHVxiERUQzLvw==
-X-Google-Smtp-Source: AGHT+IGFUlIs+51e5GqamXkD8cLEgGQ1zbNS9KbEGAAazaG80XlFKlQk1TBRuVyz16wIN5Z64Esikw==
-X-Received: by 2002:a17:902:f602:b0:21f:14c1:d5a2 with SMTP id d9443c01a7336-22307b32c3amr143870365ad.10.1740594394883;
-        Wed, 26 Feb 2025 10:26:34 -0800 (PST)
-Received: from [10.100.121.195] ([152.193.78.90])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2230a0aea18sm36194865ad.220.2025.02.26.10.26.33
+        d=1e100.net; s=20230601; t=1740594899; x=1741199699;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=HSTrgUZoP91soMblFUriLwuqf8j/+2I431RUiDo/6tI=;
+        b=vpok3uYE/fUpYEr0TueWwbYJOf5NHtLHIjWm1Q+Iq+ZcoWQ1Ub61opUGZ6Fii8qZDK
+         704KiPkv3N2sSt5RSunr/gcyxXcYD2nmmQobCtaA9OGNX1pKUQ19So9t8TNzszhbkSKG
+         x3kVo/GWrZa1rBzOYENTB8lo9SDQsmgQ8v5EzvYsOYZOgKF7Hy2w7cpQHHvBc84lul0e
+         1qn17C64aTWX+iaB48WMaDaWXf9FIHjflvQQWs3BOmevGflAAKratyfM4HleLemrzzJQ
+         gfyPumCSGHyVf+wwlWdHiHUUCEKnnS7jXdrqYD6nCt/Y7DnzCUZ46fWtKpBUuK924kwe
+         i8LQ==
+X-Gm-Message-State: AOJu0YzjdxAT410DM+1jpLaoQomtOb7epTinbKgCjr4AKtMJT64MXwyf
+	xq3A2uOTCPoU1PHGCJWHFcbWDN++Bal6rht5rNvjlof0grM8XXqK6pvP2w==
+X-Gm-Gg: ASbGncsKmp3fHdBO9DsZ8kXBWMo5ie3I0O1AYVuD5mG44LH2/Bj0BfSpZB+qf6GNq2I
+	9AEXNCdLCwCyLtXIdhZ+Nh9evAtigQCoS7eOQAbsQqOZH00Fe6ZKTaE+Un1yLg8bpopY/62EBQG
+	irC3D0N3An2GULjqSXuuto2mQDtvSlJSAto+tl3z4fBpmGH86YnLVkpXqm+T5AgFzBeb2vP7SEe
+	mE/UqWsmh2Kigl8m2UnnIASJvhKtikQ85kqKQ6ckq0JIB+jtAxUmwYAaVGwDcdChKqbU5dp45lL
+	uIpZBcwQwZ+GCXT1nU0nz9fJ5ImIlB1cY2kud308E7u65B1BDWhS7VgKboCf0y+hUWNNww==
+X-Google-Smtp-Source: AGHT+IFXaA39eijPc8H+IM9HluMq2nnhKy+WS2HYWXfYYc5D63TOZt4095Am7GACmZMmkhd9g7NTpA==
+X-Received: by 2002:a05:690c:6a06:b0:6f6:7b02:2568 with SMTP id 00721157ae682-6fbcc38c9c1mr205564777b3.32.1740594899108;
+        Wed, 26 Feb 2025 10:34:59 -0800 (PST)
+Received: from mail-yb1-f172.google.com (mail-yb1-f172.google.com. [209.85.219.172])
+        by smtp.gmail.com with ESMTPSA id 00721157ae682-6fd1185d60asm11211747b3.100.2025.02.26.10.34.58
+        for <iwd@lists.linux.dev>
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 26 Feb 2025 10:26:34 -0800 (PST)
-Message-ID: <9ec7008a-06bb-4a59-b987-b51232cc3c70@gmail.com>
-Date: Wed, 26 Feb 2025 10:26:31 -0800
+        Wed, 26 Feb 2025 10:34:58 -0800 (PST)
+Received: by mail-yb1-f172.google.com with SMTP id 3f1490d57ef6-e608e260563so88769276.0
+        for <iwd@lists.linux.dev>; Wed, 26 Feb 2025 10:34:58 -0800 (PST)
+X-Received: by 2002:a05:6902:26c9:b0:e5d:aeb7:6e62 with SMTP id
+ 3f1490d57ef6-e5e245ad516mr14131125276.7.1740594898702; Wed, 26 Feb 2025
+ 10:34:58 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: Does a AP get blacklisted if it fails auth too many times?
-To: Bryce Johnson <bryce@redpinelabs.com>
-Cc: iwd@lists.linux.dev
 References: <CADXxVSKD-YKOxt+=b919QWFHnU7QcSWnEwfb8xU-JGn=xVrbbg@mail.gmail.com>
- <4ec69c46-bbc1-4a05-9d7a-18c1d4d249d1@gmail.com>
- <CADXxVS+xAeGUiwGTe7L0Rr+OtxqRdvZ2AwwhfgpegB8h-dA9TQ@mail.gmail.com>
-Content-Language: en-US
-From: James Prestwood <prestwoj@gmail.com>
+ <4ec69c46-bbc1-4a05-9d7a-18c1d4d249d1@gmail.com> <CADXxVS+xAeGUiwGTe7L0Rr+OtxqRdvZ2AwwhfgpegB8h-dA9TQ@mail.gmail.com>
 In-Reply-To: <CADXxVS+xAeGUiwGTe7L0Rr+OtxqRdvZ2AwwhfgpegB8h-dA9TQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+From: Bryce Johnson <bryce@redpinelabs.com>
+Date: Wed, 26 Feb 2025 11:34:47 -0700
+X-Gmail-Original-Message-ID: <CADXxVS+iBcBeyj7geJ0jMCrT3wP+YBqXcGJ98oa5KEPUGa7ncg@mail.gmail.com>
+X-Gm-Features: AQ5f1Jqc_3gvAUO24Y2NCMLPWM-wr4rfecQKV6YLZ9e1lStfONC3_gqJZmIuxOQ
+Message-ID: <CADXxVS+iBcBeyj7geJ0jMCrT3wP+YBqXcGJ98oa5KEPUGa7ncg@mail.gmail.com>
+Subject: Re: Does a AP get blacklisted if it fails auth too many times?
+To: James Prestwood <prestwoj@gmail.com>
+Cc: iwd@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Bryce,
-
-On 2/26/25 10:12 AM, Bryce Johnson wrote:
-> On Wed, Feb 26, 2025 at 11:00 AM James Prestwood <prestwoj@gmail.com> wrote:
->> Hi Bryce,
->>
->> On 2/26/25 8:13 AM, Bryce Johnson wrote:
->>> I have an embedded linux device with silabs wf200 chipset with IWD
->>> 3.2.  I got logs remotely after the fact so I didn't get to debug this
->>> one in person.
->>>
->>> Every now and then wifi will drop off and usually reconnected.  On
->>> this particular one it disconnected, tried to reconnect, failed, and
->>> then never tried again.
->>>
->>> <snip>
->>>
->>>
->>> Is there some blacklist that occurs with enough failures?  This device
->>> ended up sitting like this for a couple hours before it got restarted
->>> - after the restart IWD immediately reconnected to the AP.
->> In IWD we have a few special status/reason codes that won't cause an AP
->> to be blacklisted, but an auth timeout will blacklist an AP. You will
->> generally see this log [1] if there were APs seen but they were all
->> blacklisted.
->>
->> The original reason for the blacklisting was a use case where a specific
->> AP is "broken" and repeatedly fails to allow a connection. We wanted to
->> exponentially increase the blacklist time for every failure so a client
->> would avoid connection disruptions. It really depends on your use case,
->> but I also work with headless devices and we control the networks. When
->> there is some failure that would normally trigger a blacklist, I'm
->> fairly confident this is a transient issue and isn't a "broken" AP (this
->> obviously isn't a guarantee though). So in my configuration I've
->> actually lowered the maximum blacklist timeout to something like 2-5
->> seconds to prevent repeated failures from blacklisting the AP for
->> extended periods of time.
->>
->> [1]
->> https://git.kernel.org/pub/scm/network/wireless/iwd.git/tree/src/station.c#n286
+On Wed, Feb 26, 2025 at 11:12=E2=80=AFAM Bryce Johnson <bryce@redpinelabs.c=
+om> wrote:
+>
+> On Wed, Feb 26, 2025 at 11:00=E2=80=AFAM James Prestwood <prestwoj@gmail.=
+com> wrote:
+> >
+<snip>
+> >
+> > [1]
+> > https://git.kernel.org/pub/scm/network/wireless/iwd.git/tree/src/statio=
+n.c#n286
+>
 > Thanks James!  I'll check that out.  For also headless device use
 > case, we are never moving and only provisioned to one AP.  So we'd
 > like to try as hard as possible to stay connected to the AP.
-
-Ah yes in that case I'd set the blacklist timeout to something like 1 
-second. I just looked and the blacklist code needs some work tbh. You 
-can't disable it, and I don't see any checks to ensure the maximum 
-blacklist timeout isn't lower than the initial... so I'll fix this up.
-
 >
->>> <snip>
->>>
->>> Thanks
->>> Bryce
->>>
+>
+
+Looking into the logs a little more I did see the same message:
+2025-02-26 00:13:56.071769752
+src/station.c:station_autoconnect_next() autoconnect: No suitable
+BSSes found
+
+Although it did reconnect automatically after that.  So it seems like
+it got around that blacklist eventually once in the log.  The more
+serious issue was at 2025-02-26 02:47 where it seems like it
+disconnected and never tried again.
+
+
+I did see after this event:
+ 2025-02-26 02:47:54.473847839  event: state, old: autoconnect_quick,
+new: disconnected
+
+I never saw any autoconnect messages (either trying to connect or
+autoconnect: No suitable BSSes found) for the next 2 hours until we
+restarted
+Here that ssid on was a Processing BSS from a full scan 2 hr later
+2025-02-26 04:47:04.262785719  src/station.c:station_print_scan_bss()
+Processing BSS '9a:47:32:d9:93:fa' with SSID: revelotest1, freq: 2457,
+rank: 591, strength: -3600, data_rate: 72.2, load: 29/255, clients: 12
+
+I can share the full log if that would be useful?
+
+Bryce
