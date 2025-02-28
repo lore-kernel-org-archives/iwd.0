@@ -1,178 +1,113 @@
-Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
+Received: from mail-ej1-f44.google.com (mail-ej1-f44.google.com [209.85.218.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D10F25D549
-	for <iwd@lists.linux.dev>; Fri, 28 Feb 2025 15:43:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FE4F1A3140
+	for <iwd@lists.linux.dev>; Fri, 28 Feb 2025 22:56:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740757408; cv=none; b=W+PItupUuAlg9Ozd9NMtmdt5LVJHh/CasIz1p/26hKiwTMAsBEvAl5v44yCXRlHasx7XdUyQJwEaQ2+rmeg2aXNHM72OiT1SHu0kem9Qp7vHjyEUMCBuKOQNto0lkDt5XMi4Gc80RCjfYT4lT1FaBYRU3HKhViJlAAf2Oe0GbIU=
+	t=1740783364; cv=none; b=hp8MKxjwW6E/IZ6s77/t3mKh9nZo8DEXvBy4OFsHLSLuEu5rYi5yGOlXsmNAw1Y/GmQAWIGeqMcLww5SWUKQbAzSevE6vnA0DJ7h8HBL22uNCewFXQOx6yWDjPH15nnMxOUTaWcojiaFlZ3vgLLwahcPbiap5VxcSS7qQK2Bn+A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740757408; c=relaxed/simple;
-	bh=FQS/P9U8Ooxq76xsmQC1kHf3Um176szkhS2JJXYENI0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=PdThnQ/Uobw9PXtNcsSD82wKm/fF1i1kv0IRnYPGD07QgKmOPVwtWLWEGSWxCFlMzU/vPBxcoAVHL2W4nUsJ+/iTMNVSp8aP4Z5j1/3XdtvQW1bCC5h/FSSMhpx3zpVg0gBYvR1Naej2zhJDKyZ1i4m5diNe2fm7mwGHQdMJCC8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IAL7Mvob; arc=none smtp.client-ip=209.85.214.178
+	s=arc-20240116; t=1740783364; c=relaxed/simple;
+	bh=lNjISMXfSGhDbYw+tlkWzFzDSC+AXmVq6rS0/ygksKk=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Content-Type; b=lyuo7g/ZeT8ti2I3JMSwuYEuzxX4zd7sUTKhynbt0p0UuyhLjtLmNLUIBVGwGB69wD5A+bdXmlCLSHBg+iXvCnul6V0JF0DkpZvMu5raalfUMJa265dd2gVCNjTd1PNHGMv1u+CTnzmRHWhyns74igldLXLKMx05C65Wbhu/1s8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gNRvJCYh; arc=none smtp.client-ip=209.85.218.44
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IAL7Mvob"
-Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-2235908a30aso8160315ad.3
-        for <iwd@lists.linux.dev>; Fri, 28 Feb 2025 07:43:26 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gNRvJCYh"
+Received: by mail-ej1-f44.google.com with SMTP id a640c23a62f3a-aaec111762bso468573566b.2
+        for <iwd@lists.linux.dev>; Fri, 28 Feb 2025 14:56:02 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1740757406; x=1741362206; darn=lists.linux.dev;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=t4ppqSxWTilI8Bnh/mwoM0FlIf8d89ie2KUXEwP+GLI=;
-        b=IAL7MvobJAGyFZF27NbxoVEvm1/naFpdAFnvdtafrnsbpguXN202jZ5pefdlcIEAxD
-         WelPcYUc/97qROVgKY/doYSaGM1flD8yKijeeiMcry+LzcHxYhtOM6f0BYPcCBqZM5JY
-         5bzr122vFLX3Ap57DeEZR1A7BC9JquviccLbMQOsawNBhZfBju709LAJSwQG0zKnqTWF
-         g0Focn1Hd1g3CyZ8mmCyOhKypuVSD43mAwiOmq2ITMaATlWMYTW7Kq5Tsru9AN3Y6+C0
-         rl0VSliKg/By++rVW0NlHFDjpfqh7WooawTmutRKj6CS6/0Axsy5TFs9MQH8UpmHKgwy
-         SWDQ==
+        d=gmail.com; s=20230601; t=1740783360; x=1741388160; darn=lists.linux.dev;
+        h=content-transfer-encoding:to:subject:message-id:date:from
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=4Y9O3H54/mOCXnu8/WESrQNPFSjTp2LmtJpwqkFu0aU=;
+        b=gNRvJCYh4TDlYa6FOnnltvgAUlAPtCOm8J9bgCATKftaqOwGe7WQvlcm2qdMd4/MH4
+         zNmwaWN82jYljltpRfpibF/WD9+q+zZRTsGZlRV9oz1kjsIHSqi3APhLgBb9gv6XNWwA
+         6R4nICMAy8hDnn+Gxz2TwaVox14k5zsZTaTXdHcm4WtFVgmiochaiMeeNsujWhFyBrFv
+         4aYn9ik5fkZ27zSdHIR5o+CWQ5+CNyXsIN6X/QpMsMbpHkvQn+/FCrTVQPy1ZDXVqIxs
+         hnjNwB18xB3LQgBB8UlSeo5pD79m8YTj3IN2aRlpEdA3Qj5LewJAPeEfM0NswKK9Q1qI
+         iaVw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740757406; x=1741362206;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=t4ppqSxWTilI8Bnh/mwoM0FlIf8d89ie2KUXEwP+GLI=;
-        b=KebY+jISqcRK0IqDfiQ+B2Yl6nK8uG+rDyZTDlaq2GNqkZeHXctX07ROQzC0p7pSz6
-         Nj1ntqQr3Je3m7vFY6NyngUNlHmBLfm+SbP9uNmyL7D32qSEtiQeWhmCyVqOcjt9yu3u
-         1x8Pqtl90x8mcM5MNCGQmBBafaYlmnVDYu1+IjAyC47GWYzakS9vDK1anSIvzn5zpL4G
-         +1P90G+IgJU9WKE6frUDxsO9x5WAUR30awR/zoNwpeCqrY9hIkFivjLvnseiq3qygCg/
-         jaUia5GFgVNapLvbrZfEF/QhkDrqV88de15sXDWlZxT+VpQmSJo4/xD2x5gG3iQ2no69
-         vMpQ==
-X-Gm-Message-State: AOJu0YynijxFJfHnAQU6exaghZedzR/UtFk7hAoP+nWcwIlhTZohaJpN
-	muTynDCxhk2BUSSC+rhu6sADl6++h9hqWrTGxU1Z+namilW8VrKo
-X-Gm-Gg: ASbGncsr0XD7puWRNYnNf4JUYwkOeF8bSMMtcw7MRhxqzOfPxEcQhuHxn/MDM36GmXK
-	9gYgEB4/c6sAQxaMotEFxQP/GtY2sAinCaElOtc+DCvx0AQPDF6sKB/QG4oztIJkHQSI1X5Q+l5
-	/OA4ivOmipzxBhuCMhYxaKdkUX4uqcXkK1EScucWEQ2WMQF8Gi97myxVgF6QRRRwikSpVe88GUa
-	ayIsz/QIjOpDZModG90/XblxXif+ftP+O7PdJmQmTxcfvnl3RL9yxqqiseWhZ9KkjHrsqpKZTgf
-	kYX4nJgL8me6VC+jbKC6PO9OjRRiJOmNAGhRdqGEeI/dM4DLqsG8lGh9f7i9rIQCZS/v0zPJiuA
-	+wvu3
-X-Google-Smtp-Source: AGHT+IE3L9BDMEzuUxYPasuo7HktXNVFVJyA3mESzUuuPI/NYhT9tJDVXaCBJHzHjKZGAbdUDiS++A==
-X-Received: by 2002:a05:6a21:1518:b0:1ee:68e3:ff45 with SMTP id adf61e73a8af0-1f2f4e4c740mr7779222637.35.1740757405822;
-        Fri, 28 Feb 2025 07:43:25 -0800 (PST)
-Received: from [192.168.1.164] (h69-130-12-20.bendor.broadband.dynamic.tds.net. [69.130.12.20])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-aee7de37c13sm3104574a12.34.2025.02.28.07.43.25
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 28 Feb 2025 07:43:25 -0800 (PST)
-Message-ID: <8345a386-9cbb-4dcf-9b31-8e211bd0fc85@gmail.com>
-Date: Fri, 28 Feb 2025 07:43:24 -0800
+        d=1e100.net; s=20230601; t=1740783360; x=1741388160;
+        h=content-transfer-encoding:to:subject:message-id:date:from
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=4Y9O3H54/mOCXnu8/WESrQNPFSjTp2LmtJpwqkFu0aU=;
+        b=tEYeYHMZKcm5nHrVUAbSODPWPPZKRn/+lsxiHLV/B7W1VLuqFXYzK7LKxMhvOJnmg9
+         ShMPQfZYTzd7qtbwrzXyelV0TIH6J2IDJMd5YZEvYrW8fcBI3zyVl0QfZPiBeafMx84w
+         bZHQtV7tNGlbbRDvlufZe7uL54R42k7lhnLHd0UXUTdRsFqRdYbJukqFW1SRQ8d9iVeH
+         bZzPcPiKohrxtiLapFbbQwqLYU9tFOzoapKhB+vdgbSTcoXryEaCsNVPnqVDLcooecxN
+         XGpI9JzOA4YILu2voDTRuMGa0SCtxHnpB9+z44PvMdE9dWzIfpKdHF1lg54npt9y2lKE
+         fFlg==
+X-Gm-Message-State: AOJu0Yx+W0M9lu0FXyIn4pyAbUNC7JpZgFUqsfTGaGNfatz0rYXDIxvb
+	sAQEySw6oc0LiCVjjW9P40fnbyWhgL2xk3ww53zl5Oygczkd7vAVqioOkNYuWPogJfq7EqJmqkb
+	cFnzV0vqs/uNkTGTABmUosC7A5iEkfnhE
+X-Gm-Gg: ASbGnctKT0PYt2sdW5HOBw17YQ3CjdXfUXJ17YP7DF7WiVXaJv+TAcnBfxuFwgG3qrW
+	Clw6e6ex9ctEjO9hO3q+LZr3b+kbryJSq0oa53dsvwVL32+FM0YY+wyd3zoDro5cZ7Sn+quwvX7
+	87ka0+hPlB/M0oHIvW6qx/c1qrbFFPyP54fdA/1kkhTQK1GviFOmHFaGZw48v4
+X-Google-Smtp-Source: AGHT+IENF4wSkgr+WzEgKrPfr75PUcS9SXG9iiLruBWtfeLODJBeNgQAZQw75ZkbgqhJJAf5sP8ez5RP+bt8tgLDJVU=
+X-Received: by 2002:a17:907:3206:b0:ab6:362b:a83a with SMTP id
+ a640c23a62f3a-abf25d8fceemr622735366b.8.1740783360576; Fri, 28 Feb 2025
+ 14:56:00 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC] netconfig: Global option to send hostname with dhcp request
- for all networks
-To: Bryce Johnson <bryce@redpinelabs.com>
-Cc: iwd@lists.linux.dev
-References: <CADXxVS+UQfrbWFfsDnW1QvkpvmEnkxMdv+OPBy=XpPXEFdcU8Q@mail.gmail.com>
- <2c244463-921e-42bc-8618-aea86e28d075@gmail.com>
- <CADXxVS+=KgaaehtvzQUZXcECmGquvdkAiqUuRPnCmugdU0MqWw@mail.gmail.com>
-Content-Language: en-US
-From: James Prestwood <prestwoj@gmail.com>
-In-Reply-To: <CADXxVS+=KgaaehtvzQUZXcECmGquvdkAiqUuRPnCmugdU0MqWw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+From: Donald <sirspudd@gmail.com>
+Date: Fri, 28 Feb 2025 14:55:49 -0800
+X-Gm-Features: AQ5f1JrTjbnf3leaDyWeyvtiUDTCy-edZJup5Uiv6NvHSql8HnfuIDQkB2gseHw
+Message-ID: <CAOVeLGQuNx5Cr0WVcNQDJpPZk1bWKcmQ-+YeTxdruiAODBGxBw@mail.gmail.com>
+Subject: systemd-networkd managed wireless networks
+To: iwd@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Bryce,
+Top of the morning,
 
-On 2/28/25 7:21 AM, Bryce Johnson wrote:
-> On Fri, Feb 28, 2025 at 6:58 AM James Prestwood <prestwoj@gmail.com> wrote:
->> Hi Bryce,
->>
->> On 2/27/25 1:42 PM, Bryce Johnson wrote:
->>> Add global option to send hostname with dhcp always with
->>> [IPv4].SendHostnameAlways so the first DHCP request will include the
->>> hostname on first connection and don't need to modify the .psk files
->>> to add SendHostname after they are created.
->>>
->>> ---
->>> diff --git a/src/iwd.config.rst b/src/iwd.config.rst
->>> index 4ba7b4e7..4f473e07 100644
->>> --- a/src/iwd.config.rst
->>> +++ b/src/iwd.config.rst
->>> @@ -429,6 +429,11 @@ The group ``[IPv4]`` contains settings related to
->>> IPv4 network configuration.
->>>           will limit the number of access points that can be running
->>>           simultaneously on different interfaces.
->>>
->>> +   * - SendHostnameAlways
->>> +     - Values: true, **false**
->>> +
->>> +       Always send the hostname in the DHCP request for all networks.
->> NIT: You could probably just shorten this to "SendHostname". I
->> personally don't mind if settings have the same name between main.conf
->> and network profiles.
-> Thanks for the review. I'll push up a new patch.  Looks like I
-> probably should have done it in 2 patches, one for the doc and one for
-> the netconfig?
-Yes, Denis prefers splitting up patches per-file (when possible).
->    Is there an order of preference if in the main.conf
-> SendHostname is true, but in the psk it is false?  I assume the psk
-> one should take preference?
-Yeah I would say if its explicitly set false in the PSK file, that 
-should be the priority. Otherwise use the global setting.
->>> +
->>>    DriverQuirks
->>>    ------------
->>>
->>> diff --git a/src/netconfig.c b/src/netconfig.c
->>> index cd19217c..5959a5ac 100644
->>> --- a/src/netconfig.c
->>> +++ b/src/netconfig.c
->>> @@ -375,7 +375,9 @@ gateway:
->>>       }
->>>
->>>    send_hostname:
->>> -   if (l_settings_has_key(active_settings, "IPv4", "SendHostname") &&
->>> +   l_settings_get_bool(iwd_get_config(), "IPv4",
->>> "SendHostnameAlways", &send_hostname);
->>> +
->>> +   if (!send_hostname && l_settings_has_key(active_settings, "IPv4",
->>> "SendHostname") &&
->>>               !l_settings_get_bool(active_settings, "IPv4",
->>>                           "SendHostname",
->>>                           &send_hostname)) {
->>> @@ -391,13 +393,20 @@ send_hostname:
->>>           goto mdns;
->>>       }
->>>
->>> -   if (send_hostname &&
->>> -           !l_netconfig_set_hostname(netconfig->nc, hostname)) {
->>> -       l_error("netconfig: l_netconfig_set_hostname() failed");
->>> -       success = false;
->>> -       goto mdns;
->>> +   if (send_hostname) {
->>> +       if (!l_netconfig_set_hostname(netconfig->nc, hostname)) {
->>> +           l_error("netconfig: l_netconfig_set_hostname() failed");
->>> +           success = false;
->>> +       } else {
->>> +           l_debug("netconfig: Hostname '%s' will be sent in DHCP
->>> requests", hostname);
->>> +       }
->>> +   } else {
->>> +       l_debug("netconfig: No hostname will be sent in DHCP requests");
->> It probably seemed consistent, but l_error() actually doesn't include
->> the file/function which is why those all have "netconfig:" in them. For
->> debug prints we actually don't need to prefix with "netconfig:" since it
->> will always include the file and function name.
-> Will fix this as well.
->
->>>       }
->>>
->>> +   goto mdns;
->>> +
->>> +
->>>    mdns:
->>>       /* If the networks has this set take that over the global */
->>>       if (l_settings_has_key(active_settings, "Network", "MulticastDNS")) {
->>>
->> Thanks,
->>
->> James
->>
+Do the iwd dev team strongly recommend having iwd manage the wireless
+interface with:
+
+[General]
+EnableNetworkConfiguration=3Dtrue
+
+I am asking as I am using iwd in conjunction with systemd-networkd,
+and was caught by surprise that disconnecting from my ap in iwd:
+
+iwctl station wlan0 disconnect
+
+does not result in the associated networkd instance from being degraded:
+
+                   Link File: n/a
+                Network File: /etc/systemd/network/wireless.network
+                       State: routable (configured)
+                Online state: online
+                        Type: wlan
+                        MTU: 1500 (min: 68, max: 1500)
+                       QDisc: pfifo_fast
+IPv6 Address Generation Mode: eui64
+          Wi-Fi access point: (null) (00:00:00:00:00:00)
+    Number of Queues (Tx/Rx): 1/1
+                     Address: 192.168.50.153 (DHCPv4 via 192.168.50.1)
+                              fe80::ea4f:25ff:fe44:f60b
+                     Gateway: 192.168.50.1
+                         DNS: 192.168.50.240
+                              1.1.1.1
+                              192.168.50.1
+                              2600:1700:7c10:d0ff::1
+                         NTP: 192.168.50.1
+
+It is interesting to me that networkd has enough insight to know the
+ap's name, but still does not change the state off of: routable
+(configured) or adjust the online state.
+
+Yours sincerely,
+Donald
+
+--=20
+-------------------------------
+ =C2=B0v=C2=B0  Donald Carr
+/(_)\ Chaos Reins
+^ ^   http://chaos-reins.com/
