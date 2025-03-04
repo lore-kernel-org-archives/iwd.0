@@ -1,64 +1,65 @@
-Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
+Received: from mail-oo1-f42.google.com (mail-oo1-f42.google.com [209.85.161.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9B4CEC4
-	for <iwd@lists.linux.dev>; Mon,  3 Mar 2025 22:46:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18EB2209689
+	for <iwd@lists.linux.dev>; Tue,  4 Mar 2025 14:44:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741041997; cv=none; b=E9DjfPB++wZUWQw/cOX5KlWXvQ+VGoYElalmlZ/pbEv1r+VFJgihd/lJFArN/9Mz/IG8xND4N8AYlF+Z8JQWDo1xXXY45brd4E1t9LP/+ZV9VuLfuiwpzZCoxQLjTd0zz4bcKjXTOb8JpQamIAkQFceXBEk3ao9p565vHZJC1jk=
+	t=1741099460; cv=none; b=c80TkLILZluNSkGBqAsq+5zrUviLUxWH3yQxTgvXiilkyh5BKG09WQh2S+QwXfOgeTjfKiQrJ6DE9g4fHLNrC+zc0WMnVP0WRUUgBhCQOYQoo+8Q17cJVqjJQJUwgBDvD4O/pGEvEx8VAxuQ7NcRgBQ3jfFgNWrXJznAfMjg+/8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741041997; c=relaxed/simple;
-	bh=bRciuN/Ga8WF7RTb69eo6E+qTjSWctRpTHbYXL4kHlc=;
+	s=arc-20240116; t=1741099460; c=relaxed/simple;
+	bh=JjAarKf8w2VwUKQdBCoseW1LJyBxby08Cd4D+6aE++k=;
 	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=NzmprOtKXhYRCn2PszXS1qeQTP4/vAphATi2IN2vTEllsJkgvjr2foB4kQPNtgdHfpx7WU23g+kxlcYZL50IAwxpYRo/e9VvbVnRO6w2JZTqDMavGXojHP89w7HBhL8yMz33UtG8hwUHOoLMiNl2kO2+xo6OyAMfya1ETRJNggg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BwNJ0lVv; arc=none smtp.client-ip=209.85.214.180
+	 In-Reply-To:Content-Type; b=fyxsBFnlcEP8EoW6Nu51agOV6wAJwme4t94nTsURXf9mafxX6rjf1SPUDyLC9b+HcMgRB2b17KUF3lior9kAWQBctPT5/H0lxfvHd/Ycg8APVSf6K83DRJEwO7p4wV+ejZBSYAurR4Q9vmiBNOXITfAHl9UOPPIYmUwcBsIFORU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=alx85AG5; arc=none smtp.client-ip=209.85.161.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BwNJ0lVv"
-Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-22356471820so79467635ad.0
-        for <iwd@lists.linux.dev>; Mon, 03 Mar 2025 14:46:35 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="alx85AG5"
+Received: by mail-oo1-f42.google.com with SMTP id 006d021491bc7-600131846b1so1180449eaf.0
+        for <iwd@lists.linux.dev>; Tue, 04 Mar 2025 06:44:16 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1741041995; x=1741646795; darn=lists.linux.dev;
+        d=gmail.com; s=20230601; t=1741099456; x=1741704256; darn=lists.linux.dev;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:to:subject:user-agent:mime-version:date:message-id:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=lzBsGEPP7+N6ldvK3cgNkFpWs4fi4klHFNCxN2kkPg8=;
-        b=BwNJ0lVvNlDVbndcjJFSNDqQb9tF4kkK/7ZRF3QbCilI4HsTEgW0dAnFLS7Hpy9R1T
-         W2F39i25KK4mCMbym+41JfAIU+PkexAQ4LtKoRswNjLZjTADzAm6aBU40wju+RoFErxa
-         YuEeVDmsGVMvivnuqCPu9NXUoiDHpAZW1f9gT744OTxY4MpQM7ccfsDkkEUF75NvmEOk
-         EqAa/THn212K/XeHgEffRiTeReAoff+go3AcWyx4tQqs207MmC6kevsMKQrEhp5HY1v4
-         yYO8q3nDJjF7UiKEyJmKlxRZ84i0hUFASiddfdCAktOi5VoMCwHmscYl6a5aISoEfUee
-         CrnQ==
+        bh=gwzSAUCn/XJ+9C3rpX5KsKDFle5l+YsO1odjg0hQ7mU=;
+        b=alx85AG5qc6sn34+GAxB9Vy9hWakoQjkrm4ZaYBW4r1bnZeauwcviQ6gDB5jtHrYIh
+         tGsMPCGjmOBVVe4s4481Nwlx9Rw7SXQvWdzYzgrSZZzVOGvhyLLc8o/7EbI2kjNFmK5k
+         a/XPiC8Rzofy4s1TIsHQMBAq9EJKmHQCJLNzXhCTVgr96307G7az6YMlQpfWarlqff0j
+         3fbzZdlkKhDjcuX5lpmVxmj8XexuyuJheH1piM+4btEJF6nGM/77x8Gx27KwCc9vdAlm
+         C85cNAeLaso7Ec4i3YHj1poMBHsKSNJCpXleICu/oj7JbHeH41fw96KoMmBzqt78861b
+         jsDg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741041995; x=1741646795;
+        d=1e100.net; s=20230601; t=1741099456; x=1741704256;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=lzBsGEPP7+N6ldvK3cgNkFpWs4fi4klHFNCxN2kkPg8=;
-        b=Dm4Lzh3jbBNEOB2h22L2rjiFbq2pHd6qc6d/18iE08atBdWWyt96Hel42YUA2aGVCf
-         +q29rVolYDzGWiNdstRVRXUVAMrw64JNdZiMmjEyqR1bs5zXuashEbY2SCURCbV1cYYS
-         8fHw6tr1IHDDGP9dtkxfxX1WHeuNx+c7oLwHqimpZf7DV+Mw3ovSdn4K36UpEKwNSz+v
-         VmPSHqPhWKkXDuQnDzWCjzvQEgxmmjcF7YS9F2DRUdVvmXR8HfLMea52X014TYeeG2zj
-         O+Sv4tqJM0AJi7qdeaMV6symnHi8iCZcLqu6pYD1nwrxBkzAZpFOR+8Grcoybx1ZuScV
-         85vQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVrNGYGCa8NJtgN8ebXhylPKdDuIuUczw4nN5MDeZjNXy4TRM6l+r8Av0Yj2TZ4s53b8kc=@lists.linux.dev
-X-Gm-Message-State: AOJu0YxXbvgUpNAgZwShBdPJ0/Vd3iH0NgOnFyePcOj5y8TvC2jQskTe
-	+Uyo44WaHv3MkNObh3loBMKJGrq4G2+mpJkiEPDYCUCJTPZHI2VRn1XAgQ==
-X-Gm-Gg: ASbGnctEAbIFoYfMSYSCEGLE6EfJqD7LlUOZOFIDQse4/f9Qi5f9n86q5y24gEO5No7
-	vuy6ReLPfMUtwU7g5uKYMtF4pcWzPpgoJBdJlj87OjDFym7du7lMmzUm6mSlIyplRiDZWGuDODY
-	j6nCc04CZWLHa9zeWTTUKC4hxyxRU8O1YoisPBIoHMw7uvnrnnO7Qy7zFt3U6ukUmCk5i2irWsQ
-	TnnH/mfrdsGY5UXh9jnimMNQpB7Nt8KHPLffRcbTCPcMpKKbfvs9HayHI4h/sabSeu7tv2aqM6o
-	WXC7755yGkV8UipfPhiEHQ4zfalyyBnPUh4BmrPi30EWbMaB
-X-Google-Smtp-Source: AGHT+IHaKhBzjV1DOxK5iv7x2z4dCiq8tfQ8vlhGqC2oD8N0ET3700+yA9MyDdEA+VYmAzIDlN8efA==
-X-Received: by 2002:a05:6a21:7a44:b0:1f3:3804:9740 with SMTP id adf61e73a8af0-1f33804aa1dmr2479987637.15.1741041995092;
-        Mon, 03 Mar 2025 14:46:35 -0800 (PST)
-Received: from [10.100.120.127] ([152.193.78.90])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-aee7ddf23b6sm8789024a12.15.2025.03.03.14.46.33
+        bh=gwzSAUCn/XJ+9C3rpX5KsKDFle5l+YsO1odjg0hQ7mU=;
+        b=vNdmVTqe/2g3qe7PrCz/Rf4bcqZdLjxh7kxSE4F9u5WTQZj619VMcF4vrc4ibkqPDa
+         imzByuyslbQWBV6OfmDN96xhJO63IMnKpwLOYKCgg5hkauMCialQOLjSrH+URH3pw+Jv
+         1dH53KHfQ7FHJ429rKLkedlS4VMdDbRCh0+xvTtkaQmRknc1Bz35D33sLKfAYA71HEW1
+         r2FsFizZuEE7a+16CGn5NgDFTqEG8MXYsiE+ZOiaVEllEERysV3kwh3hkoxZKM7zYY3A
+         i7PXaMyU6+0x/trR7vHkHGolv3g1LYwgaMUtIO5T3f62NycYWclvyW1rBKU3H+aWV8lA
+         QhdQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUy9DoTSz3TivtTB3dA50VrfjTHXk6+fmctojTq8CuAWBOw+espMt38+lzqqMfNF3ZfG8M=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yw1fi7z4J9mJCzbxDYTPTpOyckhc1KaYoo/o+W8IVWgtSUozume
+	GGG/4CLFk1z2oBCggZTHHxI5apar4d+beEez6O8r3vrUYrv2QBm8
+X-Gm-Gg: ASbGncuGMNs9Y47SLLOU6Uwb2Tflb4uTqq7LkEi24993ttTsL6HOvqIvUavQoDkYzqZ
+	9QpJszCm/HwcsmwNOkQmjoldQMl62KIFgEIND5beOaRYaj6g8lZ2IKnz9oiMw+j9HLSnd6sd8M8
+	5H1h92a5U6ihqGvTYNPiwH3qS1/C+dfgjuJjwh6sbiLiZrEPphGXRHo1u/W5tAeDtMg3wPpYueX
+	pZvl6LnY3AY6uSgUiIzY/bAeW0i+tTn5deHqsMvbdMgDzCD4L35DgsqNANcK+7tbp7igl3OsBVv
+	iB/uxY2ZzpK4pj7efgRh8QNXyIHzmSvOFE4yo1hPibXwrmHJhPNHfjnDZZTF3kepOpwTEMC+17o
+	gs4Rom7oPQQ==
+X-Google-Smtp-Source: AGHT+IFHBqWcq/Pit5hmlgMGbw+UOAnLBIJwrfZFnhnvX8NLRhGDMlY3TuYqal2h+GSm/SIHJoZHOg==
+X-Received: by 2002:a4a:ee89:0:b0:5fe:9b5a:531 with SMTP id 006d021491bc7-60024bc4090mr2360027eaf.0.1741099455944;
+        Tue, 04 Mar 2025 06:44:15 -0800 (PST)
+Received: from [192.168.1.25] (syn-070-114-247-242.res.spectrum.com. [70.114.247.242])
+        by smtp.googlemail.com with ESMTPSA id 006d021491bc7-5feaab76516sm2071866eaf.14.2025.03.04.06.44.14
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 03 Mar 2025 14:46:34 -0800 (PST)
-Message-ID: <3dfe4f8e-50c2-4cc1-861a-257c06bd032b@gmail.com>
-Date: Mon, 3 Mar 2025 14:46:31 -0800
+        Tue, 04 Mar 2025 06:44:15 -0800 (PST)
+Message-ID: <b652f70a-d3ae-42c0-82fb-1cb1d4e45411@gmail.com>
+Date: Tue, 4 Mar 2025 08:44:13 -0600
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
@@ -66,70 +67,34 @@ List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: systemd-networkd managed wireless networks
-To: Donald <sirspudd@gmail.com>, iwd@lists.linux.dev
-References: <CAOVeLGQuNx5Cr0WVcNQDJpPZk1bWKcmQ-+YeTxdruiAODBGxBw@mail.gmail.com>
+Subject: Re: [PATCH] blacklist: allow configuration to disable the blacklist
+To: James Prestwood <prestwoj@gmail.com>, iwd@lists.linux.dev
+References: <20250226185548.49127-1-prestwoj@gmail.com>
 Content-Language: en-US
-From: James Prestwood <prestwoj@gmail.com>
-In-Reply-To: <CAOVeLGQuNx5Cr0WVcNQDJpPZk1bWKcmQ-+YeTxdruiAODBGxBw@mail.gmail.com>
+From: Denis Kenzior <denkenz@gmail.com>
+In-Reply-To: <20250226185548.49127-1-prestwoj@gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-Hi Donald,
+On 2/26/25 12:55 PM, James Prestwood wrote:
+> Certain use cases may not need or want this feature so allowing it to
+> be disabled is a much cleaner way than doing something like setting
+> the timeouts very low.
+> 
+> Now [Blacklist].InitialTimeout can be set to zero which will prevent
+> any blacklisting.
+> 
+> In addition some other small changes were added:
+>   - Warn if the multiplier is 0, and set to 1 if so.
+>   - Warn if the initial timeout exceeds the maximum timeout.
+>   - Log if the blacklist is disabled
+>   - Use L_USEC_PER_SEC instead of magic numbers.
+> ---
+>   src/blacklist.c | 19 +++++++++++++++++--
+>   1 file changed, 17 insertions(+), 2 deletions(-)
+> 
 
-On 2/28/25 2:55 PM, Donald wrote:
-> Top of the morning,
->
-> Do the iwd dev team strongly recommend having iwd manage the wireless
-> interface with:
->
-> [General]
-> EnableNetworkConfiguration=true
-I think it depends on your use case really. For example the devices I 
-work with are WiFi-only, so using IWD to manage DHCP makes a lot of 
-sense as it takes netword/networkmanager/dhcpd etc out of the equation.
->
-> I am asking as I am using iwd in conjunction with systemd-networkd,
-> and was caught by surprise that disconnecting from my ap in iwd:
->
-> iwctl station wlan0 disconnect
->
-> does not result in the associated networkd instance from being degraded:
->
->                     Link File: n/a
->                  Network File: /etc/systemd/network/wireless.network
->                         State: routable (configured)
->                  Online state: online
->                          Type: wlan
->                          MTU: 1500 (min: 68, max: 1500)
->                         QDisc: pfifo_fast
-> IPv6 Address Generation Mode: eui64
->            Wi-Fi access point: (null) (00:00:00:00:00:00)
->      Number of Queues (Tx/Rx): 1/1
->                       Address: 192.168.50.153 (DHCPv4 via 192.168.50.1)
->                                fe80::ea4f:25ff:fe44:f60b
->                       Gateway: 192.168.50.1
->                           DNS: 192.168.50.240
->                                1.1.1.1
->                                192.168.50.1
->                                2600:1700:7c10:d0ff::1
->                           NTP: 192.168.50.1
->
-> It is interesting to me that networkd has enough insight to know the
-> ap's name, but still does not change the state off of: routable
-> (configured) or adjust the online state.
+Applied, thanks.
 
-This does seem odd, but I'm not sure what the expected behavior is with 
-systemd-networkd to be honest. You could check the IWD debug logs, but I 
-know IWD releases its IP address when disconnected so I'm not sure why 
-systemd-networkd is unable to see that. It should all come over via rtnl 
-events which systemd-networkd listens to.
-
-Thanks,
-
-James
-
->
-> Yours sincerely,
-> Donald
->
+Regards,
+-Denis
