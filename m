@@ -1,133 +1,93 @@
-Received: from mail-qk1-f178.google.com (mail-qk1-f178.google.com [209.85.222.178])
+Received: from mail-oa1-f52.google.com (mail-oa1-f52.google.com [209.85.160.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2041426BD9F
-	for <iwd@lists.linux.dev>; Thu,  6 Mar 2025 18:55:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C683321D3CC
+	for <iwd@lists.linux.dev>; Fri,  7 Mar 2025 16:29:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741287335; cv=none; b=sQzyaSCW5vB/kXs2pHbL5ujn8yk1ZdHw7O/4G2bQ9LKBZgBvtZuoOhF3Rhy7oUGWyvtyLV7cm7/Qa9HpuPADti80aCqf6FB3FsjvWjDh+FGhCKpxsQyB9VbapogorLeo3S+uWDbmeKuTh1+Ryc6lKAonpwUKJ0pdLIiTlA0V624=
+	t=1741364986; cv=none; b=uV5lGlDkK9+GbLKnZlWIJzUgz6odEXp1poVzRyMEG1HfXsNSvBFwrOOpTHuhDXYbMYgjEdm2OXNPY3YVVJbVRLtKxc6BkpBXu08kYEAM2YJlOEfdv1aEIo/Ri54c1lSXew+4xr1FGHmSFuSuhQKTtZGzWB5YhUhKLNZbmqwDjy8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741287335; c=relaxed/simple;
-	bh=xCbiKDZzlTQRwmKuUYnbKqEsgeWOr+3hJSiSbJ8ylJA=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=SUouaTpdkNkoKPDkB0ARyrjjdoOqTux2KrmY8ZF2gHryDmbEy0hTQF0xs7MIv4Nbtd15mnnf4TTcyWnXW0PHWMj/R0hybO5SHSH/NeylnBxlpWgDxLfLI7+972cukmVD2bxVym7fMqe09bnUPMRj48hbhosFwEwuZUs8Rqcs9KI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZHjTBqNj; arc=none smtp.client-ip=209.85.222.178
+	s=arc-20240116; t=1741364986; c=relaxed/simple;
+	bh=4u6bgADV+LUqVjida7OGY9ciV01UEjr4DqD7Qurgczg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=hpA6OgKyA+LewQ1LVYs2yHmuWZjRgRd+g5kRhvWlLZN+i/BFVxVTqNEKwlPewWO1gib6rvwJVllAx3cB2cxZLqqIKdUUtpqcsV5sXDX3ggpuUdGHCq2vuJMsuDbQEZUBKi+n+qzdAH8LmlBmfcznVhB3xuMqAo21ljJo1VP6Q6Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FHdumiGK; arc=none smtp.client-ip=209.85.160.52
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZHjTBqNj"
-Received: by mail-qk1-f178.google.com with SMTP id af79cd13be357-7c2303a56d6so117700685a.3
-        for <iwd@lists.linux.dev>; Thu, 06 Mar 2025 10:55:33 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FHdumiGK"
+Received: by mail-oa1-f52.google.com with SMTP id 586e51a60fabf-2c1c9b7bd9aso859068fac.0
+        for <iwd@lists.linux.dev>; Fri, 07 Mar 2025 08:29:44 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1741287333; x=1741892133; darn=lists.linux.dev;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=8B4+xLprTJdM+mCL7geno4nxmQxZ2p3JXdPa9g7xLtk=;
-        b=ZHjTBqNjuitUjwS44FCEMH6RHyy4pVkBZ/8A/H7OJFjrEjLYK0XcIxOwbHkabAne8D
-         QrNhlpKHVtGIQtpACZMsxbSz9l0JXgf1za7UdRaM0NbUDS4FiqNyrJRJnru8AU8iiQsa
-         9LSV2j0iAW+LejKGd+rd0yetWvq2qEpsb7jGB11hOzlCxTVOJUcy7cNt5jnA/Blo3Joe
-         uBCdDGWIRdpL/GLaYxM931DHYmtIMbZ3dMnShoemngm4HsTjjVRgXW+EoNY5W0Ls5HDa
-         XcCAZ8vWKeZidfyTRt4OLEpdtrTtF0X3WApeRiKs70YZNXf+/ckpe+U1UnZk0uZifFCU
-         3B1g==
+        d=gmail.com; s=20230601; t=1741364984; x=1741969784; darn=lists.linux.dev;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:to:subject:user-agent:mime-version:date:message-id:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=8/zkvmMmeSEHkKQPuge2eBOWMD51h0/xSOwmXiN/eEA=;
+        b=FHdumiGKIQE/CRa2DNiejmwafo3xOM9ktzNlGotMTlaA8OMOKyT9QnbHU3tMI84+PE
+         LSZq/kcxbZRnzB/3qkT8goSo8dCEygmPtf34pJJ7a4q04xr5IBH5D6CKY67zz60d4sZa
+         ZM0JCdqOaGAXxaRHQa8oVmyEeFbYvpAQJokjL1b0C2S3CmBmeWD20/OJkNQ9sf8OULcY
+         GGSFa1N+veP9jPLFY4nNxVyq/btJ48jbw3lQ3RrM9BF11DD36BJYVJL8q7f2foPcUz0l
+         O4SdDqSfDNAdiNmbjQnWLX8IIFU6ofnX37gjqvWyqQZuCa6RJH6HI3+8mcqD7hZl/HA5
+         t0EA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741287333; x=1741892133;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=8B4+xLprTJdM+mCL7geno4nxmQxZ2p3JXdPa9g7xLtk=;
-        b=hSziBI+Xo5nqoAacG7HS++CKfLjEYldu/ShglCNvaJuL0aNP+3JRuiWuxONj0WWMxC
-         MVqRd78zMw6CKsQAW1YGGXTeLLBOxLqoq8e67Yw/Dzc5X29WKUtsm/cUu+MqZmoSUL1t
-         /Xvcawlb3VhCtT0x96zvpCkca8XgG3jkhuWg4+3KNfFGnxunTwI0XnAvhSLf9xgJ+hyq
-         BHGPf38fo/ajyc3Yir7u9HJuoNYXUuRZwLPgdd4S5BcRZaXsumhmAhr5HPfa4ei7upPJ
-         grDZkgO4FPIuhTXktvpQpQtEwKv9sxPIXWjZCigTOZVZyXlvfOOnxSDAAQ96mhZ3LRy0
-         UAtA==
-X-Gm-Message-State: AOJu0YygskUDMlRiEMCVpLUwTgKTDQfE5KEWbvxM3B6ufQMPQB85gijo
-	SjMlIsf4PR7sSZPYr7f2eox42Us4G6BvX18areYP3jz/wNgRngiylMZ8Ow==
-X-Gm-Gg: ASbGnct9xUDrIPtOdJWhjhcdG+IpZE3q3NA/U1q7oAoGdOabiQvj9dP5TsEb2CdJjfu
-	jvTYBXgI1Sgbbh6VcLxUfBfc65qLiRpiCEsif527D9GZBF55eIgFPx0sPrjNn1guhz7xQqZYrmg
-	xGoXQpVfS+qlA/vMFgbKndxz2tucWvyc0PwDUoaJXz19fzxmHGSPFjpTuhdyB5yhsK94OastwDf
-	BW9UedfONzavwEoLDj4gr+IzJnqkJx/L4m7vPcU37AqwH1gshZHjBcbxevkkHU3UwXFa198mq9t
-	6OsuszJ1YCzD0ippFHhfflV54TS9U3F5azIiLoZx0kKNF3lqq2OYZMc=
-X-Google-Smtp-Source: AGHT+IE4ERJ/BiWrefrF42nfffHhrXGrg25TEDQyOX6XMNtfJTMwFQx9dDEDIkwhboR5nsk5KgEttw==
-X-Received: by 2002:a37:de01:0:b0:7c5:18bb:f8b8 with SMTP id af79cd13be357-7c518bbf8d5mr2248285a.1.1741287332636;
-        Thu, 06 Mar 2025 10:55:32 -0800 (PST)
-Received: from LOCLAP699.localdomain ([152.193.78.90])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7c3e55110bdsm121982585a.104.2025.03.06.10.55.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 06 Mar 2025 10:55:32 -0800 (PST)
-From: James Prestwood <prestwoj@gmail.com>
-To: iwd@lists.linux.dev
-Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH v2] auto-t: update scapy imports for newer version
-Date: Thu,  6 Mar 2025 10:55:28 -0800
-Message-Id: <20250306185528.365677-1-prestwoj@gmail.com>
-X-Mailer: git-send-email 2.34.1
+        d=1e100.net; s=20230601; t=1741364984; x=1741969784;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=8/zkvmMmeSEHkKQPuge2eBOWMD51h0/xSOwmXiN/eEA=;
+        b=pFu38FufZYmcGQv/2PAd8W9x5pGPVsA7GTbdF8X57CGrmhybfBT7khCo5vAxuDFgo3
+         bZma8YEWDFMJsOvpzKSwduT2Z4sZfhalzmYXrlZSVSzG2MTImefbpIuy9b5oMMqbXiRK
+         j3t9T2j1K4excapchz8R+r523u7/qjHmQbkP2wT+LsqX4kpQmVF8yXCc29r/M3kkydz2
+         AsldIsOVpw/Q+RVe8cN66QgnoTT62jHluCnMBcVXw5WfReD9tQHei9DWz1s5zO5bcvXY
+         lgdFAzpYNTf26hg0aUgI0qjQe4GgeT4sadi5d73wnuyR+4gg+b1EXTo79kwPOQxCaT+1
+         QjCA==
+X-Forwarded-Encrypted: i=1; AJvYcCXdXIjFOZ59ULjvnSuCXeff6nULPJp4jrkdLu/PXpmhlCLO3dWT0TNcrJbX4nkMe3x8Wi4=@lists.linux.dev
+X-Gm-Message-State: AOJu0YyRA1fzjYcp/eYwHxliVoaW4QeM9o0/+du12FxYTbEPoG+vIIaJ
+	ZK7LxFzspnESTmgIoj729sXaR1EO+SYX93pp0EBi8gejTsNzpvbR
+X-Gm-Gg: ASbGnctUcQl0dCJcCK+3SOrOM70Lz476OQHgsgr8FuLeVVXXfEaI235on5s1AXC8HvH
+	+ZCajb7DB2fH15L9MQ7rbEcNulayYc6ei9jnKsCrqcx44T0n+ShI/2AhkbDNINCyBD4MCpb86GK
+	TSIGlNqyDUu4hdwH68FC9bWXjAMavtsO63issYBeHTIedbYWGK4n646FXbkHZi2Dk+7shJVLkFB
+	tIXQwMht48AxWDUH7R66xrXVyMcLj9I+XSqd6Ji4Dopav+Rb2SnxDul//7cdlAjaiWhrae3PZI2
+	y948XpX/Y1h7EqHJsWZM9q6D+3+CrqHm8UgGbmQM9hoDzqPfpUWiTQIfXx9XtI5Ra01HA7eyAuL
+	ZN6J4JVc2/g==
+X-Google-Smtp-Source: AGHT+IE297ucsh4DtYLts5mpv8CmKiNMCb+HlM+y9nskWe5Wl7/NcooRFnoIXXh6KldfHoS6tYdlug==
+X-Received: by 2002:a05:6871:530d:b0:2b8:3c87:b491 with SMTP id 586e51a60fabf-2c2614313e3mr2310945fac.26.1741364983643;
+        Fri, 07 Mar 2025 08:29:43 -0800 (PST)
+Received: from [192.168.1.25] (syn-070-114-247-242.res.spectrum.com. [70.114.247.242])
+        by smtp.googlemail.com with ESMTPSA id 586e51a60fabf-2c248d5acfesm733102fac.33.2025.03.07.08.29.42
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 07 Mar 2025 08:29:42 -0800 (PST)
+Message-ID: <530dbc5d-d49f-4508-9bcd-24dd4dbf6e49@gmail.com>
+Date: Fri, 7 Mar 2025 10:29:41 -0600
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2] auto-t: update scapy imports for newer version
+To: James Prestwood <prestwoj@gmail.com>, iwd@lists.linux.dev
+References: <20250306185528.365677-1-prestwoj@gmail.com>
+Content-Language: en-US
+From: Denis Kenzior <denkenz@gmail.com>
+In-Reply-To: <20250306185528.365677-1-prestwoj@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Something changed between scapy versions and now the modules
-being imported don't exist.
----
- autotests/testFrameFuzzing/fake_ap.py |  6 +++++-
- autotests/util/hwsim.py               | 17 +++++++++++++----
- 2 files changed, 18 insertions(+), 5 deletions(-)
+Hi James,
 
-diff --git a/autotests/testFrameFuzzing/fake_ap.py b/autotests/testFrameFuzzing/fake_ap.py
-index 8ee369de..a9eaa1e9 100644
---- a/autotests/testFrameFuzzing/fake_ap.py
-+++ b/autotests/testFrameFuzzing/fake_ap.py
-@@ -3,7 +3,11 @@ import sys
- import sys
- import os
- from scapy.layers.dot11 import *
--from scapy.arch import str2mac, get_if_raw_hwaddr
-+from scapy.arch import str2mac
-+try:
-+    from scapy.arch import get_if_raw_hwaddr
-+except:
-+    from scapy.arch.unix import get_if_raw_hwaddr
- from time import time, sleep
- from threading import Thread
- 
-diff --git a/autotests/util/hwsim.py b/autotests/util/hwsim.py
-index 5456d30b..df6be26a 100755
---- a/autotests/util/hwsim.py
-+++ b/autotests/util/hwsim.py
-@@ -7,7 +7,10 @@ from weakref import WeakValueDictionary
- from abc import ABCMeta, abstractmethod
- from enum import Enum
- from scapy.all import *
--from scapy.contrib.wpa_eapol import WPA_key
-+try:
-+    from scapy.contrib.wpa_eapol import WPA_key
-+except:
-+    from scapy.layers.eap import EAPOL_KEY
- 
- import iwd
- from config import ctx
-@@ -444,9 +447,15 @@ class Hwsim(iwd.AsyncOpAbstract):
- 
-         # NOTE: Expected key_info is 0x008a, with the install flag
-         # this becomes 0x00ca.
--        eapol = WPA_key( descriptor_type = 2,
--                        key_info = 0x00ca, # Includes an invalid install flag!
--                        replay_counter = struct.pack(">Q", 100))
-+        try:
-+            eapol = WPA_key( descriptor_type = 2,
-+                            key_info = 0x00ca, # Includes an invalid install flag!
-+                            replay_counter = struct.pack(">Q", 100))
-+        except:
-+            eapol = EAPOL_KEY( key_descriptor_type = 2,
-+                            install = 1,
-+                            key_ack = 1,
-+                            key_replay_counter = 1)
-         frame /= LLC()/SNAP()/EAPOL(version="802.1X-2004", type="EAPOL-Key")
-         frame /= eapol
- 
--- 
-2.34.1
+On 3/6/25 12:55 PM, James Prestwood wrote:
+> Something changed between scapy versions and now the modules
+> being imported don't exist.
+> ---
+>   autotests/testFrameFuzzing/fake_ap.py |  6 +++++-
+>   autotests/util/hwsim.py               | 17 +++++++++++++----
+>   2 files changed, 18 insertions(+), 5 deletions(-)
+> 
 
+Applied, thanks.
+
+Regards,
+-Denis
