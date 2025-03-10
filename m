@@ -1,68 +1,68 @@
-Received: from mail-qt1-f172.google.com (mail-qt1-f172.google.com [209.85.160.172])
+Received: from mail-qt1-f173.google.com (mail-qt1-f173.google.com [209.85.160.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F37DA1E378C
-	for <iwd@lists.linux.dev>; Mon, 10 Mar 2025 21:41:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 302701E1C22
+	for <iwd@lists.linux.dev>; Mon, 10 Mar 2025 21:41:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741642882; cv=none; b=EZwlXrlqRmEEgJN79PH9wbm/2ifupAvg6k3SyEdbs13BalYUXWuCMWBwX/1A0PaUg/XZ/qSomA17H7nyRgYviH/nDSyDfNpXFgGZhD/3DBRIkDBQmkmXSsGhQtLRBPQ8s3+RxnHiAmLdkSyzHzTIWiL7+x6NXYR+SJkKv0hN4tA=
+	t=1741642883; cv=none; b=bWoNiRCCwnn92jshqMnxvrcl/yQ08plbJ37Ew16cJuVI2XL6/n5GCO484gNVaetsc1Fte6tpLmGdzP3UHLFAjrLuxgaUC4E/3SQ4oBpQ1iZJ69mHYNRR5hsXUHRlwGFt+1je9QG2/sv12cgkqQwB9HID47gWFDzZywIg1xMvR1g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741642882; c=relaxed/simple;
-	bh=qP4Pn+/RcHhTltFTDAx0815WcMG9CbxDW03yuCc0fGQ=;
+	s=arc-20240116; t=1741642883; c=relaxed/simple;
+	bh=4TBFHLx0v9So0GhoPkfflUk012Gl9dxE7gC31FrKIxE=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=F4DSltWKrXi9dQ/eLk20s6iVpnFz/MguqHPpqlQS+/1nzcsc1YunKTrTsmU+8sxu7PWdV5LgsJy5b6Q02yUW5yMDm1ujfNYy28uwJGXpjEcQRaMjJuPWes7aobeQlLVB++xwl2gQiLURmulDGwNUZv1wxf1//2CLfxNJjDhBgqE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lUeQMF4u; arc=none smtp.client-ip=209.85.160.172
+	 MIME-Version; b=a8ALeO2zflhUSqy5P018WUEd4nlNv4+ezSiNZBM5z0FuazpE2QQpZMuw6R9JucaIaFLiG9sPbajaWZTdBnSvaE5HcwHtSbaEYWK7SXmVogz3Asu/ckrNoEmpOhkWpGjI835APyz+hFiF9H+pZKZRMFROaQEubtsjRWbvNom+Lvc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OsGYtbz+; arc=none smtp.client-ip=209.85.160.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lUeQMF4u"
-Received: by mail-qt1-f172.google.com with SMTP id d75a77b69052e-474f0c1e1c6so55079721cf.1
-        for <iwd@lists.linux.dev>; Mon, 10 Mar 2025 14:41:20 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OsGYtbz+"
+Received: by mail-qt1-f173.google.com with SMTP id d75a77b69052e-476805acddaso18674161cf.1
+        for <iwd@lists.linux.dev>; Mon, 10 Mar 2025 14:41:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1741642880; x=1742247680; darn=lists.linux.dev;
+        d=gmail.com; s=20230601; t=1741642881; x=1742247681; darn=lists.linux.dev;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=bIc8rPcrNtR6O/5fFmMP+J568N4+MXOB1YbviJJpRkM=;
-        b=lUeQMF4u7vlB7ACs3iAf6DGQFu9KySm3Z3gQNYs24UsnMxBvhpeDf7lJknAAVz02tZ
-         pWwOQDePnPQ2cbG3KqWHhBvMCXd1Ub75RP/fu/CzgRgN58FyoIv241ybCpgAJ3KOhdKV
-         5l3z31/KLd07URS0UxzrqW6mTOURpgzV0q/svjVEuJOLHe66Z0YJURVZJJepXHT7kVVN
-         j/J2qmljP8WPZzClQjDSEH07jiKI3sFKrYnTKhToS2SUeTHgj7Xaa/9wiP9h23clNCCp
-         iApCmahJJe2pOUkw92VPoQxBLBfWEOkOXJY3rwXvzIe8LWWHolusWR6j693V9/L+0wzx
-         LDxQ==
+        bh=7Rs7qaDSYgYJxxnp510WgMdJS5hCD84nfpzE8QkJJCU=;
+        b=OsGYtbz+d/amPxtwi01xo1QeIvJOrNx41JEb2aISJ7KYlUT5CCKPNlA17BWbTfj7Eq
+         oriejvVkpo+fKVEWwlGfqm1d2X2JQOHDegXTVp2xugrMGaSTcfmhbi98djOeaRcNK1hE
+         MathlGKDLviiXL5seMVneOMDdwXqNGQJ21VpXGJMjhsQ8uPBOi8DVi5xTtGPhZflyNu5
+         H+2jicIpVeU9YSBN8FPFUvbLphtHGFZROl3yNG1myYqpC0RKfBG0qF7bNCKcZejVOkwa
+         0EimH25dHuw6kYZjpolRPdEtGSOlVXaPLfSM1nfSoQuUuXVjhCS8HJ8NkH7n0axED47e
+         Iv6Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741642880; x=1742247680;
+        d=1e100.net; s=20230601; t=1741642881; x=1742247681;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=bIc8rPcrNtR6O/5fFmMP+J568N4+MXOB1YbviJJpRkM=;
-        b=tOMFHB8SFbe1bXsv1JWo7O8nZ7cEPW/1mnoufeZTcWeOxbpQ54i37DoqvTjdyuQq2X
-         KkvxZpPbiB6D632m6bITbuRifQTSoBuQazkb55PAXHfD1s2hdM/vJ1U0m+YWS3cCT4Ia
-         edgYWD0puFoLT3+Oh8oeyBl/NOCpo2oC4BhbBdfPQmhnjCI3Dh05Lf9RW2dE8+vVfH4t
-         +G+iqF5qHAZY2vhs9njHlwT/frbotJWRDWkZUFZLxoBIP8iMeljLEuGBO54QT7vkHRIB
-         OUifQMavmvmv2YeHMtgly7b822Vz0e9Iqs9q/LjHJ1L+yHdcCx/3kkWlEW+m5X1kyi4w
-         N8RQ==
-X-Gm-Message-State: AOJu0Yw8QhR9HbSTGpwbcIYYlHQMsYfSq1U5YTBovz8Td/A3KJXIG+N2
-	WFy0yKmEQCtRSw7jnjjkaDKXSiXqai5H2SqP25FdmfQ3UzzrudqUle4fSg==
-X-Gm-Gg: ASbGncvjsdkhnu2xnFrCQUwoZDNw/eEkt4rnf/3w9pcTdQKvGdvc19AgGnpyckhMQGe
-	emRxDWj/YX02bw4wN1m1DFMfXI6XBVy/a+KjBHdOoZ1XZBqccXHEuLkhFA5t9XpRTcEFPwb+xzp
-	gPj6lrVCWOpC9vC+f5n87pCeGDK3Fs60MxJlC0MueCjYH+x4HTsVtAzUK12JgpQJxujy0tZurUe
-	u7O2axhlVlnnAkJpHM8CN5kMjZL8N0/TroCNL57Z+Kqy0bpqM96+q04tyoPVXMW0+JBL9hDhTM5
-	XsP7kJX2sVKNx1YaG77w1HyH24I3EN0XajtfwvrjeyEI1LyGOEcTY2z5U0F3cmfWIU2QTK9bWXQ
-	iSUA=
-X-Google-Smtp-Source: AGHT+IG6BTR5hFUgU3JYHDejT/cUbhsN3Vk9LzUkdZcPNxE+GLjrAEFPv9HQEQ51ZrIn6HTThjO7+A==
-X-Received: by 2002:ac8:5714:0:b0:476:8c58:4f68 with SMTP id d75a77b69052e-4768c585117mr70444391cf.2.1741642879612;
-        Mon, 10 Mar 2025 14:41:19 -0700 (PDT)
+        bh=7Rs7qaDSYgYJxxnp510WgMdJS5hCD84nfpzE8QkJJCU=;
+        b=thFdNh1kcMdevi4/+neRhe3eDguibgbVONGifh8bOt/21zA8eF1CrF/Nx8Sc1hZunO
+         kdkj0YHNPav/FbsjKuo8eX9WEzcMHZl/bLaAdO/fvV4uy7EeecVySZ/R3Bjzfol/aCxC
+         m8xIeWL3ZhQeTKrvUezh55zYCVR2vgQ6FeAcDxxFx7WamY6j9+1vSmKw+54BYWzDTA5M
+         pN3kTgTeUpak/JuAMDATHks48ilRJhbyfhHpzoKLpmY8GKvq6y30GqQwE3frEMazF/GY
+         +xQsADBdDJUtr18ICOXWmLkW0XLrfZg4OLptOFnLZMyZ2p0dW9GR6wKAIoDlEB/l1hl0
+         Y5EA==
+X-Gm-Message-State: AOJu0YzY5SS71OwN84jnngmn+Gt24o+B124RhCiuS6aL7IpWWIqRrGlt
+	2VEutKGpib5Wihjl444rEctyb8xoxcVzAtdkXZCUDOGGDDmFkDGfZ4wtmw==
+X-Gm-Gg: ASbGnctMvkWH0ZygbQn6kxRC+NoVCND75yG9H7yjhufZdZNEI0zZ+j3dKxHnVeN7hsh
+	7JZsgTMlzErXSU3F7lu/f2Fjc4j53t9yBwUb7x5SnCmSleje3exCPe/vA73cx4Ukt6vugfLKCa+
+	kC8zXmHOZmWk8UNjCfaPBlyBjYi72EY4cO8ocXbihCP6XWZgjg0v5SB0OaB/jDNvsaBJWa4i+1u
+	LDkYQ6V4Q7m1tklIKQz0ZgWviL+d+PPNmZNqBOZlbmYEl8kzrp80xmC9AWWXQ+VnEGvX5IOC5B7
+	iobtI27Lg+ta1Put9fb3OIRktUtihJUw+bB27OrHiNmsusiZKD6mA26p7HdU/ea9CmYHRoaU0nF
+	sosI=
+X-Google-Smtp-Source: AGHT+IErWfCdyWJzznKNqyfiyo9BhMFI/d++hueh9xDLKCra6rAHpjGaNu82gOQ/K9EeMcUYj8D5CQ==
+X-Received: by 2002:ac8:7f4f:0:b0:476:8f75:b885 with SMTP id d75a77b69052e-4768f75d1efmr70761181cf.44.1741642880816;
+        Mon, 10 Mar 2025 14:41:20 -0700 (PDT)
 Received: from LOCLAP699.locus-rst-dev-locuspark.locus ([152.193.78.90])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-476772de5absm30487841cf.66.2025.03.10.14.41.18
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-476772de5absm30487841cf.66.2025.03.10.14.41.19
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 10 Mar 2025 14:41:19 -0700 (PDT)
+        Mon, 10 Mar 2025 14:41:20 -0700 (PDT)
 From: James Prestwood <prestwoj@gmail.com>
 To: iwd@lists.linux.dev
 Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 6/8] scan: Introduce higher level scan BSS groups
-Date: Mon, 10 Mar 2025 14:40:57 -0700
-Message-Id: <20250310214059.20809-6-prestwoj@gmail.com>
+Subject: [PATCH 7/8] station: roam blacklist BSS when a roam is requested
+Date: Mon, 10 Mar 2025 14:40:58 -0700
+Message-Id: <20250310214059.20809-7-prestwoj@gmail.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20250310214059.20809-1-prestwoj@gmail.com>
 References: <20250310214059.20809-1-prestwoj@gmail.com>
@@ -74,92 +74,25 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This introduces a higher level grouping to BSS's to improve sorting
-as opposed to purely rank based sorting. The reason for this is to
-handle roam request-based blacklisting where we want to encourage
-IWD to avoid BSS's that have requested we roam elsewhere, but also
-not fully ban these BSS's (i.e. BLACKLIST_REASON_PERMANENT).
+If the BSS is requesting IWD roam elsewhere add this BSS to the
+blacklist using BLACKLIST_REASON_ROAM_REQUESTED. This will lower
+the chances of IWD roaming/connecting back to this BSS in the
+future.
 
-This new concept introduces 4 group types, in order of worse to
-best:
- - Blacklisted - the BSS has a permanent timeout blacklist
- - Under threshold - the BSS is under the set RSSI threshold
- - Above threshold - the BSS is above the set RSSI threshold
- - Optimal - The BSS is not "roam blacklisted" and is above the
-             set RSSI threshold.
-
-When sorting the BSS group will be considered before rank. This
-means we will still prefer roam blacklisted BSS's above those that
-are under the set RSSI threshold. BSS's within the same group are
-still compared by their rank/signal.
-
-The new group sorting logic was added via a macro
-__scan_bss_rank_compare. This was done since station uses a separate
-roam_bss structure to sort roam candidates which can also take
-advantage of this new sorting. The macro is agnostic to the type as
-long as the structure member names match.
+In addition we also needed to update the roam_bss sorting to use
+__scan_bss_rank_compare so we sort based on the new groupings
+rather than only rank/rssi.
 ---
- src/scan.c | 42 +++++++++++++++++++++++++++++++++++++-----
- src/scan.h | 41 +++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 78 insertions(+), 5 deletions(-)
+ src/station.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
-diff --git a/src/scan.c b/src/scan.c
-index aeab6516..2787028d 100644
---- a/src/scan.c
-+++ b/src/scan.c
-@@ -51,6 +51,7 @@
- #include "src/mpdu.h"
- #include "src/band.h"
- #include "src/scan.h"
-+#include "src/blacklist.h"
- 
- /* User configurable options */
- static double RANK_2G_FACTOR;
-@@ -58,6 +59,7 @@ static double RANK_5G_FACTOR;
- static double RANK_6G_FACTOR;
- static uint32_t RANK_HIGH_UTILIZATION;
- static uint32_t RANK_HIGH_STATION_COUNT;
-+static int RANK_OPTIMAL_SIGNAL_THRESHOLD;
- static uint32_t SCAN_MAX_INTERVAL;
- static uint32_t SCAN_INIT_INTERVAL;
- 
-@@ -1910,15 +1912,41 @@ int scan_bss_get_security(const struct scan_bss *bss, enum security *security)
- 	return 0;
- }
- 
-+/*
-+ * Evaluate the BSS's grouping based on its signal strength and blacklist
-+ * status. From best to worst the groupings are:
-+ *
-+ * Optimal: Not blacklisted in any form, and above the RSSI threshold
-+ * Above Threshold: Above the RSSI threshold (may be roam blacklisted)
-+ * Below Threshold: Below the RSSI threshold (may be roam blacklisted)
-+ * Blacklisted: Permanently blacklisted
-+ */
-+enum scan_bss_group scan_bss_evaluate_group(const uint8_t *addr,
-+						int16_t signal_strength)
-+{
-+	int rssi = signal_strength / 100;
-+
-+	if (RANK_OPTIMAL_SIGNAL_THRESHOLD == 0)
-+		return SCAN_BSS_GROUP_OPTIMAL;
-+
-+	if (blacklist_contains_bss(addr, BLACKLIST_REASON_PERMANENT))
-+		return SCAN_BSS_GROUP_BLACKLISTED;
-+
-+	if (!blacklist_contains_bss(addr, BLACKLIST_REASON_ROAM_REQUESTED) &&
-+			rssi >= RANK_OPTIMAL_SIGNAL_THRESHOLD)
-+		return SCAN_BSS_GROUP_OPTIMAL;
-+
-+	if (rssi >= RANK_OPTIMAL_SIGNAL_THRESHOLD)
-+		return SCAN_BSS_GROUP_ABOVE_THRESHOLD;
-+
-+	return SCAN_BSS_GROUP_UNDER_THRESHOLD;
-+}
-+
- int scan_bss_rank_compare(const void *a, const void *b, void *user_data)
+diff --git a/src/station.c b/src/station.c
+index d16e82af..148f628d 100644
+--- a/src/station.c
++++ b/src/station.c
+@@ -184,11 +184,7 @@ static int roam_bss_rank_compare(const void *a, const void *b, void *user_data)
  {
- 	const struct scan_bss *new_bss = a, *bss = b;
+ 	const struct roam_bss *new_bss = a, *bss = b;
  
 -	if (bss->rank == new_bss->rank)
 -		return (bss->signal_strength >
@@ -169,77 +102,18 @@ index aeab6516..2787028d 100644
 +	return __scan_bss_rank_compare(new_bss, bss);
  }
  
- static bool scan_survey_get_snr(struct scan_results *results,
-@@ -2678,6 +2706,10 @@ static int scan_init(void)
- 	if (L_WARN_ON(RANK_HIGH_STATION_COUNT > 255))
- 		RANK_HIGH_STATION_COUNT = 255;
+ struct wiphy *station_get_wiphy(struct station *station)
+@@ -3268,6 +3264,10 @@ static void station_ap_directed_roam(struct station *station,
+ 	l_timeout_remove(station->roam_trigger_timeout);
+ 	station->roam_trigger_timeout = NULL;
  
-+	if (!l_settings_get_int(config, "Rank", "OptimalSignalThreshold",
-+					&RANK_OPTIMAL_SIGNAL_THRESHOLD))
-+		RANK_OPTIMAL_SIGNAL_THRESHOLD = 0;
++	blacklist_add_bss(station->connected_bss->addr,
++				BLACKLIST_REASON_ROAM_REQUESTED);
++	station_debug_event(station, "ap-roam-blacklist-added");
 +
- 	return 0;
- }
- 
-diff --git a/src/scan.h b/src/scan.h
-index 4c1ebc21..4d06f29d 100644
---- a/src/scan.h
-+++ b/src/scan.h
-@@ -45,6 +45,17 @@ enum scan_bss_frame_type {
- 	SCAN_BSS_BEACON,
- };
- 
-+/*
-+ * Groupings for BSS's. These are assumed to be in order of preference where
-+ * the last enum is the most preferred group to connect to.
-+ */
-+enum scan_bss_group {
-+	SCAN_BSS_GROUP_BLACKLISTED,
-+	SCAN_BSS_GROUP_UNDER_THRESHOLD,
-+	SCAN_BSS_GROUP_ABOVE_THRESHOLD,
-+	SCAN_BSS_GROUP_OPTIMAL,
-+};
-+
- struct scan_bss {
- 	uint8_t addr[6];
- 	uint32_t frequency;
-@@ -168,6 +179,36 @@ bool scan_get_firmware_scan(uint64_t wdev_id, scan_notify_func_t notify,
- 				void *userdata, scan_destroy_func_t destroy);
- 
- void scan_bss_free(struct scan_bss *bss);
-+
-+enum scan_bss_group scan_bss_evaluate_group(const uint8_t *addr,
-+						int16_t signal_strength);
-+
-+/*
-+ * Macro to compare two scan_bss-like objects. This is to share code between
-+ * station.c and scan.c since station uses "roam_bss" objects which is a subset
-+ * of a scan_bss.
-+ *  - If the groups differ this is used as the comparison.
-+ *  - If the groups match, the BSS rank is used as the comparison
-+ *  - If the BSS ranks match, the signal strength is used as the comparison
-+ */
-+#define __scan_bss_rank_compare(a, b) ({			\
-+	int ret;						\
-+	enum scan_bss_group a_group = scan_bss_evaluate_group(	\
-+			(a)->addr, (a)->signal_strength);	\
-+	enum scan_bss_group b_group = scan_bss_evaluate_group(	\
-+			(b)->addr, (b)->signal_strength);	\
-+	if (b_group > a_group)					\
-+		ret = 1;					\
-+	else if (b_group < a_group)				\
-+		ret = -1;					\
-+	else if ((b)->rank == (a)->rank)			\
-+		ret = ((b)->signal_strength > 			\
-+				(a)->signal_strength) ? 1 : -1;	\
-+	else							\
-+		ret = ((b)->rank > (a)->rank) ? 1 : -1;		\
-+	ret;							\
-+})
-+
- int scan_bss_rank_compare(const void *a, const void *b, void *user);
- 
- int scan_bss_get_rsn_info(const struct scan_bss *bss, struct ie_rsn_info *info);
+ 	if (req_mode & WNM_REQUEST_MODE_PREFERRED_CANDIDATE_LIST) {
+ 		l_debug("roam: AP sent a preferred candidate list");
+ 		station_neighbor_report_cb(station->netdev, 0, body + pos,
 -- 
 2.34.1
 
