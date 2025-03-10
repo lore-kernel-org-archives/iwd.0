@@ -1,68 +1,68 @@
-Received: from mail-qt1-f171.google.com (mail-qt1-f171.google.com [209.85.160.171])
+Received: from mail-qt1-f176.google.com (mail-qt1-f176.google.com [209.85.160.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31FEE1E25F9
-	for <iwd@lists.linux.dev>; Mon, 10 Mar 2025 21:41:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E6991E32A2
+	for <iwd@lists.linux.dev>; Mon, 10 Mar 2025 21:41:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741642880; cv=none; b=f/NiJvJetaBDKGpYi+qtgRiMW1ep5bYIGS4oAodrJWLV9Uai5Hh7DWCVKjE1Msy2cbQYo7eTmpPL0L+dLEJwxoZPgzeLVfJ8un3hP769Ozi5WXFTyiefoM4G8iA6tHOrzzL2PGFS4LizMfpx3QCCFhdko9s3WEhoMFUWJh5K/Zk=
+	t=1741642881; cv=none; b=PxFuGFB7Z513Lpf/FiCQgmEFuMwyS5ZBNV2NKao4iXjnEUeSj85MdyZ+F6eX2ou7PRgM6zCZEX9zNERVe6IxFvhK0Vhub6pNPqkAui5KzW/LTIF5EgpBlap3Ics8yAtkyrQoxsrnu6uaq/1RTjD6n+H/rWRUu8QgN3AX71bvAzQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741642880; c=relaxed/simple;
-	bh=6Fp8R4Qw0nOtNEgD63cJHCtZcpKImAfVM8JPMBCUgTg=;
+	s=arc-20240116; t=1741642881; c=relaxed/simple;
+	bh=o2x0Ur23K6ROQ9Ffza91iYrSRrhVZcbPnX3Xljp+LA0=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=NkkKgFDIoC6kfOPIOGllmZgVtUlQMmyCFDW0gOasoTv1tcigqdxbZZsB+2qYfRTpCbUiDtglKNGd2QSkvAVqEOX+etcPQkoQnZfWFf10gRwUnQtL32xWLk/WFjOzvca4JG/ryi4GgkxrOGbuLXZU5ZAAcB+O/ux/t5TapLzHsV8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UI0UJXR1; arc=none smtp.client-ip=209.85.160.171
+	 MIME-Version; b=THlHs9xJSHTUML9qVnP1IXZrgQ7j0DqaaslAW58MQqljnvbTfoJNQrarH7tBQmTmJQKk0lXTvUPygOn2O5FdB2sk1hx3Ark5T8gOfSqt+VfaDUhDP9GsNALWwKPRzwIGmY299xo64/vwSMJyHZCXgboGysQh1HgFdtGt7r7CAoc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=N8Km8xLk; arc=none smtp.client-ip=209.85.160.176
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UI0UJXR1"
-Received: by mail-qt1-f171.google.com with SMTP id d75a77b69052e-46c8474d8f6so38241011cf.3
-        for <iwd@lists.linux.dev>; Mon, 10 Mar 2025 14:41:17 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="N8Km8xLk"
+Received: by mail-qt1-f176.google.com with SMTP id d75a77b69052e-47690a4ec97so11388531cf.2
+        for <iwd@lists.linux.dev>; Mon, 10 Mar 2025 14:41:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1741642877; x=1742247677; darn=lists.linux.dev;
+        d=gmail.com; s=20230601; t=1741642878; x=1742247678; darn=lists.linux.dev;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=2A1lLqRFKn/6XH8pCFXenZs6pITaQh0n3lF9tO6nvOU=;
-        b=UI0UJXR1y/B84fflf693PcFr3QFucxDfFRC4g30pJPxD0awDt3HtJSNaIk9IbHJ4S8
-         KSxGXbxVzF1BHZ4dG2x6X66BMkDpbEzsdUdzwkNfV0cCzttQ3cE5TrNuCjp+4U9k7emb
-         iMTaH8PuZRD9W39uhkWlfocir6/adWyOR6sk+s/aojh5Sw83b9/GVhhhJIAX1vI4H+8y
-         2pARp5DEZNk6PzN+brpRpghOnvyaWh2Syqey/F0SPLX08IpUFmMGF1z/DEc/AiAqyHNs
-         pc9ce1dYmMQ+6m6JF9tkeUXoZWqAoM7KWXipp7foJl1Di5GQHyoSUKyWv9TBwCsgqd3p
-         MSKQ==
+        bh=fvVT/A/3zKMBlutOB57nnV1meZrYFUQH+dqnTWyCI6g=;
+        b=N8Km8xLkvm8MmQKvQS8rkT3OyguCbn5m0JpvXe3jqLKqlTSDXJdSkFToGeTliTXyNf
+         gR1wka0dZwyh/sp69Fau/R53ZaIuKmWsj+Z6p1zM2rIVlNFrpSt0GY+Iwt8Jo4Ia14tZ
+         Pe5xkJevTNSOBzSLlRdhnJEwOZvYzzW6pNKWIl3jhdxvQhmJhE0NX0u2qiAOjMu7R+l8
+         jpLLR40Okj4vSmg43FhiKpffL6iFR0XK2xHZUTpEr6Wmc6Vbq9hj10eVlh7Yigh6nGF5
+         nByq4dBUe5rWvpxe5cP+BTasrjb6dV9yEcz2iFUozWsNchCgNEgvIt1C1R+YijLBZfLj
+         soAg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741642877; x=1742247677;
+        d=1e100.net; s=20230601; t=1741642878; x=1742247678;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=2A1lLqRFKn/6XH8pCFXenZs6pITaQh0n3lF9tO6nvOU=;
-        b=psad4F26uwrtCzStAEfxe2pQtfErOyPqk+IugyYl4Bg0x+FaoKEdnBRazaF2HRgpSH
-         vzVYE+Py4yreIGEbtXLjKNTKJKbxs32vdZNwmYL5NRmbHhuQNRYG29jhwutxX3nfWr8o
-         HVTfHt/jjBW+ffTabWcM1S2Bt58R8nWTwV2kTQBPMHS01GYQu2Fw9kN0x8d5cVuZYPLg
-         P878/uKFC0CJfJQM9tJSUSIsUt6bgpkjkHkp/RfPiTQTjdtUmbkyP16Ca7s6uEeFmwFs
-         23/YiuGVfDKhw15O6tkmA756Pkt2m7KQUw10t2GRIOkZIogpSNJ/L0hfIgaymBAEo9JY
-         E/9Q==
-X-Gm-Message-State: AOJu0Ywn7UfsfGc5VnqYPVI8tZ8viP+dYQRwt47w0oHNeDv512E/hg5U
-	z5w3VPXrl5RPtzLbx083z/uzOWpAtqscB76wQr54eu5zKKXx3/zIuRTfXw==
-X-Gm-Gg: ASbGnctTu4KSUFTgkkkkhR3mBmae4P+tvyqnfdiWFtQLELR+ZhNgyUua5lO38uPCyJI
-	NwdKqxBSyJC7yjyPAmNav1qVSkJMq6QVFuub/7JEfova8z7XyPuhLiwZpZfKDSYxd3qMLl59lVd
-	6zINR5N+YSwTyPF4BVOpzQf9dnZVphIi2c81Kl9nDOgmW9dWVZcchcwdnCp2MZ8w/1bEqMBFGei
-	wCOZR5GUX+fdkbq3kASFzAnWa/Ki2WBMuCbrmjUWD2BviqrEucvwagAgQWX0CXvyNfgBt7Nd0KZ
-	kUMxoVhkynqwYNgsTCV7S3RAvvtieSHHldwCjJEMdQJWEPQrL1AlqLHTwf1QE7uLHikIz/7ox+n
-	5C1k=
-X-Google-Smtp-Source: AGHT+IFT/14+yvSwIjXHlEvFDsXexacsboGf7oIx6LPzvhqJ5wsHmOKWsjK5L9Kgv49OSM2G/PgJAQ==
-X-Received: by 2002:ac8:7d16:0:b0:476:671e:deb6 with SMTP id d75a77b69052e-476994c5f5fmr15957041cf.12.1741642876770;
-        Mon, 10 Mar 2025 14:41:16 -0700 (PDT)
+        bh=fvVT/A/3zKMBlutOB57nnV1meZrYFUQH+dqnTWyCI6g=;
+        b=NvtUptNbKMXq/vktoYNa1PUc2Q83EO6DKgoRPdN/fR0lWf9xYTmHTzmEU8OSerYRkF
+         Le/XiK3nU9wX/herCEtQ6TZyKeyPxnDK0N7AqFAJzN6Pi0nOUGqI/vpqzC1JHhr/O3WF
+         22lXKkzkcXPRDNzGC6rYBYFPl1rXMk2HSo7tOld6noSj2vK06ifiRs41OeaVhX2LBwZM
+         30XYrZImTvZh5MHb2I+ZpinaB1OQ90zJekKcE5LojsEGGxE3Iy6k5OJOyJbR8e9I3M/w
+         NrJswKSDPKElLP2pGRvjsxe4RO2am/Ttc9/U6WoRncuyespBdn3a8+Du0lFbFH4TpX8W
+         sUGA==
+X-Gm-Message-State: AOJu0YzmZdob8gSb/PlS0tF2j/SZtzFjRcdx/vPJBWv0sJs7uYkwYPaU
+	rCvJqIMX/FNiiSBFl9dR70fT6VnT6UqqY3lBeTrT/Us+7w++QSOv15p1/A==
+X-Gm-Gg: ASbGnctd6R2SnvSneoaLACrCd5+krZTzwIRm0n2ufVKRRLJwOEnX2K44PiJefG95oY+
+	Wuza7qFnymzYgVjPVkuHpj4hWMN3CERRRGoTtLUwzYKh+5WakebUoixAhNlDjQRsoe662XdUp49
+	ItklIzQmMzs8uiTbAenuc8ivPZWCYQnkQmJzNPzZdqsr/xn1oKJChAsjOE8NCmjdxASY0bFb25s
+	YecJg6SEd6y93m6qI3QkpDgEVoP27xdve3qSvTXeL/YgNtVE99SYCyeKhRYTylf69q2Nxk7BksF
+	npfB3zvQdk0hsDhkou6PtwKXOfnVtm8nADZVchNS54kDtRl5JbcKCiUHt5ky/AHzWmasTOqFCs0
+	3KUA=
+X-Google-Smtp-Source: AGHT+IFaEYJLxlso9jEsUmS2pzPavpJtAdxdJ5x3LmYl+x+JZxJojNC3xnbtL8CD/phgJj53W+qLAA==
+X-Received: by 2002:a05:622a:111:b0:476:8ee8:d8a1 with SMTP id d75a77b69052e-4769964b5d5mr16111591cf.45.1741642878097;
+        Mon, 10 Mar 2025 14:41:18 -0700 (PDT)
 Received: from LOCLAP699.locus-rst-dev-locuspark.locus ([152.193.78.90])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-476772de5absm30487841cf.66.2025.03.10.14.41.15
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-476772de5absm30487841cf.66.2025.03.10.14.41.16
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 10 Mar 2025 14:41:16 -0700 (PDT)
+        Mon, 10 Mar 2025 14:41:17 -0700 (PDT)
 From: James Prestwood <prestwoj@gmail.com>
 To: iwd@lists.linux.dev
 Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 4/8] network: update to use blacklist's new temporary type
-Date: Mon, 10 Mar 2025 14:40:55 -0700
-Message-Id: <20250310214059.20809-4-prestwoj@gmail.com>
+Subject: [PATCH 5/8] blacklist: add new blacklist reason, ROAM_REQUESTED
+Date: Mon, 10 Mar 2025 14:40:56 -0700
+Message-Id: <20250310214059.20809-5-prestwoj@gmail.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20250310214059.20809-1-prestwoj@gmail.com>
 References: <20250310214059.20809-1-prestwoj@gmail.com>
@@ -74,154 +74,75 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Remove the temporary blacklist from network.c and use the new
-BLACKLIST_REASON_TEMPORARY type.
+This adds a new blacklist reason as well as an option to configure
+the timeout. This blacklist reason will be used in cases where a
+BSS has requested IWD roam elsewhere. At that time a new blacklist
+entry will be added which will be used along with some other criteria
+to determine if IWD should connect/roam to that BSS again.
 ---
- src/network.c | 34 +++++++++++++++++-----------------
- src/network.h |  2 --
- src/station.c |  8 ++++----
- 3 files changed, 21 insertions(+), 23 deletions(-)
+ src/blacklist.c | 16 ++++++++++++++++
+ src/blacklist.h |  7 +++++++
+ 2 files changed, 23 insertions(+)
 
-diff --git a/src/network.c b/src/network.c
-index 92b44ed3..b48eaa51 100644
---- a/src/network.c
-+++ b/src/network.c
-@@ -78,7 +78,6 @@ struct network {
- 	struct l_queue *bss_list;
- 	struct l_settings *settings;
- 	struct l_queue *secrets;
--	struct l_queue *blacklist; /* temporary blacklist for BSS's */
- 	uint8_t hessid[6];
- 	char **nai_realms;
- 	uint8_t *rc_ie;
-@@ -168,6 +167,18 @@ static bool network_secret_check_cacheable(void *data, void *user_data)
- 	return false;
- }
+diff --git a/src/blacklist.c b/src/blacklist.c
+index eef3f730..178cb41c 100644
+--- a/src/blacklist.c
++++ b/src/blacklist.c
+@@ -45,6 +45,7 @@
  
-+static void remove_temporary_blacklist(void *user_data)
-+{
-+	struct scan_bss *bss = user_data;
+ static uint64_t blacklist_multiplier;
+ static uint64_t blacklist_initial_timeout;
++static uint64_t blacklist_roam_initial_timeout;
+ static uint64_t blacklist_max_timeout;
+ 
+ struct blacklist_entry {
+@@ -86,6 +87,13 @@ static struct blacklist_entry *blacklist_entry_new(const uint8_t *addr,
+ 		added = 0;
+ 		expires = 0;
+ 		break;
++	case BLACKLIST_REASON_ROAM_REQUESTED:
++		if (!blacklist_roam_initial_timeout)
++			return NULL;
 +
-+	blacklist_remove_bss(bss->addr, BLACKLIST_REASON_TEMPORARY);
-+}
++		added = l_time_now();
++		expires = l_time_offset(added, blacklist_roam_initial_timeout);
++		break;
+ 	default:
+ 		l_warn("Unhandled blacklist reason: %u", reason);
+ 		return NULL;
+@@ -211,6 +219,14 @@ static int blacklist_init(void)
+ 	/* For easier user configuration the timeout values are in seconds */
+ 	blacklist_initial_timeout *= L_USEC_PER_SEC;
+ 
++	if (!l_settings_get_uint64(config, "Blacklist",
++					"InitialRoamRequestedTimeout",
++					&blacklist_roam_initial_timeout))
++		blacklist_roam_initial_timeout = BLACKLIST_DEFAULT_TIMEOUT;
 +
-+static void remove_blacklist_foreach(void *data, void *user_data)
-+{
-+	remove_temporary_blacklist(data);
-+}
++	/* For easier user configuration the timeout values are in seconds */
++	blacklist_roam_initial_timeout *= L_USEC_PER_SEC;
 +
- void network_connected(struct network *network)
- {
- 	enum security security = network_get_security(network);
-@@ -198,7 +209,7 @@ void network_connected(struct network *network)
- 	l_queue_foreach_remove(network->secrets,
- 				network_secret_check_cacheable, network);
- 
--	l_queue_clear(network->blacklist, NULL);
-+	l_queue_foreach(network->bss_list, remove_blacklist_foreach, NULL);
- 
- 	network->provisioning_hidden = false;
- }
-@@ -207,7 +218,7 @@ void network_disconnected(struct network *network)
- {
- 	network_settings_close(network);
- 
--	l_queue_clear(network->blacklist, NULL);
-+	l_queue_foreach(network->bss_list, remove_blacklist_foreach, NULL);
- 
- 	if (network->provisioning_hidden)
- 		station_hide_network(network->station, network);
-@@ -254,7 +265,6 @@ struct network *network_create(struct station *station, const char *ssid,
- 	}
- 
- 	network->bss_list = l_queue_new();
--	network->blacklist = l_queue_new();
- 
- 	return network;
- }
-@@ -1197,11 +1207,6 @@ struct scan_bss *network_bss_find_by_addr(struct network *network,
- 	return l_queue_find(network->bss_list, match_addr, addr);
- }
- 
--static bool match_bss(const void *a, const void *b)
--{
--	return a == b;
--}
--
- struct erp_cache_entry *network_get_erp_cache(struct network *network)
- {
- 	struct erp_cache_entry *cache;
-@@ -1277,7 +1282,8 @@ struct scan_bss *network_bss_select(struct network *network,
- 			candidate = bss;
- 
- 		/* check if temporarily blacklisted */
--		if (l_queue_find(network->blacklist, match_bss, bss))
-+		if (blacklist_contains_bss(bss->addr,
-+						BLACKLIST_REASON_TEMPORARY))
- 			continue;
- 
- 		if (blacklist_contains_bss(bss->addr,
-@@ -1784,11 +1790,6 @@ struct l_dbus_message *network_connect_new_hidden_network(
- 	return dbus_error_not_supported(message);
- }
- 
--void network_blacklist_add(struct network *network, struct scan_bss *bss)
--{
--	l_queue_push_head(network->blacklist, bss);
--}
--
- static bool network_property_get_name(struct l_dbus *dbus,
- 					struct l_dbus_message *message,
- 					struct l_dbus_message_builder *builder,
-@@ -1934,8 +1935,7 @@ void network_remove(struct network *network, int reason)
- 	if (network->info)
- 		network->info->seen_count -= 1;
- 
--	l_queue_destroy(network->bss_list, NULL);
--	l_queue_destroy(network->blacklist, NULL);
-+	l_queue_destroy(network->bss_list, remove_temporary_blacklist);
- 
- 	if (network->nai_realms)
- 		l_strv_free(network->nai_realms);
-diff --git a/src/network.h b/src/network.h
-index 849051dd..1e01de88 100644
---- a/src/network.h
-+++ b/src/network.h
-@@ -95,8 +95,6 @@ struct l_dbus_message *network_connect_new_hidden_network(
- 						struct network *network,
- 						struct l_dbus_message *message);
- 
--void network_blacklist_add(struct network *network, struct scan_bss *bss);
--
- struct erp_cache_entry *network_get_erp_cache(struct network *network);
- 
- const struct l_queue_entry *network_bss_list_get_entries(
-diff --git a/src/station.c b/src/station.c
-index fab37478..d16e82af 100644
---- a/src/station.c
-+++ b/src/station.c
-@@ -3462,8 +3462,8 @@ static bool station_retry_with_status(struct station *station,
- 	 *       obtain that IE, but this should be done in the future.
+ 	if (!l_settings_get_uint64(config, "Blacklist",
+ 					"Multiplier",
+ 					&blacklist_multiplier))
+diff --git a/src/blacklist.h b/src/blacklist.h
+index 6ce26aba..ec4c6de3 100644
+--- a/src/blacklist.h
++++ b/src/blacklist.h
+@@ -33,6 +33,13 @@ enum blacklist_reason {
+ 	 * appropriate (after a connection/disconnection)
  	 */
- 	if (IS_TEMPORARY_STATUS(status_code))
--		network_blacklist_add(station->connected_network,
--						station->connected_bss);
-+		blacklist_add_bss(station->connected_bss->addr,
-+					BLACKLIST_REASON_TEMPORARY);
- 	else if (!station_pmksa_fallback(station, status_code))
- 		blacklist_add_bss(station->connected_bss->addr,
- 					BLACKLIST_REASON_PERMANENT);
-@@ -3562,8 +3562,8 @@ static void station_connect_cb(struct netdev *netdev, enum netdev_result result,
- 		iwd_notice(IWD_NOTICE_DISCONNECT_INFO, "reason: %u", reason);
+ 	BLACKLIST_REASON_TEMPORARY,
++	/*
++	 * This type of blacklist is added when a BSS requests IWD roams
++	 * elsewhere. This is to aid in preventing IWD from roaming/connecting
++	 * back to that BSS in the future unless there are no other "good"
++	 * candidates to connect to.
++	 */
++	BLACKLIST_REASON_ROAM_REQUESTED,
+ };
  
- 		/* Disconnected while connecting */
--		network_blacklist_add(station->connected_network,
--						station->connected_bss);
-+		blacklist_add_bss(station->connected_bss->addr,
-+					BLACKLIST_REASON_TEMPORARY);
- 		if (station_try_next_bss(station))
- 			return;
- 
+ void blacklist_add_bss(const uint8_t *addr, enum blacklist_reason reason);
 -- 
 2.34.1
 
