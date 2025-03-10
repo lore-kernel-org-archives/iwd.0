@@ -1,68 +1,68 @@
-Received: from mail-qt1-f173.google.com (mail-qt1-f173.google.com [209.85.160.173])
+Received: from mail-qt1-f182.google.com (mail-qt1-f182.google.com [209.85.160.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 302701E1C22
-	for <iwd@lists.linux.dev>; Mon, 10 Mar 2025 21:41:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D48D1E25E1
+	for <iwd@lists.linux.dev>; Mon, 10 Mar 2025 21:41:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741642883; cv=none; b=bWoNiRCCwnn92jshqMnxvrcl/yQ08plbJ37Ew16cJuVI2XL6/n5GCO484gNVaetsc1Fte6tpLmGdzP3UHLFAjrLuxgaUC4E/3SQ4oBpQ1iZJ69mHYNRR5hsXUHRlwGFt+1je9QG2/sv12cgkqQwB9HID47gWFDzZywIg1xMvR1g=
+	t=1741642885; cv=none; b=cpo3y4LYj6U7fkCLg1TTMVLLMkYS3CZ570ZntmdEKk85u2H2Xut78VQoYuVdC9qgReXTzSsAiZOOloiC2n1fVznb/DB6c9Sc0CQciORL359KNy1ODSqBBk3NHvO+u1NgbYcjgFKka7/tl0DlHYVMRglIPgDMKqow3tq+ZZmUMZE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741642883; c=relaxed/simple;
-	bh=4TBFHLx0v9So0GhoPkfflUk012Gl9dxE7gC31FrKIxE=;
+	s=arc-20240116; t=1741642885; c=relaxed/simple;
+	bh=DgQz+47eb6MRzQ7XuoYC13sW2oZDH0N7tu4Ow/4BwwQ=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=a8ALeO2zflhUSqy5P018WUEd4nlNv4+ezSiNZBM5z0FuazpE2QQpZMuw6R9JucaIaFLiG9sPbajaWZTdBnSvaE5HcwHtSbaEYWK7SXmVogz3Asu/ckrNoEmpOhkWpGjI835APyz+hFiF9H+pZKZRMFROaQEubtsjRWbvNom+Lvc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OsGYtbz+; arc=none smtp.client-ip=209.85.160.173
+	 MIME-Version; b=EYA+R2/KtVGX4uTpPj+o+JIQb5JBlxnGmKcb2WYLHWImTsSRdzVHj9ZA/pYEdvwekHj9h72fLII+XGVCc8DwtfjKogmosk322GU5V6m4jiQ4z3Zb+90tx8EmmBLMRjFD2/Bc9+0mqNZ/IwOlvuTZhKqGietsjqOLCH3LDbqlDqw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=F1Cu1Dtn; arc=none smtp.client-ip=209.85.160.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OsGYtbz+"
-Received: by mail-qt1-f173.google.com with SMTP id d75a77b69052e-476805acddaso18674161cf.1
-        for <iwd@lists.linux.dev>; Mon, 10 Mar 2025 14:41:21 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="F1Cu1Dtn"
+Received: by mail-qt1-f182.google.com with SMTP id d75a77b69052e-474f836eb4cso36401811cf.3
+        for <iwd@lists.linux.dev>; Mon, 10 Mar 2025 14:41:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1741642881; x=1742247681; darn=lists.linux.dev;
+        d=gmail.com; s=20230601; t=1741642882; x=1742247682; darn=lists.linux.dev;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=7Rs7qaDSYgYJxxnp510WgMdJS5hCD84nfpzE8QkJJCU=;
-        b=OsGYtbz+d/amPxtwi01xo1QeIvJOrNx41JEb2aISJ7KYlUT5CCKPNlA17BWbTfj7Eq
-         oriejvVkpo+fKVEWwlGfqm1d2X2JQOHDegXTVp2xugrMGaSTcfmhbi98djOeaRcNK1hE
-         MathlGKDLviiXL5seMVneOMDdwXqNGQJ21VpXGJMjhsQ8uPBOi8DVi5xTtGPhZflyNu5
-         H+2jicIpVeU9YSBN8FPFUvbLphtHGFZROl3yNG1myYqpC0RKfBG0qF7bNCKcZejVOkwa
-         0EimH25dHuw6kYZjpolRPdEtGSOlVXaPLfSM1nfSoQuUuXVjhCS8HJ8NkH7n0axED47e
-         Iv6Q==
+        bh=fYoe+3H8/5yAERsOoYL6MzUOf1VoKgTy+zK3fCZIX1M=;
+        b=F1Cu1DtnVFCDlO5KpekVjuWthS8VMxkDV4oXDV4Yer3RKasOeJqCrBNU/LNczUR94e
+         azAmnNxjii/9ZkQMN+ltTtjBGAPPPy2T93QoFxWcb+6KCKpumNyoO25AeNC7OP7nEYoW
+         7uOsHfDAWvw+JtgN2tprY+Jm5vTbFwSwLChE5F+hVjz7mAJTGDdifAOij77s3GULF3IE
+         FwUyGw8e85IQkhX/a1JQOtqxpElIzIkXmAhisyfzczgLQH3Ay+4re+tQ9exctwo0a5gX
+         uxa3vLhF1l5gsl1zhBa9UbGh9FWlxpUxYVcmiYYf37xFYD23T+D9Bx2FxAZk7EUhxBR5
+         roAg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741642881; x=1742247681;
+        d=1e100.net; s=20230601; t=1741642882; x=1742247682;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=7Rs7qaDSYgYJxxnp510WgMdJS5hCD84nfpzE8QkJJCU=;
-        b=thFdNh1kcMdevi4/+neRhe3eDguibgbVONGifh8bOt/21zA8eF1CrF/Nx8Sc1hZunO
-         kdkj0YHNPav/FbsjKuo8eX9WEzcMHZl/bLaAdO/fvV4uy7EeecVySZ/R3Bjzfol/aCxC
-         m8xIeWL3ZhQeTKrvUezh55zYCVR2vgQ6FeAcDxxFx7WamY6j9+1vSmKw+54BYWzDTA5M
-         pN3kTgTeUpak/JuAMDATHks48ilRJhbyfhHpzoKLpmY8GKvq6y30GqQwE3frEMazF/GY
-         +xQsADBdDJUtr18ICOXWmLkW0XLrfZg4OLptOFnLZMyZ2p0dW9GR6wKAIoDlEB/l1hl0
-         Y5EA==
-X-Gm-Message-State: AOJu0YzY5SS71OwN84jnngmn+Gt24o+B124RhCiuS6aL7IpWWIqRrGlt
-	2VEutKGpib5Wihjl444rEctyb8xoxcVzAtdkXZCUDOGGDDmFkDGfZ4wtmw==
-X-Gm-Gg: ASbGnctMvkWH0ZygbQn6kxRC+NoVCND75yG9H7yjhufZdZNEI0zZ+j3dKxHnVeN7hsh
-	7JZsgTMlzErXSU3F7lu/f2Fjc4j53t9yBwUb7x5SnCmSleje3exCPe/vA73cx4Ukt6vugfLKCa+
-	kC8zXmHOZmWk8UNjCfaPBlyBjYi72EY4cO8ocXbihCP6XWZgjg0v5SB0OaB/jDNvsaBJWa4i+1u
-	LDkYQ6V4Q7m1tklIKQz0ZgWviL+d+PPNmZNqBOZlbmYEl8kzrp80xmC9AWWXQ+VnEGvX5IOC5B7
-	iobtI27Lg+ta1Put9fb3OIRktUtihJUw+bB27OrHiNmsusiZKD6mA26p7HdU/ea9CmYHRoaU0nF
-	sosI=
-X-Google-Smtp-Source: AGHT+IErWfCdyWJzznKNqyfiyo9BhMFI/d++hueh9xDLKCra6rAHpjGaNu82gOQ/K9EeMcUYj8D5CQ==
-X-Received: by 2002:ac8:7f4f:0:b0:476:8f75:b885 with SMTP id d75a77b69052e-4768f75d1efmr70761181cf.44.1741642880816;
-        Mon, 10 Mar 2025 14:41:20 -0700 (PDT)
+        bh=fYoe+3H8/5yAERsOoYL6MzUOf1VoKgTy+zK3fCZIX1M=;
+        b=LktTAxWDM08iO0fcy2S4d1WvwQCa1cpYZlb0o2ViSDAOxSrkhOtJa7RtOrUeaYCpvH
+         0Ep3qjnzNuiZZEAPbHMHwRu1fwwGllBgSu4sIjp6t+AXKNmn6V1Z/yRnL7qMqEHlNuvN
+         kUM/3VD4oetWZKC+uHGqUGnIrRPWVdsphmZ+1zemuAfbMmoaB8EXAmUiIAL7Tqwboz22
+         zrBET2FdyDi0pveL7ykP/LiB7TO750JZgF2Wzc2ouJvA2wzb3Zl7aiiy4qz1Q0w0HG2u
+         HlQyztqMUswmG84EujUbi7nl1B+5j9xxdqyS1mQIbDmKh6NHEscDfJ/iANtAi8xk5Bb9
+         BxTw==
+X-Gm-Message-State: AOJu0Yw1gx5028770QVZgHAeji7tsF+kJDavyliitLBiA62yiOHONWA2
+	jUfKqHmSWHAKvKYv1CFQ1+SpMzbI2n812YAGtZ+ncM42k4JjmXdmgdjQjA==
+X-Gm-Gg: ASbGncsohRw2a915LWRTrxJnBfmKlH3PKPNBLY7Z9gpTZHXigjqW1olgP2v5niu9sN7
+	482xtadYJpm9+j88VmJeLmX/IW3k0dOmBudrojCTIzEXQ6nzr5G3Q3MIO6S1z4daJDpNZVWvB31
+	SByK+ogHqM52THfIyQrnWZRYyGv8p1pAHiDlBzL0GMZJVjdCv2/59fLDGtPLWLBxMLRTLhfGSwY
+	pBrgrTbmqTF88rJ4Gk2F9rBN0sqb6I5TO9bi2M8H1Uzqs6aiuAKlcoQbegCwDvUvzvxti3nuwCn
+	vYJ0pFL+t9QhndlOsgGlDZAHfmpRnPd75IoYa5LAbnQV4xYUq80f13743GJL+xeWOFBdgNdOw0z
+	42Ro=
+X-Google-Smtp-Source: AGHT+IFuJ3cK49a0/GQSi5nIz7UK9aUK1Jk9p+sPZBmnfD1tbB96jo8GqNfDDkJDINNn67Io3uj1VA==
+X-Received: by 2002:a05:622a:1993:b0:472:12f1:ba4a with SMTP id d75a77b69052e-4761095065emr249644531cf.4.1741642882209;
+        Mon, 10 Mar 2025 14:41:22 -0700 (PDT)
 Received: from LOCLAP699.locus-rst-dev-locuspark.locus ([152.193.78.90])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-476772de5absm30487841cf.66.2025.03.10.14.41.19
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-476772de5absm30487841cf.66.2025.03.10.14.41.20
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 10 Mar 2025 14:41:20 -0700 (PDT)
+        Mon, 10 Mar 2025 14:41:21 -0700 (PDT)
 From: James Prestwood <prestwoj@gmail.com>
 To: iwd@lists.linux.dev
 Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 7/8] station: roam blacklist BSS when a roam is requested
-Date: Mon, 10 Mar 2025 14:40:58 -0700
-Message-Id: <20250310214059.20809-7-prestwoj@gmail.com>
+Subject: [PATCH 8/8] auto-t: add test for AP roam blacklisting
+Date: Mon, 10 Mar 2025 14:40:59 -0700
+Message-Id: <20250310214059.20809-8-prestwoj@gmail.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20250310214059.20809-1-prestwoj@gmail.com>
 References: <20250310214059.20809-1-prestwoj@gmail.com>
@@ -74,46 +74,211 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-If the BSS is requesting IWD roam elsewhere add this BSS to the
-blacklist using BLACKLIST_REASON_ROAM_REQUESTED. This will lower
-the chances of IWD roaming/connecting back to this BSS in the
-future.
-
-In addition we also needed to update the roam_bss sorting to use
-__scan_bss_rank_compare so we sort based on the new groupings
-rather than only rank/rssi.
 ---
- src/station.c | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+ autotests/testAPRoam/connection_test.py     |   2 +-
+ autotests/testAPRoam/hw.conf                |   2 +
+ autotests/testAPRoam/main.conf              |   5 +
+ autotests/testAPRoam/roam_blacklist_test.py | 154 ++++++++++++++++++++
+ 4 files changed, 162 insertions(+), 1 deletion(-)
+ create mode 100644 autotests/testAPRoam/main.conf
+ create mode 100644 autotests/testAPRoam/roam_blacklist_test.py
 
-diff --git a/src/station.c b/src/station.c
-index d16e82af..148f628d 100644
---- a/src/station.c
-+++ b/src/station.c
-@@ -184,11 +184,7 @@ static int roam_bss_rank_compare(const void *a, const void *b, void *user_data)
- {
- 	const struct roam_bss *new_bss = a, *bss = b;
+diff --git a/autotests/testAPRoam/connection_test.py b/autotests/testAPRoam/connection_test.py
+index a419f4aa..9d17ca87 100644
+--- a/autotests/testAPRoam/connection_test.py
++++ b/autotests/testAPRoam/connection_test.py
+@@ -13,7 +13,7 @@ from hostapd import HostapdCLI
+ class Test(unittest.TestCase):
  
--	if (bss->rank == new_bss->rank)
--		return (bss->signal_strength >
--					new_bss->signal_strength) ? 1 : -1;
--
--	return (bss->rank > new_bss->rank) ? 1 : -1;
-+	return __scan_bss_rank_compare(new_bss, bss);
- }
+     def validate(self, expect_roam=True):
+-        wd = IWD()
++        wd = IWD(True)
  
- struct wiphy *station_get_wiphy(struct station *station)
-@@ -3268,6 +3264,10 @@ static void station_ap_directed_roam(struct station *station,
- 	l_timeout_remove(station->roam_trigger_timeout);
- 	station->roam_trigger_timeout = NULL;
+         devices = wd.list_devices(1)
+         device = devices[0]
+diff --git a/autotests/testAPRoam/hw.conf b/autotests/testAPRoam/hw.conf
+index 00a31063..46b1d4a8 100644
+--- a/autotests/testAPRoam/hw.conf
++++ b/autotests/testAPRoam/hw.conf
+@@ -1,5 +1,7 @@
+ [SETUP]
+ num_radios=4
++hwsim_medium=true
++start_iwd=false
  
-+	blacklist_add_bss(station->connected_bss->addr,
-+				BLACKLIST_REASON_ROAM_REQUESTED);
-+	station_debug_event(station, "ap-roam-blacklist-added");
+ [HOSTAPD]
+ rad0=ssid1.conf
+diff --git a/autotests/testAPRoam/main.conf b/autotests/testAPRoam/main.conf
+new file mode 100644
+index 00000000..9c9fb994
+--- /dev/null
++++ b/autotests/testAPRoam/main.conf
+@@ -0,0 +1,5 @@
++[Rank]
++OptimalSignalThreshold=-72
 +
- 	if (req_mode & WNM_REQUEST_MODE_PREFERRED_CANDIDATE_LIST) {
- 		l_debug("roam: AP sent a preferred candidate list");
- 		station_neighbor_report_cb(station->netdev, 0, body + pos,
++[Blacklist]
++InitialRoamRequestedTimeout=20
+diff --git a/autotests/testAPRoam/roam_blacklist_test.py b/autotests/testAPRoam/roam_blacklist_test.py
+new file mode 100644
+index 00000000..259f6aa5
+--- /dev/null
++++ b/autotests/testAPRoam/roam_blacklist_test.py
+@@ -0,0 +1,154 @@
++#!/usr/bin/python3
++
++import unittest
++import sys
++
++sys.path.append('../util')
++import iwd
++from iwd import IWD
++from iwd import NetworkType
++
++from hostapd import HostapdCLI
++from hwsim import Hwsim
++
++class Test(unittest.TestCase):
++    def validate_connected(self, hostapd):
++        ordered_network = self.device.get_ordered_network('TestAPRoam')
++
++        self.assertEqual(ordered_network.type, NetworkType.psk)
++
++        condition = 'not obj.connected'
++        self.wd.wait_for_object_condition(ordered_network.network_object, condition)
++
++        self.device.connect_bssid(hostapd.bssid)
++
++        condition = 'obj.state == DeviceState.connected'
++        self.wd.wait_for_object_condition(self.device, condition)
++
++        hostapd.wait_for_event('AP-STA-CONNECTED')
++
++    def validate_ap_roamed(self, from_hostapd, to_hostapd):
++        from_hostapd.send_bss_transition(
++            self.device.address, self.neighbor_list, disassoc_imminent=True
++        )
++
++        from_condition = 'obj.state == DeviceState.roaming'
++        to_condition = 'obj.state == DeviceState.connected'
++        self.wd.wait_for_object_change(self.device, from_condition, to_condition)
++
++        to_hostapd.wait_for_event('AP-STA-CONNECTED %s' % self.device.address)
++
++        self.device.wait_for_event("ap-roam-blacklist-added")
++
++    def test_roam_to_optimal_candidates(self):
++        # In this test IWD will naturally transition down the list after each
++        # BSS gets roam blacklisted. All BSS's are above the RSSI thresholds.
++        self.rule_ssid1.signal = -5000
++        self.rule_ssid2.signal = -6500
++        self.rule_ssid3.signal = -6900
++
++        # Connect to BSS0
++        self.validate_connected(self.bss_hostapd[0])
++
++        # AP directed roam to BSS1
++        self.validate_ap_roamed(self.bss_hostapd[0], self.bss_hostapd[1])
++
++        # AP directed roam to BSS2
++        self.validate_ap_roamed(self.bss_hostapd[1], self.bss_hostapd[2])
++
++    def test_avoiding_under_threshold_bss(self):
++        # In this test IWD will blacklist BSS0, then roam the BSS1. BSS1 will
++        # then tell IWD to roam, but it should go back to BSS0 since the only
++        # non-blacklisted BSS is under the roam threshold.
++        self.rule_ssid1.signal = -5000
++        self.rule_ssid2.signal = -6500
++        self.rule_ssid3.signal = -7300
++
++        # Connect to BSS0
++        self.validate_connected(self.bss_hostapd[0])
++
++        # AP directed roam to BSS1
++        self.validate_ap_roamed(self.bss_hostapd[0], self.bss_hostapd[1])
++
++        # AP directed roam, but IWD should choose BSS0 since BSS2 is -73dB
++        self.validate_ap_roamed(self.bss_hostapd[1], self.bss_hostapd[0])
++
++    def test_connect_to_roam_blacklisted_bss(self):
++        # In this test a BSS will be roam blacklisted, but all other options are
++        # below the RSSI threshold so IWD should roam back to the blacklisted
++        # BSS.
++        self.rule_ssid1.signal = -5000
++        self.rule_ssid2.signal = -8000
++        self.rule_ssid3.signal = -8500
++
++        # Connect to BSS0
++        self.validate_connected(self.bss_hostapd[0])
++
++        # AP directed roam, should connect to BSS1 as its the next best
++        self.validate_ap_roamed(self.bss_hostapd[0], self.bss_hostapd[1])
++
++        # Connected to BSS1, but the signal is bad, so IWD should try to roam
++        # again. BSS0 is still blacklisted, but its the only reasonable option
++        # since both BSS1 and BSS2 are below the set RSSI threshold (-72dB)
++
++        from_condition = 'obj.state == DeviceState.roaming'
++        to_condition = 'obj.state == DeviceState.connected'
++        self.wd.wait_for_object_change(self.device, from_condition, to_condition)
++
++        # IWD should have connected to BSS0, even though its roam blacklisted
++        self.bss_hostapd[0].wait_for_event('AP-STA-CONNECTED %s' % self.device.address)
++
++    def setUp(self):
++        self.wd = IWD(True)
++
++        devices = self.wd.list_devices(1)
++        self.device = devices[0]
++
++
++    def tearDown(self):
++        self.wd = None
++        self.device = None
++
++
++    @classmethod
++    def setUpClass(cls):
++        IWD.copy_to_storage('TestAPRoam.psk')
++        hwsim = Hwsim()
++
++        cls.bss_hostapd = [ HostapdCLI(config='ssid1.conf'),
++                            HostapdCLI(config='ssid2.conf'),
++                            HostapdCLI(config='ssid3.conf') ]
++        HostapdCLI.group_neighbors(*cls.bss_hostapd)
++
++        rad0 = hwsim.get_radio('rad0')
++        rad1 = hwsim.get_radio('rad1')
++        rad2 = hwsim.get_radio('rad2')
++
++        cls.neighbor_list = [
++            (cls.bss_hostapd[0].bssid, "8f0000005101060603000000"),
++            (cls.bss_hostapd[1].bssid, "8f0000005102060603000000"),
++            (cls.bss_hostapd[2].bssid, "8f0000005103060603000000"),
++        ]
++
++
++        cls.rule_ssid1 = hwsim.rules.create()
++        cls.rule_ssid1.source = rad0.addresses[0]
++        cls.rule_ssid1.bidirectional = True
++        cls.rule_ssid1.enabled = True
++
++        cls.rule_ssid2 = hwsim.rules.create()
++        cls.rule_ssid2.source = rad1.addresses[0]
++        cls.rule_ssid2.bidirectional = True
++        cls.rule_ssid2.enabled = True
++
++        cls.rule_ssid3 = hwsim.rules.create()
++        cls.rule_ssid3.source = rad2.addresses[0]
++        cls.rule_ssid3.bidirectional = True
++        cls.rule_ssid3.enabled = True
++
++    @classmethod
++    def tearDownClass(cls):
++        IWD.clear_storage()
++
++if __name__ == '__main__':
++    unittest.main(exit=True)
 -- 
 2.34.1
 
