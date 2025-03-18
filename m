@@ -1,185 +1,150 @@
-Received: from mail-oa1-f51.google.com (mail-oa1-f51.google.com [209.85.160.51])
+Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A5A0156F3C
-	for <iwd@lists.linux.dev>; Tue, 11 Mar 2025 18:39:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5872420D51D
+	for <iwd@lists.linux.dev>; Tue, 18 Mar 2025 14:45:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741718392; cv=none; b=O+NEzI3tPIuy4P3alzcJhu8NwUfsaNcmU4SdhMSNjeoXkNODCt1M72Xpd5M+iES1sFUrHTTEkL6zHs1jPSipnyTv9bSzGZrUa1gyf3bH3ZFdnZCOJsJdB4YVWrHvANN/C3jkhACYyc9Di+Oww9Gfjg3I6xvr3c8/hI0VT6Ho0fk=
+	t=1742309113; cv=none; b=dKqYU6s//tYbExZ7WR9UwEarOs39K4JjjycOjc9Sci7os5NunKoEquLy/g1CwjPFcP2qCbILWSlYX7Fq164n6AxV1eePyDDyiLLyRU0Ncv07QmYW/uTaDl0EiZZTPF+dyxC5/nGodmmSyjtClPyBY7kLejFHElDe98HOHqLH9rE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741718392; c=relaxed/simple;
-	bh=npZ/02t+oXkfATYtKpl4tsa3mibQWlT9O5Mr63qyES4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=Z5Ic0MYrzujBdbrf9l96ymtGDZDUqateqeUkTCPE9Q7GPTpO4c27BXhUK+LqAGJ6xqpEhtUjtUr7uZhSUjNV7h8S45+e8r48Ig6Gj/rBnfGZxwXLBS2SIx9Z/H7mqdnZ32uEF/ypbvS7zgF4Kd325GdtgL5Nif+Yoiyy4/Bgtj8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kr7mRgGT; arc=none smtp.client-ip=209.85.160.51
+	s=arc-20240116; t=1742309113; c=relaxed/simple;
+	bh=vDMF1T7eOH6GKRhUt+QPWTp09g7OL2BHBiDtBRsFApw=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=ljjC4yJzL5GLbx4YJ82jQ7kZMrMU3mkfBEKHpyBfdRuUc/4BtC6gpFm1NExNtU6Fg/yZJRCV5di5ZIloyylNKqyRab2Nybk75jUkRph/KXZC48vpOD9pdYFN62rVvneuIu5Ad0pSY46q9R/16R7J6Spr9poFeBEnPD41vhyqxe8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=D4Eu+DXc; arc=none smtp.client-ip=209.85.214.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kr7mRgGT"
-Received: by mail-oa1-f51.google.com with SMTP id 586e51a60fabf-2b2b6019a74so3247953fac.0
-        for <iwd@lists.linux.dev>; Tue, 11 Mar 2025 11:39:50 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="D4Eu+DXc"
+Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-224191d92e4so110132355ad.3
+        for <iwd@lists.linux.dev>; Tue, 18 Mar 2025 07:45:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1741718390; x=1742323190; darn=lists.linux.dev;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=6IDI1Oxp/A78HIJTlGnbdyn/Geenm8psdo3EZq+Us/0=;
-        b=kr7mRgGTAvxaWcz+1fCtKlmUVnOO3Dh3KyrHNoqZnGhVjL1cOs7jXsQHvOijIYjt6i
-         vBi/Wl64kGVLI25zABKrYUPTgUI47EC93UUAMr4tIkkbHEAIUC+FxZgk3sBrrnPYesTH
-         SbvTh/biLkKuarj/GuMXr4/jsJUgV5eEFda2qj0Bx6Xzbe5ucg+ZzxA0u2hwXmwlSO9+
-         nh8XridNTAHFWO1hxMHvXw7GJ87z1E5vIbJtSM34nzH0Zv4Lt8B3V2i1vpYIFVWRMKBq
-         /6ikpNRRNwOO2GiX0jFF095HlnrYbsg4GASbCguem+wOauD7gzH8v32G6DVWA2wIDM9r
-         LKHg==
+        d=gmail.com; s=20230601; t=1742309107; x=1742913907; darn=lists.linux.dev;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Fo6eEo8vd4Ttv2jHt80DI0ch0RyPh6KEYVVJ7ym4bGI=;
+        b=D4Eu+DXczYYFmonmcGTQSXX+pEfEQNZQrRALjGaog3xKanpTxj80aSWTqs26yUCd0W
+         fdaUy6/vFz5LjUC1jGtfpjDwBSbZYZCEjT5F3FV0GGly36wo2foybzPC8MVPjkJmOIno
+         LNTSxKaafMCjHmAUHtBdijQicJXuKZwWySeTbpX5F1VGX/6y2Kgk8nDIpyvz7Wm2R+sM
+         0hl33RLjDckpe+x4u8Cwp6hixg1ITbmBqQjCeRY0bOYuUmwrNxvsP+lMXCkdaLLbXu4E
+         5HuT4cJAUSEqpAf3/uGk8zgQPelz2+NhAJ1k1cK8dwTW0AGUVXwNveezyy8NO9mX9Z/Q
+         rdiQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741718390; x=1742323190;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=6IDI1Oxp/A78HIJTlGnbdyn/Geenm8psdo3EZq+Us/0=;
-        b=qMNy1PNSvyUPu9HXSraexJfMtOtIgLc3qSFd963r2AFtPsZzTpFjXs2HiK6+Wz6NkG
-         oKVg2Dz9zPZDwXUQ4kLldFh3UfIoGQjbo7yOE5nGaHBMhTmINga8FTy3sjq8K3xbRQGc
-         tHpbqi6MnnVlD14U+KxSXXF+RYPkwJj5gKigm4t5mGDDby1kofef9SiLlBiWElTpZ6cB
-         yDlnl04PaNPiM+4toOrYZ321aQ5D182JYl77zFjvDigE7qPcHlJyNMIXc9NiBEchjKHi
-         KSl5th3oJE0IqsYtbb3OUFknfjz8Q5U/dBUD1Ww1lyevi5A3EFJ+pdRptSebmujul6EP
-         oZ/A==
-X-Forwarded-Encrypted: i=1; AJvYcCUIOO7ZV2pLQxr8xRvV9DckFOs2UB20SCWaop+9Xc5IWrw6WSdi1p/Zq3lx4+78iDzqGqQ=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yx+tKJPROVYXpJRXEuhsJWqGoDiWPpeTz0TlDVvQq4hnYKyZb3S
-	ECd9S9bv/P8nnO19hfKaUmZfJblOzoApOcVGbnQHyv3gcwXEOkT2gYPwlA==
-X-Gm-Gg: ASbGncvmAv1gfnpsBQwdLpnns7vCmRxGfuv3iy0vlv1DlCCSW+MuTshtJzuXwv9vhWe
-	2VqRI6xq4yth9nLr/uNjTClzPJHeRPYbvEvp0mAUBZqR00At/cTNUxGy5u5MyBy8HPi/qW4v5d0
-	nmZO36ia2D0gwyyVsMlIM9PJFXBHxznzSpGAWhkmq/rVAfs7hBfNycWOTLogtCKJpjJes1u2tzF
-	eWGDa1KeDilswVTNxFBuF85nD0FV+tKzEytws9TYshFqy4xMGLtQFHLT43siS6LEksERDpFjxLe
-	pgBF/92ndBJBCyMRFTHXdj2lGALYXdHfleCanqu1lgjcyLqak8dakKCVAJDyOP20E6FyKp4a1jP
-	MK+1tgWNYCQ==
-X-Google-Smtp-Source: AGHT+IEoleSCUICoZmzI3ULDYKyPXqUMt2C5OSAH2aDOJ0rxVS62dxNkWCK9+TVSp9mOIT9kiVkQzQ==
-X-Received: by 2002:a05:6870:c141:b0:2c2:5b16:1f0 with SMTP id 586e51a60fabf-2c260f8555bmr9079178fac.3.1741718389931;
-        Tue, 11 Mar 2025 11:39:49 -0700 (PDT)
-Received: from [192.168.1.25] (syn-070-114-247-242.res.spectrum.com. [70.114.247.242])
-        by smtp.googlemail.com with ESMTPSA id 586e51a60fabf-2c2488b19ebsm2703203fac.12.2025.03.11.11.39.48
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 11 Mar 2025 11:39:49 -0700 (PDT)
-Message-ID: <e0790aa0-6a05-4786-9a29-94be749c30f7@gmail.com>
-Date: Tue, 11 Mar 2025 13:39:47 -0500
+        d=1e100.net; s=20230601; t=1742309107; x=1742913907;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Fo6eEo8vd4Ttv2jHt80DI0ch0RyPh6KEYVVJ7ym4bGI=;
+        b=KVOc/ygyX9jfOZtLG4iDE9CPjukD/NhmMqyDNawpwWdFKZsT0d6FI0V1TLWKE6OVO1
+         9Lj89t5Ol/aKy5le1uJ82Sv/LK1SAZYSamy25hZY8Rwq2bB7uHAASRv2XdA3KMy/g8C9
+         3nYbxrW3ad4k0h3zulbwKg/V4EeftY51XpwHedlUn8Gq8oHSdDAWeEpk+kX9uxtHpMhI
+         KffHQYvu6Mq9pftEOiidhyoiIRWTNE3QZfpnPhfAjYUKjyW+TCTrrgTgs7Zsv30+nJh7
+         K+u+1707vb/w1n6kxtWS5Q8lMCChLIGX6EkdQnjtxSMFH49pINSDmr7omT08jeq4YjEg
+         j9Ow==
+X-Gm-Message-State: AOJu0YzZE2JPE8joVEESIKupmxzqYe9u1NYoan0b49gX6ucyBh76rHCN
+	icMfOq8Jre8pBZ6RVGqQM5Pnn1h27B/mPdvZGs4pGH4bNsOpNQRFeBrFog==
+X-Gm-Gg: ASbGnct7vnOAN2yP9dNgaOe3j7qtk3haWp8ENAPtI2Px7gq4U+d8PMdEX7bd9X6ppNC
+	ZTJw4qgwKlvo2/3WQ2b8inKRFPzbIBoMwYxRvnXs59wcST01xd14n1oqngtT8pMJsR1EIsVZ35B
+	VaYE+iceSYfQDS7idcEPv7kA0Wgyh2ayo0iSkk7gVzofJqqGoS/9Tkzn+DC6xX+9cBLt9iVRQdJ
+	xdlLreiWa+W91uHdi0LoZGv+mCc4+iVvKN8ixlpQlDK/4KhVMp0bfi5s6nrxxQDvDEdhP18P7X4
+	Q94gXEO0HvqhFO6IJljthfAZ8fvHWqMqDcAPszBC/CfCzhzYPgYVkY+NYvZlyIp+wQ==
+X-Google-Smtp-Source: AGHT+IH1Y2RORa/Nkjo1g7+5mx27MD9cYJFI2bHhghsnOgzT8eEBQ4jG+CXlIreLx1sUgO5qo+C2eA==
+X-Received: by 2002:a05:6a00:929b:b0:736:4fe0:2661 with SMTP id d2e1a72fcca58-737223b8f6dmr19202349b3a.11.1742309107085;
+        Tue, 18 Mar 2025 07:45:07 -0700 (PDT)
+Received: from LOCLAP699.localdomain ([152.193.78.90])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7371154b0e7sm9597144b3a.38.2025.03.18.07.45.05
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 18 Mar 2025 07:45:06 -0700 (PDT)
+From: James Prestwood <prestwoj@gmail.com>
+To: iwd@lists.linux.dev
+Cc: James Prestwood <prestwoj@gmail.com>
+Subject: [PATCH] station: always network (temp) blacklist on failure
+Date: Tue, 18 Mar 2025 07:45:00 -0700
+Message-Id: <20250318144500.50101-1-prestwoj@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] wiphy: non-LAA mac randomization
-To: rushiimachine@proton.me, iwd@lists.linux.dev
-References: <20250310225418.198643-4-rushiimachine@proton.me>
-Content-Language: en-US
-From: Denis Kenzior <denkenz@gmail.com>
-In-Reply-To: <20250310225418.198643-4-rushiimachine@proton.me>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-Hi
+Allowing the timeout blacklist to be disabled has introduced a bug
+where a failed connection will not result in the BSS list to be
+traversed. This causes IWD to retry the same BSS over and over which
+be either a) have some issue preventing a connection or b) may simply
+be unreachable/out of range.
 
-On 3/10/25 5:55 PM, rushiimachine@proton.me wrote:
-> From: rushiiMachine <rushiimachine@proton.me>
-> 
+This is because IWD was inherently relying on the timeout blacklist
+to flag BSS's on failures. With it disabled there was nothing to tell
+network_bss_select that we should skip the BSS and it would return
+the same BSS indefinitely.
 
-I need a real name / author information in order to accept patches.
+To fix this some of the blacklisting logic was re-worked in station.
+Now, a BSS will always get network blacklisted upon a failure. This
+allows network.c to traverse to the next BSS upon failure.
 
-> Add a secondary option to `AddressRandomizationRange` to not set the
-> locally-administered bit of `full` randomized MAC addresses. This
-> allows randomizing MAC addresses to not appear as Locally
-> Administered Addresses (LAA). Currently, there is no way to avoid
-> having this bit set other than setting `AddressRandomizationRange`
-> to `nic`, which undesirably copies the entire OUI and only randomizes
-> the last 3 octets.
-> ---
->   src/iwd.config.rst |  8 ++++++--
->   src/wiphy.c        | 17 +++++++++++++----
->   2 files changed, 19 insertions(+), 6 deletions(-)
-> 
-> diff --git a/src/iwd.config.rst b/src/iwd.config.rst
-> index 895a1012..55b95db9 100644
-> --- a/src/iwd.config.rst
-> +++ b/src/iwd.config.rst
-> @@ -107,7 +107,7 @@ The group ``[General]`` contains general settings.
->          the permanent address.
->   
->      * - AddressRandomizationRange
-> -     - Values: **full**, nic
-> +     - Values: **full**, full-uaa, nic
+For auth/assoc failures we will then only timeout blacklist under
+certain conditions, i.e. the status code was not in the temporary
+list.
 
-What does uaa mean here? user-administered-address?
+Fixes: 77639d2d452e ("blacklist: allow configuration to disable the blacklist")
+---
+ src/station.c | 25 +++++++++++++++++++++----
+ 1 file changed, 21 insertions(+), 4 deletions(-)
 
->   
->          One can control which part of the address is randomized using this
->          setting.
-> @@ -119,7 +119,11 @@ The group ``[General]`` contains general settings.
->   
->          When using ``AddressRandomizationRange`` set to ``full``, all 6 octets
->          of the address are randomized.  The locally-administered bit will be
-> -       set.
-> +       set, and multicast bit will be cleared.
-> +
-> +       When using ``AddressRandomizationRange`` set to ``full-uaa``, all 6
-> +       octets of the address are randomized. The locally-administered and
-> +       multicast bits will be cleared.
->   
->      * - RoamThreshold
->        - Value: rssi dBm value, from -100 to 1, default: **-70**
-> diff --git a/src/wiphy.c b/src/wiphy.c
-> index fb544fe6..ccdc7645 100644
-> --- a/src/wiphy.c
-> +++ b/src/wiphy.c
-> @@ -64,6 +64,7 @@ static struct l_hwdb *hwdb;
->   static char **whitelist_filter;
->   static char **blacklist_filter;
->   static int mac_randomize_bytes = 6;
-> +static bool mac_set_laa = true;
->   static char regdom_country[2];
->   static uint32_t work_ids;
->   static unsigned int wiphy_dump_id;
-> @@ -778,8 +779,11 @@ static void wiphy_address_constrain(struct wiphy *wiphy, uint8_t addr[static 6])
->   {
->   	switch (mac_randomize_bytes) {
->   	case 6:
-> -		/* Set the locally administered bit */
-> -		addr[0] |= 0x2;
-> +		/* Set or clear the locally administered bit */
-> +		if (mac_set_laa)
-> +			addr[0] |= 0x2;
-> +		else
-> +			addr[0] &= 0xfd;
+diff --git a/src/station.c b/src/station.c
+index 5403c332..0b20e785 100644
+--- a/src/station.c
++++ b/src/station.c
+@@ -3402,6 +3402,13 @@ static bool station_retry_with_reason(struct station *station,
+ 
+ 	blacklist_add_bss(station->connected_bss->addr);
+ 
++	/*
++	 * Network blacklist the BSS as well, since the timeout blacklist could
++	 * be disabled
++	 */
++	network_blacklist_add(station->connected_network,
++				station->connected_bss);
++
+ try_next:
+ 	return station_try_next_bss(station);
+ }
+@@ -3449,6 +3456,10 @@ static bool station_pmksa_fallback(struct station *station, uint16_t status)
+ static bool station_retry_with_status(struct station *station,
+ 					uint16_t status_code)
+ {
++	/* If PMKSA failed don't blacklist so we can retry this BSS */
++	if (station_pmksa_fallback(station, status_code))
++		goto try_next;
++
+ 	/*
+ 	 * Certain Auth/Assoc failures should not cause a timeout blacklist.
+ 	 * In these cases we want to only temporarily blacklist the BSS until
+@@ -3459,12 +3470,18 @@ static bool station_retry_with_status(struct station *station,
+ 	 *       specific BSS on our next attempt. There is currently no way to
+ 	 *       obtain that IE, but this should be done in the future.
+ 	 */
+-	if (IS_TEMPORARY_STATUS(status_code))
+-		network_blacklist_add(station->connected_network,
+-						station->connected_bss);
+-	else if (!station_pmksa_fallback(station, status_code))
++	if (!IS_TEMPORARY_STATUS(status_code))
+ 		blacklist_add_bss(station->connected_bss->addr);
+ 
++	/*
++	 * Unconditionally network blacklist the BSS if we are retrying. This
++	 * will allow network_bss_select to traverse the BSS list and ignore
++	 * BSS's which have previously failed
++	 */
++	network_blacklist_add(station->connected_network,
++				station->connected_bss);
++
++try_next:
+ 	iwd_notice(IWD_NOTICE_CONNECT_FAILED, "status: %u", status_code);
+ 
+ 	return station_try_next_bss(station);
+-- 
+2.34.1
 
-Nit: Prefer L_BIT_SET / L_BIT_CLEAR
-
->   
->   		/* Reset multicast bit */
->   		addr[0] &= 0xfe;
-> @@ -2854,9 +2858,13 @@ static int wiphy_init(void)
->   	if (s) {
->   		if (!strcmp(s, "nic"))
->   			mac_randomize_bytes = 3;
-> -		else if (!strcmp(s, "full"))
-> +		else if (!strcmp(s, "full")) {
->   			mac_randomize_bytes = 6;
-> -		else
-> +			mac_set_laa = true;
-> +		} else if (!strcmp(s, "full-uaa")) {
-> +			mac_randomize_bytes = 6;
-> +			mac_set_laa = false;
-> +		} else
->   			l_warn("Invalid [General].AddressRandomizationRange"
->   				" value: %s", s);
->   	}
-> @@ -2884,6 +2892,7 @@ static void wiphy_exit(void)
->   	l_genl_family_free(nl80211);
->   	nl80211 = NULL;
->   	mac_randomize_bytes = 6;
-> +	mac_set_laa = true;
->   
->   	l_dbus_unregister_interface(dbus_get_bus(), IWD_WIPHY_INTERFACE);
->   
-
-Looks good otherwise.
-
-Regards,
--Denis
