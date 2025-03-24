@@ -1,67 +1,67 @@
-Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
+Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F933EEC5
-	for <iwd@lists.linux.dev>; Mon, 24 Mar 2025 14:16:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 289487081A
+	for <iwd@lists.linux.dev>; Mon, 24 Mar 2025 14:16:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742825770; cv=none; b=pB+nw544LR6lf9TAwNuu8xakgwZkuslNPEbqRGagtNLmh8Q2eR19o8bJZ9SnKPfLbDD3FzkRgPuq66uxMt+iA+x/v6VnJa37eVcluCEOeqD5zd74GDmn+ZNsd2lDKTiv+0YTrXQWv9sVTt3R06T2gZEtrctt6EPJE7C78gFxxKM=
+	t=1742825772; cv=none; b=Zz2WHHeiFwRNEW33z5Gc84mZ90OvTUBtPzUV8Kdussf5icxtbEb3UCrtXMc71Fi3S4QWYpyJscVVaMumi2PvWDlKu6ysu0AgKedzTdowpBCaCMmJKFntgnb4Y0wRe1kXbKB7ZrOnvob0tS3t+Ahy8gyhR5eIGM5GIptmt689Qec=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742825770; c=relaxed/simple;
-	bh=zS7ZgTnrLcpCa6Hgpg9yTGAZAAhIDnALjmgEWaKQYdc=;
+	s=arc-20240116; t=1742825772; c=relaxed/simple;
+	bh=+Wfw9ngcS2v+v31vvf7UegVQzfvQl0BxIocCRwLvkTg=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=GTKL4cX2KSOOEJhZxj0DYOGk5BEp3LuBJ9OGRgbLKy02IK8K//8LPAvG8dX50PLX0y0nvTyohK+TNcDjoXkFgg+nS09Vt7HCwvQLb4CKtK7q6Jy/jzPU9q57QT28YXQ9wQdGQ4et+krv9OYzzIsf5HG3zNUB8ZGT3vqIoD/qDNk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NbQywY61; arc=none smtp.client-ip=209.85.214.174
+	 MIME-Version; b=cQh0QPnBVgC6bhBRt6vUSZ9U6+RPv5BZyL+rNEIVTHaAxU4GWxMD2Fu0OKBFmwpeblsh1RJmcMC71PeO6oOKMi2wk+2zcqWZ56bLb6SbzYKjGhHOguHKIE3zC+mblkXiJsuHRppl6whqvuE/yVuZs+1CjUdpZ0FvvNq+jx1cRBo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VPTiGCjN; arc=none smtp.client-ip=209.85.214.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NbQywY61"
-Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-223a7065ff8so8994525ad.0
-        for <iwd@lists.linux.dev>; Mon, 24 Mar 2025 07:16:09 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VPTiGCjN"
+Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-227aaa82fafso27500785ad.2
+        for <iwd@lists.linux.dev>; Mon, 24 Mar 2025 07:16:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1742825768; x=1743430568; darn=lists.linux.dev;
+        d=gmail.com; s=20230601; t=1742825770; x=1743430570; darn=lists.linux.dev;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=GwolN0JqN16IIQGx/QcM2yePHjLgWmEMxmMHP7W14+M=;
-        b=NbQywY61XJY/ZHcq71osxRVYES30a0+Om9UlUTKFog5R1tBaaKjuCJhv+Jke9HCWeM
-         oc+yx95j5yYH29kZu6MCBI/CkP8+84/mgU/gv7GjXxVNEqjcyeaIplGDe4xGwmJ9OQMg
-         ef4w8is85LdPZdNx+lVoRDm96+jw9Kn9H0t+7Ab9cOEJq5dp9xMjO2E6rkX2spKCre7W
-         J/BXO4aVc2Jw7ycS5juBD1H6578WMu/HXVU89b0VDHTfsUFoXhTbET2FyAN0bbjOhGLi
-         vQA9cBa5NSnjuD+m+raIqcr16AkAo4YbiJY9NhfmkOnWJhG67xz+Nh9SqKZPTT2gZJ1C
-         MmIg==
+        bh=/Y7nR1JnCTgYT7L9t49nkf3rFLk9KMFOLvHvRabt+BE=;
+        b=VPTiGCjNs7Q7Uu6Lhat5iSyP6ohPE85qPo64FTUVdbBYfHTjvlhN7K3HSNybmVPLzc
+         HDppafGpGbxno20uVKkHtk/OYZJ1Z/KmqnWcMQsa0SEIBrGxaQ2XLrYUfIpXVA3gDwSK
+         GTIIp4HWhX3hsyW9Wyy4Zu/PmJTfWS6DJCLfap3T4pnCOruLl5z3rvYqhWFtpIxevKcU
+         IRbzAD4N8+6o17sKzvOgjY9SiFyybikDj9/HTZF4YMuGTT9rRILtd6gxBARuLcVLLtEm
+         8pWqH/vmSXDpgBWlRLOMMGXu3j9Ub0iActAuFOa1zHVHbiPe8CPsiP2PrOLAtBVndbUA
+         Ee9Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742825768; x=1743430568;
+        d=1e100.net; s=20230601; t=1742825770; x=1743430570;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=GwolN0JqN16IIQGx/QcM2yePHjLgWmEMxmMHP7W14+M=;
-        b=DoMMMBPXXj5o70K5qVHyh6dB140Bwc/e/mATyl0O1PMpAywSjez/Pi+PXPAbFZwgq7
-         iOesA1bH/1+XOl1TBh1gbenMgH10Hzp5kJ9tmWHQVHT2CZRxnI3qtGivugM2YhzJLSfu
-         8E9PzvPYhpobdrKlJMPju0ooFyST6Ue7IeQWgZHmZNgocZKFSVgnJ1gC1XcLmUUECHYO
-         BtDo58JhEfw3AHAQZc3icT+5XFmmez7xUnXLmzkTiPyILV6CkbY2W7Rqj+tmXIdcVHDC
-         w5FDCJT2qskXASDcYWtaqlGTbEOua+EV3rhEG3Ue3QXlMO3JIGqIdFH/Ya8ygTNoOiJR
-         gBxA==
-X-Gm-Message-State: AOJu0Yyn/ZCnGWynosaSjsKSDylZsRoXXG48HcSOH+I1xtNeaOf50MA6
-	zY5XPKiAua1REp3WvqZdlhpCXjU/FwiypEFKDVFo1ZoFp154OJODE3vcPA==
-X-Gm-Gg: ASbGncsUE32/rX+Gybr6W0DzAekvYuqAUw7Y7fPBZDP95FOV32+ZoDLbDLUwe6A4s5I
-	mGotMco+1VtcWEUIY/4YdeF8Isn8Ac2YIdwpIACTT3oZJ6UKqPHw9rCDAe1VlPaTSg1G+Zhyc2Y
-	SEFyrX5xEcnavUfjAVLRTqAJGfoORkS6yXUGbxhlzHWfQsVqOiQxNg9ELX52kSWnwXzoHJk5+Hn
-	OrDxnVt874rRnCe0KzoyETrrkaqCUE2smE8uMs+k1Gnieu2NJf82RBRTGPGqkuRn0y3HIDFPhZk
-	OJBsSvjU8d1MoUNDEYVzZZnRta5YYTjpSehgCrMUqoVh8mhg/Nnw2eA=
-X-Google-Smtp-Source: AGHT+IFxkiwo25qcGdrROSiMXnpOBSIWT50CMiA1BipbkqlK50z7uxAqN2e2BFuoM+DhdqMG/RWfEA==
-X-Received: by 2002:a17:902:d48f:b0:220:c86d:d7eb with SMTP id d9443c01a7336-22780e15340mr218102215ad.36.1742825768252;
-        Mon, 24 Mar 2025 07:16:08 -0700 (PDT)
+        bh=/Y7nR1JnCTgYT7L9t49nkf3rFLk9KMFOLvHvRabt+BE=;
+        b=XSnKIB2KJjsQYVeH2e4M7PCiVmfOU6Pd1NxBtUrHvX9m7RZi878co3ISIp/OoJeLD2
+         c23lt1+U+hmfN3EXej4FSuKIYhERDxvvFTqQjlrBahvBaRgRORK5SB2+H5oBhq+IlJxj
+         qIRbmsJJ0qbGKM0iLk/rQidKOPNs5enlnlTkJLPFdNNGWxkF12QdaehrQ09wudEOu4t3
+         b8NGxQ6esLq3MZ/zud6mL9/iZPABZ+21SFnkA1VFd/x1eqFHHAmBJXAtfg0uyZsHnL/N
+         UHGVOWMeRZdgFE+66ejNRzTH6WxZRR7dA4wtBPnzeiLH3UNe6/RIqOKCoc9QKImVKuBk
+         i2Og==
+X-Gm-Message-State: AOJu0YwkOLSunZwKzmyHF2dVirtDrMwOZ8sEd7k4kl/Wo7D/Chz3Lljt
+	9mC1KYsQgekkRlXfGGe5ql3hRxYIn/T6PUKYjnGvjJp3d4bJ601Gkpb8Gw==
+X-Gm-Gg: ASbGncsTRpuIOgUyEEM/giumFPL2/AWcwGHaKuUAqjl/x9fi+SqQr6b9Kfw6nLF+ASL
+	m+lp4mEGAJPJbuUbiljSw/pOFpGKO0GHGdSvg3DCzpRItGdDsbuRCtnlWisv0O5jRv479ldHZfJ
+	6KnOAqyRSaTs2TryGE0bB4uKY+TS9+sGtI2Q8FuAU0kAolQRnydbgnEOBp70o3JdFEO80UR1Qgc
+	yGvMry2MVNbJ+rXsOcWxzGSTEhysZ2XJAQQK3Lhcuuh9xkrrhBhdyaTY8qZ1zSNohCYBwwjPmKO
+	QAwFKrxMyhvP+RS1yJHd3hUoqChIPQLVdnGx5NqekDv2S669nihJm48=
+X-Google-Smtp-Source: AGHT+IFxHLKxoKZiFlwCfOBOG6NwyO5yeYtJqVJt1U5mFcesRYEgB0blNMEQxrr3wuLAuYdUf51j3g==
+X-Received: by 2002:a05:6a21:7a42:b0:1f5:5903:edd3 with SMTP id adf61e73a8af0-1fe42f2cbacmr22159666637.11.1742825769931;
+        Mon, 24 Mar 2025 07:16:09 -0700 (PDT)
 Received: from LOCLAP699.localdomain ([152.193.78.90])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-73905fd54efsm8007868b3a.37.2025.03.24.07.16.06
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-73905fd54efsm8007868b3a.37.2025.03.24.07.16.08
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 24 Mar 2025 07:16:07 -0700 (PDT)
+        Mon, 24 Mar 2025 07:16:09 -0700 (PDT)
 From: James Prestwood <prestwoj@gmail.com>
 To: iwd@lists.linux.dev
 Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH v2 10/13] station: roam blacklist AP even mid-roam
-Date: Mon, 24 Mar 2025 07:15:35 -0700
-Message-Id: <20250324141538.144578-11-prestwoj@gmail.com>
+Subject: [PATCH v2 11/13] station: adapt roam scan logic to look at the bss group
+Date: Mon, 24 Mar 2025 07:15:36 -0700
+Message-Id: <20250324141538.144578-12-prestwoj@gmail.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20250324141538.144578-1-prestwoj@gmail.com>
 References: <20250324141538.144578-1-prestwoj@gmail.com>
@@ -73,78 +73,74 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-If an AP directed roam frame comes in while IWD is roaming its
-still valuable to parse that frame and blacklist the BSS that
-sent it.
-
-This can happen most frequently during a roam scan while connected
-to an overloaded BSS that is requesting IWD roams elsewhere.
+In station_roam_scan_notify BSS candidates were being ignored if
+their rank was not better than the current AP. This check needed
+to be changed to first check the BSS group, then the rank (only
+if the groups were equal). This takes into account the current BSS
+roam blacklisting status rather than only rank.
 ---
- src/station.c | 28 ++++++++++++++++++++--------
- 1 file changed, 20 insertions(+), 8 deletions(-)
+ src/station.c | 20 +++++++++++++++++---
+ 1 file changed, 17 insertions(+), 3 deletions(-)
 
 diff --git a/src/station.c b/src/station.c
-index b96419be..066ca337 100644
+index 066ca337..092d0b4d 100644
 --- a/src/station.c
 +++ b/src/station.c
-@@ -3162,12 +3162,10 @@ static void station_ap_directed_roam(struct station *station,
- 	uint8_t req_mode;
- 	uint16_t dtimer;
- 	uint8_t valid_interval;
-+	bool can_roam = !station_cannot_roam(station);
+@@ -2801,6 +2801,7 @@ static bool station_roam_scan_notify(int err, struct l_queue *bss_list,
+ 	struct handshake_state *hs = netdev_get_handshake(station->netdev);
+ 	struct scan_bss *current_bss = station->connected_bss;
+ 	struct scan_bss *bss;
++	enum scan_bss_group cur_bss_group = SCAN_BSS_GROUP_BLACKLISTED;
+ 	double cur_bss_rank = 0.0;
+ 	static const double RANK_FT_FACTOR = 1.3;
+ 	uint16_t mdid;
+@@ -2831,6 +2832,9 @@ static bool station_roam_scan_notify(int err, struct l_queue *bss_list,
+ 	bss = l_queue_find(bss_list, bss_match_bssid, current_bss->addr);
+ 	if (bss && !station->ap_directed_roaming) {
+ 		cur_bss_rank = bss->rank;
++		cur_bss_group = scan_bss_evaluate_group(
++						current_bss->addr,
++						current_bss->signal_strength);
  
- 	l_debug("ifindex: %u", netdev_get_ifindex(station->netdev));
+ 		if (hs->mde && bss->mde_present && l_get_le16(bss->mde) == mdid)
+ 			cur_bss_rank *= RANK_FT_FACTOR;
+@@ -2855,6 +2859,9 @@ static bool station_roam_scan_notify(int err, struct l_queue *bss_list,
+ 	while ((bss = l_queue_pop_head(bss_list))) {
+ 		double rank;
+ 		struct roam_bss *rbss;
++		enum scan_bss_group group = scan_bss_evaluate_group(
++							bss->addr,
++							bss->signal_strength);
  
--	if (station_cannot_roam(station))
--		return;
--
- 	if (station->state != STATION_STATE_CONNECTED) {
- 		l_debug("roam: unexpected AP directed roam -- ignore");
- 		return;
-@@ -3231,8 +3229,13 @@ static void station_ap_directed_roam(struct station *station,
- 	 * disassociating us. If either of these bits are set, set the
- 	 * ap_directed_roaming flag. Otherwise still try roaming but don't
- 	 * treat it any different than a normal roam.
-+	 *
-+	 * The only exception here is if we are in the middle of roaming
-+	 * (can_roam == false) since we cannot reliably know if the roam scan
-+	 * included frequencies from potential candidates in this request,
-+	 * forcing a roam in this case might result in unintended behavior.
- 	 */
--	if (req_mode & (WNM_REQUEST_MODE_DISASSOCIATION_IMMINENT |
-+	if (can_roam && req_mode & (WNM_REQUEST_MODE_DISASSOCIATION_IMMINENT |
- 			WNM_REQUEST_MODE_TERMINATION_IMMINENT |
- 			WNM_REQUEST_MODE_ESS_DISASSOCIATION_IMMINENT))
- 		station->ap_directed_roaming = true;
-@@ -3259,15 +3262,24 @@ static void station_ap_directed_roam(struct station *station,
- 		pos += url_len;
- 	}
+ 		station_print_scan_bss(bss);
  
-+	blacklist_add_bss(station->connected_bss->addr,
-+				BLACKLIST_REASON_ROAM_REQUESTED);
-+	station_debug_event(station, "ap-roam-blacklist-added");
-+
-+	/*
-+	 * Validating the frame and blacklisting should still be done even if
-+	 * we are mid-roam. Its important to track the BSS requesting the
-+	 * transition so when the current roam completes IWD will be less likely
-+	 * to roam back to the current BSS.
-+	 */
-+	if (!can_roam)
-+		return;
-+
- 	station->preparing_roam = true;
+@@ -2876,8 +2883,7 @@ static bool station_roam_scan_notify(int err, struct l_queue *bss_list,
+ 		if (network_can_connect_bss(network, bss) < 0)
+ 			goto next;
  
- 	l_timeout_remove(station->roam_trigger_timeout);
- 	station->roam_trigger_timeout = NULL;
+-		if (blacklist_contains_bss(bss->addr,
+-					BLACKLIST_REASON_CONNECT_FAILED))
++		if (group == SCAN_BSS_GROUP_BLACKLISTED)
+ 			goto next;
  
--	blacklist_add_bss(station->connected_bss->addr,
--				BLACKLIST_REASON_ROAM_REQUESTED);
--	station_debug_event(station, "ap-roam-blacklist-added");
--
- 	if (req_mode & WNM_REQUEST_MODE_PREFERRED_CANDIDATE_LIST) {
- 		l_debug("roam: AP sent a preferred candidate list");
- 		station_neighbor_report_cb(station->netdev, 0, body + pos,
+ 		rank = bss->rank;
+@@ -2885,7 +2891,15 @@ static bool station_roam_scan_notify(int err, struct l_queue *bss_list,
+ 		if (hs->mde && bss->mde_present && l_get_le16(bss->mde) == mdid)
+ 			rank *= RANK_FT_FACTOR;
+ 
+-		if (rank <= cur_bss_rank)
++		/*
++		 * First check the group:
++		 *   - If worse, disregard BSS candidate
++		 *   - If better, keep BSS candidate
++		 *   - If equal, compare based on rank
++		 */
++		if (group < cur_bss_group)
++			goto next;
++		else if (group == cur_bss_group && rank <= cur_bss_rank)
+ 			goto next;
+ 
+ 		/*
 -- 
 2.34.1
 
