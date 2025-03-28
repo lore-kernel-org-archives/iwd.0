@@ -1,67 +1,71 @@
-Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
+Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B4801C3029
-	for <iwd@lists.linux.dev>; Fri, 28 Mar 2025 14:43:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E5AE1BBBE5
+	for <iwd@lists.linux.dev>; Fri, 28 Mar 2025 14:43:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743172984; cv=none; b=qKy+hu2vNZjK6Kn2soO422evDLR6mNWDn1xWZiWjeESOrnqVZdMg5aUd5Y+91hba4wa8+iVNBhu2qLf7w0+/o6XEp/pLswqtON++Ewf0AJdPZzFRZG6RvCCNxBV1zT57Mk2dRC3OEOKHNHS7ZdzCuzD/3ZXw/dsj6q0md1ESOtc=
+	t=1743172986; cv=none; b=Sc7CKKmAzMKXk57ZR0cJr5jPlZGEEbb8GH1vr53lKleZxAJ+zBAQATCdlRYM1X/RxTfse3yETwKw/4oqySevnNK7StV/fizjHZXtXQoeSj6vSRXDbEfGugqoy/bPWqyIH19T5rvB1wc3DVzqUPhF0osjZKq+KIuBzN1cdCkGHcM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743172984; c=relaxed/simple;
-	bh=vDMF1T7eOH6GKRhUt+QPWTp09g7OL2BHBiDtBRsFApw=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=NQHGq49ZelDeY3s2MYbKCffIKzT+D6RAvF0Uhu5tWZXxpCfoUU/caxbLz2dmwRXCEClyCrZH5FgrEqRz2JNV6a4LUdlIEYb6WesBBo8y9lx8pdDFNrWY3EYuwfIlxeExwd6tmtTkXdOTPRefvWb/EPy44POF7q9L4C5ZTONGMss=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Twzphd8o; arc=none smtp.client-ip=209.85.214.179
+	s=arc-20240116; t=1743172986; c=relaxed/simple;
+	bh=RuQY+rH5cxO4piN6+5wH8ICIX8e/hooGS/Quj3DEKgs=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=bfSjPMDbA5uN4rbhWA0k/LZIu7+fTlvtLzksntaQ3hLBPXJ4yCGqGpuMKCl1fDYpTGCSySN5h4v/xmoV5cuawGcXwJK43j+2e5XiVioRmEA25HPi+qfGs6+twtreNYIyGk3HoRKDCKc2TEWmstFw0lddTZA5wjFQXefmBzzkGbE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ORe3XQZb; arc=none smtp.client-ip=209.85.214.170
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Twzphd8o"
-Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-22409077c06so68824865ad.1
-        for <iwd@lists.linux.dev>; Fri, 28 Mar 2025 07:43:02 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ORe3XQZb"
+Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-22548a28d0cso63363305ad.3
+        for <iwd@lists.linux.dev>; Fri, 28 Mar 2025 07:43:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1743172982; x=1743777782; darn=lists.linux.dev;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=Fo6eEo8vd4Ttv2jHt80DI0ch0RyPh6KEYVVJ7ym4bGI=;
-        b=Twzphd8oO2jk/gGkItbKe6gIP1qJfE58f1jV+SwEvFUBIV54DlwA7NUHky+Gm8bPj/
-         ocNk+eVMIQeevQ7ppynuEawSIW9n0nZjp3rIU3auAhyrlYdgf31cDtI3+ufDoWK/a2+t
-         84o9ELav172RTD3vpBJMDH/xLxloCA8nx7icFS6R9J353PaccooohCDiADMuiyXtD3oH
-         9qnMsvkr3Qj8BDu11JDiA+foq3ibfziL3hHG6QIlFqMGsV7j3HadKpBMT+fmL3KBZW1w
-         rHtpHYbnmhGXydp4DQ3FaOcB+Z9eviHDMvF/XnlhDGSt7hdj3plBmClUS1nOT3a0g3i1
-         JuIg==
+        d=gmail.com; s=20230601; t=1743172984; x=1743777784; darn=lists.linux.dev;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=/Y8J2vmE79n+rammSb68Vx/t2JXWMbDjn+1OH9GUK8w=;
+        b=ORe3XQZbVgG0dPvMmbhPFi4lxezwOVPuVbRRVGZ8fxde1bMl8SJ0/7mdIwEI9kC2Wt
+         grkKcz/4TeklRck6LbveT9/CNx9ymqYy8STB81RTwQr1O/GRY0Wjp5OU4phtbYleFD16
+         P7sFCWk0U0mHvSm+R/QD2ucAvOnWc4G10cEFgspP7tlIU3yDD9n4pU9SI3eejWLUs8nY
+         CPJGCSroyq/KrAYKURTdtGYJjncuacFiGi1iZtpGwRRRlQLT/VD1HiEnCl12nQyuPR/O
+         viUKsh4cLCsWFvYSdLVcCTESmufSPDqrPaWGsUr9IsKjE2E86wyq62xcD9MqVNo/c7sz
+         3tDA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743172982; x=1743777782;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Fo6eEo8vd4Ttv2jHt80DI0ch0RyPh6KEYVVJ7ym4bGI=;
-        b=RlZaHHb3AEe/mdu2GF8SE1DzV/tutEHM47fID+6h+ii9yVZaQarCa/qN21y0XYD3JI
-         /2bWRxwpjz52QxkLQOpQfreXFU7GSMu51jp0+kqg2xm4HGT2HQdPPQAk9t6sWoec++92
-         5xTYEkM1ysV/g1gmKek0r+s+efYkq9oj1Uxx9iRlvWoQMXPnlurI2v74M8JHthaRa07E
-         +bKH1OzfwVOcpku3HgnN4uiSMYCOqmBfskd6r4Q2VmGsrtUR+YrAuN3osPH1DSx2ubZV
-         ByiEtJ72ww901CMmKLs+RLu9SCWAd+p0MZL+ft5kMu2EFTi3DVBo4p6aslVxLl5Ik4wt
-         /dOA==
-X-Gm-Message-State: AOJu0YzN/XDSVP4Yj42KfdD9TDcTRki06ugb5JbGJRX3No06zoT+Lb6o
-	/Gh82oE0uBuSphzUjOLyOANdUjZEIQUhOI+XX7ehxP5wMKqXS21dLEcxBA==
-X-Gm-Gg: ASbGncuRP/xRoGw+OABlF6chqWDt6SAvmryThK6PMPsxQ9FaU/Unwh89rOkcEnEIEWZ
-	S0cXaCRKyqlYPGFDUhOXqsBUmZNbRpOXrCFhcznTv/YWZXYHYQZjzJHV7BLpiFVL0d7Wrx6COO8
-	o0wuKLzojCeILZODvUhcpFPNfd0vXWJWgrHHOW3O9tyIsmxq/KkIS7ZN7uJQqb1ZTgXO768ZBsr
-	ro8V8TZ24IF8v0z4lDWH4pgl/40jUi37W3X/JXZpnpAFqO8wHq03jtSGJnQ7HJSuBoiJLiTDRMO
-	wqLo20UF7FFkW8qW0GlSrX3DD+R221/DWjQpiodB/lBhsPfWjmIuhhv9IVj1U9D06PaDd3HX5GT
-	dnEoblGoz3A==
-X-Google-Smtp-Source: AGHT+IFhMdTByEauCZRnBIyUIpXqYbAzIq7p+sEpQznLlDwMGCmSlFLm12y1mTwIWL840qW1yrRl9w==
-X-Received: by 2002:a17:902:d4c5:b0:229:1cef:4c83 with SMTP id d9443c01a7336-2291cef5008mr65381955ad.4.1743172981806;
-        Fri, 28 Mar 2025 07:43:01 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1743172984; x=1743777784;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=/Y8J2vmE79n+rammSb68Vx/t2JXWMbDjn+1OH9GUK8w=;
+        b=WE/egkEScjx4+9dCg/Bc/1jwY64oI3boU0kzJnnt7FFLvWcxZkRbGKMu+wjMiTU43a
+         A8L3ZDJoRtReERujlYVRkIDFxK9dmcgVaNIN/TFfj20dwseNPIZ1NnbtRzOZk2ZazoIm
+         rIoriksRRrVwiz73fYNJ5jmBYnFpTrOPmomv1I/Js3gjU/J7twtjhDteIjORasVPYIQo
+         nDJijjCDhw0hQt9v28p8TibCijzQvof6ikmUno12AJEUzM0a7P2ev/JANZ5xtehcpe1B
+         bIu/9d8biv4DDuFCZCXuJlv8oFUx2iIgtN7BIiJZ98v1LyHpT2uZ1ybwWwB51bHzOJ6z
+         OL7g==
+X-Gm-Message-State: AOJu0YxJO0OXIEGDLXzQIHkaXV/Mb9pTAGj+h6TLNwSFQrZ2dT2pFsoF
+	GO4G5LcwUGw7ssZ+OsF828K2iyg2p+zcNcdaq2+OoFwbL4fYKQLkYbu97A==
+X-Gm-Gg: ASbGncuDf6tNfZ4R/hYZwRM5xuskJCrHzFrwQ1/RmlSGnstMPb9245K3PsfJQE6TLk/
+	G/bLQoSwy6iKpo36nXlAF8/qVMSzoK0odFwWqGxnS58CTyFAZt2ialj54triZeUE3OkMn5hR6Xl
+	8q8+ynzRiRFbKhCmovrnGJst1n6FxpcEbWdAvrE3jkUEsVKDJHY1IWdeg2BIWeDc4E2RwD/m9fd
+	LWvwuLN946b+TmkQD5sResjyu2ElF9HIhkMmRfICT8BmGRRCT7PbbmEXnP4STn4SV69LGstxy/r
+	JXMX6C54iSVp1WJmrric6aQtxoAdPeRirv9e2fMYlozCOIETmBaV1LvHjwPl0njHMr65wLqvXoA
+	=
+X-Google-Smtp-Source: AGHT+IF8e5Q/SF6u5IrEAR6LXj5wOREhbH17jpyQGJs/UmUALOcrJCUswgSYr1lYY5WjpUgDh0B1kA==
+X-Received: by 2002:a17:903:184:b0:224:fa0:36da with SMTP id d9443c01a7336-22804845131mr112945665ad.18.1743172983462;
+        Fri, 28 Mar 2025 07:43:03 -0700 (PDT)
 Received: from LOCLAP699.locus-demo-locuspark.locus ([152.193.78.90])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2291eee2288sm18885515ad.87.2025.03.28.07.43.00
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2291eee2288sm18885515ad.87.2025.03.28.07.43.02
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 28 Mar 2025 07:43:01 -0700 (PDT)
+        Fri, 28 Mar 2025 07:43:03 -0700 (PDT)
 From: James Prestwood <prestwoj@gmail.com>
 To: iwd@lists.linux.dev
 Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH v4 01/11] station: always add BSS to network blacklist on failure
-Date: Fri, 28 Mar 2025 07:42:43 -0700
-Message-Id: <20250328144253.421425-1-prestwoj@gmail.com>
+Subject: [PATCH v4 02/11] auto-t: add test for disabling the timeout blacklist
+Date: Fri, 28 Mar 2025 07:42:44 -0700
+Message-Id: <20250328144253.421425-2-prestwoj@gmail.com>
 X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20250328144253.421425-1-prestwoj@gmail.com>
+References: <20250328144253.421425-1-prestwoj@gmail.com>
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
@@ -70,82 +74,110 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Allowing the timeout blacklist to be disabled has introduced a bug
-where a failed connection will not result in the BSS list to be
-traversed. This causes IWD to retry the same BSS over and over which
-be either a) have some issue preventing a connection or b) may simply
-be unreachable/out of range.
-
-This is because IWD was inherently relying on the timeout blacklist
-to flag BSS's on failures. With it disabled there was nothing to tell
-network_bss_select that we should skip the BSS and it would return
-the same BSS indefinitely.
-
-To fix this some of the blacklisting logic was re-worked in station.
-Now, a BSS will always get network blacklisted upon a failure. This
-allows network.c to traverse to the next BSS upon failure.
-
-For auth/assoc failures we will then only timeout blacklist under
-certain conditions, i.e. the status code was not in the temporary
-list.
-
-Fixes: 77639d2d452e ("blacklist: allow configuration to disable the blacklist")
 ---
- src/station.c | 25 +++++++++++++++++++++----
- 1 file changed, 21 insertions(+), 4 deletions(-)
+ autotests/testBSSBlacklist/TestBlacklist.psk  |  2 +
+ autotests/testBSSBlacklist/connection_test.py | 57 +++++++++++++++++++
+ .../{main.conf => main.conf.default}          |  0
+ autotests/testBSSBlacklist/main.conf.disabled |  2 +
+ 4 files changed, 61 insertions(+)
+ create mode 100644 autotests/testBSSBlacklist/TestBlacklist.psk
+ rename autotests/testBSSBlacklist/{main.conf => main.conf.default} (100%)
+ create mode 100644 autotests/testBSSBlacklist/main.conf.disabled
 
-diff --git a/src/station.c b/src/station.c
-index 5403c332..0b20e785 100644
---- a/src/station.c
-+++ b/src/station.c
-@@ -3402,6 +3402,13 @@ static bool station_retry_with_reason(struct station *station,
+diff --git a/autotests/testBSSBlacklist/TestBlacklist.psk b/autotests/testBSSBlacklist/TestBlacklist.psk
+new file mode 100644
+index 00000000..abafdb66
+--- /dev/null
++++ b/autotests/testBSSBlacklist/TestBlacklist.psk
+@@ -0,0 +1,2 @@
++[Security]
++Passphrase=secret123
+diff --git a/autotests/testBSSBlacklist/connection_test.py b/autotests/testBSSBlacklist/connection_test.py
+index 9631a322..ac1cb86d 100644
+--- a/autotests/testBSSBlacklist/connection_test.py
++++ b/autotests/testBSSBlacklist/connection_test.py
+@@ -260,12 +260,69 @@ class Test(unittest.TestCase):
  
- 	blacklist_add_bss(station->connected_bss->addr);
+         self.wd.unregister_psk_agent(psk_agent)
  
-+	/*
-+	 * Network blacklist the BSS as well, since the timeout blacklist could
-+	 * be disabled
-+	 */
-+	network_blacklist_add(station->connected_network,
-+				station->connected_bss);
++    def test_blacklist_disabled(self):
++        wd = self.wd
++        bss_hostapd = self.bss_hostapd
 +
- try_next:
- 	return station_try_next_bss(station);
- }
-@@ -3449,6 +3456,10 @@ static bool station_pmksa_fallback(struct station *station, uint16_t status)
- static bool station_retry_with_status(struct station *station,
- 					uint16_t status_code)
- {
-+	/* If PMKSA failed don't blacklist so we can retry this BSS */
-+	if (station_pmksa_fallback(station, status_code))
-+		goto try_next;
++        rule0 = self.rule0
++        rule1 = self.rule1
++        rule2 = self.rule2
 +
- 	/*
- 	 * Certain Auth/Assoc failures should not cause a timeout blacklist.
- 	 * In these cases we want to only temporarily blacklist the BSS until
-@@ -3459,12 +3470,18 @@ static bool station_retry_with_status(struct station *station,
- 	 *       specific BSS on our next attempt. There is currently no way to
- 	 *       obtain that IE, but this should be done in the future.
- 	 */
--	if (IS_TEMPORARY_STATUS(status_code))
--		network_blacklist_add(station->connected_network,
--						station->connected_bss);
--	else if (!station_pmksa_fallback(station, status_code))
-+	if (!IS_TEMPORARY_STATUS(status_code))
- 		blacklist_add_bss(station->connected_bss->addr);
- 
-+	/*
-+	 * Unconditionally network blacklist the BSS if we are retrying. This
-+	 * will allow network_bss_select to traverse the BSS list and ignore
-+	 * BSS's which have previously failed
-+	 */
-+	network_blacklist_add(station->connected_network,
-+				station->connected_bss);
++        psk_agent = PSKAgent(["secret123", 'secret123'])
++        wd.register_psk_agent(psk_agent)
 +
-+try_next:
- 	iwd_notice(IWD_NOTICE_CONNECT_FAILED, "status: %u", status_code);
++        devices = wd.list_devices(1)
++        device = devices[0]
++
++        rule0.drop = True
++        rule0.enabled = True
++
++        device.autoconnect = True
++
++        condition = 'obj.state == DeviceState.connected'
++        wd.wait_for_object_condition(device, condition)
++
++        ordered_network = device.get_ordered_network("TestBlacklist", full_scan=True)
++
++        self.assertEqual(ordered_network.type, NetworkType.psk)
++
++        # The first BSS should fail, and we should connect to the second. This
++        # should not result in a connection blacklist though since its disabled.
++        bss_hostapd[1].wait_for_event('AP-STA-CONNECTED %s' % device.address)
++
++        device.disconnect()
++
++        rule0.drop = False
++        device.autoconnect = True
++
++        # Verify the first BSS wasn't blacklisted.
++        bss_hostapd[0].wait_for_event('AP-STA-CONNECTED %s' % device.address)
++
+     def setUp(self):
++        _, _, name = self.id().split(".")
++
++        # TODO: If we have this pattern elsewhere it might be nice to turn this
++        # into a decorator e.g.
++        #
++        # @config("main.conf.disabled")
++        # @profile("TestBlacklist.psk")
++        # def test_blacklist_disabled(self)
++        #    ...
++        #
++        if name == "test_blacklist_disabled":
++            IWD.copy_to_storage("main.conf.disabled", IWD_CONFIG_DIR, "main.conf")
++            IWD.copy_to_storage("TestBlacklist.psk")
++        else:
++            IWD.copy_to_storage("main.conf.default", IWD_CONFIG_DIR, "main.conf")
++
+         self.wd = IWD(True)
  
- 	return station_try_next_bss(station);
+     def tearDown(self):
+         IWD.clear_storage()
+         self.wd = None
++        self.rule0.drop = False
++        self.rule1.drop = False
++        self.rule2.drop = False
+ 
+     @classmethod
+     def setUpClass(cls):
+diff --git a/autotests/testBSSBlacklist/main.conf b/autotests/testBSSBlacklist/main.conf.default
+similarity index 100%
+rename from autotests/testBSSBlacklist/main.conf
+rename to autotests/testBSSBlacklist/main.conf.default
+diff --git a/autotests/testBSSBlacklist/main.conf.disabled b/autotests/testBSSBlacklist/main.conf.disabled
+new file mode 100644
+index 00000000..aae6bc12
+--- /dev/null
++++ b/autotests/testBSSBlacklist/main.conf.disabled
+@@ -0,0 +1,2 @@
++[Blacklist]
++InitialTimeout=0
 -- 
 2.34.1
 
