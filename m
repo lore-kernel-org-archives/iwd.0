@@ -1,275 +1,151 @@
-Received: from mail-pj1-f48.google.com (mail-pj1-f48.google.com [209.85.216.48])
+Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B89DC1F7069
-	for <iwd@lists.linux.dev>; Wed, 26 Mar 2025 17:50:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B4801C3029
+	for <iwd@lists.linux.dev>; Fri, 28 Mar 2025 14:43:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743011403; cv=none; b=FspqECcz5VagG1udiYfmqcnVjdxpj8fZlYZ4H85Lrql/cl/BQd9Jwjgi0dQ4NIBXBIsVNioLisAJFha+AP9btAsIHMa0bm8xTHGmbQmmM7HygvVcmSDcqBA2Teb2P4GGwN3XgKsZhvxHPfYCEkkGauJnFPLhEXnaTxO0+heN+sc=
+	t=1743172984; cv=none; b=qKy+hu2vNZjK6Kn2soO422evDLR6mNWDn1xWZiWjeESOrnqVZdMg5aUd5Y+91hba4wa8+iVNBhu2qLf7w0+/o6XEp/pLswqtON++Ewf0AJdPZzFRZG6RvCCNxBV1zT57Mk2dRC3OEOKHNHS7ZdzCuzD/3ZXw/dsj6q0md1ESOtc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743011403; c=relaxed/simple;
-	bh=TYE8UKrAXPKGTn4cB4fRaNbhaLdn3/BEH9GpFimPojM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=F6klWtr8OX8+KX82BQs8dgCDWtKISkCn+k72lui5lLAk2BNtuZhY/o7IAZndzjZgSU0J4NGgyqIQSaWXp+EzI3dBPMWdOtR6JqcxS8tEzdR+PL7tN6mfY4Gan52HPh5LfbufiPt4FIKsKCJJ649srfmQ1RZYkf0QuOZO/Haapt0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bR1RNx7N; arc=none smtp.client-ip=209.85.216.48
+	s=arc-20240116; t=1743172984; c=relaxed/simple;
+	bh=vDMF1T7eOH6GKRhUt+QPWTp09g7OL2BHBiDtBRsFApw=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=NQHGq49ZelDeY3s2MYbKCffIKzT+D6RAvF0Uhu5tWZXxpCfoUU/caxbLz2dmwRXCEClyCrZH5FgrEqRz2JNV6a4LUdlIEYb6WesBBo8y9lx8pdDFNrWY3EYuwfIlxeExwd6tmtTkXdOTPRefvWb/EPy44POF7q9L4C5ZTONGMss=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Twzphd8o; arc=none smtp.client-ip=209.85.214.179
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bR1RNx7N"
-Received: by mail-pj1-f48.google.com with SMTP id 98e67ed59e1d1-2ff64550991so95408a91.0
-        for <iwd@lists.linux.dev>; Wed, 26 Mar 2025 10:50:01 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Twzphd8o"
+Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-22409077c06so68824865ad.1
+        for <iwd@lists.linux.dev>; Fri, 28 Mar 2025 07:43:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1743011401; x=1743616201; darn=lists.linux.dev;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=le5L28UCIxQfqQFdXUaPLacTS4vya8kloLsmhQTzCx8=;
-        b=bR1RNx7Nve3wZUTTW7/q7ghpnaVuf+Oeey6w75iiMQgmoRweig8ymHXeeSfWMv1CYV
-         wtjQSYY3zcbQ05URNJYMVp4QXOm/qqez7Q7vNoTOmKW+YYkzvPKhxstmsHYmdWTGmk/A
-         FuWJDuN9aWuywXcjIgc5QCCzLQ8vo9YhwmXAyTI5aRt115RjQfc0m2aa7ZknRJr5gnms
-         VsYDi5SXa6pMWufSRYbYd3oiZoNl4+EAmuFHs6EBXeectztqrM7DGt8HuLU+GvwbjO5y
-         b0aokMRA8QpvuDl765Nd7oNom2bWSfF7tu+6tzI8vUvJO5irWekh8d8t+yYi8ZOBnxRx
-         /yBA==
+        d=gmail.com; s=20230601; t=1743172982; x=1743777782; darn=lists.linux.dev;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Fo6eEo8vd4Ttv2jHt80DI0ch0RyPh6KEYVVJ7ym4bGI=;
+        b=Twzphd8oO2jk/gGkItbKe6gIP1qJfE58f1jV+SwEvFUBIV54DlwA7NUHky+Gm8bPj/
+         ocNk+eVMIQeevQ7ppynuEawSIW9n0nZjp3rIU3auAhyrlYdgf31cDtI3+ufDoWK/a2+t
+         84o9ELav172RTD3vpBJMDH/xLxloCA8nx7icFS6R9J353PaccooohCDiADMuiyXtD3oH
+         9qnMsvkr3Qj8BDu11JDiA+foq3ibfziL3hHG6QIlFqMGsV7j3HadKpBMT+fmL3KBZW1w
+         rHtpHYbnmhGXydp4DQ3FaOcB+Z9eviHDMvF/XnlhDGSt7hdj3plBmClUS1nOT3a0g3i1
+         JuIg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743011401; x=1743616201;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=le5L28UCIxQfqQFdXUaPLacTS4vya8kloLsmhQTzCx8=;
-        b=mEp6lG1niiPZyQH7ymm88eBak1LqUDD546p9mXtzNdYdYP5L9NpJYQVXKlPymr/a15
-         bXGdWty2fPJY/T5hIec6X/li8AOscYnW/YmerKnCaEQJ+1AFXImmId6PHOX432KAlbU4
-         ZMBbZjd2SX+Vb20HvHjjaDx9QR8mLCb3bFAK90Eu+C7GLf05gCwjMjbvtCfFSL27pKoZ
-         4BLxwl7tyk6Wxv2Gbfp5bUkX9llAd9/ZaY3r0YIQB4JGuqgUhy4csL3zzgpZNgC0k9Fk
-         5tk7a//kLi++dcgmNoPmDwpWDfXVZx2+yfXMOZI28FXw8U0Ct9maEgXecDn2iUFaDqFl
-         kNZg==
-X-Gm-Message-State: AOJu0Yx/Q1fPauYcvjcbHCWQ/PCclQbf15Iu4+IpcoWJ6rJbTowBnhis
-	ZZLrwNVnW5lIPoCK6Fkdu9s0YBzPdw16h95Ux4ZLzLDoeKmgtvuw3peFZA==
-X-Gm-Gg: ASbGncurehWgx/zuVG8aOkBKBO7SJy2f3RrtJ42Znv5ElNRMqvW00yvNQkwy/GLHDe7
-	Cd/BcLcvVlZORk2Sg41QNdVaJ8/yqzRPexxUAoLfMZ121ShTWLodd4fkRgcZX583BC8YyejtFBB
-	cgPHKt2aZOrGtMc4f1ntWuo5AelgI+q6YOzCwqNCipLVKwhW2iR1Pb2kIsHzoKP+9MhW6woqpeW
-	e0EJPOYvmXvcnB3iGkRKBkn7+sPkGR4DauHfA1DS9rkDRuUv0F+meY7lQJXSRq5ad8NDjY4KqsL
-	z0+QcABuXPMsxlU1aRVNgAOzQSGglKp8XsgT+Tz7eBt/fIvDzjv6r4sSDMQ=
-X-Google-Smtp-Source: AGHT+IGjlnvj+DtsjdCP6qSFmcwl+zitXoM0GsuqEA+h0yiePwmah6H33IvMzXcHTpzZgN1kxy6Rrg==
-X-Received: by 2002:a17:90a:d64d:b0:2ef:67c2:4030 with SMTP id 98e67ed59e1d1-303a85c6304mr630838a91.27.1743011400261;
-        Wed, 26 Mar 2025 10:50:00 -0700 (PDT)
-Received: from [10.100.121.195] ([152.193.78.90])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3039dff0c76sm517605a91.20.2025.03.26.10.49.59
-        for <iwd@lists.linux.dev>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 26 Mar 2025 10:49:59 -0700 (PDT)
-Message-ID: <d311d92a-b236-4ff1-89bc-377a200e4cb4@gmail.com>
-Date: Wed, 26 Mar 2025 10:49:57 -0700
+        d=1e100.net; s=20230601; t=1743172982; x=1743777782;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Fo6eEo8vd4Ttv2jHt80DI0ch0RyPh6KEYVVJ7ym4bGI=;
+        b=RlZaHHb3AEe/mdu2GF8SE1DzV/tutEHM47fID+6h+ii9yVZaQarCa/qN21y0XYD3JI
+         /2bWRxwpjz52QxkLQOpQfreXFU7GSMu51jp0+kqg2xm4HGT2HQdPPQAk9t6sWoec++92
+         5xTYEkM1ysV/g1gmKek0r+s+efYkq9oj1Uxx9iRlvWoQMXPnlurI2v74M8JHthaRa07E
+         +bKH1OzfwVOcpku3HgnN4uiSMYCOqmBfskd6r4Q2VmGsrtUR+YrAuN3osPH1DSx2ubZV
+         ByiEtJ72ww901CMmKLs+RLu9SCWAd+p0MZL+ft5kMu2EFTi3DVBo4p6aslVxLl5Ik4wt
+         /dOA==
+X-Gm-Message-State: AOJu0YzN/XDSVP4Yj42KfdD9TDcTRki06ugb5JbGJRX3No06zoT+Lb6o
+	/Gh82oE0uBuSphzUjOLyOANdUjZEIQUhOI+XX7ehxP5wMKqXS21dLEcxBA==
+X-Gm-Gg: ASbGncuRP/xRoGw+OABlF6chqWDt6SAvmryThK6PMPsxQ9FaU/Unwh89rOkcEnEIEWZ
+	S0cXaCRKyqlYPGFDUhOXqsBUmZNbRpOXrCFhcznTv/YWZXYHYQZjzJHV7BLpiFVL0d7Wrx6COO8
+	o0wuKLzojCeILZODvUhcpFPNfd0vXWJWgrHHOW3O9tyIsmxq/KkIS7ZN7uJQqb1ZTgXO768ZBsr
+	ro8V8TZ24IF8v0z4lDWH4pgl/40jUi37W3X/JXZpnpAFqO8wHq03jtSGJnQ7HJSuBoiJLiTDRMO
+	wqLo20UF7FFkW8qW0GlSrX3DD+R221/DWjQpiodB/lBhsPfWjmIuhhv9IVj1U9D06PaDd3HX5GT
+	dnEoblGoz3A==
+X-Google-Smtp-Source: AGHT+IFhMdTByEauCZRnBIyUIpXqYbAzIq7p+sEpQznLlDwMGCmSlFLm12y1mTwIWL840qW1yrRl9w==
+X-Received: by 2002:a17:902:d4c5:b0:229:1cef:4c83 with SMTP id d9443c01a7336-2291cef5008mr65381955ad.4.1743172981806;
+        Fri, 28 Mar 2025 07:43:01 -0700 (PDT)
+Received: from LOCLAP699.locus-demo-locuspark.locus ([152.193.78.90])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2291eee2288sm18885515ad.87.2025.03.28.07.43.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 28 Mar 2025 07:43:01 -0700 (PDT)
+From: James Prestwood <prestwoj@gmail.com>
+To: iwd@lists.linux.dev
+Cc: James Prestwood <prestwoj@gmail.com>
+Subject: [PATCH v4 01/11] station: always add BSS to network blacklist on failure
+Date: Fri, 28 Mar 2025 07:42:43 -0700
+Message-Id: <20250328144253.421425-1-prestwoj@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 07/10] station: roam blacklist BSS's, and consider when
- roaming
-To: iwd@lists.linux.dev
-References: <20250325180041.238676-1-prestwoj@gmail.com>
- <20250325180041.238676-7-prestwoj@gmail.com>
-Content-Language: en-US
-From: James Prestwood <prestwoj@gmail.com>
-In-Reply-To: <20250325180041.238676-7-prestwoj@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
+Allowing the timeout blacklist to be disabled has introduced a bug
+where a failed connection will not result in the BSS list to be
+traversed. This causes IWD to retry the same BSS over and over which
+be either a) have some issue preventing a connection or b) may simply
+be unreachable/out of range.
 
-On 3/25/25 11:00 AM, James Prestwood wrote:
-> If the BSS is requesting IWD roam elsewhere add this BSS to the
-> blacklist using BLACKLIST_REASON_ROAM_REQUESTED. This will lower
-> the chances of IWD roaming/connecting back to this BSS in the
-> future.
->
-> This then allows IWD to consider this blacklist state when picking
-> a roam candidate. Its undesireable to fully ban a roam blacklisted
-> BSS, so some additional sorting logic has been added. Prior to
-> comparing based on rank, BSS's will be sorted into 3 groups:
->
-> Optimal - Not roam blacklisted, and above the roaming threshold
-> Above Threshold - May be blacklisted, and above the roaming threshold
-> Below Threshold - BSS is below the roaming threshold
-> ---
->   src/station.c | 88 ++++++++++++++++++++++++++++++++++++++++++++++++---
->   1 file changed, 84 insertions(+), 4 deletions(-)
->
-> diff --git a/src/station.c b/src/station.c
-> index e2ed78f3..e3c7c189 100644
-> --- a/src/station.c
-> +++ b/src/station.c
-> @@ -155,6 +155,57 @@ struct anqp_entry {
->   	uint32_t pending;
->   };
->   
-> +/*
-> + * Rather than sorting BSS's purely based on ranking a higher level grouping
-> + * is used. The purpose of this higher order grouping is the consider the BSS's
-> + * roam blacklist status. The roam blacklist is a "soft" blacklist in that we
-> + * still should connect to these BSS's if they are the only "good" option.
-> + * The question here is: what makes a BSS "good" vs "bad".
-> + *
-> + * For an initial (probably nieve) approach here we can use the RoamThreshod[5G]
-> + * and sort BSS's into "above" or "below" this threshold. Within each of these
-> + * groups a BSS may be blacklisted, meaning it should get sorted lower on the
-> + * list compared to others within the same group.
-> + *
-> + * Since we have several call sites needing to check/compare these groupings
-> + * a bitmask can be used to describe the grouping:
-> + *
-> + * Each group will have 2 bits. The lower order bit signifies the BSS is in the
-> + * group, but also blacklisted. The higher order bit signifies the BSS is in
-> + * the group, but not blacklisted. The bitmask between two BSS's can then be
-> + * compared directly similar to rank.
-> + */
-> +
-> +#define UNDER_THRESHOLD_BIT 1
-> +#define ABOVE_THRESHOLD_BIT 3
-> +
-> +static uint32_t evaluate_bss_group(const uint8_t *addr, uint32_t freq,
-> +					int16_t signal_strength)
-> +{
-> +	int threshold;
-> +	int signal = signal_strength / 100;
-> +	bool roam_blacklist;
-> +	uint32_t mask = 0;
-> +
-> +	if (blacklist_contains_bss(addr, BLACKLIST_REASON_CONNECT_FAILED))
-> +		return mask;
-> +
-> +	roam_blacklist = blacklist_contains_bss(addr,
-> +					BLACKLIST_REASON_ROAM_REQUESTED);
-> +
-> +	if (freq > 4000)
-> +		netdev_get_low_signal_thresholds(NULL, &threshold);
-> +	else
-> +		netdev_get_low_signal_thresholds(&threshold, NULL);
-> +
-> +	if (signal >= threshold)
-> +		set_bit(&mask, ABOVE_THRESHOLD_BIT - roam_blacklist);
-> +	else
-> +		set_bit(&mask, UNDER_THRESHOLD_BIT - roam_blacklist);
-> +
-> +	return mask;
-> +}
-> +
->   /*
->    * Used as entries for the roam list since holding scan_bss pointers directly
->    * from station->bss_list is not 100% safe due to the possibility of the
-> @@ -164,11 +215,13 @@ struct roam_bss {
->   	uint8_t addr[6];
->   	uint16_t rank;
->   	int32_t signal_strength;
-> +	uint32_t group;
->   	bool ft_failed: 1;
->   };
->   
->   static struct roam_bss *roam_bss_from_scan_bss(const struct scan_bss *bss,
-> -						uint16_t rank)
-> +						uint16_t rank,
-> +						uint32_t group)
->   {
->   	struct roam_bss *rbss = l_new(struct roam_bss, 1);
->   
-> @@ -176,6 +229,7 @@ static struct roam_bss *roam_bss_from_scan_bss(const struct scan_bss *bss,
->   	rbss->rank = rank;
->   	rbss->signal_strength = bss->signal_strength;
->   	rbss->ft_failed = false;
-> +	rbss->group = group;
->   
->   	return rbss;
->   }
-> @@ -184,6 +238,12 @@ static int roam_bss_rank_compare(const void *a, const void *b, void *user_data)
->   {
->   	const struct roam_bss *new_bss = a, *bss = b;
->   
-> +	if (bss->group > new_bss->group)
-> +		return 1;
-> +	else if (bss->group < new_bss->group)
-> +		return -1;
-> +
-> +	/* BSS's both have the same group, sort by rank */
->   	if (bss->rank == new_bss->rank)
->   		return (bss->signal_strength >
->   					new_bss->signal_strength) ? 1 : -1;
-> @@ -2805,6 +2865,7 @@ static bool station_roam_scan_notify(int err, struct l_queue *bss_list,
->   	struct handshake_state *hs = netdev_get_handshake(station->netdev);
->   	struct scan_bss *current_bss = station->connected_bss;
->   	struct scan_bss *bss;
-> +	uint32_t cur_bss_group = 0;
->   	double cur_bss_rank = 0.0;
->   	static const double RANK_FT_FACTOR = 1.3;
->   	uint16_t mdid;
-> @@ -2835,6 +2896,9 @@ static bool station_roam_scan_notify(int err, struct l_queue *bss_list,
->   	bss = l_queue_find(bss_list, bss_match_bssid, current_bss->addr);
->   	if (bss && !station->ap_directed_roaming) {
->   		cur_bss_rank = bss->rank;
-> +		cur_bss_group = evaluate_bss_group(current_bss->addr,
-> +						current_bss->frequency,
-> +						current_bss->signal_strength);
-This is what caused the CI to fail on testPSK-roam. Instead I should 
-have done the group evaluation on the "bss" pointer, not "current_bss". 
-This will take into account the most recent scan, rather than the stale 
-object we have from past scans.
->   
->   		if (hs->mde && bss->mde_present && l_get_le16(bss->mde) == mdid)
->   			cur_bss_rank *= RANK_FT_FACTOR;
-> @@ -2859,6 +2923,9 @@ static bool station_roam_scan_notify(int err, struct l_queue *bss_list,
->   	while ((bss = l_queue_pop_head(bss_list))) {
->   		double rank;
->   		struct roam_bss *rbss;
-> +		uint32_t group = evaluate_bss_group(bss->addr,
-> +							bss->frequency,
-> +							bss->signal_strength);
->   
->   		station_print_scan_bss(bss);
->   
-> @@ -2889,7 +2956,15 @@ static bool station_roam_scan_notify(int err, struct l_queue *bss_list,
->   		if (hs->mde && bss->mde_present && l_get_le16(bss->mde) == mdid)
->   			rank *= RANK_FT_FACTOR;
->   
-> -		if (rank <= cur_bss_rank)
-> +		/*
-> +		 * First check the group:
-> +		 *   - If worse, disregard BSS candidate
-> +		 *   - If better, keep BSS candidate
-> +		 *   - If equal, compare based on rank
-> +		 */
-> +		if (group < cur_bss_group)
-> +			goto next;
-> +		else if (group == cur_bss_group && rank <= cur_bss_rank)
->   			goto next;
->   
->   		/*
-> @@ -2898,7 +2973,7 @@ static bool station_roam_scan_notify(int err, struct l_queue *bss_list,
->   		 */
->   		station_update_roam_bss(station, bss);
->   
-> -		rbss = roam_bss_from_scan_bss(bss, rank);
-> +		rbss = roam_bss_from_scan_bss(bss, rank, group);
->   
->   		l_queue_insert(station->roam_bss_list, rbss,
->   				roam_bss_rank_compare, NULL);
-> @@ -3268,6 +3343,10 @@ static void station_ap_directed_roam(struct station *station,
->   	l_timeout_remove(station->roam_trigger_timeout);
->   	station->roam_trigger_timeout = NULL;
->   
-> +	blacklist_add_bss(station->connected_bss->addr,
-> +				BLACKLIST_REASON_ROAM_REQUESTED);
-> +	station_debug_event(station, "ap-roam-blacklist-added");
-> +
->   	if (req_mode & WNM_REQUEST_MODE_PREFERRED_CANDIDATE_LIST) {
->   		l_debug("roam: AP sent a preferred candidate list");
->   		station_neighbor_report_cb(station->netdev, 0, body + pos,
-> @@ -5344,7 +5423,8 @@ static bool station_force_roam_scan_notify(int err, struct l_queue *bss_list,
->   	/* The various roam routines expect this to be set from scanning */
->   	station->preparing_roam = true;
->   	l_queue_push_tail(station->roam_bss_list,
-> -				roam_bss_from_scan_bss(target, target->rank));
-> +				roam_bss_from_scan_bss(target, target->rank,
-> +				0xffff));
->   
->   	station_update_roam_bss(station, target);
->   
+This is because IWD was inherently relying on the timeout blacklist
+to flag BSS's on failures. With it disabled there was nothing to tell
+network_bss_select that we should skip the BSS and it would return
+the same BSS indefinitely.
+
+To fix this some of the blacklisting logic was re-worked in station.
+Now, a BSS will always get network blacklisted upon a failure. This
+allows network.c to traverse to the next BSS upon failure.
+
+For auth/assoc failures we will then only timeout blacklist under
+certain conditions, i.e. the status code was not in the temporary
+list.
+
+Fixes: 77639d2d452e ("blacklist: allow configuration to disable the blacklist")
+---
+ src/station.c | 25 +++++++++++++++++++++----
+ 1 file changed, 21 insertions(+), 4 deletions(-)
+
+diff --git a/src/station.c b/src/station.c
+index 5403c332..0b20e785 100644
+--- a/src/station.c
++++ b/src/station.c
+@@ -3402,6 +3402,13 @@ static bool station_retry_with_reason(struct station *station,
+ 
+ 	blacklist_add_bss(station->connected_bss->addr);
+ 
++	/*
++	 * Network blacklist the BSS as well, since the timeout blacklist could
++	 * be disabled
++	 */
++	network_blacklist_add(station->connected_network,
++				station->connected_bss);
++
+ try_next:
+ 	return station_try_next_bss(station);
+ }
+@@ -3449,6 +3456,10 @@ static bool station_pmksa_fallback(struct station *station, uint16_t status)
+ static bool station_retry_with_status(struct station *station,
+ 					uint16_t status_code)
+ {
++	/* If PMKSA failed don't blacklist so we can retry this BSS */
++	if (station_pmksa_fallback(station, status_code))
++		goto try_next;
++
+ 	/*
+ 	 * Certain Auth/Assoc failures should not cause a timeout blacklist.
+ 	 * In these cases we want to only temporarily blacklist the BSS until
+@@ -3459,12 +3470,18 @@ static bool station_retry_with_status(struct station *station,
+ 	 *       specific BSS on our next attempt. There is currently no way to
+ 	 *       obtain that IE, but this should be done in the future.
+ 	 */
+-	if (IS_TEMPORARY_STATUS(status_code))
+-		network_blacklist_add(station->connected_network,
+-						station->connected_bss);
+-	else if (!station_pmksa_fallback(station, status_code))
++	if (!IS_TEMPORARY_STATUS(status_code))
+ 		blacklist_add_bss(station->connected_bss->addr);
+ 
++	/*
++	 * Unconditionally network blacklist the BSS if we are retrying. This
++	 * will allow network_bss_select to traverse the BSS list and ignore
++	 * BSS's which have previously failed
++	 */
++	network_blacklist_add(station->connected_network,
++				station->connected_bss);
++
++try_next:
+ 	iwd_notice(IWD_NOTICE_CONNECT_FAILED, "status: %u", status_code);
+ 
+ 	return station_try_next_bss(station);
+-- 
+2.34.1
+
