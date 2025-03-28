@@ -1,68 +1,68 @@
-Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
+Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68BD83C0C
-	for <iwd@lists.linux.dev>; Fri, 28 Mar 2025 14:43:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDD8E1C6FE9
+	for <iwd@lists.linux.dev>; Fri, 28 Mar 2025 14:43:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743172995; cv=none; b=a8KQl/Ro0RyHoCjmikLvjzotVcJJsr3wTkqjk5420PU+eR5pjCBhN++0B1+/Ut/zdzDs9dVJ/9+bR+V/w/W/sPJZsv/BcoggQsVoM9Mvrjg3gmR4EGtyBXd4CS/xl+O0tS3/97MvObKwvVrhdLI250LIQgVHWkhxCKWaKp3AAZk=
+	t=1743172999; cv=none; b=jr9+qQUd7sVKyTN7Iymm3B8gVPWYyO2haz+xlRLi2WuAYw6/q1v4JV7Gt0cuWBE/pDFDD1z26LQ3mVov4NzD7UFaJ/b5xxGeGx9/s1UEqiXPW8/VC5C9zAFQUk/ydE4hAzRJwu9WS6x9PkDFsB9wmSwNr49yO4xrNIgZ+bhVJww=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743172995; c=relaxed/simple;
-	bh=xA9BpN09RDsdkCywfrjSEpD3TirIQRl5EBvkyw0FGno=;
+	s=arc-20240116; t=1743172999; c=relaxed/simple;
+	bh=MyM83L1eBpowQ6pWl7EN/W4VKQ1GrBqt0uY75TwPUAs=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=QXc1xStrZBmtuC2l+EmYkPwdQa2ExkA9+lH1c9CLE9tix2+3eelPkheN4f8XJWJl4H66W/XZA8o0J2GXtrDj44TFp8O+Rd4UA6RQTQxKouHc7ZARdcWmkltiBxv0BlRHYx4V+OAeqEsttnC+XHgC7KtXet3RUMm+rxs352hjRlk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=i6GsEifk; arc=none smtp.client-ip=209.85.214.169
+	 MIME-Version; b=IYSdGfFSdOTcKFmgFo4c4aA2IK0pk6oEKNMCEL7Mqz7Q6u32c5hBA/zTgA96dJPy+Fike/bvzGOQ+fk+99mM0AGllDtTD8hnfdoxmtmPXMn08dUQAMObq5TJ2uZ19a7ci9nieMnVtUT6LIGg3h5pSAYbGWYJaJ+ESN1PMLOiw5I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LWhi7vTX; arc=none smtp.client-ip=209.85.214.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="i6GsEifk"
-Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-226185948ffso47240325ad.0
-        for <iwd@lists.linux.dev>; Fri, 28 Mar 2025 07:43:14 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LWhi7vTX"
+Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-224100e9a5cso44964055ad.2
+        for <iwd@lists.linux.dev>; Fri, 28 Mar 2025 07:43:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1743172993; x=1743777793; darn=lists.linux.dev;
+        d=gmail.com; s=20230601; t=1743172997; x=1743777797; darn=lists.linux.dev;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=hWLWpPTMl0TqPjilzbOwQgfh81bG06uryhjp90dH49U=;
-        b=i6GsEifkiqtaQNNHxrtlCetZVsAUlCCfrAr0uUqriLptmb+4RpfUNQoU1MYEp9OxHm
-         1fKBwKxoKsQvBPzK4GCmLjQ6iYj2x9RhoHYGuNDsrrVRy7eD27hI2C6/R0A0khTLbwYT
-         QlZLfvExfKM4tBOdQpra7kauyVD5KBpxApnFHIfwjncpjETH/MwQKwd0TKnU29/FuZ8h
-         78w7KB53/0LOgu8hf4CrPFHF8BW6DuTwr7Ee8holWT75hClJFF/AVuJcqpIApbCu3pXw
-         hkdrvmPaRbPKUl1M6xfYZbjKaAF0uRWE2AVR5hzKrNBYvOLf5XbVkf0D7HSve6geYTe3
-         4+dw==
+        bh=ccTKIiVTHaYhZLj8hvKA0e5OsXRQ+klutkUMg9gJHMU=;
+        b=LWhi7vTXgjkS7Zp3bqkgp1VJ8g0HeL/ieW48QsH2sMrhiS1OKBwFYHrugkb44zXf6d
+         TRYOuJKenBFjVVdq3IlyyuZhfOSqx5Dw/fnAac03g7D7w/ImEeRZYylRIELPzWd7n0YO
+         LnnNgUr/tiNEuqoa4MXDiO4zDgLuaHVGGSDaHdtnZ6094WlIkszQJDtEeGw4y8utYwEt
+         2dJAh+xi2MDKQeE9wsQbdt0Jry2eWB8jgHyr5d+ypesFTUljNKyA9zDDu1UkTYWN1At2
+         UwK2NUgy/ZdtB/ALP1Xr7QYEEIo3EBHz59k396vrGCEVKpPMeQljvWu49p/Io/nBSJ1a
+         GUVw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743172993; x=1743777793;
+        d=1e100.net; s=20230601; t=1743172997; x=1743777797;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=hWLWpPTMl0TqPjilzbOwQgfh81bG06uryhjp90dH49U=;
-        b=ckMwNI0zFNe0zccWz5LqMshM9mkprupjwgp0tZUiHWvf/FFUypgIGZ/WLko3Z28yxi
-         SCGCOesI0qGSWiQOB1VrDLM5ImbJETlvZHpciFeMbwHOygdeohn2JBRDvtSmQg8ArTgP
-         JfYU5o9gMkOBGa6GUAJ9yrwousQaQC3hM3uhGNcsZlCMfu2v538jzo0GCMdtFYS6w43l
-         73EA07pgK6TnF9OvuEyqpE8EmQEBzNLbLHHXjTNspy6dTVguVhIxzVfnvplmiVjs4MD6
-         I46K+/Zm4XiguILEmSu/SLtKXVYwcn8IabpheqIiDlpPJJFzXAOqvJ6fV4wPMvAXKDeY
-         yOhQ==
-X-Gm-Message-State: AOJu0Ywk5+zRoVNiLuzLsY8BFV7Odd/nLteP+a3IymTTfxr8hv8+0qrk
-	Avu43zXRhtsPggCUnGRcHIyZRrVmdbKn/GefvVaI7RE9QWW/CSWnahQqyw==
-X-Gm-Gg: ASbGncvujS834kFQZksLvlSZm/p6EClVPoikoYJBklrYjfTnhdae/9rSYJ6IeZ9ZFlN
-	H5qaA0uUcfMSgw1DKBzdYdiSqCeZN53pg7rTXNPETf6voIRn3cJ4n6luwXFSijACiylX3Ky5P2V
-	fY4U3WneVoLeVbp41LXSChYYgY//pHRrQlpBW/SeaFxdimZX38AM1OfwDr5KxfMevCt4Z0ZR7Qr
-	kpVyiSO+urwvghlLIDBI9xhrGNIla2SKywFvmWZh7a8EIB3m3GoxtFe3M0SSrGmbGcBg1vB8pTV
-	m+Jytk7t0vNRonF4VoT2pbXtwOEMUaCwzFLBivRpJwXr12URa98sYtsb88gCFtKahD+Gx3W38y8
+        bh=ccTKIiVTHaYhZLj8hvKA0e5OsXRQ+klutkUMg9gJHMU=;
+        b=ota5LPqKEaDGOX6RBzW84JEZICOBwLV5D+8xiArIMBruqVLmvOEGx7OhD3xuYKLOrb
+         a2nfEI6JdBoKpHSDefaurplrhJzOB8LeSH5cMws/0+S9rZyHAp0e5c/Y6Qrv/Dj/ZM87
+         PqrJpLV1B/2Zlc5NLOFdGuojek46wyj2vHZMn9MUEgzm2jWJm5FG28snr3TrViTkemrg
+         P1E5/giY7kLwjHE+EEjVCc5y0nPi7aBABgorCqltOfy8SBPhBzM8f8pn2VShaCqbVE3E
+         MqZ4t/tt8/1xBZJRuILVInfqU0Ma5bqEtl4y8cbfwVtkZLqTlMEoF2Sgt4lbzzywOdEA
+         uLaA==
+X-Gm-Message-State: AOJu0YwVZxj3yGA1qxYY1d2po26FcEzenqRbQW1t30xPEiyHnt9CI+GS
+	lx0gQAzNtSrXvZ5mRkSG7PjThyg0UGIBclqPf/ae5o9nL5YjeVWBZIVtUQ==
+X-Gm-Gg: ASbGncvYrLDFE9BB2DL2TuYBPMSxhrYq6O4f2b7tHaeEe4BNxuXUmBCLpn405A932Mf
+	AfyxQ26Zumi78262dNNZnGKzGRJwX4rMOn7SnEEKL+pvcAHIwBFdieCQ3JieQbYYVrtckng+YMw
+	8KbclNyyY1oR5OXMVbqSgKf2pgC1YaWuGMuamAMWQdE5BxMRrsinK9Tpx1IKioF+zTz8RZOsctR
+	pwbiDq5nVsQaT2eCi2iokoZgh0PkCcEIaFAsst2OOvAZbTbCiETrz661byE+QiqCp4wnRxuzK/q
+	IFmVK0FiyQcMXHNIim3S/9YJDm2PEmtejCAsjmeqoZt+QUjDLRMvGYJ98KhQCkQ51SrQHNqtMiI
 	=
-X-Google-Smtp-Source: AGHT+IE+chfJTjrJ52G54NgpH+3OTG1bfaZUT9e82NG3Jj7v7bRlABpQiJLiuAeWa7c3os6/HSiFyg==
-X-Received: by 2002:a17:902:ebc3:b0:223:3ef1:a30a with SMTP id d9443c01a7336-22804966733mr121871765ad.45.1743172993252;
-        Fri, 28 Mar 2025 07:43:13 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFexosxXRBAtpLFjEFSNZ7nlDOkiN2JMU+RNFio14CE7+gNXkwf5uUFrOAGPj22BLA0JNAdag==
+X-Received: by 2002:a17:902:ccd2:b0:211:e812:3948 with SMTP id d9443c01a7336-2280455d75fmr126309865ad.0.1743172996578;
+        Fri, 28 Mar 2025 07:43:16 -0700 (PDT)
 Received: from LOCLAP699.locus-demo-locuspark.locus ([152.193.78.90])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2291eee2288sm18885515ad.87.2025.03.28.07.43.11
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2291eee2288sm18885515ad.87.2025.03.28.07.43.15
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 28 Mar 2025 07:43:12 -0700 (PDT)
+        Fri, 28 Mar 2025 07:43:16 -0700 (PDT)
 From: James Prestwood <prestwoj@gmail.com>
 To: iwd@lists.linux.dev
 Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH v4 08/11] station: roam blacklist AP even mid-roam
-Date: Fri, 28 Mar 2025 07:42:50 -0700
-Message-Id: <20250328144253.421425-8-prestwoj@gmail.com>
+Subject: [PATCH v4 10/11] doc: document InitialRoamRequestedTimeout
+Date: Fri, 28 Mar 2025 07:42:52 -0700
+Message-Id: <20250328144253.421425-10-prestwoj@gmail.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20250328144253.421425-1-prestwoj@gmail.com>
 References: <20250328144253.421425-1-prestwoj@gmail.com>
@@ -74,78 +74,27 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-If an AP directed roam frame comes in while IWD is roaming its
-still valuable to parse that frame and blacklist the BSS that
-sent it.
-
-This can happen most frequently during a roam scan while connected
-to an overloaded BSS that is requesting IWD roams elsewhere.
 ---
- src/station.c | 28 ++++++++++++++++++++--------
- 1 file changed, 20 insertions(+), 8 deletions(-)
+ src/iwd.config.rst | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-diff --git a/src/station.c b/src/station.c
-index 623cfdca..c5529842 100644
---- a/src/station.c
-+++ b/src/station.c
-@@ -3225,12 +3225,10 @@ static void station_ap_directed_roam(struct station *station,
- 	uint8_t req_mode;
- 	uint16_t dtimer;
- 	uint8_t valid_interval;
-+	bool can_roam = !station_cannot_roam(station);
+diff --git a/src/iwd.config.rst b/src/iwd.config.rst
+index 895a1012..9761e8fd 100644
+--- a/src/iwd.config.rst
++++ b/src/iwd.config.rst
+@@ -292,6 +292,12 @@ control how long a misbehaved BSS spends on the blacklist.
  
- 	l_debug("ifindex: %u", netdev_get_ifindex(station->netdev));
- 
--	if (station_cannot_roam(station))
--		return;
--
- 	if (station->state != STATION_STATE_CONNECTED) {
- 		l_debug("roam: unexpected AP directed roam -- ignore");
- 		return;
-@@ -3294,8 +3292,13 @@ static void station_ap_directed_roam(struct station *station,
- 	 * disassociating us. If either of these bits are set, set the
- 	 * ap_directed_roaming flag. Otherwise still try roaming but don't
- 	 * treat it any different than a normal roam.
-+	 *
-+	 * The only exception here is if we are in the middle of roaming
-+	 * (can_roam == false) since we cannot reliably know if the roam scan
-+	 * included frequencies from potential candidates in this request,
-+	 * forcing a roam in this case might result in unintended behavior.
- 	 */
--	if (req_mode & (WNM_REQUEST_MODE_DISASSOCIATION_IMMINENT |
-+	if (can_roam && req_mode & (WNM_REQUEST_MODE_DISASSOCIATION_IMMINENT |
- 			WNM_REQUEST_MODE_TERMINATION_IMMINENT |
- 			WNM_REQUEST_MODE_ESS_DISASSOCIATION_IMMINENT))
- 		station->ap_directed_roaming = true;
-@@ -3322,15 +3325,24 @@ static void station_ap_directed_roam(struct station *station,
- 		pos += url_len;
- 	}
- 
-+	blacklist_add_bss(station->connected_bss->addr,
-+				BLACKLIST_REASON_ROAM_REQUESTED);
-+	station_debug_event(station, "ap-roam-blacklist-added");
+        The initial time that a BSS spends on the blacklist. Setting this to zero
+        will disable blacklisting functionality in IWD.
++   * - InitialRoamRequestedTimeout
++     - Values: uint64 value in seconds (default: **30**)
 +
-+	/*
-+	 * Validating the frame and blacklisting should still be done even if
-+	 * we are mid-roam. Its important to track the BSS requesting the
-+	 * transition so when the current roam completes IWD will be less likely
-+	 * to roam back to the current BSS.
-+	 */
-+	if (!can_roam)
-+		return;
-+
- 	station->preparing_roam = true;
- 
- 	l_timeout_remove(station->roam_trigger_timeout);
- 	station->roam_trigger_timeout = NULL;
- 
--	blacklist_add_bss(station->connected_bss->addr,
--				BLACKLIST_REASON_ROAM_REQUESTED);
--	station_debug_event(station, "ap-roam-blacklist-added");
--
- 	if (req_mode & WNM_REQUEST_MODE_PREFERRED_CANDIDATE_LIST) {
- 		l_debug("roam: AP sent a preferred candidate list");
- 		station_neighbor_report_cb(station->netdev, 0, body + pos,
++       The initial time that a BSS will be marked after a BSS requests a roam.
++       This is to aid in avoiding roaming back to BSS's which are likely
++       overloaded. Setting this to zero will disabled this form of blacklisting.
+    * - Multiplier
+      - Values: unsigned int value greater than zero, in seconds
+        (default: **30**)
 -- 
 2.34.1
 
