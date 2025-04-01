@@ -1,117 +1,127 @@
-Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
+Received: from mail-oa1-f49.google.com (mail-oa1-f49.google.com [209.85.160.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4AEA83C0C
-	for <iwd@lists.linux.dev>; Fri, 28 Mar 2025 14:43:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64F0620B80F
+	for <iwd@lists.linux.dev>; Tue,  1 Apr 2025 16:08:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743173000; cv=none; b=X5d2K3CEg1lFPOdgKmeBBT/UqYogTr9k5XPWRMiCXB2uGkUKQ9w6XGXano7gNJuUKlql8dN0WONsHHjxHnq+SWokTXdID6u5yVPLpaUYc8oXjk/ivUui8hAKBXYKMa/mkjkUtA+XRo/W52x4wTNdP3nE61gODuaq+iZ+OQ/vM1Y=
+	t=1743523703; cv=none; b=J3uBwna0wtZYhwumcMjyPtsXpDJBZ3U8d2ZLbKD6Sn6oX9SMLg/rD8NQqzCEb/ajHuFpp5k8aSUuJRTF9d4QOp77bK7ZFdyu53RARbfXpN1WBdedmeOkHyDRo1fIaHJt0A+qSpvvm4SHsOc0QZeIe2HZi1T193Fj2Akml9Fs5SM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743173000; c=relaxed/simple;
-	bh=ZoDKJGPnGKMx36DKOho//j5S6HpC+6EGSHdhC2FaqhA=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=a+2gk91HCTt/LdAL2Qu8biPzZgi21RqEbKo+VSf5ynPHTMCRW4/F61JGhejU6lXb1cRd7xIOOQm46bEf2p6lsYHfQhPX86wqRJU7J0gq3gHyDlMbbBhLbTyhmQUaLnTybVBXvchQJdxKauEdu6hviVupeXA85u/0sNfsjsYrrwo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dePCDYzL; arc=none smtp.client-ip=209.85.214.180
+	s=arc-20240116; t=1743523703; c=relaxed/simple;
+	bh=pOZFix1hk3AewbB5yxAkKTfb3aFM975nTC27rBtH6n0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=tLaErPKcz0G7NfmBqaWY8FdkQvmb9maGwaJQD10x3E3+moVwcw2Cib9b9KUFISuVQu51RP7jjb3xFtSK0Nzx015+42M3AsH1jDl7/xIdJVP37vGDiBHfUI+tD3PTmhOoojk81otQmjIAstiRDuWRKbpfkUW7Zjkxnp2xq6esvm8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=k2bPdR9O; arc=none smtp.client-ip=209.85.160.49
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dePCDYzL"
-Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-224019ad9edso5989235ad.1
-        for <iwd@lists.linux.dev>; Fri, 28 Mar 2025 07:43:19 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="k2bPdR9O"
+Received: by mail-oa1-f49.google.com with SMTP id 586e51a60fabf-2c76a1b574cso1773019fac.2
+        for <iwd@lists.linux.dev>; Tue, 01 Apr 2025 09:08:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1743172998; x=1743777798; darn=lists.linux.dev;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=EORRNsfPkTWjHTPGcs+V54wVY+ikpXkKwLm6j8BBCZI=;
-        b=dePCDYzLsuSueAYs8IRPtlgOcmSoksffI4W8yjtcEpCBFu8zrB2/a0UxHe8znedken
-         q/AnjAPHYhvbkJDVYal2dBZZMl/bak/+R2QpT3a4mec3pnXgsPohoDq8u1owpCqJPrSY
-         xUMdC1Az/QaR20VCWTyWsJu9g26qZwL4MZVoZtioykSYubTMLmwgOnV6samOG60DPmrt
-         TLCDeKpEC45svATngPZ1iwvIkZ+FcIQYB8sBwD7I54yFxr6+K5R1ZZ7VtwJ/0UTojQub
-         TWW1mCmRo+ITzD7gzXHpWUZv1c45UQ9mJcruhvjwcWpgM9mfDBRdj+PpzyqC3B9M1/+8
-         1/TQ==
+        d=gmail.com; s=20230601; t=1743523701; x=1744128501; darn=lists.linux.dev;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:to:subject:user-agent:mime-version:date:message-id:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=Uk6csq/UGFR8CqYrAui/C6VmG34AvAswA5ClWCt7pj4=;
+        b=k2bPdR9OyT95d6K8F4d3WUlyTP20PsPH5MZzkAhoX4dejVPq99GX0GbshKaOWGL3f0
+         G3YW0GrvW8HBSJapVFtTCpj2TmrkCsOQZ2UAFfSfJjjgK7U/FaNxEdq3vj3CK/rjrHHf
+         mPN3j2iFAIprAJ60qhbHlqTaGGcGAJNCM37peljUG2I/e20LTVLbDW0x7SrXjhbRnq6d
+         PUsHpkvCgklFA7bAb25bUPeG53fmRHpx93JVFZ4qb75N/42hhaUBD5brtTzD/VlKuUMe
+         7vbelIOLLkC2Q1AkR4Fmy6d0AASmcpKgNl+QGhD9VPo2vbhvoNpDUXs+W/BUVjt7xk62
+         fM8A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743172998; x=1743777798;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=EORRNsfPkTWjHTPGcs+V54wVY+ikpXkKwLm6j8BBCZI=;
-        b=jnt3dEU2/xlxVT0LtWR7k8vOrKJDwwPMG4fewiG4KoXxXRE9uqGp3eJLQY71Pc85rN
-         C8NFqrFbGXMFDvcFbgYKK8MAbC0w7o8KhaUnOqlsxPAwHHabZu6c73i2UwH2P8fhteIQ
-         fffKt7+DTolSp7gL70Dn8aZfDpsf12tJrYjTsNrQaSrq/oNCKREwXOsvWEwjOwCiZFfb
-         C87UvewuGzyB4wS7TxZ/0yHMzNQp0w1pZ4cK7jF+Cu8Ova7G6CGdUFlA2ZSqGHfAwOCy
-         z4etjAj4FhFSaTuLYlLsNGy6AsMtIM9t/mGL8dk8z0XEhjydtEOs1F+m/d3eMjyeDcdk
-         EA7Q==
-X-Gm-Message-State: AOJu0YyqOglahkbQPA+GKZXXjEWmA4ke5LATNyhoDUrxrxyQ3vcw+ikh
-	yFQw4LpBp9dBx3AG+VlBGVk8pBv8l2k+oTY77wXW7+wdf/T2/ZEgCmyLBQ==
-X-Gm-Gg: ASbGncuL+elm8laArFMY2YAw47RVkqePsbVwilveyeuj+pBqfdfLNYNFyMFn4guXtLy
-	rVZA4Vn0H0zjdOPUlA2xpe5E88xyzNUy2/8SyNcAqGvW0e1YHzu3KgyYylPChN9+xZOSX6lmvQx
-	f3GHD8UKSDDl3UT3f8dXnVTbfx5FbARNj/lhWrrcE6v8xftbazyJPgU+zjMzPYXmGO3ksdCeLlF
-	IKVhEB9qV1XcQp/qI0t0tZqV1j9njHx8ziQBu+UvvmHWakNC260lZIJ5EmwaXSoheWEUFSAtzeu
-	JvjcWFZK6Qn3zROmkoj/J7nZ7LV/bT0jbfH008ixUA+WfMl0GMIt4PvmPcOh62CBRBbx3rRrKPc
-	=
-X-Google-Smtp-Source: AGHT+IGjaIelmYhsnQvevKD4M6GzFT6FN3vd0ICgxuKLnUmCznKF2aqx8QVCtnVoUf3Yw8QCf7aEWQ==
-X-Received: by 2002:a17:903:1a2b:b0:224:1ec0:8a1a with SMTP id d9443c01a7336-2280499f4eemr122808345ad.51.1743172998277;
-        Fri, 28 Mar 2025 07:43:18 -0700 (PDT)
-Received: from LOCLAP699.locus-demo-locuspark.locus ([152.193.78.90])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2291eee2288sm18885515ad.87.2025.03.28.07.43.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 28 Mar 2025 07:43:17 -0700 (PDT)
-From: James Prestwood <prestwoj@gmail.com>
-To: iwd@lists.linux.dev
-Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH v4 11/11] netdev: fix invalid read after netdev_free
-Date: Fri, 28 Mar 2025 07:42:53 -0700
-Message-Id: <20250328144253.421425-11-prestwoj@gmail.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20250328144253.421425-1-prestwoj@gmail.com>
-References: <20250328144253.421425-1-prestwoj@gmail.com>
+        d=1e100.net; s=20230601; t=1743523701; x=1744128501;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Uk6csq/UGFR8CqYrAui/C6VmG34AvAswA5ClWCt7pj4=;
+        b=KQO3e+l+P5TAYc6GryRKSsQ74ZyEUDKNe5c92UnZj+Q8053sQicFLYenrPfNFpOd7O
+         eZgO8hh13Vh7IxrTl1kz+yMCKFM+nhcO16+SzGkVnSiSRt7+mUDn8MALRTJJCxW+wLpb
+         pNlOo2PHOzqz1FT/vl5fBt2pnxofMf1jXorFeWOnR0zIcBk+BVIzNN632WjkZGJO9A02
+         xocpuerRRUO3VnchVp+jqb7nBT5IwmWA1Q13ffpO0FhBN8JCuyxpd3gVP2BZtgAd+HYA
+         5Hn0viuInhRUqJPea2ujqwK7geHbGkorPraNgQu47JEWq1rWUPeLdoELIbLXGBP1cDmm
+         AUeQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUOmrnTK9LZnMfXdOyBO5LkrdaQ38Eu1HZr7bQqqrPZobnPHGiUmA0n4pRwwDvNCUOw1Jk=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yyv4GceQ6Rk9wlBxCxGfvWjLGHFV1WL5MP2WEW9BcR5ZTbzqFEZ
+	nijhGKZkBynS3yAEAKAT4MNHv9AA/z2xPaMyvoHvOKpWJ6RIQ1TU
+X-Gm-Gg: ASbGncs2ny8sNRn8PMYkrkDl7ST9GYMbKIdsxTPLlIuuehKkmaisaoW2Tj3MNcuSeRF
+	Tn8slxHUBku/lUkgIKI2BbprwDuGJSLgKEd+jqmjH3gW7SkFQglEiYxPIhEAyHUwR9CxJ7p42Aj
+	LfI+sF8yFnIwvDOoDNME2n+9QLc65UgM5fhjnL5KsOLFacSS3txgVIY4YDnErMWbVIa9HdoUDVq
+	nFgIfn6IdgHTarchTHCQS65SMpBAw/gVsCbp97vckrITG0+WYeUC6kdirL25Z50q6mQLuu1aRLl
+	EBJleTYL1HHZ8Q7JShAa2h4W2nB3qQ+MRklgJHkngy5Hv8zxcMAE9OsLmAjZ2adZ4tFAOt/zmys
+	DF5d+0aToAw==
+X-Google-Smtp-Source: AGHT+IHV2780vOqSfZZ1Grzrj6k/U1ffcUPXcoDIZUecvMe15V3hlbBYewA+IwH9B9R0b6dmLwBZnA==
+X-Received: by 2002:a05:6870:f10c:b0:29e:766d:e969 with SMTP id 586e51a60fabf-2cbcf4ef188mr7486310fac.10.1743523701148;
+        Tue, 01 Apr 2025 09:08:21 -0700 (PDT)
+Received: from [192.168.1.25] (syn-070-114-247-242.res.spectrum.com. [70.114.247.242])
+        by smtp.googlemail.com with ESMTPSA id 586e51a60fabf-2c86a3ef951sm2410095fac.1.2025.04.01.09.08.20
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 01 Apr 2025 09:08:20 -0700 (PDT)
+Message-ID: <c5a170cd-fc55-4a7f-a5fe-af7f9cb731ed@gmail.com>
+Date: Tue, 1 Apr 2025 11:08:19 -0500
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 07/11] station: roam blacklist BSS's, and consider when
+ roaming
+To: James Prestwood <prestwoj@gmail.com>, iwd@lists.linux.dev
+References: <20250328144253.421425-1-prestwoj@gmail.com>
+ <20250328144253.421425-7-prestwoj@gmail.com>
+Content-Language: en-US
+From: Denis Kenzior <denkenz@gmail.com>
+In-Reply-To: <20250328144253.421425-7-prestwoj@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-The netdev frame watches got cleaned up upon the interface going down
-which works if the interface is simply being toggled but when IWD
-shuts down it first shuts down the interface, then immediately frees
-netdev. If a watched frame arrives immediately after that before the
-interface shutdown callback it will reference netdev, which has been
-freed.
+Hi James,
 
-Fix this by clearing out the frame watches in netdev_free.
+On 3/28/25 9:42 AM, James Prestwood wrote:
+> If the BSS is requesting IWD roam elsewhere add this BSS to the
+> blacklist using BLACKLIST_REASON_ROAM_REQUESTED. This will lower
+> the chances of IWD roaming/connecting back to this BSS in the
+> future.
+> 
+> This then allows IWD to consider this blacklist state when picking
+> a roam candidate. Its undesireable to fully ban a roam blacklisted
+> BSS, so some additional sorting logic has been added. Prior to
+> comparing based on rank, BSS's will be sorted into two higher level
+> groups:
+> 
+> Above Threshold - BSS is above the CriticalRoamThreshold
+> Below Threshold - BSS is below the CriticalRoamThreshold
 
-==147== Invalid read of size 8
-==147==    at 0x408ADB: netdev_neighbor_report_frame_event (netdev.c:4772)
-==147==    by 0x467C75: frame_watch_unicast_notify (frame-xchg.c:234)
-==147==    by 0x4E28F8: __notifylist_notify (notifylist.c:91)
-==147==    by 0x4E2D37: l_notifylist_notify_matches (notifylist.c:204)
-==147==    by 0x4A1388: process_unicast (genl.c:844)
-==147==    by 0x4A1388: received_data (genl.c:972)
-==147==    by 0x49D82F: io_callback (io.c:105)
-==147==    by 0x49C93C: l_main_iterate (main.c:461)
-==147==    by 0x49CA0B: l_main_run (main.c:508)
-==147==    by 0x49CA0B: l_main_run (main.c:490)
-==147==    by 0x49CC3F: l_main_run_with_signal (main.c:630)
-==147==    by 0x4049EC: main (main.c:614)
----
- src/netdev.c | 1 +
- 1 file changed, 1 insertion(+)
+As discussed, I amended this to read RoamThreshold since that is what patch 6 is 
+returning.
 
-diff --git a/src/netdev.c b/src/netdev.c
-index 048681f5..b81a475f 100644
---- a/src/netdev.c
-+++ b/src/netdev.c
-@@ -1109,6 +1109,7 @@ static void netdev_free(void *data)
- 		l_timeout_remove(netdev->rssi_poll_timeout);
- 
- 	scan_wdev_remove(netdev->wdev_id);
-+	frame_watch_wdev_remove(netdev->wdev_id);
- 
- 	watchlist_destroy(&netdev->station_watches);
- 
--- 
-2.34.1
+> 
+> Within each of these groups the BSS may be roam blacklisted which
+> will position it at the bottom of the list within its respecitve
+> group.
+> ---
+>   src/station.c | 75 ++++++++++++++++++++++++++++++++++++++++++++++-----
+>   1 file changed, 69 insertions(+), 6 deletions(-)
+> 
 
+<snip>
+
+> + *
+> + * For an initial (probably naive) approach here we can use the
+> + * CriticalSignalThreshod[5G] which indicates the signal level that would not
+
+ditto here.
+
+> + * be of an acceptable connection quality. BSS can then be sorted either
+> + * above or below this threshold. Within each of these groups a BSS may be
+> + * blacklisted, meaning it should get sorted lower on the list compared to
+> + * others within the same group.
+> + *
+
+All applied, thanks.
+
+Regards,
+-Denis
