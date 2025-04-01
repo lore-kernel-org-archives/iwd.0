@@ -1,65 +1,65 @@
-Received: from mail-oa1-f49.google.com (mail-oa1-f49.google.com [209.85.160.49])
+Received: from mail-ot1-f43.google.com (mail-ot1-f43.google.com [209.85.210.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64F0620B80F
-	for <iwd@lists.linux.dev>; Tue,  1 Apr 2025 16:08:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE8A7BA42
+	for <iwd@lists.linux.dev>; Tue,  1 Apr 2025 16:17:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743523703; cv=none; b=J3uBwna0wtZYhwumcMjyPtsXpDJBZ3U8d2ZLbKD6Sn6oX9SMLg/rD8NQqzCEb/ajHuFpp5k8aSUuJRTF9d4QOp77bK7ZFdyu53RARbfXpN1WBdedmeOkHyDRo1fIaHJt0A+qSpvvm4SHsOc0QZeIe2HZi1T193Fj2Akml9Fs5SM=
+	t=1743524277; cv=none; b=izy4RACfrWflfGuEVzSXkeEc4A1D157mV0RnriOj32J7B0hrx4r8XBN/DSd4HehSKF8Alqqhyulf305WPa8UPPygyft1ZZQkfuOC56QPK9yMb9UBaWNCqVxm32I3M2x6IjnORqQn0c8EXTWxfgQ7ZOd4LaXnPcZI4bJzsnbOFMI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743523703; c=relaxed/simple;
-	bh=pOZFix1hk3AewbB5yxAkKTfb3aFM975nTC27rBtH6n0=;
+	s=arc-20240116; t=1743524277; c=relaxed/simple;
+	bh=hgFZPCgIykXbr6gKTwSJ5VvCh2Uxgs08+NLCqNO+IOA=;
 	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=tLaErPKcz0G7NfmBqaWY8FdkQvmb9maGwaJQD10x3E3+moVwcw2Cib9b9KUFISuVQu51RP7jjb3xFtSK0Nzx015+42M3AsH1jDl7/xIdJVP37vGDiBHfUI+tD3PTmhOoojk81otQmjIAstiRDuWRKbpfkUW7Zjkxnp2xq6esvm8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=k2bPdR9O; arc=none smtp.client-ip=209.85.160.49
+	 In-Reply-To:Content-Type; b=QNojti1JPLnAZYiPKFgKX5ATTTG7Z+gMP5l4qdaL5T4fi0+oys8076ULSsfD/+sJOTy3FWcS41Wuvn/1YT4aoUfs/ZauK+9yACAtOTKDSPR9vm3+MpPUfmUOnb0kOZPYYvfU+0gJh1OBZUTjo/iqNEAoQsJj9v6FZN709qdZQRc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZtbfaLfr; arc=none smtp.client-ip=209.85.210.43
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="k2bPdR9O"
-Received: by mail-oa1-f49.google.com with SMTP id 586e51a60fabf-2c76a1b574cso1773019fac.2
-        for <iwd@lists.linux.dev>; Tue, 01 Apr 2025 09:08:22 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZtbfaLfr"
+Received: by mail-ot1-f43.google.com with SMTP id 46e09a7af769-72bbc03d436so3546159a34.3
+        for <iwd@lists.linux.dev>; Tue, 01 Apr 2025 09:17:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1743523701; x=1744128501; darn=lists.linux.dev;
+        d=gmail.com; s=20230601; t=1743524275; x=1744129075; darn=lists.linux.dev;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:to:subject:user-agent:mime-version:date:message-id:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=Uk6csq/UGFR8CqYrAui/C6VmG34AvAswA5ClWCt7pj4=;
-        b=k2bPdR9OyT95d6K8F4d3WUlyTP20PsPH5MZzkAhoX4dejVPq99GX0GbshKaOWGL3f0
-         G3YW0GrvW8HBSJapVFtTCpj2TmrkCsOQZ2UAFfSfJjjgK7U/FaNxEdq3vj3CK/rjrHHf
-         mPN3j2iFAIprAJ60qhbHlqTaGGcGAJNCM37peljUG2I/e20LTVLbDW0x7SrXjhbRnq6d
-         PUsHpkvCgklFA7bAb25bUPeG53fmRHpx93JVFZ4qb75N/42hhaUBD5brtTzD/VlKuUMe
-         7vbelIOLLkC2Q1AkR4Fmy6d0AASmcpKgNl+QGhD9VPo2vbhvoNpDUXs+W/BUVjt7xk62
-         fM8A==
+        bh=IHLw2mL3xIpU4Q6dCuzBIT7F2rgsqGvKL5QBHJfsMp8=;
+        b=ZtbfaLfri6/m/+G4V1JsR5+PBHNAJmJEyxoZ7Wti/e0reLHXK0gh99xRuZChXze2cD
+         V5T7r5h2Qf9eIMyE7N6oG553YtOjKYT6SDt3aVL/JcipuXkwMYPnV9ffMOum8C97GWGN
+         ULM+EVAoBxp6bm6brj8hxgNMj/ikPKove8UXxHeyDCqrV22WAzrfdsy5Zu8Q/qcztiGk
+         mt39YiLwOpaCLJ12djq74XpEYQ80DmsAz1H37OKaV/4tJ65UTuokuXSXbGDFHYXd+MX6
+         DXqYoKPBHp8+hzyMe2BLxqSS47JF3X8CsQMh2PrUMRMhEcHBdXrElNbsZjG2oK71KjPT
+         U8WQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743523701; x=1744128501;
+        d=1e100.net; s=20230601; t=1743524275; x=1744129075;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Uk6csq/UGFR8CqYrAui/C6VmG34AvAswA5ClWCt7pj4=;
-        b=KQO3e+l+P5TAYc6GryRKSsQ74ZyEUDKNe5c92UnZj+Q8053sQicFLYenrPfNFpOd7O
-         eZgO8hh13Vh7IxrTl1kz+yMCKFM+nhcO16+SzGkVnSiSRt7+mUDn8MALRTJJCxW+wLpb
-         pNlOo2PHOzqz1FT/vl5fBt2pnxofMf1jXorFeWOnR0zIcBk+BVIzNN632WjkZGJO9A02
-         xocpuerRRUO3VnchVp+jqb7nBT5IwmWA1Q13ffpO0FhBN8JCuyxpd3gVP2BZtgAd+HYA
-         5Hn0viuInhRUqJPea2ujqwK7geHbGkorPraNgQu47JEWq1rWUPeLdoELIbLXGBP1cDmm
-         AUeQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUOmrnTK9LZnMfXdOyBO5LkrdaQ38Eu1HZr7bQqqrPZobnPHGiUmA0n4pRwwDvNCUOw1Jk=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yyv4GceQ6Rk9wlBxCxGfvWjLGHFV1WL5MP2WEW9BcR5ZTbzqFEZ
-	nijhGKZkBynS3yAEAKAT4MNHv9AA/z2xPaMyvoHvOKpWJ6RIQ1TU
-X-Gm-Gg: ASbGncs2ny8sNRn8PMYkrkDl7ST9GYMbKIdsxTPLlIuuehKkmaisaoW2Tj3MNcuSeRF
-	Tn8slxHUBku/lUkgIKI2BbprwDuGJSLgKEd+jqmjH3gW7SkFQglEiYxPIhEAyHUwR9CxJ7p42Aj
-	LfI+sF8yFnIwvDOoDNME2n+9QLc65UgM5fhjnL5KsOLFacSS3txgVIY4YDnErMWbVIa9HdoUDVq
-	nFgIfn6IdgHTarchTHCQS65SMpBAw/gVsCbp97vckrITG0+WYeUC6kdirL25Z50q6mQLuu1aRLl
-	EBJleTYL1HHZ8Q7JShAa2h4W2nB3qQ+MRklgJHkngy5Hv8zxcMAE9OsLmAjZ2adZ4tFAOt/zmys
-	DF5d+0aToAw==
-X-Google-Smtp-Source: AGHT+IHV2780vOqSfZZ1Grzrj6k/U1ffcUPXcoDIZUecvMe15V3hlbBYewA+IwH9B9R0b6dmLwBZnA==
-X-Received: by 2002:a05:6870:f10c:b0:29e:766d:e969 with SMTP id 586e51a60fabf-2cbcf4ef188mr7486310fac.10.1743523701148;
-        Tue, 01 Apr 2025 09:08:21 -0700 (PDT)
+        bh=IHLw2mL3xIpU4Q6dCuzBIT7F2rgsqGvKL5QBHJfsMp8=;
+        b=HNQ3F/R4ygvdGOCU96tBtVoHLPN61KiFTsgNt0hG3WY8bgllGAL2OW9nQXF+jt4bu0
+         +nS9H3KZfvvZJiKtMjohnrrDrJjvP465BBzVu3OiTsz7XbvqE+y8p3rZNYZRmeqgPWrm
+         mNf4elMS4gqPNts2tRw4aAhRf+GKvTCxO1cC9Tju7qxRF5KaXRaWQiElv/M18XeYd/1R
+         UhtuAxjeexAm1cb+gaTOdxTF7o8OvBeAyfUXMNpqz1NRPgtU2W6BTddgpdseX8jK59aL
+         373vh6926o3v1YEC8e4dgja624XWs66q4VjRbFg8u8H4cOyZu1siXPG7JgjPuUBQwPTs
+         +avA==
+X-Forwarded-Encrypted: i=1; AJvYcCUbCLP1NfKdGTt43LoCKeaLSTfbigAe4DOck96Kfq6GbTnDD9UkHeCLHxBiSIC2be1h+jk=@lists.linux.dev
+X-Gm-Message-State: AOJu0YxoORikIyIDUw1IlR2xcb+qsUuYKb+rl9vmGhsqyQ+S6Hc6TKe1
+	D6IpES+E6j5eqm7RvAM6oxjpwfItRKIrjzXCQ2Co2XrPbLykH2Dl
+X-Gm-Gg: ASbGncuFnXZB5yTMVZZYkD2aE4gJdOk4jiQqbf5au8BN0bUxIGnq4oBWkb3fxQe8Kks
+	7FHlqxaa7EsnApc38PLVpm42KRPBiM/QKbz/Y3WFHAhYm10zJhteOPzUwdcCUWG3HY/RYI9c04Z
+	4/TnGoE5dyjIgq9XGaPXXmgt7/jznYHzKSCAbYaz9g4JvZMXW2FUF32CVHUnkJ/tak3pzLCBHyP
+	AqlyKZBELS1dZ9woHz0u4jC5uOyYC9YRBGpeuU/J4HhrsDuf6JISx4Z8j6hRiTv7cnXRBrnOaJp
+	eC1/01WPXq03i2DyG0ezV58FXLL2WRN6RFhUEUlPEGOowA0HpVyg0JVZOHYe5+DeO5eRRpi9awu
+	rhQ9wRfoDWHzHVD6f55M0
+X-Google-Smtp-Source: AGHT+IF9z1KEyk1iaWo7x5TcCuggF1RmVUdRUKUOLcEypdpDz57jrFuj2JYuwCPj4al9Ty/xFQGLBA==
+X-Received: by 2002:a05:6830:2802:b0:72b:7d60:fda6 with SMTP id 46e09a7af769-72dae42e806mr2464427a34.0.1743524274994;
+        Tue, 01 Apr 2025 09:17:54 -0700 (PDT)
 Received: from [192.168.1.25] (syn-070-114-247-242.res.spectrum.com. [70.114.247.242])
-        by smtp.googlemail.com with ESMTPSA id 586e51a60fabf-2c86a3ef951sm2410095fac.1.2025.04.01.09.08.20
+        by smtp.googlemail.com with ESMTPSA id 586e51a60fabf-2c86a860267sm2383913fac.36.2025.04.01.09.17.53
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 01 Apr 2025 09:08:20 -0700 (PDT)
-Message-ID: <c5a170cd-fc55-4a7f-a5fe-af7f9cb731ed@gmail.com>
-Date: Tue, 1 Apr 2025 11:08:19 -0500
+        Tue, 01 Apr 2025 09:17:54 -0700 (PDT)
+Message-ID: <3614045a-7b0a-477a-b90b-7c1c130bb3a9@gmail.com>
+Date: Tue, 1 Apr 2025 11:17:52 -0500
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
@@ -67,61 +67,45 @@ List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 07/11] station: roam blacklist BSS's, and consider when
- roaming
+Subject: Re: [PATCH v2 0/5] PMKSA support for fullmac drivers
 To: James Prestwood <prestwoj@gmail.com>, iwd@lists.linux.dev
-References: <20250328144253.421425-1-prestwoj@gmail.com>
- <20250328144253.421425-7-prestwoj@gmail.com>
+References: <20250213201816.230112-1-prestwoj@gmail.com>
 Content-Language: en-US
 From: Denis Kenzior <denkenz@gmail.com>
-In-Reply-To: <20250328144253.421425-7-prestwoj@gmail.com>
+In-Reply-To: <20250213201816.230112-1-prestwoj@gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 Hi James,
 
-On 3/28/25 9:42 AM, James Prestwood wrote:
-> If the BSS is requesting IWD roam elsewhere add this BSS to the
-> blacklist using BLACKLIST_REASON_ROAM_REQUESTED. This will lower
-> the chances of IWD roaming/connecting back to this BSS in the
-> future.
+On 2/13/25 2:18 PM, James Prestwood wrote:
+> This set removes the need for the prior patch on the list:
+> [RFC] netdev: avoid PMKSA for fullmac drivers
 > 
-> This then allows IWD to consider this blacklist state when picking
-> a roam candidate. Its undesireable to fully ban a roam blacklisted
-> BSS, so some additional sorting logic has been added. Prior to
-> comparing based on rank, BSS's will be sorted into two higher level
-> groups:
+> And instead implementes proper support for PMKSA as opposed to
+> disabling it.
 > 
-> Above Threshold - BSS is above the CriticalRoamThreshold
-> Below Threshold - BSS is below the CriticalRoamThreshold
-
-As discussed, I amended this to read RoamThreshold since that is what patch 6 is 
-returning.
-
+> v2:
+>   * Reworked patches to utilize a new driver callback concept within
+>     the pmksa module. This avoids the need to expose any netdev APIs
+>     and makes the removal within the kernel transparent to modules
+>     using the PMKSA cache.
 > 
-> Within each of these groups the BSS may be roam blacklisted which
-> will position it at the bottom of the list within its respecitve
-> group.
-> ---
->   src/station.c | 75 ++++++++++++++++++++++++++++++++++++++++++++++-----
->   1 file changed, 69 insertions(+), 6 deletions(-)
+> James Prestwood (5):
+>    netdev: don't set CQM thresholds for fullmac cards
+>    netdev: remove/update some iwd_notice logs
+>    pmksa: add driver callbacks and pmksa_cache_free
+>    handshake: use pmksa_cache_free
+>    netdev: implement PMKSA for fullmac drivers
+> 
+>   src/handshake.c |   6 +--
+>   src/netdev.c    | 133 +++++++++++++++++++++++++++++++++++++++++++++---
+>   src/pmksa.c     |  38 +++++++++++++-
+>   src/pmksa.h     |   9 ++++
+>   4 files changed, 173 insertions(+), 13 deletions(-)
 > 
 
-<snip>
-
-> + *
-> + * For an initial (probably naive) approach here we can use the
-> + * CriticalSignalThreshod[5G] which indicates the signal level that would not
-
-ditto here.
-
-> + * be of an acceptable connection quality. BSS can then be sorted either
-> + * above or below this threshold. Within each of these groups a BSS may be
-> + * blacklisted, meaning it should get sorted lower on the list compared to
-> + * others within the same group.
-> + *
-
-All applied, thanks.
+I went ahead and applied this series as well.  Thanks!
 
 Regards,
 -Denis
