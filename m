@@ -1,111 +1,233 @@
-Received: from mail-ot1-f43.google.com (mail-ot1-f43.google.com [209.85.210.43])
+Received: from mail-pg1-f182.google.com (mail-pg1-f182.google.com [209.85.215.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE8A7BA42
-	for <iwd@lists.linux.dev>; Tue,  1 Apr 2025 16:17:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8CB72222B6
+	for <iwd@lists.linux.dev>; Mon,  7 Apr 2025 03:48:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743524277; cv=none; b=izy4RACfrWflfGuEVzSXkeEc4A1D157mV0RnriOj32J7B0hrx4r8XBN/DSd4HehSKF8Alqqhyulf305WPa8UPPygyft1ZZQkfuOC56QPK9yMb9UBaWNCqVxm32I3M2x6IjnORqQn0c8EXTWxfgQ7ZOd4LaXnPcZI4bJzsnbOFMI=
+	t=1743997732; cv=none; b=Mil7dxGmMs21YpVxA1/j6gZ7Wle81YYoowIlbfdKb1wlTY3USxAL9XHKu3XlwRXWLr/9jJQPhZD1SkiJq/NZXQNAvS2emXo355dFf2ZrPBxUOrA/WNNI7ZsOuNIbG+EfkSzFGbpECy/XCkv5zw5JCYp4YMR3owulcoFUDRc4pV4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743524277; c=relaxed/simple;
-	bh=hgFZPCgIykXbr6gKTwSJ5VvCh2Uxgs08+NLCqNO+IOA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=QNojti1JPLnAZYiPKFgKX5ATTTG7Z+gMP5l4qdaL5T4fi0+oys8076ULSsfD/+sJOTy3FWcS41Wuvn/1YT4aoUfs/ZauK+9yACAtOTKDSPR9vm3+MpPUfmUOnb0kOZPYYvfU+0gJh1OBZUTjo/iqNEAoQsJj9v6FZN709qdZQRc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZtbfaLfr; arc=none smtp.client-ip=209.85.210.43
+	s=arc-20240116; t=1743997732; c=relaxed/simple;
+	bh=C/CPmrIy5ISc16ab7x1CnMHDOQ7aLOM8CnE8VkIbm70=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Content-Type; b=noyXKNGzo0WG9GVWu3Nvhx2WnqxQaJfB8hJfHBEbhe8sjmCrh+yenbXRVjJ7z/HRGY9RDjScTNpS86/SuyZtCI19npUQPWgVYeQayUqnyHKc0TpeiKopbphDcL8Hfu53Cfl5U5cJe/BblTpaWj38aqnVzTIItD1Yo+1XshaWm70=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jgIQYFR/; arc=none smtp.client-ip=209.85.215.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZtbfaLfr"
-Received: by mail-ot1-f43.google.com with SMTP id 46e09a7af769-72bbc03d436so3546159a34.3
-        for <iwd@lists.linux.dev>; Tue, 01 Apr 2025 09:17:55 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jgIQYFR/"
+Received: by mail-pg1-f182.google.com with SMTP id 41be03b00d2f7-af579e46b5dso2391069a12.3
+        for <iwd@lists.linux.dev>; Sun, 06 Apr 2025 20:48:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1743524275; x=1744129075; darn=lists.linux.dev;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=IHLw2mL3xIpU4Q6dCuzBIT7F2rgsqGvKL5QBHJfsMp8=;
-        b=ZtbfaLfri6/m/+G4V1JsR5+PBHNAJmJEyxoZ7Wti/e0reLHXK0gh99xRuZChXze2cD
-         V5T7r5h2Qf9eIMyE7N6oG553YtOjKYT6SDt3aVL/JcipuXkwMYPnV9ffMOum8C97GWGN
-         ULM+EVAoBxp6bm6brj8hxgNMj/ikPKove8UXxHeyDCqrV22WAzrfdsy5Zu8Q/qcztiGk
-         mt39YiLwOpaCLJ12djq74XpEYQ80DmsAz1H37OKaV/4tJ65UTuokuXSXbGDFHYXd+MX6
-         DXqYoKPBHp8+hzyMe2BLxqSS47JF3X8CsQMh2PrUMRMhEcHBdXrElNbsZjG2oK71KjPT
-         U8WQ==
+        d=gmail.com; s=20230601; t=1743997730; x=1744602530; darn=lists.linux.dev;
+        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=C/CPmrIy5ISc16ab7x1CnMHDOQ7aLOM8CnE8VkIbm70=;
+        b=jgIQYFR/ToMoMGl3o2Ify6LsCXIgQ9sVau/pC17sxrM0gYtFp9nxwILqKl9bVWmdkJ
+         c04Z5/VQRbdR/V2znYuK6Iix9Tc7RAddBlL1+/JnMO92f6U0tCiPCVULrz1XOD986kql
+         ak0GmfLuq02c9xUcnMTsVf20mSJ4lUlyY315+arXH9bJqv1FrLRGeWwoZb5356vzk01U
+         2gutTUPCb0Fu5v8jRBvCKQ0a99t+HhMQPwbzGBy/f3Wd6Ow+6yi3K934oLggurMSglFe
+         4KbUukGAl5DqRy8Joyxa40uPAUQSd55XTu3+aCdK6GaEtUFON+Lo7oJnTwC9lniB1Bji
+         33Tw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743524275; x=1744129075;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=IHLw2mL3xIpU4Q6dCuzBIT7F2rgsqGvKL5QBHJfsMp8=;
-        b=HNQ3F/R4ygvdGOCU96tBtVoHLPN61KiFTsgNt0hG3WY8bgllGAL2OW9nQXF+jt4bu0
-         +nS9H3KZfvvZJiKtMjohnrrDrJjvP465BBzVu3OiTsz7XbvqE+y8p3rZNYZRmeqgPWrm
-         mNf4elMS4gqPNts2tRw4aAhRf+GKvTCxO1cC9Tju7qxRF5KaXRaWQiElv/M18XeYd/1R
-         UhtuAxjeexAm1cb+gaTOdxTF7o8OvBeAyfUXMNpqz1NRPgtU2W6BTddgpdseX8jK59aL
-         373vh6926o3v1YEC8e4dgja624XWs66q4VjRbFg8u8H4cOyZu1siXPG7JgjPuUBQwPTs
-         +avA==
-X-Forwarded-Encrypted: i=1; AJvYcCUbCLP1NfKdGTt43LoCKeaLSTfbigAe4DOck96Kfq6GbTnDD9UkHeCLHxBiSIC2be1h+jk=@lists.linux.dev
-X-Gm-Message-State: AOJu0YxoORikIyIDUw1IlR2xcb+qsUuYKb+rl9vmGhsqyQ+S6Hc6TKe1
-	D6IpES+E6j5eqm7RvAM6oxjpwfItRKIrjzXCQ2Co2XrPbLykH2Dl
-X-Gm-Gg: ASbGncuFnXZB5yTMVZZYkD2aE4gJdOk4jiQqbf5au8BN0bUxIGnq4oBWkb3fxQe8Kks
-	7FHlqxaa7EsnApc38PLVpm42KRPBiM/QKbz/Y3WFHAhYm10zJhteOPzUwdcCUWG3HY/RYI9c04Z
-	4/TnGoE5dyjIgq9XGaPXXmgt7/jznYHzKSCAbYaz9g4JvZMXW2FUF32CVHUnkJ/tak3pzLCBHyP
-	AqlyKZBELS1dZ9woHz0u4jC5uOyYC9YRBGpeuU/J4HhrsDuf6JISx4Z8j6hRiTv7cnXRBrnOaJp
-	eC1/01WPXq03i2DyG0ezV58FXLL2WRN6RFhUEUlPEGOowA0HpVyg0JVZOHYe5+DeO5eRRpi9awu
-	rhQ9wRfoDWHzHVD6f55M0
-X-Google-Smtp-Source: AGHT+IF9z1KEyk1iaWo7x5TcCuggF1RmVUdRUKUOLcEypdpDz57jrFuj2JYuwCPj4al9Ty/xFQGLBA==
-X-Received: by 2002:a05:6830:2802:b0:72b:7d60:fda6 with SMTP id 46e09a7af769-72dae42e806mr2464427a34.0.1743524274994;
-        Tue, 01 Apr 2025 09:17:54 -0700 (PDT)
-Received: from [192.168.1.25] (syn-070-114-247-242.res.spectrum.com. [70.114.247.242])
-        by smtp.googlemail.com with ESMTPSA id 586e51a60fabf-2c86a860267sm2383913fac.36.2025.04.01.09.17.53
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 01 Apr 2025 09:17:54 -0700 (PDT)
-Message-ID: <3614045a-7b0a-477a-b90b-7c1c130bb3a9@gmail.com>
-Date: Tue, 1 Apr 2025 11:17:52 -0500
+        d=1e100.net; s=20230601; t=1743997730; x=1744602530;
+        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=C/CPmrIy5ISc16ab7x1CnMHDOQ7aLOM8CnE8VkIbm70=;
+        b=cj6MeSCF06Y1vvMaAMUiWhBiWVokVAuSxYzi7AlmldqD1noXAlAqn5iQLqLjc9rNua
+         2UunkwbQsw+AjtZbCX/fR93H6dj/Q56eC6OXsvRc1YmvOCGx/ADYYYDkRSeEkUZqkkNN
+         GYTv3UDxD4ZeZk5YEcxFcgJFLV5fPfM6oZ9+95+Pk64MMQBfBWryrHUt//F6Cv3LzXZY
+         TMiL+ltUjLqpSmqHK7/HO3rvLPqGiSuTcvVkmz2geSe9YoHYF+PjLn5WOmqap578/+P2
+         F6teRuGBVzMd4dR6LYCqbhj5vCPB0Ff0f0fzz1JoctD1f109WEdEyzL9lSj0kTfCKiCA
+         7nuw==
+X-Gm-Message-State: AOJu0Yy9Km3uOq14tS3XpxxjFgFh0xvEhH9Ta1aWOKdsiXh0htAr1aoG
+	NqL4GvHCL8k5ZiyGc7DaZpu7SGVwGVWQdAMh6tDcWAS9OVvOmFISdHu5wzKs0jt8Tr8V1tTeT9O
+	avTqq20dddpSwl/VtSJgYAT+6ldW0OXQn
+X-Gm-Gg: ASbGnctniujeNVO4N45jzALe+ax+EZr4Mzh3bRhMyVSwo5v1NIaJeGX/SHywRcaB7lc
+	TKRIfF7p+64ztUPhT9IE5JL/TfHxl7Iw7mzHm4fAePCLGSX1cH/xfOECTHF3itFUEpTWC3fk7EF
+	339FETnBzDyWQIjvttRwLyiUHN8EhFPk9c+RRqHMY=
+X-Google-Smtp-Source: AGHT+IFsjwdHWwfhuNPsymMEPpvl5zd1dZ5P13KeruXthcEEz7ciS3k2qzSZPThArrjX1C8i9sJlGFDBnOR0Min2hm4=
+X-Received: by 2002:a17:90b:570e:b0:2fe:b8ba:62e1 with SMTP id
+ 98e67ed59e1d1-306a6213a3emr13896349a91.28.1743997729883; Sun, 06 Apr 2025
+ 20:48:49 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 0/5] PMKSA support for fullmac drivers
-To: James Prestwood <prestwoj@gmail.com>, iwd@lists.linux.dev
-References: <20250213201816.230112-1-prestwoj@gmail.com>
-Content-Language: en-US
-From: Denis Kenzior <denkenz@gmail.com>
-In-Reply-To: <20250213201816.230112-1-prestwoj@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+From: KeithG <ys3al35l@gmail.com>
+Date: Sun, 6 Apr 2025 22:48:38 -0500
+X-Gm-Features: ATxdqUH7BnryJm5L_s-h3eJpX9voexfZ5N1qMIiLt3nYBFlQsqitH4x-UxuNqbQ
+Message-ID: <CAG17S_Mgb9fHFcwW1KoNZ2QxZVH2rKZuwG5i78c8us0HjwO7Eg@mail.gmail.com>
+Subject: strange behavior with synthetic ap0
+To: iwd@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
 
-Hi James,
+I have been messing around with a synthetic ap0 to set up AP mode up
+on my brcmfmac equipped Pis. This attempt is on a Pi4 with the 43455
+chip, but I've recently seen this with other Pis.
+What I do to set up the ap0 is this:
 
-On 2/13/25 2:18 PM, James Prestwood wrote:
-> This set removes the need for the prior patch on the list:
-> [RFC] netdev: avoid PMKSA for fullmac drivers
-> 
-> And instead implementes proper support for PMKSA as opposed to
-> disabling it.
-> 
-> v2:
->   * Reworked patches to utilize a new driver callback concept within
->     the pmksa module. This avoids the need to expose any netdev APIs
->     and makes the removal within the kernel transparent to modules
->     using the PMKSA cache.
-> 
-> James Prestwood (5):
->    netdev: don't set CQM thresholds for fullmac cards
->    netdev: remove/update some iwd_notice logs
->    pmksa: add driver callbacks and pmksa_cache_free
->    handshake: use pmksa_cache_free
->    netdev: implement PMKSA for fullmac drivers
-> 
->   src/handshake.c |   6 +--
->   src/netdev.c    | 133 +++++++++++++++++++++++++++++++++++++++++++++---
->   src/pmksa.c     |  38 +++++++++++++-
->   src/pmksa.h     |   9 ++++
->   4 files changed, 173 insertions(+), 13 deletions(-)
-> 
+iw dev wlan0 interface add ap0 type __ap
+ip link set dev ap0 address d8:3a:dd:60:a3:cg
+systemctl reload-or-restart iwd
+iwctl device ap0 set-property Mode ap
+iwctl ap ap0 start-profile test
 
-I went ahead and applied this series as well.  Thanks!
+Then from connmanctl, I attempt to connect to a known SSID. If ap0 is
+up, I cannot connect to the SSID with the correct password. If I take
+ap0 down 'iw ap0 del' and try again, it connects. This is with either
+iwd controlling the AP or hostapd. It doesn't matter which is
+controlling the ap0, if it is up, I always get a failed password if
+ap0 is up. This used to work and seems to have regressed.
 
-Regards,
--Denis
+When I enable debug for iwd, this is what it looks like when I attempt
+to connect to a known SSID when the ap0 is up.
+Apr 06 16:36:09 pi4 connmand[138138]: Interface wlan0 [ wifi ] state
+is association
+Apr 06 16:36:09 pi4 iwd[158609]: src/network.c:network_connect()
+Apr 06 16:36:09 pi4 iwd[158609]: src/network.c:network_connect_psk()
+ask_passphrase: true
+Apr 06 16:36:09 pi4 iwd[158609]:
+src/agent.c:agent_request_passphrase() agent 0x5582c692f0 owner
+:1.5673 path /net/connman/iwd_agent
+Apr 06 16:36:09 pi4 iwd[158609]: src/agent.c:agent_send_next_request()
+send request to :1.5673 /net/connman/iwd_agent
+Apr 06 16:36:09 pi4 iwd[158609]: src/agent.c:agent_receive_reply()
+agent 0x5582c692f0 request id 117
+Apr 06 16:36:09 pi4 iwd[158609]: src/network.c:passphrase_callback() result 0
+Apr 06 16:36:09 pi4 iwd[158609]:
+src/network.c:network_generate_sae_pt() Generating PT for Group 19
+Apr 06 16:36:09 pi4 iwd[158609]:
+src/network.c:network_generate_sae_pt() Generating PT for Group 20
+Apr 06 16:36:09 pi4 iwd[158609]: src/wiphy.c:wiphy_radio_work_insert()
+Inserting work item 6
+Apr 06 16:36:09 pi4 iwd[158609]: src/wiphy.c:wiphy_radio_work_next()
+Starting work item 6
+Apr 06 16:36:09 pi4 iwd[158609]: event: connect-info, ssid: keithS23,
+bss: 56:ba:50:be:c8:62, signal: -69, load: 0/255
+Apr 06 16:36:09 pi4 iwd[158609]: event: state, old: autoconnect_full,
+new: connecting
+Apr 06 16:36:09 pi4 iwd[158609]: src/scan.c:scan_periodic_stop()
+Stopping periodic scan for wdev 1
+Apr 06 16:36:09 pi4 connmand[138138]: Interface wlan0 [ wifi ] state
+is configuration
+Apr 06 16:36:09 pi4 iwd[158609]: src/netdev.c:netdev_mlme_notify()
+MLME notification Connect(46)
+Apr 06 16:36:09 pi4 iwd[158609]: src/netdev.c:netdev_connect_event()
+Apr 06 16:36:09 pi4 iwd[158609]: src/netdev.c:netdev_connect_event()
+aborting and ignore_connect_event not set, proceed
+Apr 06 16:36:09 pi4 iwd[158609]: src/netdev.c:netdev_connect_event()
+expect_connect_failure not set, proceed
+Apr 06 16:36:09 pi4 iwd[158609]: src/netdev.c:parse_request_ies()
+Apr 06 16:36:09 pi4 iwd[158609]: src/netdev.c:netdev_connect_event()
+Request / Response IEs parsed
+Apr 06 16:36:09 pi4 iwd[158609]: src/netdev.c:netdev_get_oci()
+Apr 06 16:36:09 pi4 connmand[138138]: wlan0 {RX} 335 packets 72684 bytes
+Apr 06 16:36:09 pi4 connmand[138138]: wlan0 {TX} 1615 packets 216925 bytes
+Apr 06 16:36:09 pi4 connmand[138138]: wlan0 {update} flags 102403 <UP,LOWER_UP>
+Apr 06 16:36:09 pi4 connmand[138138]: wlan0 {newlink} index 3 address
+DC:A6:32:B4:50:CF mtu 1500
+Apr 06 16:36:09 pi4 connmand[138138]: wlan0 {newlink} index 3
+operstate 5 <DORMANT>
+Apr 06 16:36:09 pi4 iwd[158609]: src/netdev.c:netdev_link_notify()
+event 16 on ifindex 3
+Apr 06 16:36:09 pi4 iwd[158609]: src/netdev.c:netdev_get_oci_cb()
+Obtained OCI: freq: 5785, width: 3, center1: 5775, center2: 0
+Apr 06 16:36:09 pi4 iwd[158609]: src/eapol.c:eapol_start()
+Apr 06 16:36:09 pi4 iwd[158609]:
+src/station.c:station_handshake_event() Handshaking
+Apr 06 16:36:09 pi4 iwd[158609]: src/eapol.c:eapol_handle_ptk_1_of_4() ifindex=3
+Apr 06 16:36:09 pi4 iwd[158609]: src/netdev.c:netdev_link_notify()
+event 16 on ifindex 3
+Apr 06 16:36:09 pi4 iwd[158609]: src/netdev.c:netdev_link_notify()
+event 16 on ifindex 3
+Apr 06 16:36:09 pi4 iwd[158609]: src/netdev.c:netdev_link_notify()
+event 16 on ifindex 3
+Apr 06 16:36:09 pi4 iwd[158609]: src/eapol.c:eapol_handle_ptk_3_of_4() ifindex=3
+Apr 06 16:36:09 pi4 iwd[158609]: src/netdev.c:netdev_set_gtk()
+ifindex=3 key_idx=1
+Apr 06 16:36:09 pi4 iwd[158609]:
+src/station.c:station_handshake_event() Setting keys
+Apr 06 16:36:09 pi4 iwd[158609]: src/network.c:network_sync_settings()
+Apr 06 16:36:09 pi4 iwd[158609]: src/netdev.c:netdev_set_tk()
+ifindex=3 key_idx=0
+Apr 06 16:36:09 pi4 iwd[158609]: src/netdev.c:netdev_set_rekey_offload() 3
+Apr 06 16:36:09 pi4 iwd[158609]:
+src/netdev.c:netdev_new_group_key_cb() ifindex: 3, err: 0
+Apr 06 16:36:09 pi4 iwd[158609]: src/netdev.c:try_handshake_complete()
+ptk_installed: 0, gtk_installed: 1, igtk_installed: 1
+Apr 06 16:36:09 pi4 iwd[158609]: hardware_rekey not supported
+Apr 06 16:36:09 pi4 iwd[158609]: src/netdev.c:netdev_set_station_cb()
+Apr 06 16:36:09 pi4 iwd[158609]: src/netdev.c:try_handshake_complete()
+ptk_installed: 1, gtk_installed: 1, igtk_installed: 1
+Apr 06 16:36:09 pi4 iwd[158609]: src/netdev.c:try_handshake_complete()
+nhs->complete: 0
+Apr 06 16:36:09 pi4 iwd[158609]: src/netdev.c:try_handshake_complete()
+Invoking handshake_event()
+Apr 06 16:36:09 pi4 iwd[158609]:
+src/handshake.c:handshake_state_cache_pmksa() No PMKSA for
+56:ba:50:be:c8:62
+Apr 06 16:36:09 pi4 iwd[158609]: src/netdev.c:netdev_connect_ok()
+Apr 06 16:36:09 pi4 iwd[158609]: src/station.c:station_connect_cb() 3, result: 0
+Apr 06 16:36:09 pi4 iwd[158609]: src/station.c:station_connect_ok()
+Apr 06 16:36:09 pi4 iwd[158609]: event: state, old: connecting, new:
+connecting (netconfig)
+Apr 06 16:36:09 pi4 iwd[158609]: src/wiphy.c:wiphy_radio_work_done()
+Work item 6 done
+Apr 06 16:36:09 pi4 connmand[138138]: wlan0 {RX} 336 packets 72839 bytes
+Apr 06 16:36:09 pi4 connmand[138138]: wlan0 {TX} 1619 packets 217577 bytes
+Apr 06 16:36:09 pi4 connmand[138138]: wlan0 {update} flags 102467
+<UP,RUNNING,LOWER_UP>
+Apr 06 16:36:09 pi4 connmand[138138]: wlan0 {newlink} index 3 address
+DC:A6:32:B4:50:CF mtu 1500
+Apr 06 16:36:09 pi4 connmand[138138]: wlan0 {newlink} index 3 operstate 6 <UP>
+Apr 06 16:36:09 pi4 iwd[158609]: src/netdev.c:netdev_link_notify()
+event 16 on ifindex 3
+Apr 06 16:36:19 pi4 iwd[158609]: src/netdev.c:netdev_mlme_notify()
+MLME notification Disconnect(48)
+Apr 06 16:36:19 pi4 iwd[158609]: src/netdev.c:netdev_disconnect_event()
+Apr 06 16:36:19 pi4 iwd[158609]: Received Deauthentication event,
+reason: 0, from_ap: false
+Apr 06 16:36:19 pi4 iwd[158609]: src/station.c:station_disconnect_event() 3
+Apr 06 16:36:19 pi4 iwd[158609]: event: disconnect-info, reason: 0
+Apr 06 16:36:19 pi4 iwd[158609]: src/station.c:station_disassociated() 3
+Apr 06 16:36:19 pi4 iwd[158609]:
+src/station.c:station_reset_connection_state() 3
+Apr 06 16:36:19 pi4 iwd[158609]: src/station.c:station_roam_state_clear() 3
+Apr 06 16:36:19 pi4 connmand[138138]: wlan0 {RX} 336 packets 72839 bytes
+Apr 06 16:36:19 pi4 connmand[138138]: wlan0 {TX} 1635 packets 220020 bytes
+Apr 06 16:36:19 pi4 connmand[138138]: wlan0 {update} flags 36867 <UP>
+Apr 06 16:36:19 pi4 connmand[138138]: wlan0 {newlink} index 3 address
+DC:A6:32:B4:50:CF mtu 1500
+Apr 06 16:36:19 pi4 connmand[138138]: wlan0 {newlink} index 3 operstate 2 <DOWN>
+Apr 06 16:36:19 pi4 iwd[158609]: event: state, old: connecting
+(netconfig), new: disconnected
+Apr 06 16:36:19 pi4 iwd[158609]: event: state, old: disconnected, new:
+autoconnect_quick
+Apr 06 16:36:19 pi4 iwd[158609]: src/wiphy.c:wiphy_radio_work_insert()
+Inserting work item 7
+Apr 06 16:36:19 pi4 iwd[158609]: src/wiphy.c:wiphy_radio_work_next()
+Starting work item 7
+Apr 06 16:36:19 pi4 iwd[158609]: src/netdev.c:netdev_link_notify()
+event 16 on ifindex 3
+Apr 06 16:36:19 pi4 iwd[158609]: src/scan.c:scan_notify() Scan
+notification Trigger Scan(33)
+Apr 06 16:36:19 pi4 iwd[158609]: src/netdev.c:netdev_link_notify()
+event 16 on ifindex 3
+Apr 06 16:36:19 pi4 iwd[158609]: src/scan.c:scan_request_triggered()
+Passive scan triggered for wdev 1
+Apr 06 16:36:19 pi4 iwd[158609]:
+src/station.c:station_quick_scan_triggered() Quick scan triggered for
+wlan0
+Apr 06 16:36:19 pi4 connmand[138138]: Interface wlan0 [ wifi ] error
+"connect-failed"
+Apr 06 16:36:19 pi4 connmand[138138]: Interface wlan0 [ wifi ] state is failure
+Apr 06 16:36:19 pi4 iwd[158609]: src/station.c:station_dbus_disconnect()
+Apr 06 16:36:19 pi4 iwd[158609]: event: state, old: autoconnect_quick,
+new: disconnected
+
+It is strange that it reports a bad password. Is this a brcmfmac
+driver issue or a firmware issue?
+
+Keith
