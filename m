@@ -1,108 +1,127 @@
-Received: from mail-oo1-f44.google.com (mail-oo1-f44.google.com [209.85.161.44])
+Received: from mail-pj1-f53.google.com (mail-pj1-f53.google.com [209.85.216.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B642614F117
-	for <iwd@lists.linux.dev>; Sat, 12 Apr 2025 20:23:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F9F01DE3D1
+	for <iwd@lists.linux.dev>; Sat, 12 Apr 2025 20:59:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744489403; cv=none; b=tp+XpDkuHBD7K9xyKfZH0t6y9SKWNh0OVTEst30GzaOxyYI9/LT5AetFTpTKVBdOhJ1110xMjb/ISgZWoVFqY3k7tb6u1n8JJ6yi+I0dMPPpI6MEfA5P2Q3asJT0yleoswtRz5KkT5VPpgOOszkK+dosplQzFnKN/23f6MelzRE=
+	t=1744491558; cv=none; b=NrL3MHe/nJHFGaN2vY+kjmI8ZAO1tCY5Onwm7maxLUoWvQ40aVmUhGUneEJZaXzyTXbMF3TsmONSICTrYbFSwzKgod/t5E2MCFaD5yOxJuAfpKKu1w/Ytq9x3C9iOhWG7YQ8hIDwTvz7ZwEo/ssOhrM8ZDXhgTQnimzTQDI3UW4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744489403; c=relaxed/simple;
-	bh=Qyp5YlcTJhF1X69UgT8yqTdsUT3wi9xK4P1s/WrU++U=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=h3mp+W0n/VLZ8SXtbI27jHfQopMxo19cSS11ElU8S2EDnYjXfGiwlKdQdf9SShby3RNvrm5rz0ncmNZuM0tX6Dnfg97x/lpDeYCR7i2hTM6Pyx102K/bKGxJL9Gwp9WCOAQTGEmvLfZ1aUfEGBZPqpGA9y7/p3pmq6xJ43r1N/s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Z6z+aCgj; arc=none smtp.client-ip=209.85.161.44
+	s=arc-20240116; t=1744491558; c=relaxed/simple;
+	bh=EmIx6lzC5C7jsIU0OSjy574x+VAvnC3YiaJ8okMVtgI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=m4KCrTFVeM9D4y143YHJBEyIX6zFJ78ejWu5ZRXyMseT3HYRbiM+K4tJo7HnXSFMbYm/3DTRSjV3RBJoWW1LPKWGfq8WVmGM/1aSUKDMsbpN8knNFdYn0G6sDTjV/EP8APBycix5yWLyfl63lo5F5E9p2Up1dRSWYPB7KfQgQVM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kZ1fIerQ; arc=none smtp.client-ip=209.85.216.53
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Z6z+aCgj"
-Received: by mail-oo1-f44.google.com with SMTP id 006d021491bc7-601a46ee19fso1528857eaf.0
-        for <iwd@lists.linux.dev>; Sat, 12 Apr 2025 13:23:21 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kZ1fIerQ"
+Received: by mail-pj1-f53.google.com with SMTP id 98e67ed59e1d1-2ff6a98c638so3368424a91.0
+        for <iwd@lists.linux.dev>; Sat, 12 Apr 2025 13:59:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1744489400; x=1745094200; darn=lists.linux.dev;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=FhmVn8b31GX8TGFCBrcXmPXqGrs0WsLA/ryXOaNOykE=;
-        b=Z6z+aCgjZEYMUQUIQX617UTw+rKlcLUkKeX4UAE9YZZonEyAc6lJ1//3zaMV/tZ573
-         7Of371Is6scc0UmNMnAJYJMrEu2BiNsQwESQOr1OHH7s0yoEw6Q2Lc/y8jSUc5SvQ8uA
-         csc4YmmdH5HnuhwSr1bMONlQn4bvIDWQOq3UeNvKxfDuG+PKcRRXMP1z/DahQReW9N6h
-         otydRyNgvXZz9OvW29WAmj1smbqhoMdA39j+t1ZhvmLJsNmIAuWyELvObsyIhUHooV43
-         6q5SOGWSHpy81LXztvFa7xavAn6Dgay8OFS38uUIDL/3n3NsLiM0Lq8WASFc5zGuMn+P
-         3agQ==
+        d=gmail.com; s=20230601; t=1744491556; x=1745096356; darn=lists.linux.dev;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ZyG/QZYpCdIo8As1Sz9H0CtHaBbC4D7aQh68P1C9aB0=;
+        b=kZ1fIerQC9+WjYwC9spYDp4Z9AcloPCqiaLtYJPsRhQfTIIPau0rBE3Ik2xCURGTGk
+         YTrwuP/ue4yi1DbRlDgkDsi1+djT9Gyujo8g0v+AT1b3KbytgKXum4Rv0pWn6nB4HXbD
+         VTAOkceCBQxfX3yJkxoEQnt90gc57rjf4qbHw4c50sMh5Vtjtpu/LSY1FTxx57+RwzR4
+         eNCJf2Q3lYi0ZwVvsDbcjxVbcvMLoLlzwFN+2bHZgIGD2sPjQ84mjWAkoG8j2ADLNIzD
+         6nItV7y0UChsidiH5b2OH8Lt1V9in8uW5K83stmljeAha7W9kpn5mGYTe8j0mlDYsp0r
+         LwUw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744489400; x=1745094200;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=FhmVn8b31GX8TGFCBrcXmPXqGrs0WsLA/ryXOaNOykE=;
-        b=GphYtjUm42YHpYAdzJrxE3bJ/UB8EteK9GnP9TNNw6vER9wleTN2QYRmtI6CXEANIw
-         ++WuFGzbdXsNZUwdF8T66Cq2cz4Z1M3vw6npz5U5F56LN3zEHduafBdEFlUXMFiO2FtS
-         RQXmeW0wbslXsCmEvC1hf+rwu32aYRIyp+I0n7ntPFLsFBHDAWKZnOh7WexUFyUPP8xY
-         NZhHdBPC8C6NcZ7k1gF4yUT8McrEYX0lj5PhLpb4EyRlix9acvfD2RZGofd/MylTw4hG
-         XY8CCEkR+giCv+424KigbfSD3+t+wQ+uN0zw3MChvjt4oVfy92+HiK+WuNAoUeHF8s5e
-         Ijpw==
-X-Forwarded-Encrypted: i=1; AJvYcCXSLf/By1Vn2s0VV4Qr86SAtVmT+cYJidJQRudU9OmYLO7YMcr6FItDprYM3/vWbFverQI=@lists.linux.dev
-X-Gm-Message-State: AOJu0YwnDRh7puy1RiZ6jXxND8wXZsi/78PEqNk971kRPvdNC0GyJRk1
-	Knc8biRlcyEvADF8uZJ0MOZ8ciF1JRnl3uQmdVDCaN5rjj4+I0mi
-X-Gm-Gg: ASbGncutITFdtCZw2iWhr59gNTC9IAfg2V0qe5sZXgf1urAX9fjPj5VxYcB3qWvzPN6
-	oV+8jb73H37C5uHV+pta9RLty80UvfuGlz2HT099DlU49J0z2x38Wl5AQAw4JJ+rMxgQiX/d1Vg
-	PSz/y+kEQjc043tJtxsN10lcFR3DbC8EsSP1p7UqG/A2Qpfdr/BN9XnU2wV2x5jHUwX4YsnHjvh
-	49+7lMQmAfMRa5VXIaZGk93GU0qlsfU9WTnST4yCn6YuuraoN66nTh9M8kYp/mSfUN5/9h2kbbI
-	nNviwsLMJx+YGHTCR3QZLztY51vjvuE6Iex8yn23TK0d++9sq4oL3fIjk29dkCQegPqoYY+NSot
-	kjAjHcw==
-X-Google-Smtp-Source: AGHT+IFI08Apk3SVAHzRCj6rmiwhT2BNjokHoi4HYYxSWos5rnET9o+7Jnze7p+PI14CE+P8DMuZ7A==
-X-Received: by 2002:a05:6870:1b15:b0:2c2:3fad:760f with SMTP id 586e51a60fabf-2d0d5f80ac8mr4350159fac.37.1744489400441;
-        Sat, 12 Apr 2025 13:23:20 -0700 (PDT)
-Received: from [192.168.1.25] (syn-070-114-247-242.res.spectrum.com. [70.114.247.242])
-        by smtp.googlemail.com with ESMTPSA id 586e51a60fabf-2d096d4af4esm1640826fac.45.2025.04.12.13.23.19
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 12 Apr 2025 13:23:19 -0700 (PDT)
-Message-ID: <da603744-b1de-42fb-bdd6-61472a684d85@gmail.com>
-Date: Sat, 12 Apr 2025 15:23:18 -0500
+        d=1e100.net; s=20230601; t=1744491556; x=1745096356;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ZyG/QZYpCdIo8As1Sz9H0CtHaBbC4D7aQh68P1C9aB0=;
+        b=Je6prouWDKfZE60ym/K5s4fQhNKwzdSGtcZAJx1/SUonCxv3B7vdaK1o/I/ii+1w7f
+         wJ6fONBi5zPp02+L6BhiHSKh7cNSFWCAk5ODgYOXPKmLqDoYi1LdDyk8DVDDuYkaYADi
+         sy2BUtqMpEuxg64JO5E7sGYWmLRFIfRIQa0a7cQSbjjwdO5kpF45usUcQMBkoHb+0MO8
+         iHFHie0pxCKjqdkZiEusNmFKOTF7/vq6YzwxDPQet2cnqNMTGTk+L6mZuf1rnMJbdbI2
+         q/FF8ADUHCq2qGlemNVvgXT9GSjcLkIWcuX45QbFtmzI/w+W6BWFdBraoP2zJFr0pM02
+         pAVw==
+X-Gm-Message-State: AOJu0YxtlDwNFyUU1z6qgkVmytBRz2tlObudDv/S6Oab+337aCuuwa+t
+	cddGIzsG7puMWsL38bNZx2v4BpcyI/86h0rcu+/UhG8UWTjIFLe72CnBCIoFyTmLAAIUkqk4b1h
+	4BdAs4Fy3AlS62yA29CAWYlmNz8A=
+X-Gm-Gg: ASbGncvwByzJfGpMuc/Fq03YhIGDRxvlqq5pYrNipilqpelsZiEIzDow7lSysau22oC
+	NHB6PYTqye8TxRX/AxSrvkr1quBBHdkQzuDb/GdQxVspnj0egBo78DkGMV8S4Ofgf8uv9kdmzQa
+	kRg2d2ajr4ui0zXMzZFiUM7fjY7PRNhC65J1s=
+X-Google-Smtp-Source: AGHT+IFIFA55BpUsUJZtl4mRG3pF2szecM+Nrmg/7PWc9Ry28k0aT3yGrCBLugJZkABP2L2eirJCEBoiT3ySLxi7PNo=
+X-Received: by 2002:a17:90b:4b8f:b0:2ee:f687:6acb with SMTP id
+ 98e67ed59e1d1-30823646af9mr11040011a91.13.1744491555514; Sat, 12 Apr 2025
+ 13:59:15 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: how to get scanned network strength over dbus
-To: KeithG <ys3al35l@gmail.com>, iwd@lists.linux.dev
 References: <CAG17S_NCdQ39dBaKtNdiF5yWcX=sgpppPxqhifM+Oik4o=s==A@mail.gmail.com>
-Content-Language: en-US
-From: Denis Kenzior <denkenz@gmail.com>
-In-Reply-To: <CAG17S_NCdQ39dBaKtNdiF5yWcX=sgpppPxqhifM+Oik4o=s==A@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+ <da603744-b1de-42fb-bdd6-61472a684d85@gmail.com>
+In-Reply-To: <da603744-b1de-42fb-bdd6-61472a684d85@gmail.com>
+From: KeithG <ys3al35l@gmail.com>
+Date: Sat, 12 Apr 2025 15:59:04 -0500
+X-Gm-Features: ATxdqUGqlEwetPtVyiMmSUHT-mzpka4E6j9Ncigx_rwMq4ewJLFyrZRNZGJXrmE
+Message-ID: <CAG17S_MPOSsmVoPaLNoOvANLEukG5THJsx9gVaP0xHpXYGnwFA@mail.gmail.com>
+Subject: Re: how to get scanned network strength over dbus
+To: Denis Kenzior <denkenz@gmail.com>
+Cc: iwd@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Keith,
+Denis,
 
-On 4/12/25 1:48 PM, KeithG wrote:
-> I am trying to get a listing of ssid Dbm values for my UI. I an trying
-> to write a python script to do that and ran across the ones in the iwd
-> directrory
-> https://git.kernel.org/pub/scm/network/wireless/iwd.git/tree/test
-> I copied get-diagnostics and ran it and it works for the conneced
+Thanks for the help, but I figured it out. The script in the directory
+'list-devices' illustrated how to do it.
 
-diagnostics is for the connected BSS (not network per se, there may be multiple 
-BSSes in a network).
+aside:
+Our UI is dependent on some of the output and format of some of the
+connmanctl commands.
+We wanted to remove that component and I was able to construct a
+python script that mimics
+'connmanctl services' and 'connmanctl services <service>'
 
-> network. How do I get the dBm values for all scanned networks?
-> # python3 get-diagnostics.py /net/connman/iwd/0/3
-> ConnectedBss : a6:2e:48:fd:9e:73
-> RSSI : -57 dBm
-> TxBitrate : 292500 Kbps
-> RxBitrate : 292500 Kbps
-> 
-> but I want this for all the scanned networks... Is this possible
-> across the dBus?
+This was able to get us going. I noted that the Pi boots significantly
+faster without connman. We now use
+systemd-networkd and iwd and have a python script working to start an
+ap0 if the wlan0 disconnects
+and then shuts it down if iwd reconnects to a known network.
 
-If you don't need to know the signal strength of individual BSSes, then
-                 array(on) GetOrderedNetworks()
+Keith
 
-is what you want.  See doc/station-api.txt
-
-
-Regards,
--Denis
+On Sat, Apr 12, 2025 at 3:23=E2=80=AFPM Denis Kenzior <denkenz@gmail.com> w=
+rote:
+>
+> Hi Keith,
+>
+> On 4/12/25 1:48 PM, KeithG wrote:
+> > I am trying to get a listing of ssid Dbm values for my UI. I an trying
+> > to write a python script to do that and ran across the ones in the iwd
+> > directrory
+> > https://git.kernel.org/pub/scm/network/wireless/iwd.git/tree/test
+> > I copied get-diagnostics and ran it and it works for the conneced
+>
+> diagnostics is for the connected BSS (not network per se, there may be mu=
+ltiple
+> BSSes in a network).
+>
+> > network. How do I get the dBm values for all scanned networks?
+> > # python3 get-diagnostics.py /net/connman/iwd/0/3
+> > ConnectedBss : a6:2e:48:fd:9e:73
+> > RSSI : -57 dBm
+> > TxBitrate : 292500 Kbps
+> > RxBitrate : 292500 Kbps
+> >
+> > but I want this for all the scanned networks... Is this possible
+> > across the dBus?
+>
+> If you don't need to know the signal strength of individual BSSes, then
+>                  array(on) GetOrderedNetworks()
+>
+> is what you want.  See doc/station-api.txt
+>
+>
+> Regards,
+> -Denis
