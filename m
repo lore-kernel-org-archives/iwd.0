@@ -1,67 +1,67 @@
-Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
+Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CF8FDDC5
-	for <iwd@lists.linux.dev>; Wed, 16 Apr 2025 17:33:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C05B217648
+	for <iwd@lists.linux.dev>; Wed, 16 Apr 2025 17:33:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744824837; cv=none; b=kQzXei1L1u0mxVZnvuYh3oRlOueJFxhPQvRK+LVDHrG/z03da/TzP44ybei6dm1W7FUMAiDyjS020xi5xI+1HMHwurml63L2YRMJiHGtH3bX597WGO/Xr1AprWVKLV+Nt+0s6U86PNJ6vO5/n1PRbCMvRFcoFzwg07QQ6Ue4YHI=
+	t=1744824838; cv=none; b=HEYS0AL99OjtOgllOQbIS95VlpdM36yWqwOb5xrx/XWYZkgSEc4VIcpMStaZTJhTpJTpeOYlCJVUOrQUvoHIr/D8ENIl5rV/lBR0A56dkmOYxqCwBIw/AhM5EfxB5CqTJL5BjK52yMCP3F83/DoslyDXzLG7nmvpJt0VXIugBkY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744824837; c=relaxed/simple;
-	bh=dnAh0hNNULRts5xVDY0QT2AYmER4tftL68IrsBPMwPk=;
+	s=arc-20240116; t=1744824838; c=relaxed/simple;
+	bh=2Z8TRvkw90f80EiT2iTlzF46VTMPZcmWm49GpbJ6hmk=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=mN4Mr0iLm0dVflbKC+EsxcJsvNQHvHxsxeuu9cLjOgY9bXwvRmv+wcdqOcAxxcW8Of0XkaMRhAdl5sbQTp8SdupeAolhtAdqyxPv9eqUiTJJ8VrTya8bv4xVRNW/On2Ae2HIB1MpO6SBer1R1chid7daktFkccgQWXFVbkxk9Ls=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eRmgQLD3; arc=none smtp.client-ip=209.85.214.175
+	 MIME-Version; b=gF9vV2T7IjBHNHWBG+FzSPHOaV+SizYiPEGPmAOJgjxk8fbOfpJaGGxRCuH2oHxt8rBN3T6furb83tXcGBuSlJFj3DX35aPAqkPSqUH1ms7ruKtNnP21TD4wVj1FfDoPJizv0S/BgkqWRAkwlExQbtLDbfxAMvphGa4pPGaMeU8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PWuh8YfP; arc=none smtp.client-ip=209.85.214.177
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eRmgQLD3"
-Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-223fb0f619dso80077995ad.1
-        for <iwd@lists.linux.dev>; Wed, 16 Apr 2025 10:33:54 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PWuh8YfP"
+Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-225477548e1so70812955ad.0
+        for <iwd@lists.linux.dev>; Wed, 16 Apr 2025 10:33:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1744824834; x=1745429634; darn=lists.linux.dev;
+        d=gmail.com; s=20230601; t=1744824836; x=1745429636; darn=lists.linux.dev;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=zbLhRUJxLcFIeWz6VpxzfDCs5nU8wpLLiYjEYwooRvM=;
-        b=eRmgQLD3p6KgldEjb8SknlaYZTrMQboTcPwWc953oNyKKTHwlXriN3oerIlPcu8lUk
-         U+5SN1J4HRwobP69tsdh2cA2csVngFqvP5c4hJU3Y4I6J9y4m7NY0b9xVbx+D6L5qe0R
-         had0Zi5rAf5kC8yp7kZmg1AvzTIyqWY/g+VzL6ASrGVCptlH+sAaYMyGopM16CrO/KE4
-         b9CJkDqAF4fKzpM5GZebYEZzFyoeI5YfZVgQimNtJ5s1+t5e/aHRhMi4zCO6MBTK2lYO
-         Y+7pxXJuQ/RlW9xu0kpmmT247YKrHW/pYbvnq6qdFgEH4V1cdQW2qOW8TQYJVQH+Lhnz
-         FsuA==
+        bh=E9OKIAaTqy9rd5buBUYDES3ctTAbhthQN1ANbhLhB8Y=;
+        b=PWuh8YfPS8ithsyPmWWUh/qh6zznj5Vqa4SVk439XarAT2ElwZyPDriugi22YkJ/Uv
+         QmJEY1wjL/ys9y+56XgDat6iQSU8DlaNwBB3igx2cZTOQ27tQNiF9+S0qFHVLLdQ/2P4
+         6BXc3i5wh/euwOyY+e8SRkFNTQRlKJfX2Ch/Kb+QJhNwuV7GXLWJOnLiZcXIkWJo6rsj
+         CCwWqibsDzWEoEfEU5TOI8jD2qQ74JUcumJv7UKGVHOzC+2lSG5Ko1EbNnypoWJOCZss
+         HuK2emuKRD0mYMXuROvsHjK4RZ1pCbWKeOEOyPD5VsKL6L3l4p5eWUh22jDJXEcYmDeT
+         ijAg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744824834; x=1745429634;
+        d=1e100.net; s=20230601; t=1744824836; x=1745429636;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=zbLhRUJxLcFIeWz6VpxzfDCs5nU8wpLLiYjEYwooRvM=;
-        b=mx86IR3zGfAC0dj/9TgITiBhmtPTfHleAT3S2YnheT/eqt418a6n2qoLfXatk62IRm
-         XpynAyVIASSoNs7Ta5QC10zDUXyMsocXbhUA3ON4jS7fD+pkW9b/JCSrwd2cI9wGgm85
-         BkfmTPtqJtp17n6gxyz0X3QcWPxUiU7X5k0xBtkuN3L+XEBEpWoTcvEH9+3rkwd3LlP6
-         uMzYYPDukAQ1+Hm3H4QhG2BH2DHbuOyz1+joGujqwhLE8i1kJzrcMxKZ+kwX2jGI4hKu
-         1mw2zOtjNjmWIwhwfhUagJM0UE53cr0ppcVGQ0HFvyltRmJrjUVT/isubFkL6/tt+Uky
-         E5tw==
-X-Gm-Message-State: AOJu0Yxyzph5S5RjVuDTeUTDU6TaPvnFojTMWRp3Nu45rVKYMFGqrRx+
-	i744L0k7cM76ftyiEt/uPYLSl0YnJwsE7v6IiS4DhMI6Lzcs4uWQskK4fw==
-X-Gm-Gg: ASbGncs2yLcfpuGLibg56xJ6qJl5U1YW/n0+L+B25icyZcm65Cid6MWqzfVayWMyLPb
-	b2GHGVs3x83WUMm/RUMZflKYmQNUm9kOj3wFenJyjSob1/pzBYMnsfKipfpeWQwxa49nIGFfB9z
-	W3WVTWpwez7UwiFtzCP9ZbBUZfCxYZo/AZKepnL/cBtV0xbw01NEUqJGF4i4AqOmde/foWOMekf
-	cIIjXq9PSvoWruOac+8YYNBShLtZCN+CndH6TDMt79rRrSXgcG3+PKJm+kkGoJfq+VmSycZ4P8S
-	UuVQmQdjP4pxL3WLC7Ya0BN08Lx+Gr3QF0kwe957AovMXwITacI=
-X-Google-Smtp-Source: AGHT+IHjZ1FPaDFhQWRmitF9aScEQddB3OFIeaYK9AwzczqJOCXYavrHsBSiSxRHnvjoq83WZWbICg==
-X-Received: by 2002:a17:903:2383:b0:229:1717:8826 with SMTP id d9443c01a7336-22c358fd48bmr46785905ad.28.1744824834006;
-        Wed, 16 Apr 2025 10:33:54 -0700 (PDT)
+        bh=E9OKIAaTqy9rd5buBUYDES3ctTAbhthQN1ANbhLhB8Y=;
+        b=CMnV11NdNjeFuZ060fXQsYOVhA9K+QHPTI3H6dM+AVTBWKmQzJYgoQH3aTZGBSKlf1
+         5Laj8eDK8Db+CKb75fzkqQoLflAb/TekpmSBe3t/WMTTfujhfpHZoHqYsDUbMdm/C3q5
+         v16ewjbzWUJZayrAj+MQqYlbnlzu1DGFh6EcqAx4ZnEDRZvBzOGolMEryt55kEaJ6BTE
+         QhEc1YdT65Lps9PX0zEEOHRQdfBfowneqgGdxkOk9EyRuLYUyXo2HJ8VjmfNwoDdjgQP
+         HJ2QnMyahK/quFZAQ9O+tl+FvJ+IHCtcXpl1OGUWLcCJWFBFQtS9Hp8UmNQ6fZwkKxUc
+         ZfTQ==
+X-Gm-Message-State: AOJu0YxRN6iaZOlWdLzhVSv2X98T5PP+43KEG5FESvd/UZGKPr5nsyKK
+	RDYTWBjpTWjfU1nDzRmi4QOs3cjQiowws4hO0P1hAbSetTflua90ZWNzRg==
+X-Gm-Gg: ASbGncslz1dKUa/jykeWC90s6FHqXfc0FJmrJQvFMU2uu6BkJdSNsod7dnWgj4J1oG4
+	MXG/RVHGVAEcn8hd+V+5hPhEbRfmEnxD3aMHZF+URqd5dZ1tNtZmbS9Hmb7112DNBzrMrugXj6T
+	CD2huoQrw9pbuleKgvRAsYN1gxEY2Dfaxi/TwRQh959G3NAkJplyNKmkcHjJo81ZElKAjEbhBYT
+	xrMSyEjcp7mYBZB7HPgAFWInTekppEdH3SWpM7v63TJUFq3bUnmgzcrzYuRUwqiMt0MK2SJ+i3z
+	C74KS6cVcveBFBbq09gQV9wc8S0Wv8tyQ3kHGwC7UX3JzFD5lSYGepOVDMZu9w==
+X-Google-Smtp-Source: AGHT+IENmBX7KewZ9xsOWY8S0Xb/KUT/2fXZcWnGRy2nwWz8uyEYPmtNaZtG9rhBd806w1EgCUt82w==
+X-Received: by 2002:a17:902:ec83:b0:21f:4649:fd49 with SMTP id d9443c01a7336-22c35982438mr40400245ad.49.1744824836168;
+        Wed, 16 Apr 2025 10:33:56 -0700 (PDT)
 Received: from LOCLAP699.localdomain ([152.193.78.90])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-22c33f1cd56sm17093055ad.83.2025.04.16.10.33.52
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-22c33f1cd56sm17093055ad.83.2025.04.16.10.33.54
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 16 Apr 2025 10:33:53 -0700 (PDT)
+        Wed, 16 Apr 2025 10:33:55 -0700 (PDT)
 From: James Prestwood <prestwoj@gmail.com>
 To: iwd@lists.linux.dev
 Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH v2 3/9] dpp-util: fail on duplicate values in URI
-Date: Wed, 16 Apr 2025 10:33:39 -0700
-Message-Id: <20250416173345.136025-3-prestwoj@gmail.com>
+Subject: [PATCH v2 4/9] unit: add test for duplicate URI elements
+Date: Wed, 16 Apr 2025 10:33:40 -0700
+Message-Id: <20250416173345.136025-4-prestwoj@gmail.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20250416173345.136025-1-prestwoj@gmail.com>
 References: <20250416173345.136025-1-prestwoj@gmail.com>
@@ -73,56 +73,67 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The MAC and version elements weren't super critical but the channel
-and bootstrapping key elements would result in memory leaks if there
-were duplicates.
-
-This patch now will not allow duplicate elements in the URI.
-
-Fixes: f7f602e1 ("dpp-util: add URI parsing")
 ---
- src/dpp-util.c | 13 +++++++++++++
- 1 file changed, 13 insertions(+)
+ unit/test-dpp.c | 32 ++++++++++++++++++++++++++++++++
+ 1 file changed, 32 insertions(+)
 
-diff --git a/src/dpp-util.c b/src/dpp-util.c
-index cfdedbdd..1986a5cc 100644
---- a/src/dpp-util.c
-+++ b/src/dpp-util.c
-@@ -1166,21 +1166,34 @@ struct dpp_uri_info *dpp_parse_uri(const char *uri)
+diff --git a/unit/test-dpp.c b/unit/test-dpp.c
+index 70e79814..af2f5813 100644
+--- a/unit/test-dpp.c
++++ b/unit/test-dpp.c
+@@ -116,6 +116,29 @@ struct dpp_test_info bad_channels[] = {
+ 	},
+ };
  
- 		switch (*pos) {
- 		case 'C':
-+			if (L_WARN_ON(info->freqs))
-+				goto free_info;
++struct dpp_test_info duplicates[] = {
++	/* Duplicate key */
++	{
++		.uri = "DPP:K:MDkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDIgADURzxmttZoIRIPWGoQMV00XHWCAQIhXruVWOz0NjlkIA=;K:MDkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDIgADURzxmttZoIRIPWGoQMV00XHWCAQIhXruVWOz0NjlkIA=;;",
++		.expect_fail = true
++	},
++	/* Duplicate frequencies*/
++	{
++		.uri = "DPP:C:81/1,115/36;C:81/1,115/36;;",
++		.expect_fail = true
++	},
++	/* Duplicate MACs*/
++	{
++		.uri = "DPP:M:5254005828e5;M:5254005828e5;;",
++		.expect_fail = true
++	},
++	/* Duplicate versions */
++	{
++		.uri = "DPP:V:2;V:2;;",
++		.expect_fail = true
++	},
++};
 +
- 			info->freqs = dpp_parse_class_and_channel(pos + 2, len);
- 			if (!info->freqs)
- 				goto free_info;
- 			break;
- 		case 'M':
-+			if (L_WARN_ON(!l_memeqzero(info->mac,
-+							sizeof(info->mac))))
-+				goto free_info;
+ static bool verify_info(const struct dpp_uri_info *parsed,
+ 			const struct dpp_test_info *result)
+ {
+@@ -158,6 +181,14 @@ static void test_bad_channels(const void *data)
+ 		test_uri_parse(&bad_channels[i]);
+ }
+ 
++static void test_duplicate_in_uri(const void *data)
++{
++	unsigned int i;
 +
- 			ret = dpp_parse_mac(pos + 2, len, info->mac);
- 			if (ret < 0)
- 				goto free_info;
- 			break;
- 		case 'V':
-+			if (L_WARN_ON(info->version != 0))
-+				goto free_info;
++	for (i = 0; i < L_ARRAY_SIZE(duplicates); i++)
++		test_uri_parse(&duplicates[i]);
++}
 +
- 			ret = dpp_parse_version(pos + 2, len, &info->version);
- 			if (ret < 0)
- 				goto free_info;
- 			break;
- 		case 'K':
-+			if (L_WARN_ON(info->boot_public))
-+				goto free_info;
-+
- 			info->boot_public = dpp_parse_key(pos + 2, len);
- 			if (!info->boot_public)
- 				goto free_info;
+ struct dpp_test_vector {
+ 	/* Initiator values */
+ 	const char *i_proto_public;
+@@ -576,6 +607,7 @@ int main(int argc, char *argv[])
+ 	l_test_add("DPP URI bad key", test_uri_parse, &bad_key);
+ 	l_test_add("DPP URI bad channels", test_bad_channels, &bad_channels);
+ 	l_test_add("DPP URI unexpected ID", test_uri_parse, &unexpected_id);
++	l_test_add("DPP URI duplicates", test_duplicate_in_uri, &duplicates);
+ 
+ 	return l_test_run();
+ }
 -- 
 2.34.1
 
