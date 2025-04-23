@@ -1,65 +1,64 @@
-Received: from mail-ot1-f49.google.com (mail-ot1-f49.google.com [209.85.210.49])
+Received: from mail-qk1-f172.google.com (mail-qk1-f172.google.com [209.85.222.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAC9427F4CA
-	for <iwd@lists.linux.dev>; Wed, 23 Apr 2025 14:53:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40ACB28A1F4
+	for <iwd@lists.linux.dev>; Wed, 23 Apr 2025 18:50:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745420031; cv=none; b=JHyvIAkJ1Lcl7Pwp3Kw6AXT5AhJLXSdO3WS6g0csLTN/yCyRDDIC8qdDGEoyCHfVJgiC1QLDy2oQClhYCNzp6BShBwH8Ie7xbqpR49Z5W/o9DAq3B07eBYhPqPmjRrL56v0SkYyMIz0EgtQyw9EqVjIiJWsz9ckaIvQzwR0+UEk=
+	t=1745434240; cv=none; b=YLhSIFWy1QfSeNMbXeeBSo0jNvpiiKyEu3JTusP7+WYtFD7zcNjhr4GjtsjA3KL8AFGSz99JFvtYoIRCmimCUxmC0etYGoiDj59QmqW+/AkxZwLr6gV8u9UIx6NL1CeNDErJKifensYdddBL6SzuLq8iqFYBZwq8EPjFJZqMHQU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745420031; c=relaxed/simple;
-	bh=XcCu0xSpyMuHnLwWR8kEnc+2aQbNp7TyfwRy1ujuKKc=;
+	s=arc-20240116; t=1745434240; c=relaxed/simple;
+	bh=WGiinPEYeH5T/OWN47PKG4j4sNntklZrfr21CFmDoD4=;
 	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=YrzwfRjsyvRQ6/eqqEG6QvFSzMfBRZY2JZhYtYr8L1+Fr5GIgJrP23jlPDQTCf7K1Dul7Th/AmiM2Q3x5W6msfMaB2sTMtoSrgoywc0mv64Tuu1vDVLZezQfo1/XS/XVE9ty0167RRU87MXdTL0OesAMJS+Y4EFZ4qfQh1WhTds=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JEnk7mJK; arc=none smtp.client-ip=209.85.210.49
+	 In-Reply-To:Content-Type; b=QB7wnfwi3XEUeUA+fNDSNvpO6PLjOf2MP1vdxBXi/dwJ4CrZbW8gDqT2/1DZQARMk6UiJ0Onp9g8HlHjVvcZoBId7ZfOGmX6nm/CtFWTsS00FkdywBp4OYbMnJsiBXg7aC14MFTC8yOSj3W1YZyd6uyOnEbn916DO43u4I1hRLw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=daKriVTG; arc=none smtp.client-ip=209.85.222.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JEnk7mJK"
-Received: by mail-ot1-f49.google.com with SMTP id 46e09a7af769-72ec926e828so1873043a34.0
-        for <iwd@lists.linux.dev>; Wed, 23 Apr 2025 07:53:49 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="daKriVTG"
+Received: by mail-qk1-f172.google.com with SMTP id af79cd13be357-7c5568355ffso14944385a.0
+        for <iwd@lists.linux.dev>; Wed, 23 Apr 2025 11:50:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1745420028; x=1746024828; darn=lists.linux.dev;
+        d=gmail.com; s=20230601; t=1745434238; x=1746039038; darn=lists.linux.dev;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:to:subject:user-agent:mime-version:date:message-id:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=fBfHHlEKLoCPd/ofUrVcXrkvY4dXmpXlQ7dA5iJ3QYA=;
-        b=JEnk7mJKsKQb9MkUZ3o0azDBqINTGkQqYLdcKp5FEa0DyviyIjaUhgXFfWG/hkXRgN
-         gpkaStgKAlGS65ZynzNGJyVl5ayUbfpj5nXiO6i8jlNsUYbJk1+6LVZsiyR0wr+LCzNX
-         TxdhYXsZqsetR25oIgj6lMuHFXK5ERVZFS2MRTU87pKlvPu66vNIIcvdk79mxHcRvHhD
-         /BfAGhQGekSuaVAbB+WFQJSbDbsd6f312Q2bz+rQnH++TpFyhnSxq8KZjXETeF1JmkSj
-         m9s/6uJyCTP3mgkneRvsYQ7fKLUZy4fq8gkIPcBxQ4k+KheghLwmQB1HuvRdSfzNhtek
-         D0XA==
+        bh=MGSXvxwaen/ev/TfpXec/Nle75VUkEt4VlUX2+9tgms=;
+        b=daKriVTG93F8pyoppNE3+OSlyAbghzshWi6LbKFJZdE1CNu0xnJVEkUSbK+ateKP0u
+         onF5YPFkyek//veRVA+CYoC2rwlayw2ov4lP6KyqXwM95igYA0N6RB1Xi5rD/Q2s+CQO
+         m3CXPYK0HiW0NdkLOzd9/uTXXudLVQv1nzP6pLs3QkNWwGJZiT8zS6sDUtHje0zgJ1WY
+         s18v07cuv7X7pKbPciv5b9wSrLPStv8lTHNxGJR+B2HQHj0z31ciQI9EJLvWUSrIlKeb
+         W6uj+9OxGvOYEp579lK3c1SWOw8mMDWRKJJEpL+D3G0nJTsMKa2t5Z5oP80dSGtkg1kO
+         zuPA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745420028; x=1746024828;
+        d=1e100.net; s=20230601; t=1745434238; x=1746039038;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=fBfHHlEKLoCPd/ofUrVcXrkvY4dXmpXlQ7dA5iJ3QYA=;
-        b=nWef6X55rAa/EjHnjaPMDi1i3m9ix1n4dFa6qJF5ylnot2kIDx7LEto/UMrtF6Yxso
-         KFw43Sfgy6cwdqEo+S+5yOSE+HiK9F94PxShZn3bXC3wXBFpjgri7jjMhzk/J90N+y4H
-         D5ovCipXOmkqUQpFnPveCKe1/nGaL9GAY8v/F/Ym8zZynjeqtil3N0vJ3bG0UQVw17rM
-         RHbLZwBCOOiWCQjzx2yWepBkgJgZJHTp18MbyZ6EsSgX01+diD9BzF2wuj1+IXsly5Tn
-         kBBmdlD4pZoe78MNxSstc3pfCF7+2P8Am9DSZWNbA9KEwsHBF1KcSQ3PI7YLYBI0S1/J
-         We+Q==
-X-Forwarded-Encrypted: i=1; AJvYcCXOJR/roJxXHtdOb8Yq/cX/OKpJd6Y7xx643q/MRaS4CcGh4zIGi6JXLfNnaIOaH+PldyM=@lists.linux.dev
-X-Gm-Message-State: AOJu0YyAT4UV/4gXha5m99YsEQcPf+heD7ZBNcjIP1OuB+6M6ch3Koaj
-	KyDBBRaxRX0sP+8hylJWygbbPAavTSUIr/8+VCE+iXFQbo0vlTNG6OAzOA==
-X-Gm-Gg: ASbGncsIf1APoi6WE7SVddrrxfGrGyM4ZW0fBTrdqoS6O9e5oZ67iUoF3Nx9kG0YXcD
-	UineadAQEqLqtDgJrvuZbsbnocXfw8YvxvOGZtIkhnv6NjgCLohjsi+2FmuIb21PgYsxYwUNL0N
-	dbBjqTtlvxzF1RJuNKU10uaTEpusqgjjamxI3Ay+MJcsCn8WGsswglUACDnxVnE355mdNaJ5i0G
-	P0z7QOS+pdXtMHcIhFnk1M6gHvlMEm4IgnXyjnnOCk+kBsboGEvHekdG6jwnsNZZiMdQA1qr+Q4
-	TWSx4qX3OjkX72PFYsXdzrVOgkv/p9A4AZSgf/McoCzWG/JXPB/TWzc1jbS6kkrqaD3NmMI4yCW
-	vsWOQOw==
-X-Google-Smtp-Source: AGHT+IHvdgTAomoYi6Hg8nWebZyyzBYjVP28cdsu1LLnxiGlsDTgO+BC/7srgci7dJZirMt5yWaFug==
-X-Received: by 2002:a05:6830:3902:b0:72b:9d5e:941c with SMTP id 46e09a7af769-7300622d0a7mr11967553a34.13.1745420028649;
-        Wed, 23 Apr 2025 07:53:48 -0700 (PDT)
-Received: from [192.168.1.25] (syn-070-114-247-242.res.spectrum.com. [70.114.247.242])
-        by smtp.googlemail.com with ESMTPSA id 46e09a7af769-7300478edf7sm2534739a34.10.2025.04.23.07.53.48
+        bh=MGSXvxwaen/ev/TfpXec/Nle75VUkEt4VlUX2+9tgms=;
+        b=KPF5k1ZZT0bsIhIBSzUwK5+ektph/mllHUQ5QHIZryUitaqQ7rdGQApmwfOW1I/qfi
+         Ihx7n4NpWYbR1GAYyhSBSfiQPOQ2CDcoh2BlX7WZjhNrqt6LmQWa21eRgfb4CQV/0bPt
+         ziauDCQNLGgho+cJqwIqnKqp5uVfmLJSAyk+7kcqXJxrz1HgasUyrlaErOGOt5muF3jV
+         +ndAoycXf8O5CO39gZu6ecMH4Y4bW0Qw9qjNIfFAO8f+TZun2DBtSdVElahdxO536OOm
+         uRtr7FaSGDyY4Dhq0uVI/RUIXilJX+YvrnsFf9WX/7LnRkp3NizJbyazNfaB2vgwCshQ
+         Sk0w==
+X-Forwarded-Encrypted: i=1; AJvYcCXCD49dCFeRjYx8vUNukM7PV87hO+rP9MZx9YMP6h30rdnYx7cDuf/GNnKwhtwZ8WB5/Ws=@lists.linux.dev
+X-Gm-Message-State: AOJu0YzWUKhG483sxDmSSnp4v+idNBY7Wr3fjO1RJhGD7m9LMONcEbuy
+	uRsX5tk/oPuRrJk6lxOa56cwxWJfekSbqPq900eLN4KmCMIMeVeV
+X-Gm-Gg: ASbGncu9/+6t/zlmYyaMgI9ZE0pzcuOLz7nbPUc1bIoA1Luj5aIEV8Ux0bHsDvIaurg
+	1kdWB4IV9Xg6mKjbYfoKPujtFOMZl4cOMOhJG7gyvQPz9Eog2l0YxM9xFuZZc/k1GZwUKPYQ5+O
+	RZku1cGGqIOfVvSyD/r4W+w0H59l+K1f+On96/ygKSfMX37eW22LgogvakPrqe7/QHGPi3DNVh6
+	rtZs2CMoqPZ5BYHTYaEUO6UMnnhWj/OYypNhCQogJDp5nnSVDCXhm/p2w2smy1I0QNJzrW3cbhA
+	t8uYXwkYFB8KIs4WkU7ZiMkGaD+yD9huhsbZzBvC8vpP
+X-Google-Smtp-Source: AGHT+IHUc2Tr4psI+avfOy7m3vN9e4FavjKyQRy+NSIBzHR7VkG4PROwXz3U7zSUgPVTfEPjZh6eSA==
+X-Received: by 2002:a05:620a:319e:b0:7c5:50ab:de07 with SMTP id af79cd13be357-7c955daffadmr112316585a.21.1745434237780;
+        Wed, 23 Apr 2025 11:50:37 -0700 (PDT)
+Received: from [10.100.121.195] ([152.193.78.90])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7c925b699f2sm710476485a.92.2025.04.23.11.50.37
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 23 Apr 2025 07:53:48 -0700 (PDT)
-Message-ID: <cf654842-20d3-4d1d-a602-2f75ea3f204b@gmail.com>
-Date: Wed, 23 Apr 2025 09:53:47 -0500
+        Wed, 23 Apr 2025 11:50:37 -0700 (PDT)
+Message-ID: <bc27b295-4c9e-467d-a2c3-4c8d7043e0a7@gmail.com>
+Date: Wed, 23 Apr 2025 14:50:36 -0400
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
@@ -67,101 +66,67 @@ List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 3/5] client: add SignalStrength/Frequency properties
-To: James Prestwood <prestwoj@gmail.com>, iwd@lists.linux.dev
+Subject: Re: [PATCH 2/5] station: update SignalStrength/Frequency for BSS
+ interface
+To: Denis Kenzior <denkenz@gmail.com>, iwd@lists.linux.dev
 References: <20250423135458.11337-1-prestwoj@gmail.com>
- <20250423135458.11337-3-prestwoj@gmail.com>
+ <20250423135458.11337-2-prestwoj@gmail.com>
+ <dfd01b68-2955-4fff-9f71-2e130e745c16@gmail.com>
 Content-Language: en-US
-From: Denis Kenzior <denkenz@gmail.com>
-In-Reply-To: <20250423135458.11337-3-prestwoj@gmail.com>
+From: James Prestwood <prestwoj@gmail.com>
+In-Reply-To: <dfd01b68-2955-4fff-9f71-2e130e745c16@gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-Hi James,
 
-On 4/23/25 8:54 AM, James Prestwood wrote:
-> ---
->   client/bss.c | 48 +++++++++++++++++++++++++++++++++++++++++++++++-
->   1 file changed, 47 insertions(+), 1 deletion(-)
-> 
-> diff --git a/client/bss.c b/client/bss.c
-> index def4de7f..19355f0b 100644
-> --- a/client/bss.c
-> +++ b/client/bss.c
-> @@ -32,6 +32,8 @@
->   
->   struct bss {
->   	char *address;
-> +	int16_t signal;
-signal_strength? or rssi?
-> +	uint32_t frequency;
->   };
->   
->   static const char *get_address(const void *data)
-> @@ -57,8 +59,52 @@ static void update_address(void *data, struct l_dbus_message_iter *variant)
->   	bss->address = l_strdup(value);
->   }
->   
-> +static const char *get_signal(const void *data)
+On 4/23/25 10:52 AM, Denis Kenzior wrote:
+> Hi James,
+>
+> On 4/23/25 8:54 AM, James Prestwood wrote:
+>> When the BSS's signal or frequency changes, update those properties
+>> ---
+>>   src/station.c | 15 +++++++++++++--
+>>   1 file changed, 13 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/src/station.c b/src/station.c
+>> index 14c93671..85ed2898 100644
+>> --- a/src/station.c
+>> +++ b/src/station.c
+>> @@ -545,10 +545,21 @@ static bool station_register_bss(struct network 
+>> *network, struct scan_bss *bss)
+>>        * scan_bss pointer, as this one will be freed soon.
+>>        */
+>>       old = l_dbus_object_get_data(dbus_get_bus(), path, 
+>> IWD_BSS_INTERFACE);
+>> -    if (old)
+>> -        return l_dbus_object_set_data(dbus_get_bus(), path,
+>> +    if (old) {
+>> +        l_dbus_object_set_data(dbus_get_bus(), path,
+>>                           IWD_BSS_INTERFACE, bss);
+>>   +        if (old->signal_strength != bss->signal_strength)
+>> +            l_dbus_property_changed(dbus_get_bus(), path,
+>> +                    IWD_BSS_INTERFACE, "SignalStrength");
+>> +
+>> +        if (old->frequency != bss->frequency)
+>> +            l_dbus_property_changed(dbus_get_bus(), path,
+>> +                    IWD_BSS_INTERFACE, "Frequency");
+>> +
+>> +        return true;
+>
+> nit: This return probably deserves its own commit + Fixes tag.
 
-signal_strength?
+This specifically isn't fixing anything. I just needed to set the new 
+BSS object prior to emitting the property changed signal. Technically 
+this does change the function logic but we don't actually check the 
+return of station_register_bss() anywhere, this could just be made into 
+a void return I suppose if you'd like.
 
-> +{
-> +	const struct bss *bss = data;
-> +	static char signal_str[7];
-> +
-> +	sprintf(signal_str, "%d", bss->signal);
-> +
-> +	return signal_str;
-> +}
-> +
-> +static void update_signal(void *data, struct l_dbus_message_iter *variant)
-> +{
-> +	struct bss *bss = data;
-> +	int16_t value;
-> +
-> +	if (!l_dbus_message_iter_get_variant(variant, "n", &value))
-> +		return;
-> +
-> +	bss->signal = value;
-
-ditto
-
-> +}
-> +
-> +static const char *get_frequency(const void *data)
-> +{
-> +	const struct bss *bss = data;
-> +	static char freq_str[5];
-
-There is hardware that supports frequencies in the 60G range.  Might want to 
-future proof this somewhat.
-
-> +
-> +	sprintf(freq_str, "%u", bss->frequency);
-> +
-> +	return freq_str;
-> +}
-> +
-> +static void update_frequency(void *data, struct l_dbus_message_iter *variant)
-> +{
-> +	struct bss *bss = data;
-> +	uint32_t value;
-> +
-> +	if (!l_dbus_message_iter_get_variant(variant, "u", &value))
-> +		return;
-> +
-> +	bss->frequency = value;
-> +}
-> +
->   static const struct proxy_interface_property bss_properties[] = {
-> -	{ "Address",       "s", update_address, get_address },
-> +	{ "Address",        "s", update_address, get_address },
-> +	{ "SignalStrength", "n", update_signal, get_signal },
-> +	{ "Frequency",      "u", update_frequency, get_frequency },
->   	{ }
->   };
->   
-
-Regards,
--Denis
+>
+>> +    }
+>> +
+>>       if (!l_dbus_object_add_interface(dbus_get_bus(), path,
+>>                           IWD_BSS_INTERFACE, bss))
+>>           return false;
+>
+> Regards,
+> -Denis
