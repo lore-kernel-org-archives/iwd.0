@@ -1,132 +1,165 @@
-Received: from mail-qk1-f172.google.com (mail-qk1-f172.google.com [209.85.222.172])
+Received: from mail-pg1-f173.google.com (mail-pg1-f173.google.com [209.85.215.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40ACB28A1F4
-	for <iwd@lists.linux.dev>; Wed, 23 Apr 2025 18:50:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA6043BBF0
+	for <iwd@lists.linux.dev>; Thu, 24 Apr 2025 00:52:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745434240; cv=none; b=YLhSIFWy1QfSeNMbXeeBSo0jNvpiiKyEu3JTusP7+WYtFD7zcNjhr4GjtsjA3KL8AFGSz99JFvtYoIRCmimCUxmC0etYGoiDj59QmqW+/AkxZwLr6gV8u9UIx6NL1CeNDErJKifensYdddBL6SzuLq8iqFYBZwq8EPjFJZqMHQU=
+	t=1745455948; cv=none; b=mVwURzukW3m7ogtDc8bQhuNkXMLYO58G7LZ4mclYUtJRYWztm04LN9+TGR9Ist4TYux1rQkRwu5awpvEIJ2lU2JSqwBIl9W+SwPfIYquEHLLMeVa58WQ9xfV2kB7K+Hk98AxvWRVY9Js4/5DOVW6N1HL9f+gH2jstbNbPbhEidA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745434240; c=relaxed/simple;
-	bh=WGiinPEYeH5T/OWN47PKG4j4sNntklZrfr21CFmDoD4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=QB7wnfwi3XEUeUA+fNDSNvpO6PLjOf2MP1vdxBXi/dwJ4CrZbW8gDqT2/1DZQARMk6UiJ0Onp9g8HlHjVvcZoBId7ZfOGmX6nm/CtFWTsS00FkdywBp4OYbMnJsiBXg7aC14MFTC8yOSj3W1YZyd6uyOnEbn916DO43u4I1hRLw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=daKriVTG; arc=none smtp.client-ip=209.85.222.172
+	s=arc-20240116; t=1745455948; c=relaxed/simple;
+	bh=gTNB1ZLOUWb1J3xdRrD9gr5gHOgPSDp7AqJd2Yj0mco=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Bo6kcMF5HpLtJ4Q6d6e/c3f01R3j97edirh4rXpHirZiUdluPSTtznvo5Aj61qPoL+Q48fYDyZKLbo1jd5WPDHYKhj8kqH/ZhJwvzBJWwgl36sVpoj11sThjFCMeXu/+kULAnFl0YxPxKUd4AHm9aXTYntpuBlcYg54z1SH+QD0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kcDJMhIz; arc=none smtp.client-ip=209.85.215.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="daKriVTG"
-Received: by mail-qk1-f172.google.com with SMTP id af79cd13be357-7c5568355ffso14944385a.0
-        for <iwd@lists.linux.dev>; Wed, 23 Apr 2025 11:50:38 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kcDJMhIz"
+Received: by mail-pg1-f173.google.com with SMTP id 41be03b00d2f7-b0da25f5216so237908a12.1
+        for <iwd@lists.linux.dev>; Wed, 23 Apr 2025 17:52:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1745434238; x=1746039038; darn=lists.linux.dev;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=MGSXvxwaen/ev/TfpXec/Nle75VUkEt4VlUX2+9tgms=;
-        b=daKriVTG93F8pyoppNE3+OSlyAbghzshWi6LbKFJZdE1CNu0xnJVEkUSbK+ateKP0u
-         onF5YPFkyek//veRVA+CYoC2rwlayw2ov4lP6KyqXwM95igYA0N6RB1Xi5rD/Q2s+CQO
-         m3CXPYK0HiW0NdkLOzd9/uTXXudLVQv1nzP6pLs3QkNWwGJZiT8zS6sDUtHje0zgJ1WY
-         s18v07cuv7X7pKbPciv5b9wSrLPStv8lTHNxGJR+B2HQHj0z31ciQI9EJLvWUSrIlKeb
-         W6uj+9OxGvOYEp579lK3c1SWOw8mMDWRKJJEpL+D3G0nJTsMKa2t5Z5oP80dSGtkg1kO
-         zuPA==
+        d=gmail.com; s=20230601; t=1745455946; x=1746060746; darn=lists.linux.dev;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=uj2z2e+oE7rYouKv+P6HkQaVaH+suA8spqvUCXikc/g=;
+        b=kcDJMhIzWr32IrqCw8H2J1A5tlyS2smxt+1Sl0Qsq7gDrLG0UKW/7KjBHE0XmQ0QHJ
+         FA00fPQELgz6EtTOfNVHzCOYKRDfcxhqfwUwypibJHHtUaEvgjT4qXDG3x1ipd8NPWpB
+         sPcyyzDkvLjZHsvYP34NKjohBUSNmd79f0faluCq24seFq/tSO/DCZ3LePIPXtcbOOqj
+         8L+P+DIDSTRrvqSJsB0/5LSJvIcXYTvsLf3sjodD04HXIHg14NB796ggqA8aT6kIQwtm
+         m2m/78zOSLZdeh+DmkasIT9wyXeZiuYM6SuScWcIEd+VznhnYuRbaujpToOHQTwtDC/P
+         /MCg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745434238; x=1746039038;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=MGSXvxwaen/ev/TfpXec/Nle75VUkEt4VlUX2+9tgms=;
-        b=KPF5k1ZZT0bsIhIBSzUwK5+ektph/mllHUQ5QHIZryUitaqQ7rdGQApmwfOW1I/qfi
-         Ihx7n4NpWYbR1GAYyhSBSfiQPOQ2CDcoh2BlX7WZjhNrqt6LmQWa21eRgfb4CQV/0bPt
-         ziauDCQNLGgho+cJqwIqnKqp5uVfmLJSAyk+7kcqXJxrz1HgasUyrlaErOGOt5muF3jV
-         +ndAoycXf8O5CO39gZu6ecMH4Y4bW0Qw9qjNIfFAO8f+TZun2DBtSdVElahdxO536OOm
-         uRtr7FaSGDyY4Dhq0uVI/RUIXilJX+YvrnsFf9WX/7LnRkp3NizJbyazNfaB2vgwCshQ
-         Sk0w==
-X-Forwarded-Encrypted: i=1; AJvYcCXCD49dCFeRjYx8vUNukM7PV87hO+rP9MZx9YMP6h30rdnYx7cDuf/GNnKwhtwZ8WB5/Ws=@lists.linux.dev
-X-Gm-Message-State: AOJu0YzWUKhG483sxDmSSnp4v+idNBY7Wr3fjO1RJhGD7m9LMONcEbuy
-	uRsX5tk/oPuRrJk6lxOa56cwxWJfekSbqPq900eLN4KmCMIMeVeV
-X-Gm-Gg: ASbGncu9/+6t/zlmYyaMgI9ZE0pzcuOLz7nbPUc1bIoA1Luj5aIEV8Ux0bHsDvIaurg
-	1kdWB4IV9Xg6mKjbYfoKPujtFOMZl4cOMOhJG7gyvQPz9Eog2l0YxM9xFuZZc/k1GZwUKPYQ5+O
-	RZku1cGGqIOfVvSyD/r4W+w0H59l+K1f+On96/ygKSfMX37eW22LgogvakPrqe7/QHGPi3DNVh6
-	rtZs2CMoqPZ5BYHTYaEUO6UMnnhWj/OYypNhCQogJDp5nnSVDCXhm/p2w2smy1I0QNJzrW3cbhA
-	t8uYXwkYFB8KIs4WkU7ZiMkGaD+yD9huhsbZzBvC8vpP
-X-Google-Smtp-Source: AGHT+IHUc2Tr4psI+avfOy7m3vN9e4FavjKyQRy+NSIBzHR7VkG4PROwXz3U7zSUgPVTfEPjZh6eSA==
-X-Received: by 2002:a05:620a:319e:b0:7c5:50ab:de07 with SMTP id af79cd13be357-7c955daffadmr112316585a.21.1745434237780;
-        Wed, 23 Apr 2025 11:50:37 -0700 (PDT)
-Received: from [10.100.121.195] ([152.193.78.90])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7c925b699f2sm710476485a.92.2025.04.23.11.50.37
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 23 Apr 2025 11:50:37 -0700 (PDT)
-Message-ID: <bc27b295-4c9e-467d-a2c3-4c8d7043e0a7@gmail.com>
-Date: Wed, 23 Apr 2025 14:50:36 -0400
+        d=1e100.net; s=20230601; t=1745455946; x=1746060746;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=uj2z2e+oE7rYouKv+P6HkQaVaH+suA8spqvUCXikc/g=;
+        b=O0thBSdIURZCrMApEYxrRnu3xzan/gibwtRQYrh7MLfMYg2uAHO5InKcZ9bFiLBeqg
+         RArFMoKO0Jc2YyBRmYtDlYIpv2n8/4j0+Eeo4iECHNEl5ttKqfAcPrVhIxsLXHrWLlA/
+         GgzNudVRIh0fgXezEfw0Ypw2lAy+ZN0Sajqgme1dQs9qzwHgPg0kqUGw4zIspKc/uIEa
+         gsTPo6nLmPy1sk/wLPY/ju3uxhyKQcmx00pMDIdZnlDkh36i7cm/gwCamzwPbo3/tGoP
+         XsQhH5bB17AnOgWRyemylEFzr1403H7KR28yP+kSG6QiY+VqSvlHGcOIZsvXz+TgmM4n
+         AyPA==
+X-Gm-Message-State: AOJu0YxgTqn7q1re6yrGVJb6d6ny9GsWeREgA4zxaO7PzaNa4cqWUedi
+	ZrHw0jvM4TL9C/sFYaKt6nnS0dtMRBn7x40gWs6pa3L8g0eytipOT42t88uvPqb3ojxA1caqq/p
+	W3tWrg4O6rUWFUEBIjDoPgPcH+I0=
+X-Gm-Gg: ASbGnctGESeiR3pbBQh4xQQftE91KLLT4AezVJxfN+mGp5uAgJ49SG5B3Pq9JAb5GVD
+	d7O/iP5dUZPpYuc9MwVgCn4Z0rrUoVNa3guD4WgF2SSD+13UNDfMy1o2bB71ZHd3Rx18/KaQYtq
+	CMuuBRZPStuF4Ft31bWRpApHAhKTT33YCeQTmUPyL+Qj3E1g==
+X-Google-Smtp-Source: AGHT+IGMGwKIp/gCiwvWXcUXyssKSNhBVdUPwZgYlc+IMXqKjU4x3a/AzZtbG3n1zZCgqWPMccVnGLkSyvFqPe5w+N4=
+X-Received: by 2002:a17:90b:2e42:b0:2fe:9581:fbea with SMTP id
+ 98e67ed59e1d1-309ed35b2f1mr1009584a91.29.1745455945798; Wed, 23 Apr 2025
+ 17:52:25 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 2/5] station: update SignalStrength/Frequency for BSS
- interface
-To: Denis Kenzior <denkenz@gmail.com>, iwd@lists.linux.dev
-References: <20250423135458.11337-1-prestwoj@gmail.com>
- <20250423135458.11337-2-prestwoj@gmail.com>
- <dfd01b68-2955-4fff-9f71-2e130e745c16@gmail.com>
-Content-Language: en-US
-From: James Prestwood <prestwoj@gmail.com>
-In-Reply-To: <dfd01b68-2955-4fff-9f71-2e130e745c16@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+References: <CAG17S_M4_+CR1uSsajyvHBjig6cfCuxegipnHREhk1sXjSyOsA@mail.gmail.com>
+ <a0dcf03d-3bd3-43e5-9532-5a565d20930f@gmail.com>
+In-Reply-To: <a0dcf03d-3bd3-43e5-9532-5a565d20930f@gmail.com>
+From: KeithG <ys3al35l@gmail.com>
+Date: Wed, 23 Apr 2025 19:52:14 -0500
+X-Gm-Features: ATxdqUH6zhcel7Rbzd8Qm44zms-IsS1wbOu70zu6KscrJXpSAmOJNZAxamP9Dsc
+Message-ID: <CAG17S_MKZXf3vC0zgaK_MUrA1nqRzhGcPGUho873KU3jYVShXw@mail.gmail.com>
+Subject: Re: brcmfmac disconnects when iwd scans
+To: Denis Kenzior <denkenz@gmail.com>
+Cc: iwd@lists.linux.dev, James Prestwood <prestwoj@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-
-On 4/23/25 10:52 AM, Denis Kenzior wrote:
-> Hi James,
+On Wed, Apr 23, 2025 at 9:42=E2=80=AFAM Denis Kenzior <denkenz@gmail.com> w=
+rote:
 >
-> On 4/23/25 8:54 AM, James Prestwood wrote:
->> When the BSS's signal or frequency changes, update those properties
->> ---
->>   src/station.c | 15 +++++++++++++--
->>   1 file changed, 13 insertions(+), 2 deletions(-)
->>
->> diff --git a/src/station.c b/src/station.c
->> index 14c93671..85ed2898 100644
->> --- a/src/station.c
->> +++ b/src/station.c
->> @@ -545,10 +545,21 @@ static bool station_register_bss(struct network 
->> *network, struct scan_bss *bss)
->>        * scan_bss pointer, as this one will be freed soon.
->>        */
->>       old = l_dbus_object_get_data(dbus_get_bus(), path, 
->> IWD_BSS_INTERFACE);
->> -    if (old)
->> -        return l_dbus_object_set_data(dbus_get_bus(), path,
->> +    if (old) {
->> +        l_dbus_object_set_data(dbus_get_bus(), path,
->>                           IWD_BSS_INTERFACE, bss);
->>   +        if (old->signal_strength != bss->signal_strength)
->> +            l_dbus_property_changed(dbus_get_bus(), path,
->> +                    IWD_BSS_INTERFACE, "SignalStrength");
->> +
->> +        if (old->frequency != bss->frequency)
->> +            l_dbus_property_changed(dbus_get_bus(), path,
->> +                    IWD_BSS_INTERFACE, "Frequency");
->> +
->> +        return true;
+> Hi Keith,
 >
-> nit: This return probably deserves its own commit + Fixes tag.
-
-This specifically isn't fixing anything. I just needed to set the new 
-BSS object prior to emitting the property changed signal. Technically 
-this does change the function logic but we don't actually check the 
-return of station_register_bss() anywhere, this could just be made into 
-a void return I suppose if you'd like.
-
+> On 4/22/25 8:00 PM, KeithG wrote:
+> > I ran into this a while back and James came up with a few patches that
+> > I have been using to keep it from restarting the AP0 interface.
+> > [PATCH 1/3] station: remove scan subsets for dbus scans
+> > [PATCH 2/3] eap: fix compile issue on ARM/GCC 12
+> > [PATCH 3/3] scan: use ifindex and only active scans
 >
->> +    }
->> +
->>       if (!l_dbus_object_add_interface(dbus_get_bus(), path,
->>                           IWD_BSS_INTERFACE, bss))
->>           return false;
+> Likely this is the fix.  Passive scans take too long to remain off-channe=
+l.
+>
+> >
+> > These no longer seem to work with current builds of iwd from git. I am
+> > running iwd 3.6.r10.g4ded663e. My kernel is 6.12.20. The firmware is:
+> > [    3.496006] brcmfmac: brcmf_fw_alloc_request: using
+> > brcm/brcmfmac43455-sdio for chip BCM4345/6
+> > [    3.839254] brcmfmac: brcmf_c_preinit_dcmds: Firmware: BCM4345/6
+> > wl0: Oct 28 2024 23:27:00 version 7.45.286 (be70ab3 CY) FWID
+> > 01-95efe7fa
+> >
+> > I get the same response with the firmware that ships with RPiOS,
+> > 7.45.265 as well. I am building a fresh kernel to be able to get iwmon
+> > data and should be able to do so tomorrow.
+> >
+> > This flakiness of ap0 happens regardless if I use iwd or hostap to
+> > bring up ap0. When I use hostapd, I use this to bring up the
+> > interface:
+> >
+> > iw dev wlan0 interface add ap0 type __ap
+> > ip link set dev ap0 address d8:3a:dd:60:a3:cg
+> > systemctl start hostapd
+> > systemctl start dnsmasq
+> > ip addr add 192.168.5.1/24 broadcast 192.168.5.255 dev ap0
+> >
+> > With this, I can have the ap0 up and can scan on wlan0 with the single
+> > brcmfmac card. If I use wpa_supplicant, ap0 does not go down when
+> > wpa_supplicant scans for ssids.
+> > iw wlan0 scan
+>
+> This uses an active scan.  See what happens with
+> 'iw wlan0 scan passive'
+>
+> > It is only with iwd that the network goes down when iwd scans for ssids=
+.
+> > iwctl station wlan0 scan
+>
+> iwd uses active scans when connected or if the hardware is capable of
+> anonymizing the active scan.   Otherwise it uses a passive scan.
 >
 > Regards,
 > -Denis
+
+Denis,
+
+I am building iwd from git with those 3 patches and every time it
+scans, it disconnects the AP.
+When I use wpa_supplicant, it does not disconnect regardless of using:
+iw wlan0 scan passive
+or
+iw wlan0 scan
+
+it is only with iwd that it disconnects and only with iwctl. If I run
+'iw wlan0 scan passive' or
+'iw wlan0 scan' when iwd is running and wpa_aupplicant is removed, It
+seems to be OK.
+My laptop shows a disconnect, sometimes, but when I check the wlan0 on
+the laptop
+it is still connected to the ap running on the RPi. I think it looses
+the connection for a
+second but reconnects. If I run the 'iwctl station wlan0 scan' it will
+disconnect and not reconnect.
+When it does, the ap0 gets to a strange state as it takes a number of
+attempts to get it to
+reconnect and sometimes it requires a tear down and restart of ap0
+before I can reconnect
+
+This is an iwmon log of my RPi.
+https://drive.google.com/file/d/1WNZz0dOip0XZZVIOs7RGcYIeLY2W4bXC/view?usp=
+=3Dsharing
+I had connected to it from my laptop. I then ran:
+
+# iw wlan0 scan
+# iw wlan0 scan passive
+# iwctl station wlan0 scan
+
+after I ran the last command, the Pi's ap0 disconnected from my laptop.
+
+Keith
