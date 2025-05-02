@@ -1,165 +1,240 @@
-Received: from mail-pg1-f173.google.com (mail-pg1-f173.google.com [209.85.215.173])
+Received: from mail-oi1-f175.google.com (mail-oi1-f175.google.com [209.85.167.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA6043BBF0
-	for <iwd@lists.linux.dev>; Thu, 24 Apr 2025 00:52:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58FD035950
+	for <iwd@lists.linux.dev>; Fri,  2 May 2025 14:45:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745455948; cv=none; b=mVwURzukW3m7ogtDc8bQhuNkXMLYO58G7LZ4mclYUtJRYWztm04LN9+TGR9Ist4TYux1rQkRwu5awpvEIJ2lU2JSqwBIl9W+SwPfIYquEHLLMeVa58WQ9xfV2kB7K+Hk98AxvWRVY9Js4/5DOVW6N1HL9f+gH2jstbNbPbhEidA=
+	t=1746197155; cv=none; b=WCpxWeyosmDXXtGTvfh8J81hgqIH7j6XdQ3C+2gqMhdAJrR9yeKc+XXOz3aDKT+svrEtTdh8If+ZLzKXbIW7qn3XO2Gt5vh/gN7ON1dgHLmoF8I2sku2kZ/tp2aJk+c0e14HOMeCX6ehtPwY8UDslQBoeOFrKpIWQPNDGaAaX/k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745455948; c=relaxed/simple;
-	bh=gTNB1ZLOUWb1J3xdRrD9gr5gHOgPSDp7AqJd2Yj0mco=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Bo6kcMF5HpLtJ4Q6d6e/c3f01R3j97edirh4rXpHirZiUdluPSTtznvo5Aj61qPoL+Q48fYDyZKLbo1jd5WPDHYKhj8kqH/ZhJwvzBJWwgl36sVpoj11sThjFCMeXu/+kULAnFl0YxPxKUd4AHm9aXTYntpuBlcYg54z1SH+QD0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kcDJMhIz; arc=none smtp.client-ip=209.85.215.173
+	s=arc-20240116; t=1746197155; c=relaxed/simple;
+	bh=obSo+HDuapebjKKeghFcYbPBOh9AwP53C0sRhJ1tzvA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=W9C4IBLkZf6peh6LBbplx7UB1a0fU2njNyw56gl1VhPCHENqUpO13Bh9EDJnX56TVWuK481qOby7Z99D2cpmHHvCX/xNokyLq5wmMqoAbCzidw8WCUd7Y+cC2kdu22ZedHR/TE7lhKZAVLOt63TXb9GIwj2tg66bD33iHPiE9JI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gqXiP6WW; arc=none smtp.client-ip=209.85.167.175
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kcDJMhIz"
-Received: by mail-pg1-f173.google.com with SMTP id 41be03b00d2f7-b0da25f5216so237908a12.1
-        for <iwd@lists.linux.dev>; Wed, 23 Apr 2025 17:52:26 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gqXiP6WW"
+Received: by mail-oi1-f175.google.com with SMTP id 5614622812f47-3feaedb39e9so624865b6e.1
+        for <iwd@lists.linux.dev>; Fri, 02 May 2025 07:45:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1745455946; x=1746060746; darn=lists.linux.dev;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=uj2z2e+oE7rYouKv+P6HkQaVaH+suA8spqvUCXikc/g=;
-        b=kcDJMhIzWr32IrqCw8H2J1A5tlyS2smxt+1Sl0Qsq7gDrLG0UKW/7KjBHE0XmQ0QHJ
-         FA00fPQELgz6EtTOfNVHzCOYKRDfcxhqfwUwypibJHHtUaEvgjT4qXDG3x1ipd8NPWpB
-         sPcyyzDkvLjZHsvYP34NKjohBUSNmd79f0faluCq24seFq/tSO/DCZ3LePIPXtcbOOqj
-         8L+P+DIDSTRrvqSJsB0/5LSJvIcXYTvsLf3sjodD04HXIHg14NB796ggqA8aT6kIQwtm
-         m2m/78zOSLZdeh+DmkasIT9wyXeZiuYM6SuScWcIEd+VznhnYuRbaujpToOHQTwtDC/P
-         /MCg==
+        d=gmail.com; s=20230601; t=1746197153; x=1746801953; darn=lists.linux.dev;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=e4N4GUU1MrHBZDSKj3vg88WA92E3QifFZwCcl8lMfOQ=;
+        b=gqXiP6WWzMFPjhmBr/XvdkCutRcPahgGUb4SqfNxV5JUIg8sKgh8YD6mFWwgZj9ow4
+         6QnwrslSFz8dcgIj9csLIX5ZeXTAwZ65p6OjSuKX8RkIFV006pC1ZmtBbPfN50S04OQd
+         9LL5f5+sb/v2UNSRszkgb6HzC1M8nzYqh7k7FdteKkQN/EjSoWc7+TrX/jYw+M3Dh55T
+         +Q7XQZw7e5QHg0oFiSeuk3QiIxnVQjEt8Qn7nY/2G29+WRtmp7FfsOpbVK1h0M9Yba6Q
+         UgX5RDzLOrUwE4xFMz7GZhbJ1RPH1xt3E0F/ivRClc5nyV2Z0VO+rI1juLwoWnvZm/Rg
+         NS4Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745455946; x=1746060746;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=uj2z2e+oE7rYouKv+P6HkQaVaH+suA8spqvUCXikc/g=;
-        b=O0thBSdIURZCrMApEYxrRnu3xzan/gibwtRQYrh7MLfMYg2uAHO5InKcZ9bFiLBeqg
-         RArFMoKO0Jc2YyBRmYtDlYIpv2n8/4j0+Eeo4iECHNEl5ttKqfAcPrVhIxsLXHrWLlA/
-         GgzNudVRIh0fgXezEfw0Ypw2lAy+ZN0Sajqgme1dQs9qzwHgPg0kqUGw4zIspKc/uIEa
-         gsTPo6nLmPy1sk/wLPY/ju3uxhyKQcmx00pMDIdZnlDkh36i7cm/gwCamzwPbo3/tGoP
-         XsQhH5bB17AnOgWRyemylEFzr1403H7KR28yP+kSG6QiY+VqSvlHGcOIZsvXz+TgmM4n
-         AyPA==
-X-Gm-Message-State: AOJu0YxgTqn7q1re6yrGVJb6d6ny9GsWeREgA4zxaO7PzaNa4cqWUedi
-	ZrHw0jvM4TL9C/sFYaKt6nnS0dtMRBn7x40gWs6pa3L8g0eytipOT42t88uvPqb3ojxA1caqq/p
-	W3tWrg4O6rUWFUEBIjDoPgPcH+I0=
-X-Gm-Gg: ASbGnctGESeiR3pbBQh4xQQftE91KLLT4AezVJxfN+mGp5uAgJ49SG5B3Pq9JAb5GVD
-	d7O/iP5dUZPpYuc9MwVgCn4Z0rrUoVNa3guD4WgF2SSD+13UNDfMy1o2bB71ZHd3Rx18/KaQYtq
-	CMuuBRZPStuF4Ft31bWRpApHAhKTT33YCeQTmUPyL+Qj3E1g==
-X-Google-Smtp-Source: AGHT+IGMGwKIp/gCiwvWXcUXyssKSNhBVdUPwZgYlc+IMXqKjU4x3a/AzZtbG3n1zZCgqWPMccVnGLkSyvFqPe5w+N4=
-X-Received: by 2002:a17:90b:2e42:b0:2fe:9581:fbea with SMTP id
- 98e67ed59e1d1-309ed35b2f1mr1009584a91.29.1745455945798; Wed, 23 Apr 2025
- 17:52:25 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1746197153; x=1746801953;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=e4N4GUU1MrHBZDSKj3vg88WA92E3QifFZwCcl8lMfOQ=;
+        b=boZhHwkLr5pnQuse7PWLKE0nScgH2RMEFDh+k6dlQrRKCGQ4YMwegE34bEGXv1dQjn
+         fu09kEFBP1y8uXmm3fX4eCsyp08h6Xk5Li/SDlBV/UUV+suJIpQ3wfVBnuVndgnS6nkA
+         P91n8ph68tRJ09HozeCML2Y228VP0ot3dcz7zRdOokM8GlbaOqe1A41sY7xjHcMxnwNo
+         jL5iTRRzU4WxDhG/YRp6xaB3Cggs0BMLlxGRXoFhGZSg2IQPqht70ombiEjPd2eDnqN/
+         hA9o5I0nQpA4AVHiC4n4Ed66yXZPDaQwydQL7grDT90AIwjYeakb2VFUfkbuirQsZl+H
+         GQxg==
+X-Gm-Message-State: AOJu0Yzey8JFP/m6oljpfUKVzTBxFWYAg5hFAvUZoo2pORHy9XJxTbkT
+	pwOitGJcdASbiPjz1aHSWiY+BGth5lvloGsI8psup6OUqpFB7f77
+X-Gm-Gg: ASbGnctKpg94klW0Ju7DLeOB61uxoj3UiTRk6l3Qbnvt4pxHXuBrc+12J/sHASO6IKG
+	0XsmdS8ikZSadCrLXi8OunU36mwMW+GxC/ZoMHzMsoC5pGZE+Q1P1neKsIi0ps3uPqsRiCgWFbU
+	Yx5t8I5sukFEWI+/AzpNyidtQYqxL4NrEFIDYw4w8UwJZVzwD7D8Si88WInxlYoAIkiFCx2Hd3E
+	yxRothWcrrgiVdPdoY5XoMzZmm/u++qrPV1IGS2jr315X1coQeBs3Hevu/+6GDNM6QGLBFualOs
+	aLMvrO79fE6ZDKXRzBzqMTTINAD5KlK2nL5m93uZVmXBf6YvYL4WFMRZvXY0N1vomH58ZUll8Au
+	Jv5exhQ==
+X-Google-Smtp-Source: AGHT+IEnlZ+n83D3V7wzYeB/zUWh4hc1SfdjdlBd0Rr3JRsVXYjfUo1A6+eLhLJ2k0Cd/Vp6bBBXUw==
+X-Received: by 2002:a05:6808:90:b0:3fe:aeaf:2d3 with SMTP id 5614622812f47-403414c3561mr1712365b6e.39.1746197153161;
+        Fri, 02 May 2025 07:45:53 -0700 (PDT)
+Received: from [192.168.1.25] (syn-070-114-247-242.res.spectrum.com. [70.114.247.242])
+        by smtp.googlemail.com with ESMTPSA id 006d021491bc7-607e7fb645bsm550480eaf.28.2025.05.02.07.45.52
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 02 May 2025 07:45:52 -0700 (PDT)
+Message-ID: <45bc2f1b-b037-4784-a2a9-7732a82b7391@gmail.com>
+Date: Fri, 2 May 2025 09:45:51 -0500
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: brcmfmac disconnects when iwd scans
+To: KeithG <ys3al35l@gmail.com>
+Cc: iwd@lists.linux.dev, James Prestwood <prestwoj@gmail.com>,
+ Arend Van Spriel <arend.vanspriel@broadcom.com>
 References: <CAG17S_M4_+CR1uSsajyvHBjig6cfCuxegipnHREhk1sXjSyOsA@mail.gmail.com>
  <a0dcf03d-3bd3-43e5-9532-5a565d20930f@gmail.com>
-In-Reply-To: <a0dcf03d-3bd3-43e5-9532-5a565d20930f@gmail.com>
-From: KeithG <ys3al35l@gmail.com>
-Date: Wed, 23 Apr 2025 19:52:14 -0500
-X-Gm-Features: ATxdqUH6zhcel7Rbzd8Qm44zms-IsS1wbOu70zu6KscrJXpSAmOJNZAxamP9Dsc
-Message-ID: <CAG17S_MKZXf3vC0zgaK_MUrA1nqRzhGcPGUho873KU3jYVShXw@mail.gmail.com>
-Subject: Re: brcmfmac disconnects when iwd scans
-To: Denis Kenzior <denkenz@gmail.com>
-Cc: iwd@lists.linux.dev, James Prestwood <prestwoj@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+ <CAG17S_MKZXf3vC0zgaK_MUrA1nqRzhGcPGUho873KU3jYVShXw@mail.gmail.com>
+Content-Language: en-US
+From: Denis Kenzior <denkenz@gmail.com>
+In-Reply-To: <CAG17S_MKZXf3vC0zgaK_MUrA1nqRzhGcPGUho873KU3jYVShXw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Wed, Apr 23, 2025 at 9:42=E2=80=AFAM Denis Kenzior <denkenz@gmail.com> w=
-rote:
->
-> Hi Keith,
->
-> On 4/22/25 8:00 PM, KeithG wrote:
-> > I ran into this a while back and James came up with a few patches that
-> > I have been using to keep it from restarting the AP0 interface.
-> > [PATCH 1/3] station: remove scan subsets for dbus scans
-> > [PATCH 2/3] eap: fix compile issue on ARM/GCC 12
-> > [PATCH 3/3] scan: use ifindex and only active scans
->
-> Likely this is the fix.  Passive scans take too long to remain off-channe=
-l.
->
-> >
-> > These no longer seem to work with current builds of iwd from git. I am
-> > running iwd 3.6.r10.g4ded663e. My kernel is 6.12.20. The firmware is:
-> > [    3.496006] brcmfmac: brcmf_fw_alloc_request: using
-> > brcm/brcmfmac43455-sdio for chip BCM4345/6
-> > [    3.839254] brcmfmac: brcmf_c_preinit_dcmds: Firmware: BCM4345/6
-> > wl0: Oct 28 2024 23:27:00 version 7.45.286 (be70ab3 CY) FWID
-> > 01-95efe7fa
-> >
-> > I get the same response with the firmware that ships with RPiOS,
-> > 7.45.265 as well. I am building a fresh kernel to be able to get iwmon
-> > data and should be able to do so tomorrow.
-> >
-> > This flakiness of ap0 happens regardless if I use iwd or hostap to
-> > bring up ap0. When I use hostapd, I use this to bring up the
-> > interface:
-> >
-> > iw dev wlan0 interface add ap0 type __ap
-> > ip link set dev ap0 address d8:3a:dd:60:a3:cg
-> > systemctl start hostapd
-> > systemctl start dnsmasq
-> > ip addr add 192.168.5.1/24 broadcast 192.168.5.255 dev ap0
-> >
-> > With this, I can have the ap0 up and can scan on wlan0 with the single
-> > brcmfmac card. If I use wpa_supplicant, ap0 does not go down when
-> > wpa_supplicant scans for ssids.
-> > iw wlan0 scan
->
-> This uses an active scan.  See what happens with
-> 'iw wlan0 scan passive'
->
-> > It is only with iwd that the network goes down when iwd scans for ssids=
-.
-> > iwctl station wlan0 scan
->
-> iwd uses active scans when connected or if the hardware is capable of
-> anonymizing the active scan.   Otherwise it uses a passive scan.
->
-> Regards,
-> -Denis
+Hi Keith,
 
-Denis,
+ > I am building iwd from git with those 3 patches and every time it
+> scans, it disconnects the AP.
+> When I use wpa_supplicant, it does not disconnect regardless of using:
+> iw wlan0 scan passive
+> or
+> iw wlan0 scan
+> 
+> it is only with iwd that it disconnects and only with iwctl. If I run
+> 'iw wlan0 scan passive' or
+> 'iw wlan0 scan' when iwd is running and wpa_aupplicant is removed, It
+> seems to be OK.
+> My laptop shows a disconnect, sometimes, but when I check the wlan0 on
+> the laptop
+> it is still connected to the ap running on the RPi. I think it looses
+> the connection for a
+> second but reconnects. If I run the 'iwctl station wlan0 scan' it will
+> disconnect and not reconnect.
+> When it does, the ap0 gets to a strange state as it takes a number of
+> attempts to get it to
+> reconnect and sometimes it requires a tear down and restart of ap0
+> before I can reconnect
+> 
+> This is an iwmon log of my RPi.
+> https://drive.google.com/file/d/1WNZz0dOip0XZZVIOs7RGcYIeLY2W4bXC/view?usp=sharing
+> I had connected to it from my laptop. I then ran:
+> 
+> # iw wlan0 scan
+> # iw wlan0 scan passive
+> # iwctl station wlan0 scan
+> 
+> after I ran the last command, the Pi's ap0 disconnected from my laptop.
 
-I am building iwd from git with those 3 patches and every time it
-scans, it disconnects the AP.
-When I use wpa_supplicant, it does not disconnect regardless of using:
-iw wlan0 scan passive
-or
-iw wlan0 scan
+I do indeed see the local AP interface generating 'Del Station' events, which 
+means the local client was disconnected.  The funny part is that iwd ends up 
+scanning a subset of the frequencies triggered via 'iw', it just does it in two 
+sets.
 
-it is only with iwd that it disconnects and only with iwctl. If I run
-'iw wlan0 scan passive' or
-'iw wlan0 scan' when iwd is running and wpa_aupplicant is removed, It
-seems to be OK.
-My laptop shows a disconnect, sometimes, but when I check the wlan0 on
-the laptop
-it is still connected to the ap running on the RPi. I think it looses
-the connection for a
-second but reconnects. If I run the 'iwctl station wlan0 scan' it will
-disconnect and not reconnect.
-When it does, the ap0 gets to a strange state as it takes a number of
-attempts to get it to
-reconnect and sometimes it requires a tear down and restart of ap0
-before I can reconnect
+Here's what I see iw doing:
 
-This is an iwmon log of my RPi.
-https://drive.google.com/file/d/1WNZz0dOip0XZZVIOs7RGcYIeLY2W4bXC/view?usp=
-=3Dsharing
-I had connected to it from my laptop. I then ran:
+< Request: Trigger Scan (0x21) len 16 [ack]                           22.190542
+     Interface Index: 3 (0x00000003)
+     Scan Flags: Mask: 0x00004000 len 4
+             Colocated6G
+ > Event: Trigger Scan (0x21) len 364                                  22.194336
+     Wiphy: 0 (0x00000000)
+     Interface Index: 3 (0x00000003)
+     Wireless Device: 1 (0x0000000000000001)
+     Scan SSIDs: len 0
+     Scan Frequencies: len 320
+         0: 2412 (0x0000096c)
+         1: 2417 (0x00000971)
+         2: 2422 (0x00000976)
+         3: 2427 (0x0000097b)
+         4: 2432 (0x00000980)
+         5: 2437 (0x00000985)
+         6: 2442 (0x0000098a)
+         7: 2447 (0x0000098f)
+         8: 2452 (0x00000994)
+         9: 2457 (0x00000999)
+         10: 2462 (0x0000099e)
+         11: 5170 (0x00001432)
+         12: 5180 (0x0000143c)
+         13: 5190 (0x00001446)
+         14: 5200 (0x00001450)
+         15: 5210 (0x0000145a)
+         16: 5220 (0x00001464)
+         17: 5230 (0x0000146e)
+         18: 5240 (0x00001478)
+         19: 5260 (0x0000148c)
+         20: 5280 (0x000014a0)
+         21: 5300 (0x000014b4)
+         22: 5320 (0x000014c8)
+         23: 5500 (0x0000157c)
+         24: 5520 (0x00001590)
+         25: 5540 (0x000015a4)
+         26: 5560 (0x000015b8)
+         27: 5580 (0x000015cc)
+         28: 5600 (0x000015e0)
+         29: 5620 (0x000015f4)
+         30: 5640 (0x00001608)
+         31: 5660 (0x0000161c)
+         32: 5680 (0x00001630)
+         33: 5700 (0x00001644)
+         34: 5720 (0x00001658)
+         35: 5745 (0x00001671)
+         36: 5765 (0x00001685)
+         37: 5785 (0x00001699)
+         38: 5805 (0x000016ad)
+         39: 5825 (0x000016c1)
+     Scan Flags: Mask: 0x00004000 len 4
+             Colocated6G
 
-# iw wlan0 scan
-# iw wlan0 scan passive
-# iwctl station wlan0 scan
+While iwd does:
+< Request: Trigger Scan (0x21) len 64 [ack]                           31.619536
+     Wireless Device: 1 (0x0000000000000001)
+     Information Elements: len 12
+         Extended Capabilities: len 10
+             Capability: bit 19: BSS transition
+             00 00 08 00 00 00 00 00 00 01                    ..........
+     Scan Frequencies: len 24
+         0: 2412 (0x0000096c)
+         1: 2437 (0x00000985)
+         2: 2462 (0x0000099e)
+     Scan Flags: Mask: 0x00004002 len 4
+             Flush
+             Colocated6G
 
-after I ran the last command, the Pi's ap0 disconnected from my laptop.
+then
+< Request: Trigger Scan (0x21) len 248 [ack]                          32.040780
+     Wireless Device: 1 (0x0000000000000001)
+     Information Elements: len 12
+         Extended Capabilities: len 10
+             Capability: bit 19: BSS transition
+             00 00 08 00 00 00 00 00 00 01                    ..........
+     Scan Frequencies: len 208
+         0: 5180 (0x0000143c)
+         1: 5200 (0x00001450)
+         2: 5210 (0x0000145a)
+         3: 5220 (0x00001464)
+         4: 5240 (0x00001478)
+         5: 5260 (0x0000148c)
+         6: 5280 (0x000014a0)
+         7: 5300 (0x000014b4)
+         8: 5320 (0x000014c8)
+         9: 5500 (0x0000157c)
+         10: 5520 (0x00001590)
+         11: 5540 (0x000015a4)
+         12: 5560 (0x000015b8)
+         13: 5580 (0x000015cc)
+         14: 5600 (0x000015e0)
+         15: 5620 (0x000015f4)
+         16: 5640 (0x00001608)
+         17: 5660 (0x0000161c)
+         18: 5680 (0x00001630)
+         19: 5700 (0x00001644)
+         20: 5720 (0x00001658)
+         21: 5745 (0x00001671)
+         22: 5765 (0x00001685)
+         23: 5785 (0x00001699)
+         24: 5805 (0x000016ad)
+         25: 5825 (0x000016c1)
+     Scan Flags: Mask: 0x00004002 len 4
+             Flush
+             Colocated6G
 
-Keith
+And about 1.5 seconds later the Del Station event comes in.
+ > Event: Del Station (0x14) len 32                                    33.560662
+     Interface Index: 7 (0x00000007)
+     MAC Address 50:84:92:A6:7A:7A
+     Generation: 0 (0x00000000)
+     Station Info: len 0
+
+Not really sure what could be causing this.  Maybe this is a question for Arend?
+
+Regards,
+-Denis
+
