@@ -1,118 +1,84 @@
-Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 463FF24BBEB
-	for <iwd@lists.linux.dev>; Mon,  5 May 2025 12:39:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
+Received: from mail.holtmann.org (coyote.holtmann.net [212.227.132.17])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 786411F91C8
+	for <iwd@lists.linux.dev>; Mon,  5 May 2025 12:39:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.132.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746448762; cv=none; b=p2h9y3g9/HZM7JAKZNrjjpKF0dZSOqi6BOcsd4GOqX+2bK9OFblhw0a3QLgBYqBx0cyKAetRA2F2vZZoGI1rECjTMyMRaqfIl+gDit8Hw3pCYII7Qgo/RO8+kdEa+pFlLvssEPlVoGV1Skhi7W07VbXqRRaWJARSSv8+I5f8owk=
+	t=1746448778; cv=none; b=CQfBgakWtB2JaAj9+arcuf8mH85UECSZ5S2tzfUD0QjHwvDcQA8hiqlE1IyhianrSMvGC/IUrEs/T2PGxFSLgMYK8583eUUvmUZp77jdZ2f/5U3H1bgCbWJNxfwsWxZ7T6XnrgaE0Wi+12JuG7e8UFQ3ez5PCsHoVkLe+HHu8e0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746448762; c=relaxed/simple;
-	bh=puv7rgAsEzF1dFI1NMwDA0nW+drBpMThmSHUdgCiOFk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=cWh7LJmB0qZe08XEXmd1LJcLEPGtZGpNFvXIWYP3+8HXBXvQtdNNZPe36dxyLdeF6SaebNcvUkp9UU37VLbAynjbHPrdiLP/rblV38CMfAEwH2X1baZCzUV+tBVc3B3TjnanjbHxVltIp6Q8DoN02PhO6uNbgXCMgS3LsG2XrxY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iJqR3i4o; arc=none smtp.client-ip=209.85.214.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iJqR3i4o"
-Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-22c336fcdaaso48380995ad.3
-        for <iwd@lists.linux.dev>; Mon, 05 May 2025 05:39:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1746448760; x=1747053560; darn=lists.linux.dev;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=q8Kwkbw1d8GQ9t9K9z9C6vyqLweNNvZzaRrv/5VIuoA=;
-        b=iJqR3i4o69ik11ywXh1d8cg3qJ7Y5qNsv9af84R7SixDjfiDvDxlt4lxSlrXs9Tj9i
-         eKu43L9IWPJdoawFpwbAFKR9SbLAguQnRH8P9HIgqyrONnuDzmEIaT6oeWRwM6fGATnd
-         V+baMdmgJAiu57sIykSXkHSbGBaCmZQ0vmDopNLzd6rU2/5bKnUHgo5Iewb5OYAGKHLA
-         JT+zIt3wZ6JS/itXuGVz3V/DaSBXH1gMsyHG1HUDiuaiKzjOi+MaW7tPtmPUydVqmIzq
-         WHIX3Q7UHQ9C2sx+6bRSbQvGt/RJQ5eT/AawxfFmruycQyb8kLuPJdE+jCi52PAV3Nuj
-         hJjw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746448760; x=1747053560;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=q8Kwkbw1d8GQ9t9K9z9C6vyqLweNNvZzaRrv/5VIuoA=;
-        b=NEk9dz2fmGpO7kCobaE07aaZBWfbJfp1t7GmIgYzFpV1O1Mwii0hlUMTbarYLkbTp+
-         r5uKi/VyIMKWa7l8NpcGk0AKpLonclMtgQNltzy6t3j7ceHBY5MTTZA3+r+XIiyCb/GM
-         Rcw10/9SwUE464dhf5EojJ6IiA8QTgc5X8aPZn7PT9AUH6ZXtb81xk85QncZ/+Jzp4ty
-         lUKddijY3e2dQ3qO6J2O8V6EKBI2YWwHzv/3XzQoOvwti/ZANDfLkGORtJvpF9lPzEi6
-         lmZRAkDK5hHrfiwqiNjYH8x5eQvRnSV9+oN+sGNWdAnQRh6NIAe3LlFm8NsJkQ+YgpWY
-         6Vpg==
-X-Gm-Message-State: AOJu0Yzci+9bwY0he49HfOJQKvdYNc3lvNUYEF2p/ua/xWF953sdScDK
-	i+2NwAgcjKDf1kFX265KYDQ7fuQNtgdDsoOzy3rxN1RABoTcuHas
-X-Gm-Gg: ASbGnctm+ug3WnfPhVyC/Sz6y0bjMCfpOfF+Ng2aev6sAMvDMea+cNyh8M2vtoNrYsu
-	riWCojZetqi3NRHnAjuP2kKJbbtJXZZWoIHw0w4dGtEA+LeHPN1jbqSY4ckD5wuxsCyfKDh4/0a
-	pwgYiZFJpyv7AaxskWbgemQx187Cogx5zmeSBrVUTD8hZACir3lBUbpQ76vjQlt8nwCWv6HB+ek
-	Jx18v2QVKx6fksTcis/kRzHMnZ6F9j+2vmyG4HlHH8Yl8O53PWkTlWOKEOoG84iJk+0r/ejgV3q
-	L7kwYFLhi5HwU6pb7C14iwBc29jmLX874pWdzLNpVGj6qvZE+MrnDXAg2/KyBG5M+SmV/DoIqtN
-	+NVJeW4FkAvdtIe0c6gY=
-X-Google-Smtp-Source: AGHT+IFlsMFNTrW5do8fKUtdy5fANOELoBfjfL0kvVwZ7ZoPtNd2Wi1czD1s+n8WrfpRvYQrM7d8SA==
-X-Received: by 2002:a17:902:e78f:b0:227:e74a:a066 with SMTP id d9443c01a7336-22e1ea27583mr110966445ad.28.1746448760194;
-        Mon, 05 May 2025 05:39:20 -0700 (PDT)
-Received: from [192.168.1.164] (h69-130-12-20.bendor.broadband.dynamic.tds.net. [69.130.12.20])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-22e1521fb56sm53195165ad.111.2025.05.05.05.39.19
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 05 May 2025 05:39:19 -0700 (PDT)
-Message-ID: <4c9c290a-9c9c-4956-a5d1-b0eef0a7dcf2@gmail.com>
-Date: Mon, 5 May 2025 05:39:18 -0700
+	s=arc-20240116; t=1746448778; c=relaxed/simple;
+	bh=stsiyDWbuIpcyV1HwAKyCAxdZh6es1k4mQyzoxAlKBE=;
+	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
+	 Message-Id:References:To; b=bmwCApyLMnNxe4fXCduxltsoWLBY1tQmkryGoYZf3VRcYDk/gAPRkR+2l1wQleMwjopy/d6NvVogMjCr87nPbPLQVlCwFQml420Ripvj5ZBxTE84s5QzdI9icwfXdJMOaz+CAwpYLoxmWCFkzRuv1PJoBRwzC6GWEGg8vsHuY3E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=holtmann.org; spf=pass smtp.mailfrom=holtmann.org; arc=none smtp.client-ip=212.227.132.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=holtmann.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=holtmann.org
+Received: from smtpclient.apple (p4ff9fee4.dip0.t-ipconnect.de [79.249.254.228])
+	by mail.holtmann.org (Postfix) with ESMTPSA id 279F4CED0C;
+	Mon,  5 May 2025 14:39:35 +0200 (CEST)
+Content-Type: text/plain;
+	charset=utf-8
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: test failure in 3.7
-To: Marcel Holtmann <marcel@holtmann.org>,
- Andreas Radke <andreas.radke@mailbox.org>
+Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3826.500.181.1.5\))
+Subject: Re: [PATCH] unit: check cipher support and cleanup in test-storage
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20250505123540.281773-1-prestwoj@gmail.com>
+Date: Mon, 5 May 2025 14:39:24 +0200
 Cc: iwd@lists.linux.dev
-References: <D9NMMJZ63E59.YC0XX4QP9HYU@mailbox.org>
- <5595AB40-CF63-4118-8DFA-3FFEAA091F5D@holtmann.org>
-Content-Language: en-US
-From: James Prestwood <prestwoj@gmail.com>
-In-Reply-To: <5595AB40-CF63-4118-8DFA-3FFEAA091F5D@holtmann.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <80DB75BF-0D93-4432-879A-AFAC76B4BE8B@holtmann.org>
+References: <20250505123540.281773-1-prestwoj@gmail.com>
+To: James Prestwood <prestwoj@gmail.com>
+X-Mailer: Apple Mail (2.3826.500.181.1.5)
 
-Hi,
+Hi James,
 
-On 5/5/25 4:57 AM, Marcel Holtmann wrote:
-> Hi Andreas,
->
->> the new 3.7 release gives a test failure compiling for Arch Linux
->> using gcc15:
->>
->> .. contents:: :depth: 2
->>
->> FAIL: unit/test-storage
->> =======================
->>
->> test-storage: unit/test-storage.c:41: test_short_encrypted_bytes: Assertion
->> `__storage_decrypt(settings, "mySSID", &changed) < 0' failed.
->> TAP version 12
->> 1..1
->> not ok 1 - /storage/profile encryption
->> FAIL: unit/test-storage 1 - /storage/profile encryption
-> it works for me. I checked on Debian and Fedora on x86_64, ppc32 and aarch64. What architecture is this?
->
-> Can you check the return value of __storage_decrypt().
+> The __storage_decrypt API requires AES_CTR so support should be
+> checked before running that test. In addition storage_exit was never
+> being called which leaves unbalanced mlock/munlock calls.
+> ---
+> unit/test-storage.c | 11 +++++++++--
+> 1 file changed, 9 insertions(+), 2 deletions(-)
+>=20
+> diff --git a/unit/test-storage.c b/unit/test-storage.c
+> index c40518e6..765d9967 100644
+> --- a/unit/test-storage.c
+> +++ b/unit/test-storage.c
+> @@ -44,12 +44,19 @@ static void test_short_encrypted_bytes(const void =
+*data)
+>=20
+> int main(int argc, char *argv[])
+> {
+> + int ret;
+> +
+> l_test_init(&argc, &argv);
+>=20
+> storage_init((const uint8_t *)"abc123", 6);
+>=20
+> - l_test_add("/storage/profile encryption",
+> + if (l_cipher_is_supported(L_CIPHER_AES_CTR))
+> + l_test_add("/storage/profile encryption",
+> test_short_encrypted_bytes, NULL);
 
-The return value would help, but I also just sent a patch which skips 
-this test if AES_CTR isn't supported by the kernel in case that's the 
-problem. I also tested this in an arch docker container without an issue 
-fwiw.
+just use L_TEST_FLAG_ALLOW_FAILURE instead.
 
-Thanks,
+> - return l_test_run();
+> + ret =3D l_test_run();
+> +
+> + storage_exit();
+> +
+> + return ret;
 
-James
+I really prefer we keep =E2=80=9Creturn l_test_run()=E2=80=9D as the =
+basics on how test case are run.
 
->
-> Regards
->
-> Marcel
->
->
+Just put storage_init,storage_exit into the test case itself. I would =
+just do system_key_set =3D false in the exit function.
+
+Regards
+
+Marcel
+
