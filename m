@@ -1,152 +1,143 @@
-Received: from mail-ot1-f50.google.com (mail-ot1-f50.google.com [209.85.210.50])
+Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C903F1A0BF1
-	for <iwd@lists.linux.dev>; Wed,  7 May 2025 16:31:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1099D28E5F5
+	for <iwd@lists.linux.dev>; Wed,  7 May 2025 19:44:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746635486; cv=none; b=SUfuvpE18T9BpTDFGRZ8p1+RdlFQfKtlXoUQgZsCN648CoHnSU0CCv3WUfnxctFIT1jpi62P1GnSCwxIRc5BAd0MBeX6Cm9Cz0/rvOBlGlGM/g+Fi6YRDQZUQnGdEHm6d1zHRqh6gl/G4wS/3w/pfPSYkKNWItbQayTQ7zW4R6w=
+	t=1746647096; cv=none; b=meArPfWmqcpPsN3OgcTDr2WKXp7cPKvDGyJit9CtUV891+WI6x4Qa9xAWmYjxt9XMYrqMdsJgSV+BY0zOguLE1Gvu95tZtQRQuPGvDYR9WsCKt9J57AbqVdwaIOpiGizkNdXjoeDbh++f56mSvcWJOJ109Ej0xC1DlrdtNnSTuA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746635486; c=relaxed/simple;
-	bh=YnVaMNn7XM5q3rbhhyg4uh7tRk8cRjGAKIjy2RgAo9o=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=BFoaLbOpd9BozszDwy6bavSCgwF6G8lgSUb/d6e7ISz8/Ox/Ywc0yjT0G0ymPWrk9Oj1ICsg9kt+JL261OBeQbviBjfLLhOMAz57PDDOd6sBWOV4Vpyp9ogPMY68ix50zKXQdiISI8r+B4ZZkkUlrxJ8ATnu7171Y5zqmerxLaw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=g4nxB/zv; arc=none smtp.client-ip=209.85.210.50
+	s=arc-20240116; t=1746647096; c=relaxed/simple;
+	bh=6rgf0Xn0ralCHYPFURjUuBL/qPSJOuep8GwINlAC+w4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=mLgDVtvCfbwQyBAm26HkA9YdZs3lcb/A3SePXtU0fOWs9OQvNAqSNAZrmybhu+V6dKzcdoa7bHqn4a7NDUkpYb5UW4DHtBEyzSNa3MZuJFupwMA78mPWnYuAuNsibogsMStm9Crf//Pp/R0CVbGg40L3bczOQbbk9BDRuuBPars=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NwMGw9Uz; arc=none smtp.client-ip=209.85.214.179
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="g4nxB/zv"
-Received: by mail-ot1-f50.google.com with SMTP id 46e09a7af769-72c14235af3so4460769a34.3
-        for <iwd@lists.linux.dev>; Wed, 07 May 2025 09:31:24 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NwMGw9Uz"
+Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-22c33677183so2954485ad.2
+        for <iwd@lists.linux.dev>; Wed, 07 May 2025 12:44:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1746635484; x=1747240284; darn=lists.linux.dev;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=hUJe3S+R93rfy7FAPPBJ2imz5wW3HPPamcInOjbdaEc=;
-        b=g4nxB/zvZM4PwbZZHasSGJLg0rOsKXMiws6bnw0bbiym1SqD/fQBUXyO1empdYltot
-         0Wh62iqA6gsJDQCliEQy4lcu9ZW/g88wbpBM1IypaDlpulh4pHO/1kXayeFk+ebDSWDS
-         Z5AzpyR+HvlJgT62+OabVflSfkqihtdqEhA14VmhqEjXFBRIN9H1rNoa7Cb/ScCb8L+/
-         Nj5ziHOx+vssf4ZAxUsX8hvqDV4WHVYxaKQAu8mvyhDvk2B76ag2uPyfH+h4KVkoKMMS
-         VCkbTx+hg8ZPCfbJ0dVDUesx6YyG3G981VCaI5lDtsa22ak4/3sejtD6jQVY5Acv120i
-         Hj1w==
+        d=gmail.com; s=20230601; t=1746647094; x=1747251894; darn=lists.linux.dev;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=dOPoEF80avTCyWNNUoE4Oyw89v2Ein/1CTwIOK7mRbA=;
+        b=NwMGw9UzgPMFYOpGHLa+QfVKR88iygfEeiXbMwkfyYjR8qOuj9XI4QZhwkXuHXRv5o
+         tasPPD4gUHMRmBRfStx1A8j7Gehic2nuyI7r3zmxOKn6Dpxo12WQFKjVPQw0Dy1udMJv
+         p4qIMqUgXUoZXmNjEcwk/r3Qgd/TUluUQApLxMp3i8ujD0DWT9hSR/R7FsUIFpqdUS/d
+         L6PI7+WkfQz1eRsgnb4aFcGa3ebIFhPpwqtEDlxDx1HHBmX3p0cmzDSgbEz0wiNbufYG
+         rz2lGk672y6EveSabZkTpiXFYm2RHCJ7RIZ8srg7XZw1XzT6aiwFqMpaMwIVEG1x9uwb
+         wsgA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746635484; x=1747240284;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=hUJe3S+R93rfy7FAPPBJ2imz5wW3HPPamcInOjbdaEc=;
-        b=Mn3rTbZLqn8yARoERFsElzmxXFHazwKrp03F5662GftTFgRTZ2UJBIVjFUaxiJxkLW
-         sBf/v3xWAxLbGWMUhtnLVSKqO0m3ZWwF3W3//05lgvIwm6Gu2Avs4mJgv0lPxLKGcvKm
-         i6xEROD1YQCCqEGwM0idmwHiNudz2gRVnCl+f7o9F25nvRMqmePn0RMIyum2CeEpIuLZ
-         ++vWg6tUKeSGBdjFISaxiJfIFPB1HtHtJVgJ0NzTz8XpoQhkrpe3rCVfgYtDvx6YH7mm
-         BYP8Di1lq1e9bVvGrrq1MqBtiA1i8F9zmrcUStcf6ETWEOT0qE57k6v5n3RCt2ZE1tpF
-         A4Dg==
-X-Forwarded-Encrypted: i=1; AJvYcCWniDSTDVMHfcV4UbMYVjucOEpctIhzu6JRIHTZlp7ZH8/bvdop64679ewSWXBBo+aXsQw=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yw+V0cuykTERogEvd4NQlTl12H4kpIoQYjG7Lw3skn2KiENUmeI
-	0HI6952Cy023g7dJan5+lYloXrqgbtiJIEJan7H2Q3eEFcPSs5I/
-X-Gm-Gg: ASbGncty1xyaLHa44hL3T9ZDqok5AAenChJcvx31wTCkX0XsKM8GKnLfMS2g9qLTXgd
-	d+0/qRMA0PXumWZuMWgRhGqliCBlsY05bqI+wKq6xl8MPfDRRHZt8Lne4/mdDrWKAylichQRBuH
-	W1m4msYSedjC+c37fYAnhFerrHxVM0RTDRgB5IjYOCqkUT2P4Hipu4ZZE30RYUXxmMfczduzhR7
-	FHnfjv5ZFuofSQLdNi60n2QsmkWPRHmVqeHkBqJLMIgv9h2U4QUqXTDAy3/5+qTHM9jwKEjcSC9
-	rESLV7P/k64vRENEL6G/RgPGYz5fNQH+0ixRSdnnLAK07NUio94fLCc/nrAJO/g8FgC16Cx2xd8
-	b275smQ==
-X-Google-Smtp-Source: AGHT+IGuVFnBYaitSP+7/u0s/aKzVBDR1PfsKEfGF7J0Tt/jYi8XHvu6EWQgM2AoExHLs5yZpF0N+w==
-X-Received: by 2002:a05:6830:6c0d:b0:72b:8326:f0c7 with SMTP id 46e09a7af769-73210b194f6mr2820783a34.28.1746635483738;
-        Wed, 07 May 2025 09:31:23 -0700 (PDT)
-Received: from [192.168.1.25] (syn-070-114-247-242.res.spectrum.com. [70.114.247.242])
-        by smtp.googlemail.com with ESMTPSA id 46e09a7af769-732109fc94dsm612290a34.19.2025.05.07.09.31.22
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 07 May 2025 09:31:23 -0700 (PDT)
-Message-ID: <d89b7056-860c-4da1-a6bd-4eac4fd9b0d3@gmail.com>
-Date: Wed, 7 May 2025 11:31:22 -0500
+        d=1e100.net; s=20230601; t=1746647094; x=1747251894;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=dOPoEF80avTCyWNNUoE4Oyw89v2Ein/1CTwIOK7mRbA=;
+        b=KqSPkeUxlEzg5TKWg/XHBXkbN0uLVl1IScLq5h0CjnOxtooYA1aHSHUSmhHnOgbK3k
+         B7F2di+KqT3nLYxKFHpuWVq6Q7x0rRdE3KcOupf2jwCV9XPMw5U5VUheQ/ufgxo6AKW2
+         6XHY8r84BITxVkSN6HA+Im68oa8YSAbIJMcA20vFuSKJBxbyHIIIVHYiqzzJImNH/xVL
+         ySbpsF7k9LRCy1iyT2wzF+lxfje+fVhIZxwTkbBOhkK0829kx8A7q2xgsZde+cEwD96X
+         8Hxl4K6ERjzRBZSMquec0+T7vyyAF+uPbhFmfYttmM2h+yDb2Fmtf8XSk9JpAtM6ZY+V
+         Hgzw==
+X-Forwarded-Encrypted: i=1; AJvYcCXcsfVCJGez4cxbqlBsytRdO2wQF30xXpFx+Dw7rjh8w5erx4sovYroAR3qUmNIIqKkuxg=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yw037rWsA4jEZQiPJ2PcyQ/5SLQU/eUPULiDjISsBY+sp13odov
+	tEFJNVz452jQGf/xji0Wr9PVptRjvhARxcAHD3p8wYwKqHU0vFgOpmEzpCEo9zrHq/OjGUWQAEn
+	2lQnOCpes+n/M86PrkBEKjueolLo=
+X-Gm-Gg: ASbGncu43I/LX3+lp5TzJtAcdb10t0OpNB9p8weu04Scl4LLdf+3khwZrKtIxsAMGtk
+	A7zC0Fr/k41aSL/LY/Lg7tKgz4KnztZmOUpK7cK1kILaDoT7qwnAbCb9nLSLJGYJaYgJXE5RK1c
+	dP/6JzVBYoGgKKXj1769aUN2LYmif21NZfob4=
+X-Google-Smtp-Source: AGHT+IEFkbNmLe4oSFWJ8zExuS0w04aBHZ1rtf2wvKG4dNboEpeAS/UkxUMyrVadaIglYYGyqAZug1/y6ue5KmBpaIo=
+X-Received: by 2002:a17:90b:1e4b:b0:304:ec28:4437 with SMTP id
+ 98e67ed59e1d1-30aac2a104amr6144011a91.22.1746647094156; Wed, 07 May 2025
+ 12:44:54 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH RFC 3/3] station: improve roam scan strategy
-To: Alexander Ganslandt <alexander.ganslandt@axis.com>, iwd@lists.linux.dev
-References: <20250415-roam-scan-improvements-v1-0-12827e086895@axis.com>
- <20250415-roam-scan-improvements-v1-3-12827e086895@axis.com>
- <ab31a956-b65b-4b42-b37c-a1c63385d3c9@gmail.com>
- <c56180f6-8eff-479e-93ab-522bd8a43ad2@axis.com>
-Content-Language: en-US
-From: Denis Kenzior <denkenz@gmail.com>
-In-Reply-To: <c56180f6-8eff-479e-93ab-522bd8a43ad2@axis.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <CAG17S_M4_+CR1uSsajyvHBjig6cfCuxegipnHREhk1sXjSyOsA@mail.gmail.com>
+ <a0dcf03d-3bd3-43e5-9532-5a565d20930f@gmail.com> <CAG17S_MKZXf3vC0zgaK_MUrA1nqRzhGcPGUho873KU3jYVShXw@mail.gmail.com>
+ <45bc2f1b-b037-4784-a2a9-7732a82b7391@gmail.com> <CAG17S_MqLBQV6ktjbWsoAv0e+2A0dnNN5+X7Pf+b-qDP3mrL1Q@mail.gmail.com>
+ <19691dcb210.279b.9b12b7fc0a3841636cfb5e919b41b954@broadcom.com>
+ <CAG17S_MX3S9=EmiHBae8WsRnmsUGBJ5h4d8kCmgdxYZ2Zaeh8Q@mail.gmail.com>
+ <1fb12821-1707-4478-941b-9fbc007c4e9a@broadcom.com> <CAG17S_M9_-TG4YnHAwx2+O2bJ6sbEE75X=V0y4Pbxy222O3ZJg@mail.gmail.com>
+ <CAG17S_Njkt7rFTk4Tn-KnLVS8kzA61KJGyWgNQ9kqx5M=s7DnA@mail.gmail.com> <38be0ddf-50ff-4ef9-bd98-748ffcfed2e1@broadcom.com>
+In-Reply-To: <38be0ddf-50ff-4ef9-bd98-748ffcfed2e1@broadcom.com>
+From: KeithG <ys3al35l@gmail.com>
+Date: Wed, 7 May 2025 14:44:43 -0500
+X-Gm-Features: ATxdqUEHkr3uMC6SJ7njvLaLeRD1DkNNSmPw8hMz1DDLB7VH4kwld7ij3-ooP50
+Message-ID: <CAG17S_NCAmDPa+jK=OPdF18H8Yuuio3czytaa2q5hMSJiKO9bw@mail.gmail.com>
+Subject: Re: brcmfmac disconnects when iwd scans
+To: Arend van Spriel <arend.vanspriel@broadcom.com>
+Cc: Denis Kenzior <denkenz@gmail.com>, iwd@lists.linux.dev, 
+	James Prestwood <prestwoj@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Alexander,
+On Wed, May 7, 2025 at 9:27=E2=80=AFAM Arend van Spriel
+<arend.vanspriel@broadcom.com> wrote:
+>
+> On 5/7/2025 3:54 PM, KeithG wrote:
+> > further information...
+> >
+> > I tried this with 2 different pi4s and have been able to confirm
+> > wpa_supplicant/hostapd is stable on the Pi4 (will try others when I
+> > get a chance). I also tried both the 'shipping' brcmfmac43455 firmware
+> > and the 'latest'. It is only with the 'latest' that I get reliable
+> > connections. With the 'shipping' version, I can get connections for
+> > both wlan0 with wpa_suppolicant and ap0 with hostapd, but the ap0
+> > connection is flaky without any connection on wlan0. And I cannot
+> > sustain both connections at all. This 'latest' firmware is required
+> > for a sustainable, reliable ap0 with connection with hostapd.
+> >
+> > this is the firmware required:
+> > [    3.658201] brcmfmac: brcmf_fw_alloc_request: using
+> > brcm/brcmfmac43455-sdio for chip BCM4345/6
+> > [    3.660643] usbcore: registered new interface driver brcmfmac
+> > [    4.041524] brcmfmac: brcmf_c_process_txcap_blob: no txcap_blob
+> > available (err=3D-2)
+> > [    4.042269] brcmfmac: brcmf_c_preinit_dcmds: Firmware: BCM4345/6
+> > wl0: Oct 28 2024 23:27:00 version 7.45.286 (be70ab3 CY) FWID
+> > 01-95efe7fa
+> >
+> > The only annoyance I get is that the log fills up with failed scan mess=
+ages:
+> > May 07 08:43:11 deskrune wpa_supplicant[604]: wlan0: Failed to
+> > initiate sched scan
+>
+> The scheduled scan is basically a scan offload in which user-space tells
+> the driver what to look for and how often (hence scheduled). The
+> advantage of the scheduled scan is that the host (RPi) goes to sleep
+> while the wifi chip is on the lookout for the ssid. No idea why it is
+> failing though.
+>
+> > the Pi still works and is scanning because when a known ssid appears,
+> > it immediately connects, so it is scanning, I just get this message.
+>
+> What I recall from wpa_supplicant behavior is that it does a regular
+> scan for a configured ssid and after a number of attempts it does try to
+> setup a scheduled scan if the driver supports it. When it fails it
+> simply continues with the regular scans. The brcmfmac driver supports
+> scheduled scan so it seems like regression although apart from the log
+> message the end-user is not really affected. I expect it will not make
+> much noticable difference on the energy bill. ;-)
+>
+> > Now that I have this working well with wpa_supplicant and know how to
+> > get it all 'up' and stable, I will start investigating what
+> > differences there are with iwd and why it is flaky. Please guide me as
+> > to the best way to do this.
+>
+> Were you successful using nlmon. I suspect differences should show up
+> between wpa_supplicant and iwd.
+>
+> Regards,
+> Arend
 
- >
-> Yes, it will start reusing frequencies and might never reach the less common 
-> frequencies depending on how long time the scans take. That's definitely not 
-> ideal. Looking at the age as you suggest has the problem that it will eventually 
-> spend time scanning uncommon frequencies when that time would have been better 
-> spent scanning common frequencies that are getting old.
+I will use nlmon and see what the difference is. Will post them when I get =
+them.
 
-DFS frequencies are valid and it is quite common for APs to operate on them. 
-Not scanning them or delaying the DFS scan excessively can lead to really 
-terrible user experience.  In fact, we're having this problem on some older 
-FullMAC hardware.  The firmware doesn't initially scan DFS frequencies, even 
-though it is being told to.  This has led to all sorts of fun issues and lots of 
-$/time wasted.
-
-The less 'preferred' frequencies can be scanned last, but I think we still need 
-to scan every valid frequency before starting the next roaming attempt.
-
-> 
-> Maybe this is an impossible task to solve perfectly as there will always be a 
-> trade-off, maybe it's better left as configs for the user? In my livestream use 
-
-A typical user cannot be expected to optimize something like this.  Our 
-principle is to not rely on the user for any configuration.  The default 
-behavior should be good enough for typical uses.
-
-> case the APs should be configured such that most good frequencies are in 
-> "neighbor" or "known", so I would like to spend most time on these frequencies. 
-> However, for a use case where the network setup is unknown, having more 
-> exploration of uncommon frequencies might be better.
-> 
-
-+1
-
-> We could have configs instead where users can define the subsets and age 
-> threshold. If they don't set anything, the default is the current behavior. If 
-
-No.  You should not be relying on the user for anything like this.
-
-> they set subsets, the roaming algorithm will pick frequencies from those in the 
-> prioritized order, just like this patch does. It could still get stuck scanning 
-> the same frequencies if the age threshold is too low, but then it would be a 
-> user configuration error. We then also get rid of hard-coding frequencies in IWD 
-
-Strong no.  It is not the user's problem and never should be.  Also, I really 
-question using 'age' in seconds.  I strongly suspect it is something that will 
-likely fail in all kinds of unexpected ways.  Hardware has all sorts of strange 
-behaviors outside of iwd's control.  Scan times vary wildly.  A more stable 
-solution is needed.
-
-> and all problems that causes, but still give users the possibility to do so if 
-> needed. Does this make more sense?
-> 
-> On 4/16/25 19:19, Denis Kenzior wrote:
->> Have you considered maintaining a scan_freq_set of all the frequencies scanned
->> by the neighbor and known-frequency stages instead of maintaining an hashtable
->> based on age?
-> 
-> I don't completely follow what you mean here. The reason for having the 
-> hashtable is to know how long ago a certain frequency was scanned in order to 
-> not scan it again too soon. So that info will have to be stored somehow, or did 
-> you have some other approach in mind?
-
-See my comment above about using a time based age value.  I would push more 
-towards a solution that scans every (enabled) frequency in some sort of 
-preference order.  My opinion is that using a set of previously scanned 
-frequencies, rather than a hashtable, would fit better into that sort of strategy.
-
-Regards,
--Denis
+Keith
