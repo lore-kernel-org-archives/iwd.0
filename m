@@ -1,192 +1,118 @@
-Received: from mail-qt1-f177.google.com (mail-qt1-f177.google.com [209.85.160.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fout-a7-smtp.messagingengine.com (fout-a7-smtp.messagingengine.com [103.168.172.150])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D5DB291874
-	for <iwd@lists.linux.dev>; Fri,  9 May 2025 13:12:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 910E040855
+	for <iwd@lists.linux.dev>; Fri,  9 May 2025 13:45:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.150
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746796349; cv=none; b=aLXxGSHxPx2Z1LibgzhsOt0x6hGyBrIG5IxNS/DADBEgGXoOaX2huKRtIUn6j9UNxer0fE4ie8bFbAl0G0RK5W2mxWPo7vo3mwqGrrMk/ekw9hqJCY4WoxcMbOwuSoAnWaGF1h4XwGBPqgJdB/ecTQjKRpWkBNFsq3ZZTOYKZ+E=
+	t=1746798353; cv=none; b=Lz/WYZHkU/EqWSRTzKSmAT6hNQ3Ld0RIHw+IPiKq5mQm9P3e664SS0R9hN5mMFyrPJ5tgBVtRy3ZSSLD209V+x7Sit0uLGLjGLNS5+q1TsdE6/BX4iEGsza+wB+xDkaZL8S+q16EFuadVYTOl9cThnvQJlEpnCpPw6O6XHuuKvY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746796349; c=relaxed/simple;
-	bh=1WWyjB8u7UlIiW0KwaclRdlUJn1ij8nqZrTMpU5aJ7I=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=odhZmuOo9Dvvy2XUB7yWxqXp5MqI6bJtXzZndD0F54Pya1zH2Nu1CS6UwU/ZN6SryKRo1tpMiCKtfb46JXA/DMWH6DugQHNv4NVzGMYPQTPcOdSeYIq3yArCynWJTkKDsEvl+tPbgNyCdq5ose6E6duv1fiLxbYeWU91CvUFI7U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VLMwVLJM; arc=none smtp.client-ip=209.85.160.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1746798353; c=relaxed/simple;
+	bh=BrPK8k/DO3VHGWLMymAKRJriwZkP4LWX9Q5CIJlVdYI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=DQkO1LRnk122BBekw+nNksw/i8JMwNb6CQCpU3NLJqPtd1EYzjdN2C3CCidEjwbLCtDYz7vK7gZh/pvH1arfYJ1/CJ5qFs6tPoO6M1093l6YpaaSP4pBoj4tfJcYhHWIx4+NUCo6ULdZ7toXBVYHCyXZWnR7Kf+4+b7tbCFh/nM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=jfarr.cc; spf=pass smtp.mailfrom=jfarr.cc; dkim=pass (2048-bit key) header.d=jfarr.cc header.i=@jfarr.cc header.b=A+XbDlxZ; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=r26vCT76; arc=none smtp.client-ip=103.168.172.150
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=jfarr.cc
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=jfarr.cc
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VLMwVLJM"
-Received: by mail-qt1-f177.google.com with SMTP id d75a77b69052e-47698757053so27973721cf.0
-        for <iwd@lists.linux.dev>; Fri, 09 May 2025 06:12:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1746796347; x=1747401147; darn=lists.linux.dev;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=zNTsk+ubj/Qw14Ek/kIvcy3QgaxEnCDA58EUUDDrPi4=;
-        b=VLMwVLJMI7yAeBoNu6RQ8fH8SgCD3ubHkLTwoPyr8Qwct8mk8UdUPNVFMmkatudysN
-         OfGnmc3Gf0dVKZF9nnBA1RdveeRyOec2aMKuIpNx2/2jB6QRMI6Rzdk/Q+L8WHYxi34N
-         hz0DMO30RvQcGPhRhlA3WLt0VfQBD/AlWDSFXY/rBitwulSYkX0D+haH55IZ5hvZQbxN
-         gkJURjyi9fBJrbzjhOBGatH5IhGHvyN6Pvs6gpkKqH+rVpsDd/cDfO67chwp8iYKmcD4
-         65gkQ7emdpAW4ly3CkiU441KgRNmaxYFJ9mgdIpJlcKhRgkSo3Kk56SfXA0zQKPsQnxR
-         pgcg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746796347; x=1747401147;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=zNTsk+ubj/Qw14Ek/kIvcy3QgaxEnCDA58EUUDDrPi4=;
-        b=UcoqrtPpZRcB7pzX0Am6M5StHT696Q6fwBt1SNNpr1FnqYC+zjFS5sxK608ox3+P3P
-         1C+7c9J+Dw9w2dLEwYY/nf3lC+RSFf1zBrcaB1ERa7eCOupvO1WLqlRdSvJ/j5v5tfGi
-         jraak/aPmGLzQDV2l3pPOz6ORMghrLuwEDtn6MpG2zLNy3iqSR+4Xuety/GPmGdYD3Qt
-         NODJAcu+PoFdYiCLcPKYnfOdimdKwbu+vKg1muqTUOK5exFL+GtBFB1KSriY//CxGCBS
-         RTJotQckTn51pTSfLrF1yAEOOJIRSwb0ufpujSZKuVFvrxQTPNUoUrB+2BqDH6fyTmZN
-         v3gA==
-X-Forwarded-Encrypted: i=1; AJvYcCWTQ0uSM6l3zzlhcdf5qOWQaC7XqLdAaqIE9HdPzZIe+Oi1s53Y18GPeF+8eMa7P7YCtd8=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yx1inNRkH+7DRGQIki9704wCjlvM9qr5nVo2GcxhX+SGxs9bFmI
-	KNxPQtYQm7KT7VY8fahfG1xy2zLFwgVeosqhCSrdwbiyBypaasBB
-X-Gm-Gg: ASbGncstoC4qeKr4lp3jGrL1D/kTXHic00c4FEiG+CxJZOErAoKr+EZYWN6CCRXeSec
-	bAswzVzjTN3Pdpow5V+PaPWKW1/FZ0LCyVJVi6NBWgfIJua4ib/ujjV5hkHgbFMDIr0l6/bQokX
-	8btbjt4aFUnfh8SIDu13CbHjuswe2NZhnr7U//M3MVEAleb+PkkToutb4G89ppANxIa1mQGxgiA
-	F8n4+s1o/v4PjUMwC2MVN7+1pmCI8wcEuY931uNuH5DtRcBamcIjym6LYeAyz+8vBxLYeqtJyJd
-	Cn/ArpqBfMZZW23vuzZpJcZqP+fAl2MXJA/XyObqqE9bTSfIKLHggcY=
-X-Google-Smtp-Source: AGHT+IHCyEmUop2zOSnS8rwrCxea0FZ3ATRi1ndV0HoRUnaHD2vfHHixlEa1KLEnZgd0wEe7diHrKQ==
-X-Received: by 2002:ac8:5a49:0:b0:476:923a:f1cb with SMTP id d75a77b69052e-494527d50e7mr48716561cf.41.1746796346708;
-        Fri, 09 May 2025 06:12:26 -0700 (PDT)
-Received: from [10.100.121.195] ([152.193.78.90])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4945259bd7bsm12166111cf.65.2025.05.09.06.12.25
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 09 May 2025 06:12:25 -0700 (PDT)
-Message-ID: <4ffbeb94-ac19-4437-9d98-24981fe6c240@gmail.com>
-Date: Fri, 9 May 2025 06:12:23 -0700
+	dkim=pass (2048-bit key) header.d=jfarr.cc header.i=@jfarr.cc header.b="A+XbDlxZ";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="r26vCT76"
+Received: from phl-compute-11.internal (phl-compute-11.phl.internal [10.202.2.51])
+	by mailfout.phl.internal (Postfix) with ESMTP id 9730C1380291;
+	Fri,  9 May 2025 09:45:49 -0400 (EDT)
+Received: from phl-mailfrontend-01 ([10.202.2.162])
+  by phl-compute-11.internal (MEProxy); Fri, 09 May 2025 09:45:49 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=jfarr.cc; h=cc
+	:cc:content-type:content-type:date:date:from:from:in-reply-to
+	:in-reply-to:message-id:mime-version:references:reply-to:subject
+	:subject:to:to; s=fm2; t=1746798349; x=1746884749; bh=UXHc7xHX9E
+	ONnrGRxG53xhIsWzuFWwpFboRpg7vFIHI=; b=A+XbDlxZGd0Sm48QQY10nQvEhP
+	MMwtE8hTnOtQtLz9Oo6fP4DFYK+iS71EHu+eitwXlF1+Ermp0nH4sNPvS7OfYPUi
+	ci10bZPnu9hr/D5KUk/Ukhl3p1eLNv9w1S3Gc7HGbe3vUg+Zx7P+khArg0NTMVFM
+	y5OzcJACD5NXbLW5M2qSZ4dQSp3rNyEwwBWnkhv8xsva4FtLiij+1TnjU1TFwiah
+	X+wXiS/iprZMKnuhaMMqVBKgNwNYg0FTU1heUoSdXNNGDGNYhIA7yCqg/HTSngnA
+	BPqO6b4bAAHxVB2dkOYeevM7rDXUnbOZnEir3o02NZN4SSEXNGJ7fLCN/xtA==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
+	1746798349; x=1746884749; bh=UXHc7xHX9EONnrGRxG53xhIsWzuFWwpFboR
+	pg7vFIHI=; b=r26vCT76quwOrSv5LJfB/rsiyjkqv7WhGxwesCQ3H1ZxmAaG4Bu
+	A3dHWULmjniJFXBZykjSH8of9iL6/PXlpPfdh/3paD9A/cCAuICbl8k1HqFjUkyq
+	E6yM+hxogPKH/rB2C3PctPPEfoEzbGiyhXoDERZQGsFjHwtyDhNwylALPhCBADOy
+	boTfnuMp3Z8ZOob/HPZMcqDBid3wOIbcaCcatEI1k6Jyq3b9gA7up2k9KFFwixKV
+	iFqCVSGCBY6rHD3PHlMJc9kbUiaNq5ZhKom1Xyy89EsZcukk2ReekI2epbhFZcSu
+	1K4CqGtExXN5XEoly19qp7vLbPpVgtpcu9g==
+X-ME-Sender: <xms:DQceaKlrOmHLBB0ynw0GSUTAErg3K5BJlLMaxmZJN-tyGOWuOVnQ-w>
+    <xme:DQceaB3JW_jdeMdajqVtkBlgMko90egTILlTFbWpKvZtVTf4TyEhF6i7ldET4t_9O
+    N8OxI0yV8AQRzUwT88>
+X-ME-Received: <xmr:DQceaIoH4bl1E5SfKPynfBcQFox8gBCXC0ctgeOZIeAH_yGmOW6LJekmtS6F7_ui26h7cEqKBIGhoDdmgBCk3Vwa2Rbq>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgddvledvjeejucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggv
+    pdfurfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpih
+    gvnhhtshculddquddttddmnegfrhhlucfvnfffucdlfedtmdenucfjughrpeffhffvvefu
+    kfhfgggtuggjsehttdertddttddvnecuhfhrohhmpeflrghnucfjvghnughrihhkucfhrg
+    hrrhcuoehkvghrnhgvlhesjhhfrghrrhdrtggtqeenucggtffrrghtthgvrhhnpedukeeg
+    ffdtfeeihfehteevvdeiueetteelgfefvdfhleeufeegieduieduhfekieenucevlhhush
+    htvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehkvghrnhgvlhesjhhf
+    rghrrhdrtggtpdhnsggprhgtphhtthhopeegpdhmohguvgepshhmthhpohhuthdprhgtph
+    htthhopehprhgvshhtfihojhesghhmrghilhdrtghomhdprhgtphhtthhopehlihhnuhig
+    qdifihhrvghlvghsshesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehmih
+    hrihgrmhdrrhgrtghhvghlrdhkohhrvghnsghlihhtsehinhhtvghlrdgtohhmpdhrtghp
+    thhtohepihifugeslhhishhtshdrlhhinhhugidruggvvh
+X-ME-Proxy: <xmx:DQceaOmdsTUBcNYqyxs5KUFHMqZrbsmvCYWyB4Es9xUAh6quTeXAsg>
+    <xmx:DQceaI1Wj02C9D8jly7U5VphOfhR-bZqrc-te9oCqvG3nIX4n3KwQw>
+    <xmx:DQceaFskrV7oUhM4wFKKvX3nsqZmeysQyw1L6YUAzCd8ufuxe0-f0A>
+    <xmx:DQceaEXO476PLvPyYWI6aF_BFOTnEOHN5PRsuhisll5a9Mv7iijgnw>
+    <xmx:DQceaORKVtJMQ-QMraXjnqtUh9q0lhyopezVObD7WNoXxXDRqgkrExDU>
+Feedback-ID: i01d149f8:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Fri,
+ 9 May 2025 09:45:48 -0400 (EDT)
+Date: Fri, 9 May 2025 15:45:47 +0200
+From: Jan Hendrik Farr <kernel@jfarr.cc>
+To: James Prestwood <prestwoj@gmail.com>
+Cc: linux-wireless@vger.kernel.org,
+	Miri Korenblit <miriam.rachel.korenblit@intel.com>,
+	iwd@lists.linux.dev
+Subject: Re: wifi: iwlwifi: SAE fails when AP sends confirm before STA
+Message-ID: <aB4HC8Iaa6wR5dj7@archlinux>
+References: <aB30Ea2kRG24LINR@archlinux>
+ <4ffbeb94-ac19-4437-9d98-24981fe6c240@gmail.com>
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: wifi: iwlwifi: SAE fails when AP sends confirm before STA
-To: Jan Hendrik Farr <kernel@jfarr.cc>, linux-wireless@vger.kernel.org
-Cc: Miri Korenblit <miriam.rachel.korenblit@intel.com>, iwd@lists.linux.dev
-References: <aB30Ea2kRG24LINR@archlinux>
-Content-Language: en-US
-From: James Prestwood <prestwoj@gmail.com>
-In-Reply-To: <aB30Ea2kRG24LINR@archlinux>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <4ffbeb94-ac19-4437-9d98-24981fe6c240@gmail.com>
 
-Hi Jan,
+On 09 06:12:23, James Prestwood wrote:
+> 
+> One thing you could try easily right off the bat would be to try forcing the
+> default SAE group in IWD's config. I've seen some APs really struggle with
+> group negotiation which is why we added the ability to set this. In your
+> network profile (/var/lib/iwd/ssid.psk) set this:
+> 
+> 
+> [Settings]
+> UseDefaultEccGroup=true
+> 
+> And see if that helps.
 
-On 5/9/25 5:24 AM, Jan Hendrik Farr wrote:
-> Hello,
->
-> I noticed that specifically on the 6GHz band SAE connection fails
-> on my device most of the time. Connecting over 5GHz works
-> (even using SAE). So I started to investigate. Here's some of
-> the details about the devices involved:
->
-> STA:
->
-> - linux 6.14.5
-> - iwlwifi (Intel(R) Wi-Fi 6E AX211 160MHz)
-> - firmware 89.7f71c7f4.0 so-a0-gf-a0-89.ucode
-> - iwd 3.7
->
-> AP:
->
-> - Unifi U7 Pro (2nd gen, i.e. U7PROP)
-> - firmware 8.0.19.16619
->
-> I recorded a capture of a failed connection that is attached
-> (and also one that worked). Here's my understanding so far of what's
-> going on (starting at frame number 834 in the capture):
->
-> 1. STA sends commit
-> 2. AP sends ACK
-> 3. AP sends commit
-> 4. STA sends ACK
-> 5. AP sends confirm
-> - NO ACK from STA!
-> - iwd logs show this is never received by iwd
-> 6. AP retries confirm
-> - NO ACK from STA!
-> - iwd logs show this is never received by iwd
-> 7. AP retries confirm
-> - NO ACK from STA!
-> - iwd logs show this is never received by iwd
-> 8. AP retries confirm
-> - NO ACK from STA!
-> - iwd logs show this is never received by iwd
-> 9. STA sends confirm
-> 10. AP sends ACK
-> 11. STA sends confirm
-> 12. AP sends ACK
-> 12. STA sends confirm
-> 13. AP sends ACK
->
->
-> Here's iwd logs with IWD_SAE_DEBUG=1:
->
-> event: connect-info, ssid: kepler_56, bss: 96:2a:6f:b6:d7:9f, signal: -46, load: 0/255
-> event: state, old: autoconnect_full, new: connecting
-> [SAE]: Received frame transaction=1 status=126 state=committed
-> [SAE]: Sending Confirm to 96:2a:6f:b6:d7:9f sc=1
-> event: authentication-timeout,
-> event: connect-failed, status: 1
->
->
-> Here's dmesg from the relevant period:
->
-> [32295.061686] wlan0: authenticate with 96:2a:6f:b6:d7:91 (local address=a0:d3:65:93:5c:47)
-> [32295.063142] wlan0: send auth to 96:2a:6f:b6:d7:91 (try 1/3)
-> [32295.177571] wlan0: authenticate with 96:2a:6f:b6:d7:91 (local address=a0:d3:65:93:5c:47)
-> [32295.178025] wlan0: send auth to 96:2a:6f:b6:d7:91 (try 1/3)
-> [32296.093842] iwlwifi 0000:00:14.3: Not associated and the session protection is over already...
-> [32296.093940] wlan0: Connection to AP 96:2a:6f:b6:d7:91 lost
-> [32297.246064] wlan0: send auth to 96:2a:6f:b6:d7:91 (try 2/3)
-> [32298.166457] iwlwifi 0000:00:14.3: Not associated and the session protection is over already...
-> [32298.166553] wlan0: Connection to AP 96:2a:6f:b6:d7:91 lost
-> [32299.293860] wlan0: send auth to 96:2a:6f:b6:d7:91 (try 3/3)
-> [32300.219460] iwlwifi 0000:00:14.3: Not associated and the session protection is over already...
-> [32300.219555] wlan0: Connection to AP 96:2a:6f:b6:d7:91 lost
-> [32301.338987] wlan0: authentication with 96:2a:6f:b6:d7:91 timed out
->
->
-> At first I thought maybe iwd is at fault because its state machine
-> assumes that it always sends the confirm first. However, from iwd's
-> perspective this is fine as it's all happening on a single thread in a
-> synchronous way. So it's always gonna process the AP's confirm
-> after sending its own confirm. Independent of the actual order.
->
-> The fact that the confirm by the AP is not getting acknowledged by the
-> STA, to me, indicates that this is a problem with the device firmware or
-> iwlwifi driver. The confirm by the AP also never makes it to userspace
-> (iwd).
->
->
-> The notable difference with the successful connection (starting at
-> packet number 4752) is that the confirm by the STA happens to be sent
-> just before the confirm by the AP. All successful connections I've seen
-> have this in common. So I think somewhere in the stack (either firmware
-> or kernel) this order is assumed.
->
->
-> Best Regards
-> Jan
+Thanks for the suggestion. It does not appear to change the behavior I'm
+seeing. Also I'm pretty convinced that the AP is not at fault here. It
+is sending the confirm, and the STA fails to ACK that and the confirm
+never shows up in iwd.
 
-One thing you could try easily right off the bat would be to try forcing 
-the default SAE group in IWD's config. I've seen some APs really 
-struggle with group negotiation which is why we added the ability to set 
-this. In your network profile (/var/lib/iwd/ssid.psk) set this:
+Confirmed that the settings is applied using these logs from iwd:
 
+[SAE]: Using SAE H2E
+[SAE]: Using group 19
 
-[Settings]
-UseDefaultEccGroup=true
+I assume group 19 is the default group?
 
-And see if that helps.
-
-Thanks,
-
-James
-
+Best Regards
+Jan
