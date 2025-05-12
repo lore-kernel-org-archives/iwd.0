@@ -1,101 +1,153 @@
-Received: from mail-ot1-f47.google.com (mail-ot1-f47.google.com [209.85.210.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fout-a6-smtp.messagingengine.com (fout-a6-smtp.messagingengine.com [103.168.172.149])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E4AE254B10
-	for <iwd@lists.linux.dev>; Mon, 12 May 2025 19:23:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7163622FF37
+	for <iwd@lists.linux.dev>; Mon, 12 May 2025 20:52:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.149
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747077824; cv=none; b=Ze0Hag64GRwMstK8Yy2s/jTithBYqK8VbkBvu6OKbCkMJAeBNk65JycVkFU5V9f+rBFpOzLFZZhTsG0xBhYnuMcDICbZwXJgXHyiZ50n9++bh9PxnJYcY43nB3kRx7uwXctXX1+NWRZNICSJLlqXwt6hZ82IKae4ZhVYgAiPfR4=
+	t=1747083136; cv=none; b=V14swee+Cj9Hc0I6N6WbiOhjCw2bo7LOx7lmZ4md+6gJUmtq3BdN65EAmfebUIf6eZkLk6uW0XNQSpsXIAdHHe2aocOWQAMUliu3z+S5OuSkY6894oTm2zF2at6+EZKyF/1ZJIBLa9wlkHxeQ8GEYrcVxrBGESG1EmZp7GXEkyo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747077824; c=relaxed/simple;
-	bh=ADtzpXUXGE2jXGYfg4o7nOG60L1dvDFkJv3e/XmUrhQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=dM9mHCKqtXl0EBnLQloRNZOuwQ90jIEc9Jtpb95oAeFjEZLUO7y+AnuKo4AhKZDNvDtfqRbdugc1G/lT8hti0NmXNTRyWeH0UMZ/DESTAQkUXqj/E+1Onp+JKifEb8punFkl04TMSx/C1KMH3D5wPL2uDvwrUpom9b+77eXBGFg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QKU9Puwh; arc=none smtp.client-ip=209.85.210.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1747083136; c=relaxed/simple;
+	bh=YdiU2gTkrSKQU9SPGThxWy0Etr6ju8zYvcT17sdQ83Q=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=KnoYF/yxPt3ZTj3UV3Otr7X3y0baYiMIkWKEWjPYJVNlEjlwUOQ/neRo7YOC9F+AXLRc0J2+i2F/PInjI2LQFRfQHVkBIPql8p6qg9VhVSBaKag88Uo2B6b3wUDUXhZKdw1oF/wuBu8mJvVyRoslK66J7VjGd54RR/aRrj0Dtoc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=jfarr.cc; spf=pass smtp.mailfrom=jfarr.cc; dkim=pass (2048-bit key) header.d=jfarr.cc header.i=@jfarr.cc header.b=eQLCh0ZA; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=S7XECg7P; arc=none smtp.client-ip=103.168.172.149
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=jfarr.cc
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=jfarr.cc
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QKU9Puwh"
-Received: by mail-ot1-f47.google.com with SMTP id 46e09a7af769-72c14235af3so3089037a34.3
-        for <iwd@lists.linux.dev>; Mon, 12 May 2025 12:23:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1747077822; x=1747682622; darn=lists.linux.dev;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=NDKzeFzR5r+xLOph+KpwYfzgeQPNqyDkASpiNDaPY4I=;
-        b=QKU9PuwhJSs9JcFjAX2ke3st9ATnWjCqLyexqOlPtc7Ti0OLwYrFBSNeoAWUxR1TR8
-         Lm6pZZh16Mw8EC9n+R7iTjNRWp9G7pP9pyfFANJR5hwKW13rrDFSQrYpfQWnh+1jyeVX
-         19dLpBPjLw7uEFccAIDOsQ7Ib5QTO8y1l55MDWE1l7Nz/p0AmekpK3khNSx4qTM+ueuh
-         AI2v95ThxCHPTaANptrJIya69ISmUHZIX0mysysgRMpvC8A8O4t18BSJqNh2zb76lHBb
-         YzYLS/jcgLcyVeb4McRh+6KXvTxpgjJYUM/p5tiVelGh4AZsm2vMbsh/6TbhxEuCl8PL
-         RFYQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747077822; x=1747682622;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=NDKzeFzR5r+xLOph+KpwYfzgeQPNqyDkASpiNDaPY4I=;
-        b=Z1n4mqC6oEYZmkbi8B4LSuzfdvq6nfN7yM+FU0HzPXFvAQAMZ/pAR3G0VmLF4G0Id5
-         feBhNUvyS/JlDjmZTIG410TvnTsD15fEgQBHjAbLzZp83FisYmGNdHLhmiA3NYqYrmIK
-         Ln2iDCk4gVME/x9oqYUL6/6JeD2xmmTEfnndbRmktubAxs7r+Stfmb6EvKQJ85bWg8v4
-         HIyaV4H5T2saKUoB6W/RcVa8vfqZW3/HDqBeeh8jJbBFM0BBNchz6MwA6n1/B5lD7JLb
-         gFZ/UOzEYQP0A5GWWxKjhNMI66m+prlYxqDlh//9efijSojuPC73lCBVeXLunt3833T1
-         uWYg==
-X-Gm-Message-State: AOJu0YxL8+uKrph67XwUlJPWa2oJ2iVI8DZDboXxfvnQrhkInqMKCl8V
-	GT3V9bEfN+jPGTEq4Mb9MybzMfnqVVaYCrxC7AXB0/6rOiCJkR2+
-X-Gm-Gg: ASbGncs59t5sJXiyDzp/YafnOpwpwoCLLD4P3xby+4W+tyHeRlY5oyVXIrwYpPirFKo
-	Wp9O4zhESC22C3PI7hXwwGxUQybS+2PSlJmTa2CvOAxjZ4U/vInTag4Yuwv6kt4y9lYBQDVn6yv
-	Yxr3rHEzYPd45qeO3/I1z5ItBIcWKbsmcxpvILLOds92fuIklUvvCu0v3L//QEV69vPpUbpRzDY
-	04f4s3Pqnjna9LkQgQyHUOwH2KGmc4N1BVD00jBCco0v7/j3AxqFNBtnqcUazJMZPO4t2DiJpWh
-	r8rtXiPIHMx6fNtiKmv5PTl7cG+NchGxj1iiEF2eSSKOzP8BBAcejsK2h9Xs31AT18kNiui3Shu
-	QtedHR4cK5aqFeA1j
-X-Google-Smtp-Source: AGHT+IFSd32YCSNXp1V0D3fib/EM+o2DmdixiF3jx/WA8ZiRXxhPajH9YFfnQP9Bei1nraiFBtC9kA==
-X-Received: by 2002:a05:6870:4790:b0:2d4:ea06:b11 with SMTP id 586e51a60fabf-2dba41f6d18mr8396254fac.7.1747077822417;
-        Mon, 12 May 2025 12:23:42 -0700 (PDT)
-Received: from [192.168.1.25] (syn-070-114-247-242.res.spectrum.com. [70.114.247.242])
-        by smtp.googlemail.com with ESMTPSA id 46e09a7af769-732264b0403sm1666901a34.18.2025.05.12.12.23.41
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 12 May 2025 12:23:42 -0700 (PDT)
-Message-ID: <797eb196-8634-4e2f-adf0-457600627f1e@gmail.com>
-Date: Mon, 12 May 2025 14:23:41 -0500
+	dkim=pass (2048-bit key) header.d=jfarr.cc header.i=@jfarr.cc header.b="eQLCh0ZA";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="S7XECg7P"
+Received: from phl-compute-05.internal (phl-compute-05.phl.internal [10.202.2.45])
+	by mailfout.phl.internal (Postfix) with ESMTP id 6A69813800D0;
+	Mon, 12 May 2025 16:52:13 -0400 (EDT)
+Received: from phl-mailfrontend-02 ([10.202.2.163])
+  by phl-compute-05.internal (MEProxy); Mon, 12 May 2025 16:52:13 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=jfarr.cc; h=cc
+	:cc:content-type:content-type:date:date:from:from:in-reply-to
+	:in-reply-to:message-id:mime-version:references:reply-to:subject
+	:subject:to:to; s=fm2; t=1747083133; x=1747169533; bh=8NoIQ1VVHd
+	Y9E/NzQDXuU4uALGtsF740JJdCC9TGiQM=; b=eQLCh0ZAFjg2bKZ2hzxZUuRU/i
+	B6QEybo5bQ7X22zcpjqtmVd18ShYCfvll/4Ky/KLStVZCzG4srasbfrKLA1ZvYGr
+	GsVnWDvPGS1Tb3qy4Ee99e5gGZpeUm4zM6DnaZcrHHFCsQgDlmgbr85Opc012U7/
+	+pzyt+0G1AQLT5N4z2dkKDDuQIKoqXdWICX3owcGzIiagg9HOeMkfKEv1sOgJv0R
+	ZX201/wG3nJTaTmfYPC9T7LpknpkjK1qDJavI/JDz1aHvqWTac1D+AQsa3oWfD8/
+	m4uSoFaEIuA8RHdxILbw5mHeeS7u7Y1vv6v3b5tXuqtSKfXLDGH08SiLovmw==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
+	1747083133; x=1747169533; bh=8NoIQ1VVHdY9E/NzQDXuU4uALGtsF740JJd
+	CC9TGiQM=; b=S7XECg7PszerXZgw8/sukwshduYtvOMKGvgahpalEgjh+CEjJt5
+	/XmQ/Okj43xv4GbagxfXHMVm75tStvXq+DJxRdMCYPuvZl19ozBjS926fDAuZNSH
+	GZ8Y9BJbgdv3C8CRs+Jt312OXcJxg4GM6z6hpQd/g5Rb2dTCJJrzGswl+G6sn9iv
+	cM4A+2GLXl3rIxJRSRuDaWxTBGlMvWE5gc9fMRLCB3KQE/l2V02iFuy/C7eO7OSY
+	dCbpSfFbAOgiK0ISU94Q3OfClJbbMHbSPEB5CK2VICVRs/1uYO6b9FdbnoE/aMpe
+	df3s8a14zmfNhw2SL3KyZU/RO8+OtB46Znw==
+X-ME-Sender: <xms:fV8iaL7CmAWzyk6e78sVejWggc1IshD5xojT1SAw1r6BOFzuQFQRyA>
+    <xme:fV8iaA67HzRmk819NJ3qs72TZeGSIZwlAbKmvTAizpFPVSvWOmeXaXUDQ3TDLGswm
+    I-rA_2-oZfW2QoiPig>
+X-ME-Received: <xmr:fV8iaCeR2T9GHMYHkCKmf_ERElaKa2kB7YLT5Pki-gzM9dc_IGpol6lrOS6FOskmFtOarvMJy8uAVRqG1ZdvWUAVLgun>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgdeftddvvddvucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggv
+    pdfurfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpih
+    gvnhhtshculddquddttddmnegfrhhlucfvnfffucdlfedtmdenucfjughrpeffhffvvefu
+    kfhfgggtuggjsehttdertddttddvnecuhfhrohhmpeflrghnucfjvghnughrihhkucfhrg
+    hrrhcuoehkvghrnhgvlhesjhhfrghrrhdrtggtqeenucggtffrrghtthgvrhhnpedukeeg
+    ffdtfeeihfehteevvdeiueetteelgfefvdfhleeufeegieduieduhfekieenucevlhhush
+    htvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehkvghrnhgvlhesjhhf
+    rghrrhdrtggtpdhnsggprhgtphhtthhopeehpdhmohguvgepshhmthhpohhuthdprhgtph
+    htthhopehjohhhrghnnhgvshesshhiphhsohhluhhtihhonhhsrdhnvghtpdhrtghpthht
+    ohepphhrvghsthifohhjsehgmhgrihhlrdgtohhmpdhrtghpthhtoheplhhinhhugidqfi
+    hirhgvlhgvshhssehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtohepmhhirhhi
+    rghmrdhrrggthhgvlhdrkhhorhgvnhgslhhithesihhnthgvlhdrtghomhdprhgtphhtth
+    hopehifigusehlihhsthhsrdhlihhnuhigrdguvghv
+X-ME-Proxy: <xmx:fV8iaMJD446NACcIx2ZEMeL1OF9OXexZUW-vCfN6YpPBBG1mGCZW4Q>
+    <xmx:fV8iaPLpv_Q59Cy4rJVNKvUa6a1dZQbPKvwyiVO8-Bouxv8C2mw0ow>
+    <xmx:fV8iaFyk5KkZP26SSggtXW0kRBzvh1guEsyHycoMG2b1y-rCUuF4Iw>
+    <xmx:fV8iaLI0coE8lrd42MGtnE0_ycVd3ZiGFFfNZG4LaiqWCinYRDmTng>
+    <xmx:fV8iaJGCnorHBECdrx5xxvh7dvXnpnV7ElYLh4j0t1jRRscsiWKCrMTF>
+Feedback-ID: i01d149f8:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
+ 12 May 2025 16:52:12 -0400 (EDT)
+Date: Mon, 12 May 2025 22:52:10 +0200
+From: Jan Hendrik Farr <kernel@jfarr.cc>
+To: Johannes Berg <johannes@sipsolutions.net>
+Cc: James Prestwood <prestwoj@gmail.com>, linux-wireless@vger.kernel.org,
+	Miri Korenblit <miriam.rachel.korenblit@intel.com>,
+	iwd@lists.linux.dev
+Subject: Re: wifi: iwlwifi: SAE fails when AP sends confirm before STA
+Message-ID: <aCJfeg0f9c2sTX4c@archlinux>
+References: <aB30Ea2kRG24LINR@archlinux>
+ <4ffbeb94-ac19-4437-9d98-24981fe6c240@gmail.com>
+ <aB4HC8Iaa6wR5dj7@archlinux>
+ <15943a1f-0e5d-4705-b8ef-3f22fa3fe672@gmail.com>
+ <aB4hMsBfyawYatoj@archlinux>
+ <902daf8802c723d72fff0155cd0638848ce1bc7f.camel@sipsolutions.net>
+ <aB5onavenLymR-QJ@archlinux>
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: linksys router incorrectly showing as WEP?
-To: Bryce Johnson <bryce@redpinelabs.com>,
- James Prestwood <prestwoj@gmail.com>
-Cc: iwd@lists.linux.dev
-References: <CADXxVSKPz7o3TT18hCqzz=3MMWrE69NbaBDLSHFBfoRDq5VT7w@mail.gmail.com>
- <d6050f21-98ad-4b1d-a3ca-1d0be7ff7f15@gmail.com>
- <CADXxVS+kVrO=0rBs7E2sTssP2LNpBQLwGq_anKB80gWvCagTrw@mail.gmail.com>
-Content-Language: en-US
-From: Denis Kenzior <denkenz@gmail.com>
-In-Reply-To: <CADXxVS+kVrO=0rBs7E2sTssP2LNpBQLwGq_anKB80gWvCagTrw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aB5onavenLymR-QJ@archlinux>
 
-Hi Bryce,
-
-On 5/12/25 1:24 PM, Bryce Johnson wrote:
-> Hi James,
+On 09 22:42:10, Jan Hendrik Farr wrote:
+> > Could you do trace and sniffer at the same time? According to the trace
+> > there was no authentication frame from the AP. In the sniffer capture it
+> > _is_ there, of course, but I'd like to look at the timing.
 > 
->>
->> Could you grab an iwmon pcap of this? Here you can see how the security
->> level is determined, and its quite basic:
->>
 > 
-> I'll give that a try, unfortunately I didn't have CONFIG_NLMON in the
-> kernel, I'll add that in now. They are also going to ship me the
-> problem router so I'll try and repo the issue in person, hopefully a
-> little more easily.
+> Ok, I did another capture.
 > 
+> 1. iwd only knows credentials for a single SSID: kepler_test
+> 2. kepler_test is the only SSID broadcasting on 6GHz channel 37 (or any
+> 6GHz channel)
+> 3. I captured 802.11 frames using a second device
+> 4. I did a trace on the client in question
+> 5. I captured dmesg and iwd logs
+> 6. All captures were done simultaneously
+> 
+> All attached to capture2.tar. Contents:
+> capture2/dmesg2.txt      : dmesg
+> capture2/iwd_log2.txt    : iwd log using IWD_SAE_DEBUG=1
+> capture2/trace2.dat      : trace-cmd (iwlwifi, mac80211, cfg80211, iwlwifi_msg)
+> capture2/iwd_main.conf   : iwd config (/etc/iwd/main.conf)
+> capture2/kepler_test.psk : ssid config for iwd (/var/lib/kepler_test.psk)
+> capture2/capture2.pcapng : the external 802.11 frame capture
+> 
+> 
+> I disabled 5Ghz via BandModifier5GHz=0.0 (couldn't disable 2.4GHz as iwd
+> then complains about not being able to disable both)
+> 
+> 
+> One note about the client: It's running an Intel N100, so it's probably
+> on the lower end of devices that will be running a modern wifi 6e card.
+> So this increases the chances that the AP will send it's confirm before
+> the client will.
+> 
+> 
+> Best Regards
+> Jan
 
-This info would also show up in an air capture if iwmon is not available.
+I think there is something weird going on with the system time. I tried
+lining up the times of frames in the packet capture with the
+iwlwifi/iwlwifi_dev_(rx/tx) events and noticed that it's not possible to
+get them to line up.
 
-Regards,
--Denis
+For example time between STA sending commit and sending it's own confirm
+is 41.85 ms according to the packed capture. But the time between what I
+think are the corresponding events in the trace is 106.63 ms.
+
+Then I noticed that the time in dmesg -T was running ahead of the
+correct time even though it was synced at boot. clock source is tsc.
+
+This is making analysis very annoying, but could it also be causing the
+issue in the first place?
+
+Best Regards
+Jan
+
