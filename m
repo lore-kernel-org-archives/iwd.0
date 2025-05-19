@@ -1,95 +1,209 @@
-Received: from sipsolutions.net (s3.sipsolutions.net [168.119.38.16])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f48.google.com (mail-qv1-f48.google.com [209.85.219.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53E621FAC54;
-	Thu, 15 May 2025 12:40:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=168.119.38.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3403427F758
+	for <iwd@lists.linux.dev>; Mon, 19 May 2025 14:39:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747312855; cv=none; b=RxLX7hsYf3e6kO2f+ptdT2AV8LrRvRl2+i+zdimnevo5+Svz2arxZIvQlSkDR7WEKjQ5JrqfIaC8oxXqeWzbHgUiTqeE3NRlXPCY9kJXUv+no005UR/brLjyQeGpFk88xYf/4pgcYvllGaTCYA/J11zN+Gy6SZTrEiKDus6dMwA=
+	t=1747665578; cv=none; b=O/OE+p0CQZb/V4+2+H9Hl54UQ0Kc3NKEaTUEVbbdTpqk4kIWqidEu2Pz1SWTDz+awBd9nm8QnS+dHYU2e+7BnoyFzSL0Zt/uRK7hPqEaDxH5XfHbfJNv9yHIEp2bMgmXXr49pS393sPGBTbs0HvfqCo6KLeJqcqCq2hr/S6sFkU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747312855; c=relaxed/simple;
-	bh=wz0Mbb6Uh6Xj0sa8P47kdV3BnJ5XRFO/7tkjWrKPQnA=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=b90XRiT3QHpmTP71qw8AL/raR0SzzNCbFqM2AirZIz1RsIIwubsPq45GphTewf6u+GPh79UFLtd0Jlt7W8vVq2YQ4kcqvQ6tezpybOFHk2A52tmuR/izNsIX/fDRlE+sJ7FMQZwPpdF9NOnwCvTkVJ4s7NKg7jJfT27kAT7L57g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net; spf=pass smtp.mailfrom=sipsolutions.net; dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b=KcOAVZFP; arc=none smtp.client-ip=168.119.38.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sipsolutions.net
+	s=arc-20240116; t=1747665578; c=relaxed/simple;
+	bh=6eI66h2lmUxDmP584oH3o3L1wjtxdBrpQ+fhN/iabdQ=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=pl4GEyXl1dqZIzNfCuAhEpqtfkb5Cx0NRD1rE0WKN03LzC3v9iXT5q5ZuxK0u9B+bDmBztYK3CftuxnA5uV0FSZoxt/7jcdYS04OB3ydtYzTi1Yh1q8J1TCJv+3Tw+Hb11d8AV97ZvqMMyl2HkYnGkxkra21C8mkpLUpzSfJY5U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gg6gS58v; arc=none smtp.client-ip=209.85.219.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="KcOAVZFP"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=sipsolutions.net; s=mail; h=MIME-Version:Content-Transfer-Encoding:
-	Content-Type:References:In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-To:
-	Resent-Cc:Resent-Message-ID; bh=wz0Mbb6Uh6Xj0sa8P47kdV3BnJ5XRFO/7tkjWrKPQnA=;
-	t=1747312854; x=1748522454; b=KcOAVZFPTTz09uB8n/hs1rUFgXuaVRpiEFjAItbH8iVeLuT
-	nddIcVBGtXu8VDnMJQXwh2i2kRZknXzn1O+h/CWarIYo4m1F1c4cW8ZuL0KlYnuvencK3r+AV44Sv
-	ih5XIQamoNXt0HZQfm7bX1KSgl0C7BmZjMhQLVz9FHkYObLmXTY/5yGcloA5ZIRNTnCdOapiWE6Q6
-	N6cKuL0LRfejTCkTWWhwVaYlFgjzk+C2NuzPBQBRT3Je5ZYAx3Nj/VFTyzSyS2I+99V0t6TUp0JR1
-	cD1fpJRsxs3P4HUt1c+wQmglCHxmBp/F9p8ovd9yTUK5LyYHYQXzNgZ6zoSI/V0A==;
-Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.98.1)
-	(envelope-from <johannes@sipsolutions.net>)
-	id 1uFXtL-0000000BG5h-0WPH;
-	Thu, 15 May 2025 14:40:51 +0200
-Message-ID: <31ff7d1bbc5a66e18dc0b92a9c0e6963ce73167a.camel@sipsolutions.net>
-Subject: Re: wifi: iwlwifi: SAE fails when AP sends confirm before STA
-From: Johannes Berg <johannes@sipsolutions.net>
-To: Jan Hendrik Farr <kernel@jfarr.cc>
-Cc: James Prestwood <prestwoj@gmail.com>, linux-wireless@vger.kernel.org, 
- Miri Korenblit <miriam.rachel.korenblit@intel.com>, iwd@lists.linux.dev,
- Denis Kenzior <denkenz@gmail.com>
-Date: Thu, 15 May 2025 14:40:50 +0200
-In-Reply-To: <aCXfy0Uqx6wH32DR@archlinux>
-References: <aB4hMsBfyawYatoj@archlinux>
-	 <902daf8802c723d72fff0155cd0638848ce1bc7f.camel@sipsolutions.net>
-	 <aB5onavenLymR-QJ@archlinux>
-	 <8a1c5172bc0fd9d2a33522294d1a2a4c4ceb313a.camel@sipsolutions.net>
-	 <aCMtCCYtNNl4dL5Q@archlinux>
-	 <e1b26ee842bc60cfa939874f467a03531871807e.camel@sipsolutions.net>
-	 <aCN0Tjwu-yS2mzi_@archlinux>
-	 <047456d40bc42248a6ba1b76d630d5d82b857bf1.camel@sipsolutions.net>
-	 <aCODE231NMCQ48xu@archlinux>
-	 <1a6ee5fb05b32e290fc45e66af4b7dc719f06ed8.camel@sipsolutions.net>
-	 <aCXfy0Uqx6wH32DR@archlinux>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.54.3 (3.54.3-1.fc41) 
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gg6gS58v"
+Received: by mail-qv1-f48.google.com with SMTP id 6a1803df08f44-6f8d8fb211eso8256246d6.3
+        for <iwd@lists.linux.dev>; Mon, 19 May 2025 07:39:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1747665576; x=1748270376; darn=lists.linux.dev;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=4JY9XfBNaGpa6MsBayfMDot3cLV++Nau4I8N4/eujZs=;
+        b=gg6gS58vRLZrXLsKwqU6Bv6NWnrKonvufLY4x3/DJ6v5IjZtWIjPiPnOApJAe30BbX
+         /rZ2yqXXNwN4bRvisfYLjC8NrA+myYZjKbmLHKhAvZWRyVFwfY/KtYm9OC8/R0qB/I9o
+         CjQ98muwtorCpLHRPd1cPn8jz9I7IvB5ObdPBoPys5vyUjQjT9/ICKbKPHrN2VZNPRZz
+         c4WY0ie+IAG0flC+0Gk2mFFWO+c4cYSGhsLF37pmzpLwbvp00BfTJxLDP+KcHCLJ6Ocj
+         6F5j38Qkvm5EPO4wkINQFEMV+izJGnw1Sa5THU8OvMlMOlwZOAFrWrVs7Ni/IJi/bLFM
+         tejg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1747665576; x=1748270376;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=4JY9XfBNaGpa6MsBayfMDot3cLV++Nau4I8N4/eujZs=;
+        b=DLddUgFq07NnSWr9GdbLG0DgJO57RoYPKhEKC4HY70W5gazPLLebbNKaOe1fIWyo4a
+         189RoExc0WuSBc0jFif9lPX7x8ZX2nd81LO1XRZzcqDCEKDT3djN4hoei/aJubnlpPl3
+         sfHuPKB3kUEZ2gaXvubx45olgQ69/VvEJA5zY7yVIrV5DrukTdp8Pp+4kpAQMaEruizC
+         TQ44lydLSFNJdQSsujGrL6O2cLqKMyzkPGHEO/T23g3vLDuVxcyBCUdDtwxqoVocBwhe
+         VX2HETpPPb6KIzIVbVP/KBr4V+2FVk0SuJVJ4wYI2LR4n4nxsAYunyokgMbYr1w/mn0n
+         a7OA==
+X-Gm-Message-State: AOJu0YwNV+lN+O9Wn+q82ccN4FwduzneGapWDnzVPajM2sVyOeu+075w
+	8u6TQ1/WeJk4bqMpO67hv87RuP2JoV+zMCKV+63JAt529Rxl1ADYqQNI2PfrJg==
+X-Gm-Gg: ASbGncsJTlacFFFwjLTALGg6G6JvMCAFFa0Ur7QwY++a/lAMJUBMYCYOamjDV84PB9s
+	meIo7OOiGS5ET/78sb4kQj3VUGbqAc4lHHKGiej5TSDxkZkh9ZvQF7gbGWfkg7hnzZu2ovN/z4y
+	RxsPz36mK5M99+T0qwZJXKobUw1BVJUpPn7JZQR+J7Zv7wdqIl02DcJEQqMuvOB52P6WRwxh0IP
+	KmIPUw1BrotMXLE5hyPO40WbVVLWVAlzL7k3f709qFcGy1NIZLH6D7Zqi0prjQnEIOn7nDrsAJE
+	Y38oUsyj8j4m7BsH4/VjUXSAbEFEhTo4h9kSKz1hEjSdnwmAvlGCA/73moi4TSHdvVG+IhA7qSC
+	huIcDXlf7wg==
+X-Google-Smtp-Source: AGHT+IHZfw70PJDXLTBt9SMdjZW+lcwcyH9aveBQQG7TXSffRei7tI0u80xMp4o9wbcA4Gnsz2YLdw==
+X-Received: by 2002:a05:6214:62c:b0:6f4:c742:7a7b with SMTP id 6a1803df08f44-6f8b08e5baamr192668006d6.43.1747665575746;
+        Mon, 19 May 2025 07:39:35 -0700 (PDT)
+Received: from LOCLAP699.locus-rst-dev-locuspark.locus ([152.193.78.90])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6f8b08be302sm57525966d6.54.2025.05.19.07.39.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 19 May 2025 07:39:35 -0700 (PDT)
+From: James Prestwood <prestwoj@gmail.com>
+To: iwd@lists.linux.dev
+Cc: James Prestwood <prestwoj@gmail.com>
+Subject: [PATCH] ap: implement pre-scanning to "unlock" frequencies
+Date: Mon, 19 May 2025 07:39:30 -0700
+Message-Id: <20250519143930.182695-1-prestwoj@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-X-malware-bazaar: not-scanned
+Content-Transfer-Encoding: 8bit
 
-On Thu, 2025-05-15 at 14:36 +0200, Jan Hendrik Farr wrote:
-> On 13 19:45:45, Johannes Berg wrote:
-> > On Tue, 2025-05-13 at 19:36 +0200, Jan Hendrik Farr wrote:
-> >=20
-> > > So this test doesn't proof that it would work with the order the othe=
-r way
-> > > around. Maybe I should try making iwd sleep while generating the comm=
-it.
-> >=20
-> > I guess you could, right.
->=20
-> Just to report back on this:
->=20
-> I added a 20ms delay in iwd's generation of the confirm message and
-> everything is working as expected with your patch applied.
-> Connection is succesful with the following order of frames
-> confirmed by external capture:
->=20
-> 1. client sends SAE commit
-> 2. AP sends SAE commit
-> 3. AP sends SAE confirm
-> 4. client sends SAE confirm
->=20
+Some drivers/hardware are more strict about limiting use of
+certain frequencies on startup until the regulatory domain has
+been set. For most cards the only way to set the regulatory domain
+is to scan and see BSS's nearby that advertise the country they
+reside in.
 
-Cool, good to know. I still think we shouldn't really do this unpaired
-(prepare/complete), but of course almost nothing except iwlwifi cares.
-But also iwlwifi shouldn't abort session protection for auth in this
-case anyway (or in the unlikely case of WEP shared key auth), unless the
-process is suspended/finished.
+This is particularly important for AP mode since AP's are always
+emitting radiation from beacons and will not start until the desired
+frequency is both enabled and allows IR. To make this process
+seamless in IWD we will first check that the desired frequency is
+enabled/IR and if not issue a scan to (hopefully) get the regulatory
+domain set.
+---
+ src/ap.c | 86 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 86 insertions(+)
 
-johannes
+diff --git a/src/ap.c b/src/ap.c
+index d52b7e55..af6a1709 100644
+--- a/src/ap.c
++++ b/src/ap.c
+@@ -109,6 +109,8 @@ struct ap_state {
+ 	struct l_timeout *rekey_timeout;
+ 	unsigned int rekey_time;
+ 
++	uint32_t pre_scan_cmd_id;
++
+ 	bool started : 1;
+ 	bool gtk_set : 1;
+ 	bool netconfig_set_addr4 : 1;
+@@ -354,6 +356,12 @@ static void ap_reset(struct ap_state *ap)
+ 		l_timeout_remove(ap->rekey_timeout);
+ 		ap->rekey_timeout = NULL;
+ 	}
++
++	if (ap->pre_scan_cmd_id) {
++		scan_cancel(netdev_get_wdev_id(ap->netdev),
++				ap->pre_scan_cmd_id);
++		ap->pre_scan_cmd_id = 0;
++	}
+ }
+ 
+ static bool ap_event_done(struct ap_state *ap, bool prev_in_event)
+@@ -3852,6 +3860,70 @@ static int ap_load_config(struct ap_state *ap, const struct l_settings *config,
+ 	return 0;
+ }
+ 
++static void ap_pre_scan_trigger(int err, void *user_data)
++{
++	struct ap_state *ap = user_data;
++
++	if (err < 0) {
++		l_error("AP pre-scan failed: %i", err);
++		ap_start_failed(ap, err);
++		return;
++	}
++}
++
++static bool ap_check_channel(struct ap_state *ap)
++{
++	const struct band_freq_attrs *freq_attr;
++
++	freq_attr = wiphy_get_frequency_info(netdev_get_wiphy(ap->netdev),
++				band_channel_to_freq(ap->channel, ap->band));
++	if (L_WARN_ON(!freq_attr))
++		return false;
++
++	/* Check if disabled/no-IR */
++	if (freq_attr->disabled || freq_attr->no_ir)
++		return false;
++
++	return true;
++}
++
++static bool ap_pre_scan_notify(int err, struct l_queue *bss_list,
++				const struct scan_freq_set *freqs,
++				void *user_data)
++{
++	struct ap_state *ap = user_data;
++
++	if (!ap_check_channel(ap)) {
++		l_error("Unable to channel %u even after pre-scan",
++			ap->channel);
++		goto error;
++	}
++
++	if (ap_start_send(ap))
++		return false;
++
++error:
++	ap_start_failed(ap, -ENOTSUP);
++	return false;
++}
++
++static void ap_pre_scan_destroy(void *user_data)
++{
++	struct ap_state *ap = user_data;
++
++	ap->pre_scan_cmd_id = 0;
++}
++
++static bool ap_pre_scan(struct ap_state *ap)
++{
++	ap->pre_scan_cmd_id = scan_passive(netdev_get_wdev_id(ap->netdev),
++						NULL, ap_pre_scan_trigger,
++						ap_pre_scan_notify,
++						ap, ap_pre_scan_destroy);
++
++	return ap->pre_scan_cmd_id != 0;
++}
++
+ /*
+  * Start a simple independent WPA2 AP on given netdev.
+  *
+@@ -3962,6 +4034,20 @@ struct ap_state *ap_start(struct netdev *netdev, struct l_settings *config,
+ 		return ap;
+ 	}
+ 
++	if (!ap_check_channel(ap)) {
++		l_debug("Channel %u is disabled/no-IR, pre-scanning",
++			ap->channel);
++
++		if (ap_pre_scan(ap)) {
++			if (err_out)
++				*err_out = 0;
++
++			return ap;
++		}
++
++		goto error;
++	}
++
+ 	if (ap_start_send(ap)) {
+ 		if (err_out)
+ 			*err_out = 0;
+-- 
+2.34.1
+
