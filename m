@@ -1,105 +1,91 @@
-Received: from mail-oa1-f52.google.com (mail-oa1-f52.google.com [209.85.160.52])
+Received: from mail-pj1-f44.google.com (mail-pj1-f44.google.com [209.85.216.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7539218ABA
-	for <iwd@lists.linux.dev>; Mon, 19 May 2025 21:39:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E15451D5AB5
+	for <iwd@lists.linux.dev>; Thu, 22 May 2025 18:41:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747690760; cv=none; b=uG+hxYxRaEXsG/ZJgjDK9GzmiylsDnsR3w83UCzXjCmE6NM2i11LJiTgkpE07O1+Knp0XxmeDWCtCvlsPS8BdB0YVum0Vt9zlbdpv7KnfEa/EB2XIU94R0SRLTxveI9dM3k/l/SjXAe9YYfY+1SUQhQ7iRP5iHHCEgHn2Z86EXE=
+	t=1747939317; cv=none; b=GOVhMuUMo/XqgOWJPT2+vYTaN7PxjRpOkG8bs117/pbUFIu8mKAG0P7yygwR9UgFTPQl8pOwRLiT3H0SYA34Vm310cAwQ8KfCXbZYlafw44ffqG+tYMDRrqZCYkMe2wfegJOw4ADfYA/IAgans1RF/Q0d2zApre6WXDVFAzRABQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747690760; c=relaxed/simple;
-	bh=l3LSh0dr4lThTBZ3YsOucXhfl2dMQqJBwNdYe8wzDOU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=Fk5yjymfEn+QR1Ll17XE58fgPbsIaDhDILlt4IuRNv4z1q3jhUgiT46s1uJdJ3MQ29qZgYDp2CWEuEbHq9xCbhbk4VqUomb9kfscV2abcn5ctIvpVwcS2bVw1jnBp0910DxIktt0iDn60IugfuXcmWnruVtDjAh95KiJ1hN3dTU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VTwF9LiV; arc=none smtp.client-ip=209.85.160.52
+	s=arc-20240116; t=1747939317; c=relaxed/simple;
+	bh=q4lKwypnjqJYX1y56x5tzaN+AI3Uevn6fKfJqSARmc8=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=K+0zmV+1iNf8unVTjN69WeHsj52X7tcPV/jiEtRdaYQPsuS/nxzMcLt/ojW7XawDg0g3CNpFwMe9vXU9Nbfw5nAfjQSZiMdYwjiL11a0OalTwNevDhuV6lGmNneLww2v9KXtIyKgI+lYfxOcxfNIAnYNJZiljbTEqWFaeokdcIU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jqBbMwv7; arc=none smtp.client-ip=209.85.216.44
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VTwF9LiV"
-Received: by mail-oa1-f52.google.com with SMTP id 586e51a60fabf-2da3c572a0bso2045932fac.3
-        for <iwd@lists.linux.dev>; Mon, 19 May 2025 14:39:17 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jqBbMwv7"
+Received: by mail-pj1-f44.google.com with SMTP id 98e67ed59e1d1-310ce23a695so814556a91.3
+        for <iwd@lists.linux.dev>; Thu, 22 May 2025 11:41:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1747690756; x=1748295556; darn=lists.linux.dev;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=2eJFwZEGKaeAV008Mmzc/FjsN007H1WveBZR6JR57uw=;
-        b=VTwF9LiVNKFWQt9HtAK72QrUKTw3O8hfUvHaFDJ0Gzid/aM447nKjR+d2PdqTOMXbo
-         WFUZLJnACQ1dz3eY5ADuiRprtlc68jtvtMmnAtDBXltcbBAjulRxh8/MtQfsVPfUsME8
-         tXNYxrjQm7SybG7HlyxZhFCptaHzr6OzMxqk2MyP2ziS3rv0jxa2PFIrWezA6aFnxyWG
-         65MAwxlZz/kuRaeuFmNM9EPOPBujwVsdDPA3/G3YXwKqo7OUdPT6bQW+6vJP8uMXsa1U
-         J34GNtwCyKL2U0w5R0FeqKA6nzvUVmjqJzfrcy6S9FkKxpI2PmkyZSmYXZ2X8GBCyq6Q
-         4ROw==
+        d=gmail.com; s=20230601; t=1747939315; x=1748544115; darn=lists.linux.dev;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=JBdb+Y40gt9b6Uha/w3VUSxvgG+7d25rF9KMCqro5fE=;
+        b=jqBbMwv7VSAbIpcFEQXk7ltLcSj4D8OAHmiwPwxHLsNgH9ALyPaSOwTpzurN5tZro3
+         3NQt0K87DXfyro5J/nCVaQlLrQ1SQzO5Pe3oGioXT2sjeqrbLlm0zp0BWTgPk+dtDtR3
+         wR0i8B7qrwMO0ZdzN+IB2ONWKbcgThjAkPbfvwRBjO+LIW5nDpqXRRvCnxEQMA/nvTT5
+         wkzyNp6ONCMuHACcAWcMu4JJ/nW3N0W55CQEtqJRGR4kfpk27JDksbtIp3XPzdEKPrru
+         YBLIgW9iuIkukgb7v95rJzWEYc6ExOAQ9yapaC4uQfznnG4UbA2Q+G1SGlC5zHRxYrt9
+         5p/A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747690756; x=1748295556;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=2eJFwZEGKaeAV008Mmzc/FjsN007H1WveBZR6JR57uw=;
-        b=O/i4XLZDO5EcqAXfOW9aQDk/wmBKdDPCdVtiGB12Ey8xpjMkktqT74cbChVChfZ/r7
-         e5pNV0+bHaMEPLE0HltCbWRuk5LMRCHExHH1g7mfmEQovmMy2zOAkWYw13PCj6oTh3L+
-         sbhiHiEPOr4ueVWZxWwztgtZhNTsdJyfdo7Dvw0zNhEl+XsrhUdw2goGJE3QmEVkgvzD
-         xNHJdc8SNGon7GI8zJClWr5TZj+fpHozBQI2fsVw8Fh2g6dGF4thFdwy8FzNqSC+Sa6+
-         ZsPHpgM9Y05o8+hXBt+d/TZ0D8sIKbeFpcLN2/msExGdy0SS4kKxiOPG/o7Hxy9aM/Pt
-         81SA==
-X-Forwarded-Encrypted: i=1; AJvYcCUGe4lz3ISebRGCZFcZg12eht2ZGa4HYMRyyh7ghRS5bECnssplZeCajMUFT7kiHZ10yPM=@lists.linux.dev
-X-Gm-Message-State: AOJu0YwWPbD6UpuSWMGoBRjl7KlDuLLHuuNE+Lst4DkmIcaIYFNsjzRp
-	rhPwUl3Rw7NfBUmi1L9sFKyhDA/C3By2/LTXNV1N+Jl+LKnT7pAACy8W
-X-Gm-Gg: ASbGncvwe5if1okQhkXAbwdQuOlx4uKMi2XIEmB6ekezeuhvN9i4DN9lJP1tBF0RnXi
-	NiVrqJfedpAeTGNpu5kgOGeXxcQsFEyTvy4tF6pFH2LKKvL3MIBEC5Sv579pV4p0DBQmdSnXo64
-	Rkn69yr2spFQrmC/AfKseSKRO/yJlFp7YMZijFQNYt5ur67Ory8UddMTZglC6XNKhBy+0LJdZD3
-	EfHMGFsZrrkAA7UXOaUumPQjdhzAJZu7yq2LPnfPt0+giQtnY+C/kwOAd8uWN0Z1R0aAUVWSn39
-	ypMZXc2G+m9sJUSFtSMrWw6u1ipU3HdCVFpNjqVmadhmU4RmKQvIF7xGJHGAr/o+OJcA2WYKbjS
-	BhCmAogTrDFXFBUEA
-X-Google-Smtp-Source: AGHT+IGcWsfMTFkjG/369SP1he8Nk0y4OxHqBCrngXmUhx4yqQdSa0ts24As84Vnco9K5PO5se4dGQ==
-X-Received: by 2002:a05:6871:a6a9:b0:2d6:b7f:1e6d with SMTP id 586e51a60fabf-2e3c16151f9mr7655186fac.0.1747690756489;
-        Mon, 19 May 2025 14:39:16 -0700 (PDT)
-Received: from [192.168.1.25] (syn-070-114-247-242.res.spectrum.com. [70.114.247.242])
-        by smtp.googlemail.com with ESMTPSA id 586e51a60fabf-2e3c060e1d8sm1930921fac.4.2025.05.19.14.39.15
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 19 May 2025 14:39:16 -0700 (PDT)
-Message-ID: <ecc4cbfd-49e3-42ba-b0bd-224dbbc6aad0@gmail.com>
-Date: Mon, 19 May 2025 16:39:14 -0500
+        d=1e100.net; s=20230601; t=1747939315; x=1748544115;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=JBdb+Y40gt9b6Uha/w3VUSxvgG+7d25rF9KMCqro5fE=;
+        b=KW38QpytQMzeX+eEGh095jQbfesst/zttrSL3BWZj4Zf9cfgYqms/GGub+cbcL1igi
+         QEQ4xHfNErv1VReFD2EE4itIqLN4avaxLbdns1qkKvW8Dx/vc9v/oQ+S3Gxd/sxaLKgU
+         iX3i6iMIz2IvbVJniVuEu3vha9m0vuOTLbXmpYod2T9roq6iuQa7xq+SykwLjnreGTQt
+         Ja8D+p1heQxpflV6cST/qoxFuJkPTjOu7kNlcNcdsQaRXGuzyj1FYb2H2C1Cb2rqbSqo
+         FT1e7tugd/C1g+ukQlFJIo2eDynDHKG65+Y6qbpf5yzp85B46FPixxjvvvwQNqapXD34
+         laAg==
+X-Gm-Message-State: AOJu0YzCzCHHPwod88D4gnxvNsWvc/tmbq8aIA5IFGROrhWhBQoZonxK
+	jVibX2rThwIAlN98IIVWB/qnKk6sFaTB++ynrFm9EA1PEF7wHw2e0doYK1TNlQ==
+X-Gm-Gg: ASbGnctle+uXxLIQjkYrjhMC0nLKOBnn5AyQ9x/dx3o5U/5c/r3gpZwURBcUTH9UM7A
+	9HOH1/j2UrdX3Nf3kBeTBCtDwjgJ1UVJV3RGGJgYy0dwlt32+vjP98BVm7Id5zTnNt4oJ2Tya24
+	ebtSN/U/YOxc4h5GscatQw4c3FrUmv00fQJNesY9V5IZO+F9pDZ8W23BXVNAApvJBrY2q8iCPZt
+	r1YUunGZ+dMowahnOe42H47AVhzNJu9cWb6V5BF2v650h9/NavanCviXdc7aPAyWw018KaPZ06R
+	IJ+hv5lZOBE90GYVfph7kY8OsqmXOUwCOmG59YXWPfDzt6agcQ1B1sb97ov8c3rTtRiIxXrVZ5p
+	v4lVvatBeH+a9YOD4rJpeVL9NkRrgm04mjUI2sg==
+X-Google-Smtp-Source: AGHT+IFByK0Wudwc9itZ0uGm9pDNTz66doX0VnI8sVcPbJh1JTsdYtuPCvVlE1xLoueE0SynrDz7dg==
+X-Received: by 2002:a17:90b:3b8c:b0:30e:390e:c24c with SMTP id 98e67ed59e1d1-310e96e7476mr413234a91.18.1747939314815;
+        Thu, 22 May 2025 11:41:54 -0700 (PDT)
+Received: from LOCLAP699.localdomain (h69-130-12-20.bendor.broadband.dynamic.tds.net. [69.130.12.20])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-30f365f3487sm5829492a91.42.2025.05.22.11.41.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 22 May 2025 11:41:54 -0700 (PDT)
+From: James Prestwood <prestwoj@gmail.com>
+To: iwd@lists.linux.dev
+Cc: James Prestwood <prestwoj@gmail.com>
+Subject: [PATCH 1/3] nl80211cmd: add NL80211_CMD_ASSOC_COMEBACK
+Date: Thu, 22 May 2025 11:41:50 -0700
+Message-Id: <20250522184152.29950-1-prestwoj@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/4] blacklist: rename ROAM_REQUESTED to AP_BUSY
-To: James Prestwood <prestwoj@gmail.com>, iwd@lists.linux.dev
-References: <20250519163624.198865-1-prestwoj@gmail.com>
-Content-Language: en-US
-From: Denis Kenzior <denkenz@gmail.com>
-In-Reply-To: <20250519163624.198865-1-prestwoj@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-Hi James,
+---
+ src/nl80211cmd.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-On 5/19/25 11:36 AM, James Prestwood wrote:
-> The initial pass of this feature only envisioned BSS transition
-> management frames as the trigger to "roam blacklist" a BSS, hence
-> the original name. But some APs actually utilize status codes that
-> also indicate to the stations that they are busy, or not able to
-> handle more connections. This directly aligns with the original
-> motivation of the "roam blacklist" series and these events should
-> also trigger this type of blacklist.
-> 
-> First, since we will be applying this blacklist to cases other
-> than being told to roam, rename this reason code internally to
-> BLACKLIST_REASON_AP_BUSY. The config option is also being renamed
-> to [Blacklist].InitialAccessPointBusyTimeout while also supporting
-> the old config option, but warning that it is deprecated.
-> ---
->   src/blacklist.c | 20 ++++++++++++++------
->   src/blacklist.h | 12 +++++++-----
->   src/station.c   |  5 ++---
->   3 files changed, 23 insertions(+), 14 deletions(-)
-> 
+diff --git a/src/nl80211cmd.c b/src/nl80211cmd.c
+index 065d52af..65a948c5 100644
+--- a/src/nl80211cmd.c
++++ b/src/nl80211cmd.c
+@@ -177,6 +177,7 @@ static const struct {
+ 	{ NL80211_CMD_UNPROT_BEACON,		"Unprotected Beacon"	},
+ 	{ NL80211_CMD_CONTROL_PORT_FRAME_TX_STATUS,
+ 						"Control Port TX Status" },
++	{ NL80211_CMD_ASSOC_COMEBACK,		"Association comeback delay" },
+ 	{ }
+ };
+ 
+-- 
+2.34.1
 
-All applied, thanks.
-
-Regards,
--Denis
