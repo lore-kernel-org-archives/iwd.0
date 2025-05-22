@@ -1,68 +1,68 @@
-Received: from mail-pf1-f182.google.com (mail-pf1-f182.google.com [209.85.210.182])
+Received: from mail-pj1-f51.google.com (mail-pj1-f51.google.com [209.85.216.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAB741D5CDE
-	for <iwd@lists.linux.dev>; Thu, 22 May 2025 18:41:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E91351D5AB5
+	for <iwd@lists.linux.dev>; Thu, 22 May 2025 18:41:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747939318; cv=none; b=QaN/GeYonCTxRza5m5JpNtKdqLYgLmYYHTYu8Gu/ykOjbitddvcOX2ZFaoDO4i4uXwg8D6dp6LWjY5gBGa0VL8HCOaa5gx+/HriwV5aaeTgErkkhjDG8kK73h+5jvdULOFTbPUNWA4oxR0LpB4WC+w9L7n5JEwNPhBLORyabgIc=
+	t=1747939319; cv=none; b=lZHpGxlzkpcpsT93VGHvVADOP7PCteacFIqq1fc1FEXXsJwAccDToF/LJgmO4fow6rt8YV9hhz3jjuaojTSUZhJbw3PDXVw0dSy9KdgpWZ4lSuiBW5Ihzrdx6Nth2HTcPBbgpN13VZZtFHm6Lp2jb6cpQvxnU0JmUW8LEkrTyUw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747939318; c=relaxed/simple;
-	bh=bKSVfV8s48iCA8872+4MaX4M2es+KJBs+wVT+EWEn/o=;
+	s=arc-20240116; t=1747939319; c=relaxed/simple;
+	bh=nkme0XkhQJ7TsF5PjmBq+WbXMZUnjhTgSo9OPe9xG/Q=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=IO4Qy2/VF+AE+0P37LhBzh9LwavIk+PCKKPc6ls3YZLeU9SlAsITsQ5QXTQrnJWrLPUf/9Z52naFGl0UyUYc0E41gDqE3Qoj8dGj74KvnYGrObHr/aDLJOx0HvmRZjsXJTa7VnVktGy9tcT8sCbtp/a04xRjnMhAswzOOWoJQA8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=H8fRRuwv; arc=none smtp.client-ip=209.85.210.182
+	 MIME-Version; b=Qr7LI59JLM88M0D9QPo0/1yHLgfD/8hlS4c93K2TwHmT1p29kFLkzlUsi9woxSzBuDKxRQKw5WajPK4J0soFnBWQSHwhKJoR6rYFyNpb9cIBFRW4a7XKXvmC6Q/LJ9GQDjHqZAlFb52CQqDhq1QurzGTTyYNrXrj6XWLJsfmm6k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WGhKX+ca; arc=none smtp.client-ip=209.85.216.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="H8fRRuwv"
-Received: by mail-pf1-f182.google.com with SMTP id d2e1a72fcca58-7406c6dd2b1so170905b3a.0
-        for <iwd@lists.linux.dev>; Thu, 22 May 2025 11:41:56 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WGhKX+ca"
+Received: by mail-pj1-f51.google.com with SMTP id 98e67ed59e1d1-30e9e81d517so4950582a91.1
+        for <iwd@lists.linux.dev>; Thu, 22 May 2025 11:41:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1747939316; x=1748544116; darn=lists.linux.dev;
+        d=gmail.com; s=20230601; t=1747939317; x=1748544117; darn=lists.linux.dev;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=R3qdyvHnR1T2bmYKbozFzio6XOkWfzIpuEO7wzi84y8=;
-        b=H8fRRuwvMALLLcc/hxfOUbK0S6xXMsL+emjfcbWUsqfXbpFpi1ha9xW1x9SAHAcilZ
-         s7jZu7hNvj6YhPvIEwfLLeZJmd+bdZAKWQ54m0pvZ8Fxkzz15yNcWqsci9Fo5vFCjdZL
-         4oPB5n8y3jHfu7XMQOb6xh58QQgf/Z9mAGpZOBvIo8poscvejGCPGG1CVvFKFCIULZfX
-         ZOyCyLtfdfb5bbOILAplF/89OqqZvk0ltj90uf+qZKZ4QqP44x5lJ3s2tWT0T6OfZuWk
-         rKClruwKMKtdfuhqVAVKnCnNLBeZfuSafsTUuWNl4UeGhCPGFAiOBCMavSb6a0a47tFL
-         9mYw==
+        bh=UD/dCfDBTWGqcRBuY/3ANOfX0RrdeWuZlf5p97oE6zk=;
+        b=WGhKX+caX3HrfLTLL5HNW5fNPFT005FU+z3E3JiakA6Nqqorhzlno+fXACrwU5ftP/
+         RPHueLqeqFiwlQp8474dgU1e/fOv9GFrH7pJ+nYwIZnry8DEiagYNQZ0Admel+Ql1JMG
+         qIelnqU90edD3pm8XR6qOpQripAgR9hPVTR2fQ9D40mQ5nC5xxvXx0LUnRJaBpMdQ5iO
+         5QJFNVQ5Y1FUCIT+EByIw2GRdkP1tBygiXyZ0U94obkh6XBUUyEoan+5VMrWCbyqBZpM
+         x+3T+R5KNWWAyu75oR1hedXEaCGz3JMIb/eo+/w/57kx4mx97zZ/HFrB9GMlm2C3dV9v
+         itKw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747939316; x=1748544116;
+        d=1e100.net; s=20230601; t=1747939317; x=1748544117;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=R3qdyvHnR1T2bmYKbozFzio6XOkWfzIpuEO7wzi84y8=;
-        b=lIzY7JkWoCbm1ZAMoEeWiw5zp4KUGuDKa8dF2Ik5cOMbZ0kmvcHO4k1m9EEJYopDxq
-         Y2amnMiTmRct7OX+LTjZ0NHPeBzPhlh4ZmgnIRzWiW5FnXTzloJZvAZ0efGoOJ/1kjsg
-         RGJXClMPSwrQQePsdwlEldRuCBQLMdztWF/QQUVKJGFliKgUnulftVQ3lHbbX6IfA6Gu
-         /l6rUbw2iLj60TvwD88+nur60Zo02F3RqLsteAIx/Zz9df0lBhzBXoi7oH0E35/N0S9U
-         nFkB6zgJojGwqefWg4KBcUA164PyBqW+Jk7WVpu3zAQj3CCIdghcIlbUj4h+yz1o/rod
-         Vnaw==
-X-Gm-Message-State: AOJu0YyjBQATXFJpX98WmfFVIz1r8G/OlA0PnuOjvednNn7NocDGGJ37
-	bd0vnzuhs/ITNJq2u/XrZTSXd9yr5PeB498L19rjaERPPqk5+zOPFtnLUviyrg==
-X-Gm-Gg: ASbGnct3n8PdGOUoLKKZWyrWfn+MTRcbeQk3Q5ljtIhRm6sqLpDfaubzI78cqeWt2v/
-	Uu5FtqKI0y0ptST/dowkhW/+ZiQBcZmf1HRHabfaWx88tAwiEXReWDGJhpZW5Op2h/soXjw3DtU
-	SdYyadQmhnmTRLTRQyPPN6sg/Sr81AQSecQMCaZOMSq+0ycliPQBk/2qK20MXc5sUgrsbBYqW/W
-	jgkLVQX5GU11YnoeMphSDZREiUk7FqBSAMjf5wcc6nJ8sZx1o4h0Uyw7z00LkFD9Vr7HmNERH26
-	2X3x4im81rDVqIlylZChtd1TdrJB1cxlWq2gQ1L97DOA7oHggVTxtwlBQLDp7ny6b22PSx7EKP3
-	TO/OeZDzJ3opucFEeViRiMPBsc0l/tm64bdjNjVOTR6W8Wm/q
-X-Google-Smtp-Source: AGHT+IGs9d31SKsdnWwRyZ+neGZEGK1i/eKoyskKylFzIoxCQSmDEnq/xSqRPKCg13VL7hTB7OQrnA==
-X-Received: by 2002:a17:90b:2ed0:b0:310:8d73:bb27 with SMTP id 98e67ed59e1d1-310e8900917mr825979a91.13.1747939315764;
-        Thu, 22 May 2025 11:41:55 -0700 (PDT)
+        bh=UD/dCfDBTWGqcRBuY/3ANOfX0RrdeWuZlf5p97oE6zk=;
+        b=sh0j+t4gnocIltfw1LetGV27kN1rzRGGQAChmy/Mk+OuRV3CeqmfmYevNrsb7EjI3I
+         5zVevKwVHl525d5yHZZSiSSPoNcLs+LEkSsbnOsXb9vT/dWdTrOjBwXLqIPFpPeFT512
+         3AGajuDh64qgd1m31xpce8Jj4tY4Xr30pidkNmN1TzT7W7lVR1yD/ax+XgyG/BVgtbSg
+         QcmxR1rz+ZK7yE/IIvToao/AD7f5t0sMMZdDZpZNhHEM7zw/TrI5y5JV+CZZMKv6a3qI
+         440yo7JfxYaGi/rynW4YqsIzlRSWCI7/tmWVNuUrM4lUep62HZH0Mb30A3j8nGwWYziO
+         U5JQ==
+X-Gm-Message-State: AOJu0YzeJfXl/8x/RLPKhy3fM/BqjNZJVNXiGnXTgeaIgssiIiu2k92U
+	iiLTWZzpPbEfu5sAd0OgDa1Wfve1ZAZKaFPZsOv9JxBvtaB0yRkG2MCP7cNZYw==
+X-Gm-Gg: ASbGnctOtX/qlTh+SEO2ucZxnswaGgTImviNTYXzXoMTFG0wmcG6qofPJndFZwUuUK2
+	pQF34gWBxhWLH+am/fnWW3Q8DlpYO3l9D6aUmgJwDAPQSgTtsZQ19s9KC/eJXoOO3JhTpF/YVXU
+	M/V7yhtufc5S2zYOB5q1zNHVyUx4oSsYFZI66x44xiEGDHvZvNKY7zvIquY8tmLdwel7izTeWA2
+	lei/wdYKoVVKgOmVmIcz1W/B+k73cGdY4XD7GQ2r16gtDm76Aiy3AdW3DER0gkkmpU8oto9pXSI
+	ne6bLeQpT8gohvtJCfllin3ZtkETftlHDPu9IKiGutBNoS37S1o4IJ5riLRj+E7SRZHnwJG1c5f
+	qUb6cOH+sr+suS9cYiWMBhF7WXtWtikGBZDQNw4ogTTdHNe+0
+X-Google-Smtp-Source: AGHT+IHbDVACsPJG3zquytDXV4zpgxu5w/Y1XDFHPLsOFDxfJH0VjqwkeDFss4dcWuWvdnxT3cnYcA==
+X-Received: by 2002:a17:90b:1ccc:b0:30e:823f:ef3a with SMTP id 98e67ed59e1d1-30e823ff012mr39228036a91.30.1747939316771;
+        Thu, 22 May 2025 11:41:56 -0700 (PDT)
 Received: from LOCLAP699.localdomain (h69-130-12-20.bendor.broadband.dynamic.tds.net. [69.130.12.20])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-30f365f3487sm5829492a91.42.2025.05.22.11.41.54
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-30f365f3487sm5829492a91.42.2025.05.22.11.41.55
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 22 May 2025 11:41:55 -0700 (PDT)
+        Thu, 22 May 2025 11:41:56 -0700 (PDT)
 From: James Prestwood <prestwoj@gmail.com>
 To: iwd@lists.linux.dev
 Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 2/3] nl80211util: support parsing NL80211_ATTR_TIMEOUT
-Date: Thu, 22 May 2025 11:41:51 -0700
-Message-Id: <20250522184152.29950-2-prestwoj@gmail.com>
+Subject: [PATCH 3/3] netdev: support handling NL80211_CMD_ASSOC_COMEBACK
+Date: Thu, 22 May 2025 11:41:52 -0700
+Message-Id: <20250522184152.29950-3-prestwoj@gmail.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20250522184152.29950-1-prestwoj@gmail.com>
 References: <20250522184152.29950-1-prestwoj@gmail.com>
@@ -74,22 +74,76 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
----
- src/nl80211util.c | 1 +
- 1 file changed, 1 insertion(+)
+A BSS can temporarily reject associations and provide a delay that
+the station should wait for before retrying. This is useful when
+sane values are used, but taking it to the extreme an AP could
+potentially request the client wait UINT32_MAX TU's which equates
+to 49 days.
 
-diff --git a/src/nl80211util.c b/src/nl80211util.c
-index 0fdefddf..60cab7ec 100644
---- a/src/nl80211util.c
-+++ b/src/nl80211util.c
-@@ -190,6 +190,7 @@ static attr_handler handler_for_nl80211(int type)
- 	case NL80211_ATTR_CENTER_FREQ2:
- 	case NL80211_ATTR_AKM_SUITES:
- 	case NL80211_ATTR_EXTERNAL_AUTH_ACTION:
-+	case NL80211_ATTR_TIMEOUT:
- 		return extract_uint32;
- 	case NL80211_ATTR_FRAME:
- 		return extract_iovec;
+Either due to a bug, or worse by design, the kernel will wait for
+however long that timeout is. Luckily the kernel also sends an event
+to userspace with the amount of time it will be waiting. To guard
+against excessive timeouts IWD will now handle this event and enforce
+a maximum allowed value. If the timeout exceeds this IWD will
+deauthenticate.
+---
+ src/netdev.c | 36 ++++++++++++++++++++++++++++++++++++
+ 1 file changed, 36 insertions(+)
+
+diff --git a/src/netdev.c b/src/netdev.c
+index a26a484e..3bdc3e69 100644
+--- a/src/netdev.c
++++ b/src/netdev.c
+@@ -5451,6 +5451,39 @@ static void netdev_michael_mic_failure(struct l_genl_msg *msg,
+ 	l_debug("ifindex=%u key_idx=%u type=%u", netdev->index, idx, type);
+ }
+ 
++#define MAX_COMEBACK_DELAY 1200
++
++static void netdev_assoc_comeback(struct l_genl_msg *msg,
++					struct netdev *netdev)
++{
++	const uint8_t *mac;
++	uint32_t timeout;
++
++	if (L_WARN_ON(!netdev->connected))
++		return;
++
++	if (nl80211_parse_attrs(msg, NL80211_ATTR_MAC, &mac,
++				NL80211_ATTR_TIMEOUT, &timeout,
++				NL80211_ATTR_UNSPEC) < 0)
++		return;
++
++	if (L_WARN_ON(memcmp(mac, netdev->handshake->aa, ETH_ALEN)))
++		return;
++
++	if (timeout <= MAX_COMEBACK_DELAY) {
++		l_debug(MAC" requested an association comeback delay of %u TU",
++			MAC_STR(netdev->handshake->aa), timeout);
++		return;
++	}
++
++	l_debug("Comeback delay of %u exceeded maximum of %u, deauthenticating",
++		timeout, MAX_COMEBACK_DELAY);
++
++	netdev_deauth_and_fail_connection(netdev,
++					NETDEV_RESULT_ASSOCIATION_FAILED,
++					MMPDU_STATUS_CODE_REFUSED_TEMPORARILY);
++}
++
+ static void netdev_mlme_notify(struct l_genl_msg *msg, void *user_data)
+ {
+ 	struct netdev *netdev = NULL;
+@@ -5504,6 +5537,9 @@ static void netdev_mlme_notify(struct l_genl_msg *msg, void *user_data)
+ 	case NL80211_CMD_MICHAEL_MIC_FAILURE:
+ 		netdev_michael_mic_failure(msg, netdev);
+ 		break;
++	case NL80211_CMD_ASSOC_COMEBACK:
++		netdev_assoc_comeback(msg, netdev);
++		break;
+ 	}
+ }
+ 
 -- 
 2.34.1
 
