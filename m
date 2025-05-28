@@ -1,66 +1,70 @@
-Received: from mail-qv1-f48.google.com (mail-qv1-f48.google.com [209.85.219.48])
+Received: from mail-qv1-f46.google.com (mail-qv1-f46.google.com [209.85.219.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2192221D3E9
-	for <iwd@lists.linux.dev>; Wed, 28 May 2025 19:28:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D5D521D3EF
+	for <iwd@lists.linux.dev>; Wed, 28 May 2025 19:28:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748460487; cv=none; b=JUh7/j6cLXW4/9jyPdJoa/FsqOTQ1ASxM8R9wmH4o4edlCZcIVyKppAhxTpV4c29bECShbAfaB95iw1Oph66jBK9aJRlxaEyYlosxsYgtN9qDDPl6qoUbhWTW4C1EZw3YZE8ZUsxPmU1xJIGqez2/670LVIESp15b2T831xdloI=
+	t=1748460488; cv=none; b=ihZTfdZuki8DgBumo+7H+l1BMaUy/LQrNcTlmjXUNfxNsYs/BzyAqVx4yEylPiU/3+uD14PmAvMPBCmw39X0Zg0PfFtTpaWqxGszELA1FdGl40R8woQKtBq3OTWUWM/f264c0n73VQ+mBnLZEo7BcZFp6a5x3/t7s23RF3w3wfU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748460487; c=relaxed/simple;
-	bh=e/Ku+IiCT5OyYaAto4SYQGyzD+/AqhxDIq4o8wo3so0=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=dxPXQcdT0nSDrMwMTy+4QhCO75O5v21gAUgP9an1G+90SbKGJrCZj7ZZK8gPmU5T7DdsaIncCPq7nN0o1fjTRmByEDVj++M3M4MZwXvyRQ57jTtTUJDSFxQkR6PvqZWyOZGJP9pJA+6z5MWyVnrmf4Pcef8hel8LOUAtpKwibwc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lgRJ5Jws; arc=none smtp.client-ip=209.85.219.48
+	s=arc-20240116; t=1748460488; c=relaxed/simple;
+	bh=wTRGe1EyDbNY41k5RWjgMD77QgQ66qJSPl0aN84unWg=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=BVwQLF6iZepjj500DghWtfsfGdCFzuJyJ6o/Z25FiwnXwC08mSpea9MnFZFzF1c6289/BmIizCyYw4UHIjUUt8o0Hke+fYoOMRRwJ71PnqCoVUR91M7UWHtsH3BFKE71seMK4OTJ4sxbmrWghu+ndnoX1g6YiBTpt/Fh3WMMvu4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=N5/BMnzo; arc=none smtp.client-ip=209.85.219.46
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lgRJ5Jws"
-Received: by mail-qv1-f48.google.com with SMTP id 6a1803df08f44-6faa5c69550so2700966d6.3
-        for <iwd@lists.linux.dev>; Wed, 28 May 2025 12:28:05 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="N5/BMnzo"
+Received: by mail-qv1-f46.google.com with SMTP id 6a1803df08f44-6fac1c60e19so9491176d6.1
+        for <iwd@lists.linux.dev>; Wed, 28 May 2025 12:28:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1748460485; x=1749065285; darn=lists.linux.dev;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=0uxIflcmTv72ZL+LXWqwaFNOZAFpyJkwGCr3ZB7wRIk=;
-        b=lgRJ5JwsHnRk32PH68KdKU3YxlW6KAbPx6VJszuWCeMi5omgoQtiZi7ej33KWtx1+9
-         XjUxryhCN67S3ThLZpKgpa+3m+vabJC0XXg98e6+l/a74GJfmCXtL47iFjFmrHozHKAT
-         vw+Lh7IjBldzfOoqNwYdvLRkE+5npbceY2YB3xRcvQl5QmwNRyR69D79Zj4j2y/nf7qg
-         2xMZ+iWXIEofPn2fYbqdpgtJODI7+wyLGhWtEzVvRUA3a9gamUo4HcHS7qvhm9oRUi9V
-         MK7r7HtWpa/ajwfRWSjqqXIKp3Bv4Wr0FNlgsQUGdex6Kzar3qL3r4pg/xr0PnOLMWzm
-         ABhw==
+        d=gmail.com; s=20230601; t=1748460486; x=1749065286; darn=lists.linux.dev;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=H6xVv52Y7jpe9J9LkZThbWJDe8RkWjXx2YVfUOiXE1g=;
+        b=N5/BMnzoOJMU1SHSQ3Bfo9ODoYpNko/Vm65eoHDINqW6jeMhImySBK7yddoHYn/TZF
+         2N1xvCt1LSipa1FPrzmm3k2G9/kw5jIlJQCHpbDNOW1yGFzoPMWssHgHAHyHw2uiDCc4
+         f2mkthjTLis+y8vb+NHl+M/B22Ld4DKaPGDrRbkAb7Fcd7BNF6gQ1d/iF4+V1vTkZdnp
+         fkrY8lDgtKQ6Kud7wAu/0RwAJ/PqOyEWuy4ULNZoPTWq60xDkKAFjvLoarSopYI+wRYj
+         +LckIQCLRnnW9cbzkbHoQv8qeSWaFUJECbeG2ifm6rFevIz9SmUJNRWCyqaDcVOclowl
+         xlog==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748460485; x=1749065285;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=0uxIflcmTv72ZL+LXWqwaFNOZAFpyJkwGCr3ZB7wRIk=;
-        b=Z3fcGqnQfwjNVp0pqxecKA0+uwyVGebFQ44wOhDYRnswylvJj4iIEo75OAUOOk7k8e
-         IpC4hAIk6aIii0kdszCEJxtHpjuZ23Jeqv4azjSc1RlPkz77Vs+IVuTnD3QlKVUzzu/l
-         sAZWD8cCC8nZpcGysaheE69JRUEVsqoSAOnDZY2H4H11JafUvhZ58TT/h75mkPK9gujz
-         V5EnIWF2hj8Dqd3EoHTAJ9Id3PHR3J/nFybGb3npUuJKUqdkEIQDZdNyEdjoJVKkTHq7
-         9qAFAJdS+f+5D13XycW66DorMGZnj45om1wG0j+PxHoMMv32i7C3XCYjy3SK/Bn7pyOy
-         VdbA==
-X-Gm-Message-State: AOJu0YwBo+S+W2oUjGvd+QPHlbviN9pkaFw7txd2Qzoz24+LjhK/dSbF
-	DTHneb5nY8OBm3M2wqhzmfk0X+qH6OcuobeRMF3RxwUofWYRK4vWr3rDYLJ4lw==
-X-Gm-Gg: ASbGnct9UM6EZ6xgdhvfC3uZ0uoiEmf5GaxETK/vmBWvVhNpIz4l16eN1vdIFtkgv2R
-	mxH7Y1YJrsyTUx6gVoIEZ/LCrJAPakLdv2Z8rUaUukDdoZhUI2CAWXHOR/cCrU2esnejPUSLEGm
-	SPwukHp+FZ8ko8YM1oeFI3i4xnSSBlhGAvkFQBSgU3Kum4XgiIxxv6b26YUAHKfrVzEy89A0/9z
-	3SFZCn9OU/i9N7cDlGl3kJEHbAjR5CC9fvsc8jq7v79Sc6gxi4wSlCJpoqSBaCG1MQeygcQlb12
-	OGhC82/AP7iUTnhSrnaRz60w30El6TCxoBVIXEOiQec5ms9Oovz9q6/w8mWDy4xlQfwPvqTA
-X-Google-Smtp-Source: AGHT+IGBwjAtNJxqNWzZYKq9vF8JQINmMSPAaaeRENcFcXkLd1YiM/HCwwkyd/qo89rHB779OnOUQg==
-X-Received: by 2002:ad4:5ec9:0:b0:6f2:c7b0:3b16 with SMTP id 6a1803df08f44-6fa9d157088mr257150046d6.6.1748460484653;
-        Wed, 28 May 2025 12:28:04 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1748460486; x=1749065286;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=H6xVv52Y7jpe9J9LkZThbWJDe8RkWjXx2YVfUOiXE1g=;
+        b=Dn+O/3ltocj+twCn3ikxrr9d0lWQDEwt6ybN+7yMkK2c4wXhgeC0KgcDXxMC+sflDO
+         jAlvMAYZY9NqGn/RmA/0BFgjxB/p1/XGTRxnLAO8DiD229Luwhjl7L0YJ1uMevArd+xP
+         InVAMebx8CByTyY9V8YXVvuFgGjFiD0zKAyXzsErPeMTBc7jM9vbfI8n01Gg3p0L9HVl
+         4xhWeG4D8ta/TN5KZONBxyNzgGzjBG8IuK8QCJwoBPfn2/tsAtzS8tIoeb4s3o6Jwup6
+         FlQXre7Av4W6N0z3+c0JVjiBf0+mtU+8WGEboRVBDV0Kkt4Vl2CTzHfcgfbFdqTbh0YX
+         +EBg==
+X-Gm-Message-State: AOJu0YwQv2qxs8FJJtvPOGtGTMQwmuJsdI5xzv7qf9c1dLj43SiidQXF
+	eCv6uLFIjb0gtJ75QbVgID2Ktva2FPgqXGuROHX62VafDeMTTApotos+clWLvA==
+X-Gm-Gg: ASbGncszSlyQ92zrjA4/orEuiEOHAu/L6oeQfsxU26UejfzVtNbC2ANr/+KEnybD+BR
+	BW6TNVBoUMWCYcidVVz0S8s0y9RU19G5uBuNQohJnv6Z51ELttIfmlhIlNZvcLF42Dc79OGQeZ8
+	bYZXWyEnpsnilNPHuxBtWgvYKeydbmppyDj+ZRn4mkaohp7sllBFDPRzzX+lx91Wui9ShKUTc6X
+	H3mhgOvnDxl3lYvmfgVyUP5e6bW0xM3NUHqu3F2es2AVNY8BBY47hTRqncjLUeSq0woehYVVuo7
+	BSHRpv4fnkRdXR2+P7NjTKgGr/PHOErPS+BvPE7ejRDBY7ToQABZaW6XH9fQaim9hu5EPam3
+X-Google-Smtp-Source: AGHT+IFruQwFVk392TwlUVCM1tlQu4nhNvy0VA9IEx7bTIPeitMew9flzAWOFZJMfeE3x0hSpvF4Tg==
+X-Received: by 2002:a05:6214:4782:b0:6fa:b467:aa67 with SMTP id 6a1803df08f44-6fac5d6529amr13794746d6.20.1748460485841;
+        Wed, 28 May 2025 12:28:05 -0700 (PDT)
 Received: from LOCLAP699.localdomain ([152.193.78.90])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6fac0bc7bbcsm9987626d6.96.2025.05.28.12.28.03
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6fac0bc7bbcsm9987626d6.96.2025.05.28.12.28.04
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 28 May 2025 12:28:04 -0700 (PDT)
+        Wed, 28 May 2025 12:28:05 -0700 (PDT)
 From: James Prestwood <prestwoj@gmail.com>
 To: iwd@lists.linux.dev
 Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH v2 1/2] sae: check return on sae_send_commit()
-Date: Wed, 28 May 2025 12:27:58 -0700
-Message-Id: <20250528192759.555623-1-prestwoj@gmail.com>
+Subject: [PATCH v2 2/2] sae: prevent groups 21, 25, and 26 from being used
+Date: Wed, 28 May 2025 12:27:59 -0700
+Message-Id: <20250528192759.555623-2-prestwoj@gmail.com>
 X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20250528192759.555623-1-prestwoj@gmail.com>
+References: <20250528192759.555623-1-prestwoj@gmail.com>
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
@@ -69,63 +73,31 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-If this fails, in some cases, -EAGAIN would be returned up to netdev
-which would then assume a retry would be done automatically. This
-would not in fact happen since it was an internal SAE failure which
-would result in the connect method return to never get sent.
-
-Now if sae_send_commit() fails, return -EPROTO which will cause
-netdev to fail the connection.
+These groups are not working reliably and until that is fixed they
+should be disabled.
 ---
- src/sae.c | 14 ++++++++++----
- 1 file changed, 10 insertions(+), 4 deletions(-)
+ src/sae.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
 diff --git a/src/sae.c b/src/sae.c
-index 3305dfdc..87e64041 100644
+index 87e64041..9ffdf648 100644
 --- a/src/sae.c
 +++ b/src/sae.c
-@@ -994,7 +994,8 @@ static int sae_process_anti_clogging(struct sae_sm *sm, const uint8_t *ptr,
- 	sm->token_len = len;
- 	sm->sync = 0;
+@@ -169,6 +169,14 @@ static int sae_choose_next_group(struct sae_sm *sm)
+ 				!sm->handshake->ecc_sae_pts[sm->group_retry])
+ 			continue;
  
--	sae_send_commit(sm, true);
-+	if (L_WARN_ON(!sae_send_commit(sm, true)))
-+		return -EPROTO;
- 
- 	return -EAGAIN;
- }
-@@ -1074,7 +1075,9 @@ static int sae_verify_committed(struct sae_sm *sm, uint16_t transaction,
- 			return -ETIMEDOUT;
- 
- 		sm->sync++;
--		sae_send_commit(sm, true);
++		/*
++		 * TODO: Groups for P192, P224 and P521 are currently
++		 * non-functional with SAE. Until this is fixed we need to
++		 * avoid these groups from being used.
++		 */
++		if (group == 21 || group == 25 || group == 26)
++			continue;
 +
-+		if (L_WARN_ON(!sae_send_commit(sm, true)))
-+			return -EPROTO;
- 
- 		return -EAGAIN;
+ 		break;
  	}
-@@ -1129,7 +1132,9 @@ static int sae_verify_committed(struct sae_sm *sm, uint16_t transaction,
- 				sm->group);
  
- 		sm->sync = 0;
--		sae_send_commit(sm, false);
-+
-+		if (L_WARN_ON(!sae_send_commit(sm, false)))
-+			return -EPROTO;
- 
- 		return -EAGAIN;
- 	}
-@@ -1294,7 +1299,8 @@ static int sae_verify_confirmed(struct sae_sm *sm, uint16_t trans,
- 	sm->sync++;
- 	sm->sc++;
- 
--	sae_send_commit(sm, true);
-+	if (L_WARN_ON(!sae_send_commit(sm, true)))
-+		return -EPROTO;
- 
- 	if (!sae_send_confirm(sm))
- 		return -EPROTO;
 -- 
 2.34.1
 
