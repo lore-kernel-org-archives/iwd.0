@@ -1,67 +1,67 @@
-Received: from mail-qv1-f46.google.com (mail-qv1-f46.google.com [209.85.219.46])
+Received: from mail-qv1-f50.google.com (mail-qv1-f50.google.com [209.85.219.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FA4E21A453
-	for <iwd@lists.linux.dev>; Wed, 28 May 2025 20:10:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4621E2206A7
+	for <iwd@lists.linux.dev>; Wed, 28 May 2025 20:10:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748463036; cv=none; b=A3RPN60xutbomO0fe7M7gq2nhuK3dnItDUsm4yAprlOiCwhNI8q0DY1p5a5wS3sHtZAXfwOauQvbOfl7bfcRQP5Vnf1/IogCHk0WVa5XckkPTpS0vEeUwiqu8M8KUSkOrDx/ha70YnR22WOHlvbp03CnGHQw1D606OPlm61t0dU=
+	t=1748463036; cv=none; b=H73US9HvcfMVuh+u+8JAPaQ/9tAjd1L1hFhZsK+yjDJvExl80Colr4/tzyqO4i54DnGyFMIYK2sxZL4bqw/0tZ3j0iCien8GaO5UfT+Vc6mFwjgZDMWixD/nHmz1HvcSL7TjuRZAfCA26MFvbXeWiPYncwgpEVwp2/8YtLY5PtE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1748463036; c=relaxed/simple;
-	bh=WJAp0+PUNBX+thmgATikYnSGlJvtzgaVVulj+zVdZc0=;
+	bh=yNCOFemxTaW9eVu1WeklKsHSZWqDQqc7dUw/cLMDEz0=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=I6I21cwwb0arc0n6CJxfyKTFpNC9n9OObihcJLqX8Q1oQRRtBKzYKUdBcQjffk8JWC5hb1tdez0hKYXNeqmXRW8CQq5dMTb2qhOYE7pwPffG7jy1JmHKDLmigq16m0GrE2Rgey7uwKMctE2tUEbvD4qV8D0AgguIVRmKhhkHYRk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=h1Gsrf0A; arc=none smtp.client-ip=209.85.219.46
+	 MIME-Version; b=jM8OCAPB3NxkxRqasxRex4yeHhq1S4ThChINxM6eL2S4EisvHQfS7b9wATgYkhUnZwiPNpd+TRcoSwbRAtarJt9l01RfoHVJ0FSdkHJx8XWtHLkidUufSfU5Oawxz/xRvmcrQhInviHtfKS9avJUDA+h2zaikSVbv1x77qjHVQg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lYE6TFw3; arc=none smtp.client-ip=209.85.219.50
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="h1Gsrf0A"
-Received: by mail-qv1-f46.google.com with SMTP id 6a1803df08f44-6f0c30a1cf8so3302926d6.2
-        for <iwd@lists.linux.dev>; Wed, 28 May 2025 13:10:33 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lYE6TFw3"
+Received: by mail-qv1-f50.google.com with SMTP id 6a1803df08f44-6faacf5d5adso2720176d6.1
+        for <iwd@lists.linux.dev>; Wed, 28 May 2025 13:10:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1748463033; x=1749067833; darn=lists.linux.dev;
+        d=gmail.com; s=20230601; t=1748463034; x=1749067834; darn=lists.linux.dev;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Zhd0+P2SR7KyI72yh8RZnA914oLlNoRlmm1n0Kzg04w=;
-        b=h1Gsrf0AXmHj/dRrw8pa/5BGTg2DXlzOKoJuKXXAyybTCE+yHUmg4RukmwkaI4n1N3
-         vRK4f7YTnMN3PWq8Ql2L/XS2nQR+R51fVBJvaPid1VFIhGI8eKjXSCRUD8XTCUPy+gCA
-         5snxDwG6gkNUMjb8aGZKaylsqhkewVp/NLPRxXvSYJFGe/olsEngjzjKByC+yFeawYge
-         qKlEQLBUdQwEiXghtmYI1YbPx9+2u1aREys7LPi45GQ/BZgw5gy6v5HSO5UTf3mRVCcn
-         /z1QTsSvYqEFkXeNNoPQcoO1MKC0M5KWQld1aDychv5/lMK918ZbC33hKckYGVcD99dn
-         DEmw==
+        bh=UslDIdL6Bdqac1WpqkDbXx8fCULQLCDGb6FI8tT10/c=;
+        b=lYE6TFw3RNxQSVBP2kdMQAH1srk16V605ISGK5PCLx7uKC9ZrFE2AJpvmlxrcHxuw6
+         CoNco+YD0BJyy3QZwOjjB1IBdVvztgr0NgVFDuaYePVeJVSPwCJGinbbPftMFlyiTb6K
+         C+oBaOJGKdz24MTQ/+yId7H3cE2jRHx7XZDYoV3nySigN8er1IdOLhIw8RYzxT8cclLi
+         QV7ctTqfFBjEby6XlC4tcLJ4v9BxThsw9Nulz9UlBp3g/BD2ZiJi3g7xM71/WbDmNXFR
+         1byKYfoiSGHdVgJXqju620ZFTjyyuilEYbRhcNFNnoE0TCZoXXyrxzlftCeTuWecU/j7
+         Yi8Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748463033; x=1749067833;
+        d=1e100.net; s=20230601; t=1748463034; x=1749067834;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=Zhd0+P2SR7KyI72yh8RZnA914oLlNoRlmm1n0Kzg04w=;
-        b=RgWLF0PcF5YCXu0sXyLl/o1kdFODfCwqBZw9scnjOZ9EpmL3pb+K5qhTKiaPxQrNtp
-         tzhX8EzRs/PNlsLstoVv3rOBvhL7VGgurDTEhwNdtpmFT9MVOqxiDjuDaHelarXLM/Mo
-         aGl8vNXw8Q8T43mIv15qRU4FlBacpvCPMQVX2tiR5ChXT2Yps4ORTa9+5Vcb0F9yx8VE
-         b22LPLV4PdMUJ7UtvWttOrwyEUJXDJELpi7b9YY2WoQitJEAANZcGzVohjcMGMMTnyTa
-         dfBvXyikQ4Fo87wmkVd8QI99XE1n16QQgi/IkaDLpH8Q2Ra1/P88LYdSTiWHY25ampJw
-         kaIA==
-X-Gm-Message-State: AOJu0YzgoH5ZrDP/HK+UoFKwFU6ywfGTV58Kb/xTf01+hs6o5nDyGh8j
-	0QgJ3kh51r07PGOR4Rl4fGdYDtkXnme2C3uPpccflp8F8ZrdUib7lLMgFbkBHg==
-X-Gm-Gg: ASbGnctOv8vEXqh7IIRTMdv2VQUB4QBXn3AcYff3OGqWKpEdpUJVWoZQGQj6U9Jq7x/
-	A6HfvJrtvIoEbBKD4AErbY7AmpV6dqNsKZNGg+4stJG3KXjTRkZvW4TYALAKXSL0PG+nPz8fHj9
-	qH53Ehw9cVeb6rAwRNXPaBzbZut7mw3IVArE28/tRTcOdHvkTchPwP7SJ1/FzNTYDP9rKs4Gza3
-	yOfFlWxXbCpM667lcGDm1FyxUjMqgHCXtOQqLRALsvgNX1QrSOCr1PtDNM+08oE46UgO9qAJUbK
-	n/yBUSHuGg1uPhBZs7JbpHjnoKKSA1z3LhqrwT9QfAMFPI3+dHuiWnR+RWIqRF5VXFSXbdw5
-X-Google-Smtp-Source: AGHT+IGYrNNvuGmQ6HgOxUC0k99D7HZdyVImhOzd46lMkyd7//b08RkglfZ7cEgKMmsQGExD9WVkpw==
-X-Received: by 2002:ad4:5ec9:0:b0:6f5:4dfa:693c with SMTP id 6a1803df08f44-6fa9d134838mr285825446d6.14.1748463032697;
-        Wed, 28 May 2025 13:10:32 -0700 (PDT)
+        bh=UslDIdL6Bdqac1WpqkDbXx8fCULQLCDGb6FI8tT10/c=;
+        b=wXrJac7o5cMzzgzBZqfb7/zStxGoQDtg2/zlshH+bgMMWLmlZo1py1iuaLvhFeevXa
+         5axxEg/IkYEhFvwAvwCCnEkqeDDO9EgDwU9+/3vAuDLfMpwQnefSU8clqCKXYoQaSZYU
+         nUtpffenjODrzs5Hb0TZSUnPA5zo2G7GbLUrhLadYp2xAquwciYwUs2WsMV3qgot/BxH
+         r9KcEkRX/4aoiSf3i9/+E6F240ZCiTijKURQnEpBx5QBF2XLZrXm4hgbQDf4G0J0a6j0
+         T22TL3uq6jwBCybBBiz4pJxD9LfMSpNvIDj0iLYLPhl9Lf4c9ZBRuzUrNTnk0mEtx8NT
+         22BQ==
+X-Gm-Message-State: AOJu0Yw2PWCFcjwq2oHeuxaGjZ1imKEfSEu3J1qnfu+pkduhDIn+SaoZ
+	vUATVBCC9cPAD7Dnc2mJPpGLLCBDBm14Qhj3r1MGxRNHLjIWEL7nxvcs0g91VQ==
+X-Gm-Gg: ASbGncsCEFbQMX2RCXly4ODk15CSmQlxvOSnGFF48sOG5MmnA+/yIUJ4gd98Jph0fOV
+	kEY9iZRv+8+2ExOk4FzHw6W5Ijofvj7G3ev25OzK4Od4C0xrUmyikN813zQlheuQtcDq3ff1QYK
+	Fzoz6UFF0+Ofni7N9rGG+5haVnWaXMqnrYXNClyh/stIUErK7ofSyowBbVnRlBiQnp0xXioiXV9
+	bLKyVFJnbj9pRH8Os9a4KDxBSrOuuVX/sRx+0WBx57/V3/cOqblSKeSnc4hQ2UR9hMweI9ZUn4d
+	Ke8hW6ZdelHxiRY4dLYeYiilPMRzmQYRjWWKhR40MSpBFOQIC8l9vVb1evQS/A==
+X-Google-Smtp-Source: AGHT+IEFbFu4HtE1Vq8nZp389H7JJxw0GnOOprAhpDCjBFrFdsDkQzQ+bs4u1NvEIVNVYjoiHljerQ==
+X-Received: by 2002:ad4:5cce:0:b0:6fa:ac51:bbda with SMTP id 6a1803df08f44-6faac51bd64mr157230236d6.26.1748463033816;
+        Wed, 28 May 2025 13:10:33 -0700 (PDT)
 Received: from LOCLAP699.localdomain ([152.193.78.90])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6fac0b2888asm10408126d6.45.2025.05.28.13.10.31
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6fac0b2888asm10408126d6.45.2025.05.28.13.10.32
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 28 May 2025 13:10:32 -0700 (PDT)
+        Wed, 28 May 2025 13:10:33 -0700 (PDT)
 From: James Prestwood <prestwoj@gmail.com>
 To: iwd@lists.linux.dev
 Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH v2 3/6] station: include netconfig as part of the BSS retry logic
-Date: Wed, 28 May 2025 13:10:23 -0700
-Message-Id: <20250528201026.598221-3-prestwoj@gmail.com>
+Subject: [PATCH v2 4/6] auto-t: allow configurable DBus timeout/callbacks on connect{_bssid}
+Date: Wed, 28 May 2025 13:10:24 -0700
+Message-Id: <20250528201026.598221-4-prestwoj@gmail.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20250528201026.598221-1-prestwoj@gmail.com>
 References: <20250528201026.598221-1-prestwoj@gmail.com>
@@ -73,168 +73,93 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-A netconfig failure results in a failed connection which restarts
-autoconnect and prevents IWD from retrying the connection on any
-other BSS's within the network as a whole. When autoconnect restarts
-IWD will scan and choose the "best" BSS which is likely the same as
-the prior attempt. If that BSS is somehow misconfigured as far as
-DHCP goes, it will likely fail indefinitely and in turn cause IWD to
-retry indefinitely.
+Let the caller specify the method timeout if there is an expectation
+that it could take a long time.
 
-To improve this netconfig has been adopted into the IWD's BSS retry
-logic. If netconfig fails this will not result in IWD transitioning
-to a disconnected state, and instead the BSS will be network
-blacklisted and the next will be tried. Only once all BSS's have been
-tried will IWD go into a disconnected state and start autoconnect
-over.
+For the conventional connect call (not the "bssid" debug variant) let
+them pass their own callback handlers. This is useful if we don't
+want to wait for the connect call to finish, but later get some
+indication that it did finish either successfully or not.
 ---
- src/station.c | 85 +++++++++++++++++++++++++--------------------------
- 1 file changed, 41 insertions(+), 44 deletions(-)
+ autotests/util/iwd.py | 34 ++++++++++++++++++++++++----------
+ 1 file changed, 24 insertions(+), 10 deletions(-)
 
-v2:
- * Removed network_disconnected() call on failure
- * Utilize network_clear_blacklist() and retain the existing call site
-   for network_connected()
-
-diff --git a/src/station.c b/src/station.c
-index 4180b7a4..a4c3e7d1 100644
---- a/src/station.c
-+++ b/src/station.c
-@@ -1795,6 +1795,8 @@ static void station_enter_state(struct station *station,
- 		periodic_scan_stop(station);
- 		break;
- 	case STATION_STATE_CONNECTED:
-+		network_clear_blacklist(station->connected_network);
+diff --git a/autotests/util/iwd.py b/autotests/util/iwd.py
+index 9091807a..37eb4943 100755
+--- a/autotests/util/iwd.py
++++ b/autotests/util/iwd.py
+@@ -112,8 +112,8 @@ class AsyncOpAbstract(object):
+         self._is_completed = True
+         self._exception = _convert_dbus_ex(ex)
+ 
+-    def _wait_for_async_op(self):
+-        ctx.non_block_wait(lambda s: s._is_completed, 30, self, exception=None)
++    def _wait_for_async_op(self, timeout=50):
++        ctx.non_block_wait(lambda s: s._is_completed, timeout, self, exception=None)
+ 
+         self._is_completed = False
+         if self._exception is not None:
+@@ -280,8 +280,15 @@ class StationDebug(IWDDBusAbstract):
+     def autoconnect(self):
+         return self._properties['AutoConnect']
+ 
+-    def connect_bssid(self, address):
+-        self._iface.ConnectBssid(dbus.ByteArray.fromhex(address.replace(':', '')))
++    def connect_bssid(self, address, wait=True):
++        self._iface.ConnectBssid(
++            dbus.ByteArray.fromhex(address.replace(':', '')),
++            reply_handler=self._success,
++            error_handler=self._failure
++        )
 +
- 		if (station->connect_pending) {
- 			struct l_dbus_message *reply =
- 				l_dbus_message_new_method_return(
-@@ -2221,6 +2223,26 @@ static void station_early_neighbor_report_cb(struct netdev *netdev, int err,
- 				&station->roam_freqs);
- }
++        if wait:
++            self._wait_for_async_op()
  
-+static bool station_try_next_bss(struct station *station)
-+{
-+	struct scan_bss *next;
-+	int ret;
+     def roam(self, address):
+         self._iface.Roam(dbus.ByteArray.fromhex(address.replace(':', '')))
+@@ -870,8 +877,8 @@ class Device(IWDDBusAbstract):
+     def stop_adhoc(self):
+         self._prop_proxy.Set(IWD_DEVICE_INTERFACE, 'Mode', 'station')
+ 
+-    def connect_bssid(self, address):
+-        self._station_debug.connect_bssid(address)
++    def connect_bssid(self, address, wait=True):
++        self._station_debug.connect_bssid(address, wait=wait)
+ 
+     def roam(self, address):
+         self._station_debug.roam(address)
+@@ -999,7 +1006,7 @@ class Network(IWDDBusAbstract):
+     def extended_service_set(self):
+         return self._properties['ExtendedServiceSet']
+ 
+-    def connect(self, wait=True):
++    def connect(self, wait=True, timeout=50, reply_handler=None, error_handler=None):
+         '''
+             Connect to the network. Request the device implied by the object
+             path to connect to specified network.
+@@ -1014,12 +1021,19 @@ class Network(IWDDBusAbstract):
+             @rtype: void
+         '''
+ 
++        if not reply_handler:
++            reply_handler = self._success
 +
-+	next = network_bss_select(station->connected_network, false);
++        if not error_handler:
++            error_handler = self._failure
 +
-+	if (!next)
-+		return false;
-+
-+	ret = __station_connect_network(station, station->connected_network,
-+						next, station->state);
-+	if (ret < 0)
-+		return false;
-+
-+	l_debug("Attempting to connect to next BSS "MAC, MAC_STR(next->addr));
-+
-+	return true;
-+}
-+
- static bool station_can_fast_transition(struct station *station,
- 					struct handshake_state *hs,
- 					struct scan_bss *bss)
-@@ -2263,28 +2285,26 @@ static bool station_can_fast_transition(struct station *station,
- 	return true;
- }
+         self._iface.Connect(dbus_interface=self._iface_name,
+-                            reply_handler=self._success,
+-                            error_handler=self._failure)
++                            reply_handler=reply_handler,
++                            error_handler=error_handler,
++                            timeout=timeout)
  
--static void station_disconnect_on_error_cb(struct netdev *netdev, bool success,
--					void *user_data)
-+static void station_disconnect_on_netconfig_failed(struct netdev *netdev,
-+							bool success,
-+							void *user_data)
- {
- 	struct station *station = user_data;
--	bool continue_autoconnect;
+         if wait:
+-            self._wait_for_async_op()
++            self._wait_for_async_op(timeout=timeout)
  
--	station_enter_state(station, STATION_STATE_DISCONNECTED);
--
--	continue_autoconnect = station->state == STATION_STATE_CONNECTING_AUTO;
-+	if (station_try_next_bss(station))
-+		return;
- 
--	if (continue_autoconnect) {
--		if (station_autoconnect_next(station) < 0) {
--			l_debug("Nothing left on autoconnect list");
--			station_enter_state(station,
--					STATION_STATE_AUTOCONNECT_FULL);
--		}
-+	if (station->connect_pending) {
-+		struct l_dbus_message *reply = dbus_error_failed(
-+						station->connect_pending);
- 
--		return;
-+		dbus_pending_reply(&station->connect_pending, reply);
- 	}
- 
--	if (station->autoconnect)
--		station_enter_state(station, STATION_STATE_AUTOCONNECT_QUICK);
-+	station_reset_connection_state(station);
-+
-+	station_enter_state(station, STATION_STATE_DISCONNECTED);
-+	station_enter_state(station, STATION_STATE_AUTOCONNECT_FULL);
- }
- 
- static void station_netconfig_event_handler(enum netconfig_event event,
-@@ -2297,23 +2317,20 @@ static void station_netconfig_event_handler(enum netconfig_event event,
- 		station_enter_state(station, STATION_STATE_CONNECTED);
- 		break;
- 	case NETCONFIG_EVENT_FAILED:
--		if (station->connect_pending) {
--			struct l_dbus_message *reply = dbus_error_failed(
--						station->connect_pending);
-+		station_debug_event(station, "netconfig-failed");
- 
--			dbus_pending_reply(&station->connect_pending, reply);
--		}
-+		netconfig_reset(station->netconfig);
- 
- 		if (station->state == STATION_STATE_NETCONFIG)
- 			network_connect_failed(station->connected_network,
- 						false);
- 
-+		network_blacklist_add(station->connected_network,
-+						station->connected_bss);
-+
- 		netdev_disconnect(station->netdev,
--					station_disconnect_on_error_cb,
-+					station_disconnect_on_netconfig_failed,
- 					station);
--		station_reset_connection_state(station);
--
--		station_enter_state(station, STATION_STATE_DISCONNECTING);
- 		break;
- 	default:
- 		l_error("station: Unsupported netconfig event: %d.", event);
-@@ -3416,26 +3433,6 @@ static void station_event_channel_switched(struct station *station,
- 	network_bss_update(network, station->connected_bss);
- }
- 
--static bool station_try_next_bss(struct station *station)
--{
--	struct scan_bss *next;
--	int ret;
--
--	next = network_bss_select(station->connected_network, false);
--
--	if (!next)
--		return false;
--
--	ret = __station_connect_network(station, station->connected_network,
--						next, station->state);
--	if (ret < 0)
--		return false;
--
--	l_debug("Attempting to connect to next BSS "MAC, MAC_STR(next->addr));
--
--	return true;
--}
--
- static bool station_retry_owe_default_group(struct station *station)
- {
- 	/*
+     def __str__(self, prefix = ''):
+         return prefix + 'Network:\n' \
 -- 
 2.34.1
 
