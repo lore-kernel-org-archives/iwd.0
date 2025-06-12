@@ -1,98 +1,144 @@
-Received: from mail-oi1-f177.google.com (mail-oi1-f177.google.com [209.85.167.177])
+Received: from mail-yb1-f173.google.com (mail-yb1-f173.google.com [209.85.219.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E37271CAA62
-	for <iwd@lists.linux.dev>; Thu,  5 Jun 2025 15:03:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E24BE220F2A
+	for <iwd@lists.linux.dev>; Thu, 12 Jun 2025 13:51:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749135782; cv=none; b=ulEvWLRnhVyScXrwSFVfwxqxwBD+qK/gjuM3ktXfHCEwHkIuErMfIG5pBTpcwApJM+Qlfi8Dm4JE51+pGVXlfowj/yx8/+Uu8Ed0YTZnjuw36vNAMZ6PqIX1akEJdCbIBaDROCno3d/hzaOK4K2YIvfPkpWM3NH+qM45RtmYhF0=
+	t=1749736296; cv=none; b=PceMh2sJlVxhtdE6GpWT0LcaKz2sFWwpGStaCSvt9mh9LO4CMTin2G65gmCL3N8GV4mkJdFkGf8KnbmRUqKXda8wfhYEq3AJhWnlyl1POLnHgMivny1Ptm2gk9RMES++pE8VImZdY0YKliGNvysQ5fJ9TIQ7n8WfuXjfh6EQo1A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749135782; c=relaxed/simple;
-	bh=y01gJj5GW0QG72gGOTVQvLgM0SAUVGIqNJ0gvc/lCs4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=n2ySro/0EOkD6je1rbhJcatS6MCPQplme7ngD5rnxDcu1thCyPgFJfk2ng6EhA0jZvTk/hwQpIUtSppdrOgZOeq7nONrMgJq3DE3oeCgob/5EPSQFIfS53Veo9dooT8DimG/rIVfhH+TznmENkSzDrcwWMGitxYNqcdXCHzc4eo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ia52BwtE; arc=none smtp.client-ip=209.85.167.177
+	s=arc-20240116; t=1749736296; c=relaxed/simple;
+	bh=SwlEgiTYOEFffETTgQecNqgfTLK86ODS4wjcObZDWxw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=jx7Pk+vikHV2qL1FxnXli+0APmwetDtuS8JMARw5i9F5qFGwePl8O2TfvOBX5qNFRk/QYEDtMF94RizwlWl0wIzD6Z7E1Eycfi32XklHkRU+qIFlxc8ySZ88YgbKDnz5zw0RHATr9RQqZCUdGxEU6xFLh3l5NQ7R38NonKMjSy8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QigI4Kzr; arc=none smtp.client-ip=209.85.219.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ia52BwtE"
-Received: by mail-oi1-f177.google.com with SMTP id 5614622812f47-4067ac8f6cdso925441b6e.2
-        for <iwd@lists.linux.dev>; Thu, 05 Jun 2025 08:03:00 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QigI4Kzr"
+Received: by mail-yb1-f173.google.com with SMTP id 3f1490d57ef6-e7b4ba530feso844100276.1
+        for <iwd@lists.linux.dev>; Thu, 12 Jun 2025 06:51:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1749135780; x=1749740580; darn=lists.linux.dev;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=UzJTlIll5N/g8hbiX9JUDigU4b/9VU9op719ylatrKc=;
-        b=ia52BwtEqitGgKeHn1UWHjA5INgctYtro90VHFQF8zo9jUJtEJcg2VoekC529c2CJh
-         uusPkVniR5mM8+LcK1NhfZI9Md4nikrWt6ddLvRagKwAGymebPVwft76QJwa7svWEo9S
-         1BI7OsIs0qbPTIa5RRj/z+2wOdayrVQ2UgV/TaoBUWs8BKqy1O7zHhrz7/dPG4eoOEKg
-         Ov3zLsK4LSXlfyNA6LCIim4/e2oXf7FKxGcFs2TLO55HabVm4cW9WONQIM5DcHn5AYm9
-         l1FhqZBIRVGNkJ5jwjqPWNyzQk+LC/1H/e39XScPZ23vA9Bih97zA0gLtE/XW5yWqUCK
-         2ynQ==
+        d=gmail.com; s=20230601; t=1749736294; x=1750341094; darn=lists.linux.dev;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=SwlEgiTYOEFffETTgQecNqgfTLK86ODS4wjcObZDWxw=;
+        b=QigI4KzrukQuQ7qnrRMi474XGDeqiC0J79e8MOlACdAE1j2qqZEFkFqAu3Sf5VGdCl
+         i3yGKCHPAxBKYwYAnDjT9bNVIpnenqxD3m1iGh8K2hShQGI2twhCD81bGRbiqt5B2ujf
+         2qQ1dJk6FZsrwXd6wbyszC0wV1SDZ0uhuMOw5DhNjmia0d93tsIM/OG9ZIx5GLCtnN9f
+         C5vAB3EWeyJU8Bt13Y7QXyrsZit2tPsiv1ouL4+f7fAVq2bf50zlsQEsYvQeK59ptJFx
+         +cvj5GUzxMSKlOC5zVX3wKjfkLYprlw91wfCyIwGwCqtxc02/amwlhehQiEVPtfXKFNG
+         Z/hw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749135780; x=1749740580;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=UzJTlIll5N/g8hbiX9JUDigU4b/9VU9op719ylatrKc=;
-        b=TDCXOre2vpC7OyoA7AopFEu73IaDFA7vpXyT3AxV1sp1CHC3l6ADjMEu70+R6PS1bo
-         zn4px0hQ+46uuzUrQySsBSBg1U1X6c3v1TZZ+SkYP1viUl4XyKa2FCdGh9ANl+zko2bK
-         cMKDeGqRdMsDl90G8EC9yd+Woob5E1f6PjDfaj+MDJOl3NCRfD1SnbPY+Y3YI6pQJBYU
-         qixrtagM28wSIpN1pWm2gwk1PEJbACYB1VAgb/nZe0do8i9J58l/NU3DED1txREkPIgp
-         CktUtrtyJ3lbPkfquMB/UPVhwJ1CidePg/43cMrCq1SKIeGK81JqFGME99VPR3MUHMUj
-         rHgA==
-X-Forwarded-Encrypted: i=1; AJvYcCVVaaKPtkMuwJeNIYtDfySQm5faTjdXQJl/G1RC5bXSz3kuEDppnD6l5B5ZypUBpQd6ILE=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yx4vDFF1319hU7c7lZb3M0kRNL3tyZ3EnJ8VuKmf86lBGhhwSUl
-	GSagEDWLRRFFtAmE9wvb2m57fQKV+uWIGptG+4EhVoe0q+dx16piawvO
-X-Gm-Gg: ASbGncu0vbuSPLz5TKC0m52a5nrh9OjE9Fa9bj2+qh1/+L/subpNx3ca25U4TCU+7ed
-	2x2twrgeJN4voL+5yaiUIlBPvuPmULnUceImcYqBdPpV8c8HFYmGrcJ2L/D20CIIdQTrTumo8nh
-	5pyxAr5rtgg8xB4yu65/n6tU8RCdvon5MBOX030RHLxlvJtxgAs0n6/YUSb5pQ8gVNKLsLb/Jah
-	RYceDozZ3f7o8zkUGI+VlGf7HP3FLvQ+MZtKTQg9cXBEa8wZaPP7RiYo8YqSiT6UTixnVCzvfKn
-	O/lW8tF9Q4ibuVClWVt1MWOtgb9UNmEqpUvEYK25KqEEc8EDvt9b/IVVOPai13LG5DQMGRs2e+R
-	T1edCKiSiWGG25CNXb0omvnUq0Qs=
-X-Google-Smtp-Source: AGHT+IFTb4sesOkcqoVW4IaNyhcvfRWjr7K0YIEQKKy++jj3uTTuZH/CxDnSd4SwVOqkdpzpKZ7mpA==
-X-Received: by 2002:a05:6808:1df2:b0:403:2a0d:428b with SMTP id 5614622812f47-408f105e774mr4990927b6e.39.1749135779908;
-        Thu, 05 Jun 2025 08:02:59 -0700 (PDT)
-Received: from [192.168.1.20] (syn-070-114-247-242.res.spectrum.com. [70.114.247.242])
-        by smtp.googlemail.com with ESMTPSA id 006d021491bc7-60f283b2244sm360117eaf.18.2025.06.05.08.02.59
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 05 Jun 2025 08:02:59 -0700 (PDT)
-Message-ID: <30652854-cb83-4695-8a85-82734219873d@gmail.com>
-Date: Thu, 5 Jun 2025 10:02:58 -0500
+        d=1e100.net; s=20230601; t=1749736294; x=1750341094;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=SwlEgiTYOEFffETTgQecNqgfTLK86ODS4wjcObZDWxw=;
+        b=FZO7eUUXhHhf5FYu6L4J+wRljwuuElKA+OrMzb5km+W8CzpewGUUYL3LQIEoAwZE+I
+         SD15gFR5oeVXLh7C4SibjuYn7v7agIHSJWI+IozripQErdqwOtcRkNH0w1C4efc2/mM/
+         aTKgxamZESqFulV4olBcLVvuTkpFe18j7z52UhJX0OXKh5cgUxGSYYNyLnefLC6kh+5/
+         D6q3rE/qkd0LDr8cCLgAK7i8cc++R9yroO3F8NNiA4f99KbSfowxBMifK3rKKcpigWI+
+         7GTQrI4TE+oaeRaCj6riaCJTJKwygp5cwhZsjjHif+ZNGABPYN7K5MEG59Ys7d8RrlZ0
+         0b5w==
+X-Forwarded-Encrypted: i=1; AJvYcCVfbaMCFpYzkUrX/OvHTGCe0qPN5gVR75Op9qFyjPcld4EBEgqGCdTgRg8B26vN9AhZ4Bg=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yx2pAbTAzYP4Bkq05KYbG0sdZFum7uSscDGD0llJSOM3HD77xR6
+	V2iKsFzojzx2s4lk2RMC71XcRcs4PjFmVx5ZTX2j4TG7xFfP6rWv7HNxfBkwhYft8QPwPJjc66T
+	f3KR0Y2fg93vcg7jw5AQSx0czx9cl8tM=
+X-Gm-Gg: ASbGncvdDMAceQkm1ucz7SRaAagMJH1zW3Kzs6B6YMubabwKs4V7WGJC6nq3RYC1rY2
+	lQeAnDJiyrdyrM4/YSlOGTdw5aOYBOOUproEbegbe0CHX/LXpIkBZtcKdmplyq64llH++fmFkYN
+	MPc3XvXZyJRVlmKvt2j3hk5bOWODoxLyAEnVq5/yqtFahRfw==
+X-Google-Smtp-Source: AGHT+IGRNlpqSZjjUpr5a8+48CLMYRtVJNcQdkSnffvYIMOuy9MztHZ4/65IObtdwEP5mo3p1XWpaTtyk2u8/Z1isDo=
+X-Received: by 2002:a05:6902:18d0:b0:e81:b872:8469 with SMTP id
+ 3f1490d57ef6-e820b6e9bd8mr5022669276.32.1749736293720; Thu, 12 Jun 2025
+ 06:51:33 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 1/6] network: make clearing network blacklist a
- separate operation
-To: James Prestwood <prestwoj@gmail.com>, iwd@lists.linux.dev
-References: <20250528201026.598221-1-prestwoj@gmail.com>
-Content-Language: en-US
-From: Denis Kenzior <denkenz@gmail.com>
-In-Reply-To: <20250528201026.598221-1-prestwoj@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <CAG17S_M4_+CR1uSsajyvHBjig6cfCuxegipnHREhk1sXjSyOsA@mail.gmail.com>
+ <a0dcf03d-3bd3-43e5-9532-5a565d20930f@gmail.com> <CAG17S_MKZXf3vC0zgaK_MUrA1nqRzhGcPGUho873KU3jYVShXw@mail.gmail.com>
+ <45bc2f1b-b037-4784-a2a9-7732a82b7391@gmail.com> <CAG17S_MqLBQV6ktjbWsoAv0e+2A0dnNN5+X7Pf+b-qDP3mrL1Q@mail.gmail.com>
+ <19691dcb210.279b.9b12b7fc0a3841636cfb5e919b41b954@broadcom.com>
+ <CAG17S_MX3S9=EmiHBae8WsRnmsUGBJ5h4d8kCmgdxYZ2Zaeh8Q@mail.gmail.com>
+ <1fb12821-1707-4478-941b-9fbc007c4e9a@broadcom.com> <CAG17S_M9_-TG4YnHAwx2+O2bJ6sbEE75X=V0y4Pbxy222O3ZJg@mail.gmail.com>
+ <CAG17S_Njkt7rFTk4Tn-KnLVS8kzA61KJGyWgNQ9kqx5M=s7DnA@mail.gmail.com>
+ <38be0ddf-50ff-4ef9-bd98-748ffcfed2e1@broadcom.com> <CAG17S_NCAmDPa+jK=OPdF18H8Yuuio3czytaa2q5hMSJiKO9bw@mail.gmail.com>
+ <CAG17S_MbUsp6Nu=idnk0p9sQLRJWg=G8oaE1X2kdjwZ_uH4KAA@mail.gmail.com>
+ <CAG17S_PxYNxLpAMzXOuS6riv46G22zpOM0rT0D7Xp-usbWyo+A@mail.gmail.com>
+ <196b5fd2b70.279b.9b12b7fc0a3841636cfb5e919b41b954@broadcom.com> <CAG17S_PzWmDmFekBgtBj7VHPt-g2qU0+LSa9WzYi75aNR5Mb_g@mail.gmail.com>
+In-Reply-To: <CAG17S_PzWmDmFekBgtBj7VHPt-g2qU0+LSa9WzYi75aNR5Mb_g@mail.gmail.com>
+From: KeithG <ys3al35l@gmail.com>
+Date: Thu, 12 Jun 2025 08:51:22 -0500
+X-Gm-Features: AX0GCFsqlRk4wIVeAI40VyqEDoO30TKcYO8G2497BNYPdcEwcH25uQx41wgeuLc
+Message-ID: <CAG17S_NMk44gBa2B=xNyjhXVJuaeYVn-+T9u_8fid+r7k--56A@mail.gmail.com>
+Subject: Re: brcmfmac disconnects when iwd scans
+To: Arend Van Spriel <arend.vanspriel@broadcom.com>
+Cc: Denis Kenzior <denkenz@gmail.com>, iwd@lists.linux.dev, 
+	James Prestwood <prestwoj@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi James,
+Arend,
 
-On 5/28/25 3:10 PM, James Prestwood wrote:
-> This adds a new API network_clear_blacklist() and removes this
-> functionality from network_connected(). This is done to support BSS
-> iteration when netconfig is enabled. Since a call to
-> network_connected() will happen prior to netconfig completing we
-> cannot clear the blacklist until netconfig has either passed or
-> failed.
-> ---
->   src/network.c | 9 ++++++---
->   src/network.h | 1 +
->   2 files changed, 7 insertions(+), 3 deletions(-)
-> 
+I am still seeing this:
+wpa_supplicant[431]: wlan0: Failed to initiate sched scan
 
-All applied, thanks.
+I tried the brcmfmac options listed above and got no change? Still
+getting this every 6 seconds in the log.
+Did I get the command in the modprobe conf wrong?
 
-Regards,
--Denis
+On Fri, May 9, 2025 at 1:01=E2=80=AFPM KeithG <ys3al35l@gmail.com> wrote:
+>
+> > >
+> > > With this setup, things work really well and the only strange thing I
+> > > am getting is a 'failed scheduled scan' message in the log every ~6
+> > > sec.
+> > >
+> > > May 09 08:53:50 pi4 wpa_supplicant[2254218]: wlan0: Failed to initiat=
+e
+> > > sched scan
+> > > May 09 08:53:57 pi4 wpa_supplicant[2254218]: wlan0: Failed to initiat=
+e
+> > > sched scan
+> > > May 09 08:54:03 pi4 wpa_supplicant[2254218]: wlan0: Failed to initiat=
+e
+> > > sched scan
+> > > May 09 08:54:09 pi4 wpa_supplicant[2254218]: wlan0: Failed to initiat=
+e
+> > > sched scan
+> > > May 09 08:54:16 pi4 wpa_supplicant[2254218]: wlan0: Failed to initiat=
+e
+> > > sched scan
+> > > May 09 08:54:22 pi4 wpa_supplicant[2254218]: wlan0: Failed to initiat=
+e
+> > > sched scan
+> >
+> > I thought wpa_supplicant had a config option to disable scheduled scan,=
+ but
+> > can not find it. You can disable it in brcmfmac using feature_disable=
+=3D2
+> > modparam.
+> >
+> > Regards,
+> > Arend
+> >
+> >
+> Arend,
+>
+> Thanks. I must be doing something wrong as I still get the 'Failed to
+> initiate scan' spammed in the log with this config:
+>
+> # cat /etc/modprobe.d/brcmfmac.conf
+> options brcmfmac feature_disable=3D0x200000
+> options brcmfmac feature_disable=3D2
+>
+> Do I have it formatted wrong?
+>
+> Keith
+>
+> I think you suggested the the first line due to a different log
+> spamming message.
