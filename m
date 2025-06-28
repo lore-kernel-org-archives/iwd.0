@@ -1,58 +1,57 @@
-Received: from mail-yw1-f175.google.com (mail-yw1-f175.google.com [209.85.128.175])
+Received: from mail-yb1-f175.google.com (mail-yb1-f175.google.com [209.85.219.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93A381A8F60
-	for <iwd@lists.linux.dev>; Tue, 24 Jun 2025 17:21:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97D051401C
+	for <iwd@lists.linux.dev>; Sat, 28 Jun 2025 15:57:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750785680; cv=none; b=RMjTlgUdsT1/lrWNLlqVkXK2stRD0sYLmCTLjMVd7PMV7M5cbrUDT0GV0oCVWlHPG1bPxE3Ga6W4CPrMP69btuHXU+enwfT1D8e6SWl5xtQw+55ZYNp+LhaWB5Z0S7WBA3libR3y3vdKyayLZTwEAA1vFB4kJ0kmj26ytS79Bbs=
+	t=1751126264; cv=none; b=QJU1i1fVz/Qafhy63bGO+FT3vemhDId1YdeTd47pF7KbQCU5zoTv2twLuvDRUs/cwC4ZcoqKs1vI5dU8Dnkv7peGz8ghYaikfOZqLrrhJz5PQVSQAsogZsPoH9fFTBy6YBrJwMJV8uC535f7lTEZxFlkESm7/WQXcwssbzPdTPE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750785680; c=relaxed/simple;
-	bh=NYNPmgHLp4H3gowblSrsGdMV20pp2VkgZwxkpbhxUDM=;
+	s=arc-20240116; t=1751126264; c=relaxed/simple;
+	bh=ogvrsB4N/pvktoPshwgWFnJlrj7pMEzqaktCntKinQY=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=OkK1mLSvGVigRCGX5EaFnVJP1yWtxgatjW3IuV9AQXlsZAr64tSTmnPFABLB2CnVQUi4V9w/l6acxAnL73hiEm/Uaiem1AIR7ULFsBMjcoWmlw9O4SfNplqlWYXUFeVQE0O27xVyIKcglpb301KPpjITGR3tRNmOdtHnGUuGPCk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QyMoX6BB; arc=none smtp.client-ip=209.85.128.175
+	 To:Cc:Content-Type; b=rj7mILqX+0fQEizNIYafi4CpLOo83nN1bOQ+1tDaUeYqeDmkmhHWTXQ1ig+KNDDQRGBQlY75z0Ns1oDrvOZXiTIXGObK2fXZlm4GAxGUjbHTXvkaFKgmG0MD0NVnH+Ngy1/r3yoZ6WC5C3j6Dqy+esigu2phgiZ1kS4gigoVueU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MYchDb1c; arc=none smtp.client-ip=209.85.219.175
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QyMoX6BB"
-Received: by mail-yw1-f175.google.com with SMTP id 00721157ae682-70f147b5a52so42882647b3.3
-        for <iwd@lists.linux.dev>; Tue, 24 Jun 2025 10:21:18 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MYchDb1c"
+Received: by mail-yb1-f175.google.com with SMTP id 3f1490d57ef6-e82278e3889so1929105276.2
+        for <iwd@lists.linux.dev>; Sat, 28 Jun 2025 08:57:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1750785677; x=1751390477; darn=lists.linux.dev;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=NYNPmgHLp4H3gowblSrsGdMV20pp2VkgZwxkpbhxUDM=;
-        b=QyMoX6BB4k5r18A+MX8YxF1fDIUaxM1uREwqY1uYLE2iL68BuYS46ZQSyCOe+nHgj2
-         HqdD5ODW3jqoAL7skF9PfHbhaNU0aLK+MHA1t2Wu9dixGWUWn1PfStsuYIrRiuZUNinc
-         GjuNAsswwe8xgDRlftSv8YtGDC5UdDpKuRqAejl6xi/nrX1T0QvQC701c+S18n788XVs
-         G+vZ7ioAKl9IaRqaJ1rmWUw4AXf+1k+gWxE+qKhRCrJ6o+URqcX6YVncU/82g0f/Y4nd
-         k1L2vt9EtEcJ5sSvCetxNLj0mmH80AtEAqurKrT4Mc/vwlwokaguJRmqbMvppafENBiO
-         Oifg==
+        d=gmail.com; s=20230601; t=1751126261; x=1751731061; darn=lists.linux.dev;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=lH+HFlXDx4Rv9lnbHTAKOtf/7vEO4d9wN49VGROIXKA=;
+        b=MYchDb1c0QgdftsjJZ/vHMEVFInNVzg2pC5McTA38JD9NMH/o+P0jdKc5TCDEGU7ZI
+         8TZOOGfexUiTY8GzsrADWsdweP6kcyDVCgi4YMmOn6yaXT9FCjShhCpC6diuxyshN6zr
+         fbKf16ZOdUsWBRT+fFHsVEAoGPzINAsP7FvE9JFsAAQ9E5axdVzoV9a4sFTakqFcW4xq
+         UccgXFUI1GO5H5NbpuKHZsFcSGfcwneZqh0ZK+kCLD9VkNCNzTPyJGrgk/LQTsasVNoq
+         ufk5cJ7QP+hwVLSwipxgRN+I/S720RP/MAPuWxAIEdMlyozk7lcQRuXkGs8iPN2+EKFW
+         YG5A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750785677; x=1751390477;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=NYNPmgHLp4H3gowblSrsGdMV20pp2VkgZwxkpbhxUDM=;
-        b=jung2r5zbVc4gSn8tntKW6LoHrmq44Fm1/Rd0OFMQFu1H0gTrrRVkocKsftzBYWBXe
-         GoOU4J/qHnSfocY/hf+EKTjRErUwbQx/P2fRrkW7dOU1QfyE43H95//HGrxiQYDSYYIB
-         d+DOwguAcKX+0vYAl6couFv0JCuylwsDlAQHDe5xBRMfezPwJtTzDPEFNUyvmYj1Oerj
-         D+VTXn5DFYJnLL/mYJCgfyswR9z7tGihg3o3P4LzO1Rk65cKdxtZcNG8RY0IeJ+6ruCo
-         zJZqelcW4taELjjqLC+1ongOycRrjhH07oSqCjAxrLFvF8TSv/fUzpaJYRqvB3PRIeWE
-         GpQg==
-X-Forwarded-Encrypted: i=1; AJvYcCVpRzUdfRxoJv1Y6jMAVOyzT8Cxn3M7wypKeUxlONdRVJRzxsH2kZ8WpJWkbnjFviE1QI4=@lists.linux.dev
-X-Gm-Message-State: AOJu0YzSmog8sGT3eIyBG+j0cZGYnYuumrK13Owq9DMfsyGxEpq2XYuT
-	CI0G/Ix3C3AQ/qkz35R4twpPs92RvE6ZZ7+5GczjwCsVjuB2Rs94mnciU3JwcrNWeFeCb6jGKNx
-	jXATGJYs8TIm0b/O0muVzVMsH9EVpDWg6/83hfBc=
-X-Gm-Gg: ASbGncu3XIF6QrzKwPW0VOOO8USbLgq+f3dKsDUFw9APtVWwwTvpMhQJWJaa/8KIAVF
-	J/SYbKb6A9qIV8cu4inFgxiSO1RO0dyZbwVfyBQ9eDDgi/Xav1pt4Up2EiS9MATMjQU4fKZwEpI
-	oRVFvcKXh2sPgRuBlaJMM939r5pYuy29jwYZtXzOIhQ7WhjQ==
-X-Google-Smtp-Source: AGHT+IG8uf+XFiI03Fb1JtZ3Vr60LlNJ6/g6wBJdP5XaxIyTI4tQWrO/XS7eb4VyemxDRgJnRLSlNq75P06GH2ll8Dw=
-X-Received: by 2002:a05:690c:3812:b0:6f7:ae31:fdf with SMTP id
- 00721157ae682-712c63b2eaemr250432097b3.12.1750785677575; Tue, 24 Jun 2025
- 10:21:17 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1751126261; x=1751731061;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=lH+HFlXDx4Rv9lnbHTAKOtf/7vEO4d9wN49VGROIXKA=;
+        b=BUHp3BcnIFiCmha5CEZpS3l4NuO2YEa9LjjYE05vV/WxRwdwNiUGKI5wz6XOlmPfgT
+         RvLlM+r6H5QDW3SYzqE/Fv3bElQkFUlbphbJSRm/5jbPJYMJBn02eUFhXQ6KFvMJN9nz
+         WgsTvf5Kr+pKjl2vpEbdWgPpfow7FaKfZx7CpvuwEZZaFJDGrQC+xXkBeOE83bppqR8c
+         PlTzlbFJ/6yAb85jUCK67+7dM14otvU7lxQyeEU3s+v+HvneybkjL7sw+cevfMALx6xK
+         +ARIm3X7RPpCtdvTb5NVTh71q16CQLcLZugx5YSPBUp01iZRIOvmvCQeXphFull+Xlw3
+         FksQ==
+X-Forwarded-Encrypted: i=1; AJvYcCU+N4H9sqUUYBInUOod2owLLVwHHPloUh1z+JmzzUUF0qkKpSMjygUEYOtfHqFGWuqZvXQ=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yw98qdiIPAfaouG0c90fEcW604pdPMa/UZKoyzvIUvg2dMcObzN
+	TVBOpENiW1PjC26qe1IeJRzLjA0WBlNl7JFuFHO1KwzIXANvpvexOm5SZq4447ePd/UE3Z9fu1k
+	DidxHB0sQPFQIUZ5eqEZQJ3k+9vRjB94=
+X-Gm-Gg: ASbGncvDZ4TAbD9qOC06rkNrr2HzOe3R3pYxiztCTtF2om6M7+r+zaqfqV87an5dsfF
+	cN4nEKpDMldMnHOhybGQMsVENRbLSNOn1QPpPzPV/KxQnmbYk1NyZEqVUN0K8GofY30VfG7b8eT
+	dLRgS0e0PtQaxTId21bzl+GuMuP4CIvA2qJvs9IODQbF2IzXIbmmNOtE0=
+X-Google-Smtp-Source: AGHT+IExaNA+Byjgu1iXKjnqseB4vWJhDeqkx8vj9U/hIJpdYfB5ZLfTeZ6Mwib5B2cn4NtqJ18QAqMNmCLEnv6Oldo=
+X-Received: by 2002:a05:690c:6c0b:b0:70e:7638:a3a9 with SMTP id
+ 00721157ae682-7151719250dmr113323077b3.18.1751126261384; Sat, 28 Jun 2025
+ 08:57:41 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
@@ -73,106 +72,37 @@ References: <CAG17S_M4_+CR1uSsajyvHBjig6cfCuxegipnHREhk1sXjSyOsA@mail.gmail.com>
  <CAG17S_PzWmDmFekBgtBj7VHPt-g2qU0+LSa9WzYi75aNR5Mb_g@mail.gmail.com>
  <CAG17S_NMk44gBa2B=xNyjhXVJuaeYVn-+T9u_8fid+r7k--56A@mail.gmail.com>
  <197649346d8.279b.9b12b7fc0a3841636cfb5e919b41b954@broadcom.com>
- <CAG17S_PcYOFqbfKPnaNUsQ0AsJzWGRgGDRYrq9SgewUskqck_w@mail.gmail.com> <197652ee6b0.279b.9b12b7fc0a3841636cfb5e919b41b954@broadcom.com>
-In-Reply-To: <197652ee6b0.279b.9b12b7fc0a3841636cfb5e919b41b954@broadcom.com>
+ <CAG17S_PcYOFqbfKPnaNUsQ0AsJzWGRgGDRYrq9SgewUskqck_w@mail.gmail.com>
+ <197652ee6b0.279b.9b12b7fc0a3841636cfb5e919b41b954@broadcom.com> <CAG17S_NuBvCbNd_FKUTP3SpShExiE4Z1Bx+zDPkfTe_ht3o86Q@mail.gmail.com>
+In-Reply-To: <CAG17S_NuBvCbNd_FKUTP3SpShExiE4Z1Bx+zDPkfTe_ht3o86Q@mail.gmail.com>
 From: KeithG <ys3al35l@gmail.com>
-Date: Tue, 24 Jun 2025 12:21:06 -0500
-X-Gm-Features: AX0GCFvRaAeQwj8Uvq8-7NGBDaZXkhEm79zgIwmWgPsVUGSDkAZU2H_73e944X8
-Message-ID: <CAG17S_NuBvCbNd_FKUTP3SpShExiE4Z1Bx+zDPkfTe_ht3o86Q@mail.gmail.com>
+Date: Sat, 28 Jun 2025 10:57:30 -0500
+X-Gm-Features: Ac12FXy4B16tIMqpbO9GWxm878leyceRfHsjH3EHEP-3y64suVMZ2ziSHhHhgM8
+Message-ID: <CAG17S_Nb9bsySbRO1=DDZdBp+jjNf=f55wZFYK-SgsdSTdKSjw@mail.gmail.com>
 Subject: Re: brcmfmac disconnects when iwd scans
 To: Arend Van Spriel <arend.vanspriel@broadcom.com>
 Cc: Denis Kenzior <denkenz@gmail.com>, iwd@lists.linux.dev, 
 	James Prestwood <prestwoj@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Thu, Jun 12, 2025 at 12:27=E2=80=AFPM Arend Van Spriel
-<arend.vanspriel@broadcom.com> wrote:
->
-> On June 12, 2025 6:51:29 PM KeithG <ys3al35l@gmail.com> wrote:
->
-> > ...
-> >
-> > On Thu, Jun 12, 2025 at 9:37=E2=80=AFAM Arend Van Spriel
-> > <arend.vanspriel@broadcom.com> wrote:
-> >>
-> >> On June 12, 2025 3:51:34 PM KeithG <ys3al35l@gmail.com> wrote:
-> >>
-> >>> Arend,
-> >>>
-> >>> I am still seeing this:
-> >>> wpa_supplicant[431]: wlan0: Failed to initiate sched scan
-> >>>
-> >>> I tried the brcmfmac options listed above and got no change? Still
-> >>> getting this every 6 seconds in the log.
-> >>> Did I get the command in the modprobe conf wrong?
-> >>
-> >> Maybe. You could try to merge the two value so one line with 0x200002.
-> >> Could be that wpa_supplicant determines support for scheduled scan in =
-an
-> >> unexpected way. Have not looked at the wpa_supplicant code for that.
-<snip>
->
-> Right. Scheduled scan is a different API compared to the normal scan. It
-> allows userspace to say "scan periodically and let me know when you see a=
-ny
-> of the ssids I am interested in" to the driver/firmware and go take a nap=
-.
->
-> If I remember correctly wpa_supplicant does a couple of normal scans and
-> when it doesn't see the ssids in its config file, it switches to using th=
-e
-> scheduled scan api.
->
-> Regards,
-> Arend
->
-OK, I get it.
+Arend,
 
-Could it be that I an running hostapd at the same time that is the
-cause of these 'Failed to initiate sched scan' messages in the log?
-I am running this as systemd wpa_supplicant@wlan0 and am using
-systemd-networkd to manage the IPv4/v6 (not Network-Manager)
+Do not know if this is correct, but I noticed a difference between how
+wpa_supplicant@.service versus wpa_supplicant.service calls
+wpa_supplicant.
+in the @ version, it is called like this:
+ExecStart=/sbin/wpa_supplicant -c/etc/wpa_supplicant/wpa_supplicant-%I.conf -i%I
 
-This log shows what happens when it is connected via hostapd to my
-laptop and then I turn on my iPhone hotspot which is 'known' in the
-wpa_supplicant@wlan0.conf:
+whereas the normal wpa_supplicant is called like this:
+ExecStart=/sbin/wpa_supplicant -u -s -O "DIR=/run/wpa_supplicant GROUP=netdev"
 
-Jun 24 11:58:50 pi4 wpa_supplicant[423]: wlan0: Failed to initiate sched sc=
-an
-Jun 24 11:58:56 pi4 wpa_supplicant[423]: wlan0: Failed to initiate sched sc=
-an
-Jun 24 11:59:03 pi4 wpa_supplicant[423]: wlan0: Failed to initiate sched sc=
-an
-Jun 24 11:59:09 pi4 wpa_supplicant[423]: wlan0: Trying to associate
-with 36:b7:9b:9b:cc:c0 (SSID=3D'BatPhone' freq=3D5745 MHz)
-Jun 24 11:59:09 pi4 hostapd[5315]: ap0: STA ae:00:2d:31:28:7f IEEE
-802.11: disassociated
-Jun 24 11:59:09 pi4 systemd-networkd[184]: wlan0: Connected WiFi
-access point: BatPhone (36:b7:9b:9b:cc:c0)
-Jun 24 11:59:09 pi4 wpa_supplicant[423]: wlan0: Associated with
-36:b7:9b:9b:cc:c0
-Jun 24 11:59:09 pi4 wpa_supplicant[423]: wlan0:
-CTRL-EVENT-SUBNET-STATUS-UPDATE status=3D0
-Jun 24 11:59:09 pi4 wpa_supplicant[423]: wlan0:
-CTRL-EVENT-REGDOM-CHANGE init=3DCOUNTRY_IE type=3DCOUNTRY alpha2=3DUS
-Jun 24 11:59:09 pi4 wpa_supplicant[423]: wlan0: WPA: Key negotiation
-completed with 36:b7:9b:9b:cc:c0 [PTK=3DCCMP GTK=3DCCMP]
-Jun 24 11:59:09 pi4 wpa_supplicant[423]: wlan0: CTRL-EVENT-CONNECTED -
-Connection to 36:b7:9b:9b:cc:c0 completed [id=3D0 id_str=3D]
-Jun 24 11:59:09 pi4 systemd-networkd[184]: wlan0: Gained carrier
-Jun 24 11:59:10 pi4 hostapd[5315]: ap0: STA ae:00:2d:31:28:7f IEEE
-802.11: associated
-Jun 24 11:59:10 pi4 hostapd[5315]: ap0: STA ae:00:2d:31:28:7f RADIUS:
-starting accounting session C040C6E0561E8E1E
-Jun 24 11:59:10 pi4 hostapd[5315]: ap0: STA ae:00:2d:31:28:7f WPA:
-pairwise key handshake completed (RSN)
-Jun 24 11:59:10 pi4 systemd-networkd[184]: wlan0: DHCPv4 address
-172.20.10.2/28, gateway 172.20.10.1 acquired from 172.20.10.1
-Jun 24 11:59:36 pi4 systemd-networkd[184]: wlan0: Gained IPv6LL
+I edited my wpa_supplicant.service to be:
+ExecStart=/sbin/wpa_supplicant  -u -s -O "DIR=/run/wpa_supplicant
+GROUP=netdev" -c /etc/wpa_supplicant/wpa_supplicant.conf -i wlan0
 
-I did not initiate a scan, manually, but when I turned on the hotspot,
-it immediately connected. As soon as I turn off the hotspot, I get the
-'Failed to initiate sched scan' every 6 or so seconds, again.
+and now it seems to run correctly and I no longer get the "Failed to
+initiate sched scan" in the log.
+If I do not have this proper or if there may be a 'better way' let me
+know, but now it seems to work.
 
 Keith
