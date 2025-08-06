@@ -1,169 +1,107 @@
-Received: from smtp11.infineon.com (smtp11.infineon.com [217.10.52.105])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oa1-f45.google.com (mail-oa1-f45.google.com [209.85.160.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 075A41DE89B
-	for <iwd@lists.linux.dev>; Wed,  6 Aug 2025 09:18:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.10.52.105
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A92828C5D1
+	for <iwd@lists.linux.dev>; Wed,  6 Aug 2025 14:35:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754471889; cv=none; b=LuG7H9bfeVmv9I4b/1z+C54e1W+wZ+OgRQcKe6DfMgtDb5VrWDpbZz7LtkmX/4vPLgStG36UgkPOOdowExlhEqkItxNuRZRlLqQm2+sBGhCuUcf9NmjeeI4pQlSdViRFGdivd43EK7RuD5aCNu30kenVaMMfLYO8bm5bLdj+mdU=
+	t=1754490959; cv=none; b=CrHlA5qOgpb04Z9wzIv8K6ZM3T10sH/jK5lEQLyJJ9eCoCWcJqa5XIDkThdQbLKwwgEHKct5Bzwx9qegPbiKLpM1N2hiteyxzdtYAafS9ZWWzlTq84T5jpD7gxu5fqsV3FO1uTxFsqJIwxsoeHUgSRoXYJVe81Z//Onajjh9iWs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754471889; c=relaxed/simple;
-	bh=4TETj0rwg3qzdrp3KjC//+WnJkChZdSIH7/vpNlXEBU=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=ZOZQsLOgofzho8qbTre3SbpyA0Dj5/yv/a0DWzqRZKg9Tbq4qFHKKVfWnDLy8jRgq8u04IXzFKYRAfjYoNpgkzHqRcZw6hpBBPvaQeF+z57D9RYwHRE+H5Q7kgnJqvzQaO2UuezKmwBfxenq1SF92XjwQn37ilq27LZe+l9SZXQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infineon.com; spf=pass smtp.mailfrom=infineon.com; dkim=pass (1024-bit key) header.d=infineon.com header.i=@infineon.com header.b=Tp9yHnNd; arc=none smtp.client-ip=217.10.52.105
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infineon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=infineon.com
+	s=arc-20240116; t=1754490959; c=relaxed/simple;
+	bh=AmqS8lr4nDPZ76yK4bETv6rq0zWfzppeM0KRpavFXB0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ApLDI4UQncxVj+DbCfUS6pxJ7YKBwUJ3z2s0eCUqUfwoaDRuNzHlMqt9kaYDi3+JvjyS9qHe5T1Ot0Ohoe6yMEm5KRIVrPyKvn5bJDTM6Ao/UyuPthTm74WwQ6A291MwtE6MbvejQtMC9CdcaN+1CqrGCC4Rtv4iadYinNV44fs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mxf0IEm6; arc=none smtp.client-ip=209.85.160.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=infineon.com header.i=@infineon.com header.b="Tp9yHnNd"
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=infineon.com; i=@infineon.com; q=dns/txt; s=IFXMAIL;
-  t=1754471888; x=1786007888;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=4TETj0rwg3qzdrp3KjC//+WnJkChZdSIH7/vpNlXEBU=;
-  b=Tp9yHnNdlXsZSrFYP/h2mehM55jTQk3JMGK4Ry6LhjvrtrUGliKuznKy
-   e5+uJzonyM+uxgHVjWse0BxMsarHfMki5eKoYS2Fd+ssaSV2ZIaTJg8xU
-   5vDKaDEJGTUIoUUoVt3OucmPMK7ejK0EWod00zrrI3C2F7Gs7il5Hk8w/
-   U=;
-X-CSE-ConnectionGUID: xhzgy839SuqsUDSdNxnNnw==
-X-CSE-MsgGUID: iRhhOMr+QSik6QnispOJeQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11513"; a="105141881"
-X-IronPort-AV: E=Sophos;i="6.17,268,1747692000"; 
-   d="scan'208";a="105141881"
-Received: from unknown (HELO MUCSE805.infineon.com) ([172.23.29.31])
-  by smtp11.infineon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Aug 2025 11:16:56 +0200
-Received: from MUCSE827.infineon.com (172.23.29.20) by MUCSE805.infineon.com
- (172.23.29.31) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1748.26; Wed, 6 Aug
- 2025 11:16:55 +0200
-Received: from ISCN5CG14747PP.infineon.com (10.161.6.196) by
- MUCSE827.infineon.com (172.23.29.20) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1748.26; Wed, 6 Aug 2025 11:16:53 +0200
-From: Gokul Sivakumar <gokulkumar.sivakumar@infineon.com>
-To: <iwd@lists.linux.dev>
-CC: Gokul Sivakumar <gokulkumar.sivakumar@infineon.com>,
-	<wlan-kernel-dev-list@infineon.com>
-Subject: [PATCH] netdev: parse INACTIVE_TIME and CONNECTED_TIME in netdev_get_station
-Date: Wed, 6 Aug 2025 14:46:25 +0530
-Message-ID: <20250806091625.1277-1-gokulkumar.sivakumar@infineon.com>
-X-Mailer: git-send-email 2.43.0
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mxf0IEm6"
+Received: by mail-oa1-f45.google.com with SMTP id 586e51a60fabf-2ebb468cbb4so263fac.2
+        for <iwd@lists.linux.dev>; Wed, 06 Aug 2025 07:35:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1754490957; x=1755095757; darn=lists.linux.dev;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=juEcV1e7lqi12PswNjjdpdbHzXV8hXoR7HqXa0u/Nds=;
+        b=mxf0IEm61+5k6FsY1LNFRi/D3GJ/N5f/SK1vv3E2zC5vNVIDUqk9JpbDqQQloBpnUG
+         j9INkWdchJabLOy18ZfnBJqSaox0g/uRLK+jC4qd70xx3BGXwkgp5HVVKFCSDxx/gj9u
+         o4pgkI1fuE9WAmICRsUwmNH+3/GZAh/lLglutIPwozzS7tqkHcVK6P8j42MOy8RS3U+c
+         OJzIpSPZsW/5jtnAaaaZXBqXJ1MgqxYC2BWf/Ymh7541c79FU5j3IunSx9w2p5u1O9zc
+         Cvp7px9IbKkf0EqiPP45mrhDroK+gdU+r9gMJ45+x+A5UolRWv18a6bga3L8kWhboeBa
+         /cEQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1754490957; x=1755095757;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=juEcV1e7lqi12PswNjjdpdbHzXV8hXoR7HqXa0u/Nds=;
+        b=MxBGdQtVwY3Fqg7FyEZjFZHJDX15eVp6Xubp0NnCXvAJTh/RS3+b91+lSHu1tNmULJ
+         UEhs8lXSi0GbS+1YfUVyVRFK/N4iTaG/cG+ivPe9+qWJV5TXkUqzpvM58s+e/BDtFWBB
+         y5hrKp2AorYm9wLOtGTdBcL662V+46J/wQKc26ZDqKbH036Q7OAFpjieiLXZlOB2pzpn
+         JxQ5o0ktPseC8wjJR+fHPiieCAZyLIulcG9yYHIrrL/lssv1YFnbV+m28kWipnkgW/dQ
+         KkuuXEkJj8plwj3fP6KWpAFGIACXH2sPoIuZ/ygLsJQlcbUdC4hRpuwsdQ1kynLdoA77
+         5GQQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVLQKLMG6GGA28tRFr3xmhRHmPRB5Gd/j+sj1I/vZSLOKP0xlEzF7EH9DC8hYDDBdvKa3M=@lists.linux.dev
+X-Gm-Message-State: AOJu0Ywu4MiE1ctGBaK3qBA+RNwm8DJEKrYT+rGarHyJ5U4u+1I9cw+J
+	UlhTGpd6QoW90FR4gUDhivEhHSkg8SL50jRJcjiQmo18M6xNEREMoaG5g2DHcw==
+X-Gm-Gg: ASbGncs5C9sjG4P/LDvhAtZuUlpOxbWiH1NUGl5ER+u7QrA58mKtQWtxVEku+ztsOcW
+	k29wbt64bn5cBCeqhc95GdXYku1bVSTqxRyrfb8cKdQVDC3yWEJxNLkFUW98dM0x4Fucw9L7Z8x
+	TUaeqja1cRBUN4US5f2Fe7xiaPU63U/qqE/Pp5kjpXlJdbOkK0U2VFIkzDyydD8pZ3XZrKhNJgv
+	4YWO/AScq7Tc9K5pv1xKLrfpKQKgsF9l+YgfSZqKDA6DpVLIjc3+aKjLl8LU6ylGwxTGST5xz/p
+	6DPsHPehWtY3hruBrrUH91gR56xeCIreMcAkj1a4WibuElvafIoU7T5fKLb7VTKLixQVhb+w00R
+	oJqf42E1E9rqDVNGYlvE/DCdAIROtvRSYfnmSQ3sxQZAdiGM/SAYxuHzQNzP6nuRoRpTUaVgaX7
+	Q=
+X-Google-Smtp-Source: AGHT+IFLcbDtoTzFIKWWk1TqhOxg8HwDXaaoZikhYesK9o+RZbrpRgcwQPdadQ7atEHwyKm50rKIKQ==
+X-Received: by 2002:a05:6870:f624:b0:2d5:ba2d:80ed with SMTP id 586e51a60fabf-30be6079f5amr1515826fac.25.1754490957341;
+        Wed, 06 Aug 2025 07:35:57 -0700 (PDT)
+Received: from [172.16.49.130] (syn-070-114-247-242.res.spectrum.com. [70.114.247.242])
+        by smtp.googlemail.com with ESMTPSA id 586e51a60fabf-307a740deefsm4204330fac.29.2025.08.06.07.35.56
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 06 Aug 2025 07:35:56 -0700 (PDT)
+Message-ID: <586befbc-4be5-4036-ac15-f2c24bd40fae@gmail.com>
+Date: Wed, 6 Aug 2025 09:35:55 -0500
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: MUCSE815.infineon.com (172.23.29.41) To
- MUCSE827.infineon.com (172.23.29.20)
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] netdev: parse INACTIVE_TIME and CONNECTED_TIME in
+ netdev_get_station
+To: Gokul Sivakumar <gokulkumar.sivakumar@infineon.com>, iwd@lists.linux.dev
+Cc: wlan-kernel-dev-list@infineon.com
+References: <20250806091625.1277-1-gokulkumar.sivakumar@infineon.com>
+Content-Language: en-US
+From: Denis Kenzior <denkenz@gmail.com>
+In-Reply-To: <20250806091625.1277-1-gokulkumar.sivakumar@infineon.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-These two newly parsed station info params "inactive time" and the
-"connected time" would be helpful to track the duration (in ms) for
-which the station was last inactive and the total duration (in s) for
-which the station is currently connected to the AP.
+Hi Gokul,
 
-When the wlan device is in STA mode, these fields represent the info
-of this station device. And when wlan device is in AP mode, then these
-fields repesents the stations that are connected to this AP device.
----
- client/diagnostic.c |  2 ++
- src/diagnostic.c    |  8 ++++++++
- src/diagnostic.h    |  5 +++++
- src/netdev.c        | 17 ++++++++++++++++-
- 4 files changed, 31 insertions(+), 1 deletion(-)
+On 8/6/25 4:16 AM, Gokul Sivakumar wrote:
+> These two newly parsed station info params "inactive time" and the
+> "connected time" would be helpful to track the duration (in ms) for
+> which the station was last inactive and the total duration (in s) for
+> which the station is currently connected to the AP.
+> 
+> When the wlan device is in STA mode, these fields represent the info
+> of this station device. And when wlan device is in AP mode, then these
+> fields repesents the stations that are connected to this AP device.
+> ---
+>   client/diagnostic.c |  2 ++
+>   src/diagnostic.c    |  8 ++++++++
+>   src/diagnostic.h    |  5 +++++
+>   src/netdev.c        | 17 ++++++++++++++++-
+>   4 files changed, 31 insertions(+), 1 deletion(-)
+> 
 
-diff --git a/client/diagnostic.c b/client/diagnostic.c
-index 92a6126a..2be8b724 100644
---- a/client/diagnostic.c
-+++ b/client/diagnostic.c
-@@ -95,6 +95,8 @@ static const struct diagnostic_dict_mapping diagnostic_mapping[] = {
- 	{ "Frequency", 'u' },
- 	{ "Channel", 'q' },
- 	{ "Security", 's' },
-+	{ "InactiveTime", 'u', "ms" },
-+	{ "ConnectedTime", 'u', "s" },
- 	{ NULL }
- };
- 
-diff --git a/src/diagnostic.c b/src/diagnostic.c
-index b928c2c1..9dc61deb 100644
---- a/src/diagnostic.c
-+++ b/src/diagnostic.c
-@@ -110,6 +110,14 @@ bool diagnostic_info_to_dict(const struct diagnostic_station_info *info,
- 		dbus_append_dict_basic(builder, "ExpectedThroughput", 'u',
- 					&info->expected_throughput);
- 
-+	if (info->have_inactive_time)
-+		dbus_append_dict_basic(builder, "InactiveTime", 'u',
-+					&info->inactive_time);
-+
-+	if (info->have_connected_time)
-+		dbus_append_dict_basic(builder, "ConnectedTime", 'u',
-+					&info->connected_time);
-+
- 	return true;
- }
- 
-diff --git a/src/diagnostic.h b/src/diagnostic.h
-index fd965839..3a3b65de 100644
---- a/src/diagnostic.h
-+++ b/src/diagnostic.h
-@@ -43,6 +43,9 @@ struct diagnostic_station_info {
- 
- 	uint32_t expected_throughput;
- 
-+	uint32_t inactive_time;
-+	uint32_t connected_time;
-+
- 	bool have_cur_rssi : 1;
- 	bool have_avg_rssi : 1;
- 	bool have_rx_mcs : 1;
-@@ -50,6 +53,8 @@ struct diagnostic_station_info {
- 	bool have_rx_bitrate : 1;
- 	bool have_tx_bitrate : 1;
- 	bool have_expected_throughput : 1;
-+	bool have_inactive_time : 1;
-+	bool have_connected_time : 1;
- };
- 
- bool diagnostic_info_to_dict(const struct diagnostic_station_info *info,
-diff --git a/src/netdev.c b/src/netdev.c
-index 3bdc3e69..c5ab9105 100644
---- a/src/netdev.c
-+++ b/src/netdev.c
-@@ -637,7 +637,6 @@ static bool netdev_parse_sta_info(struct l_genl_attr *attr,
- 				info->have_tx_mcs = true;
- 
- 			break;
--
- 		case NL80211_STA_INFO_EXPECTED_THROUGHPUT:
- 			if (len != 4)
- 				return false;
-@@ -645,6 +644,22 @@ static bool netdev_parse_sta_info(struct l_genl_attr *attr,
- 			info->expected_throughput = l_get_u32(data);
- 			info->have_expected_throughput = true;
- 
-+			break;
-+		case NL80211_STA_INFO_INACTIVE_TIME:
-+			if (len != 4)
-+				return false;
-+
-+			info->inactive_time = l_get_u32(data);
-+			info->have_inactive_time = true;
-+
-+			break;
-+		case NL80211_STA_INFO_CONNECTED_TIME:
-+			if (len != 4)
-+				return false;
-+
-+			info->connected_time = l_get_u32(data);
-+			info->have_connected_time = true;
-+
- 			break;
- 		}
- 	}
--- 
-2.43.0
+Applied, thanks!
 
+Could you also update doc/station-diagnostic-api.txt and 
+doc/access-point-diagnostic-api.txt to reflect these as well?
+
+Regards,
+-Denis
