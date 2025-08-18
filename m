@@ -1,71 +1,71 @@
-Received: from mail-qt1-f172.google.com (mail-qt1-f172.google.com [209.85.160.172])
+Received: from mail-qt1-f171.google.com (mail-qt1-f171.google.com [209.85.160.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 029D12C15B6
-	for <iwd@lists.linux.dev>; Fri, 15 Aug 2025 15:26:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84ED323AB9C
+	for <iwd@lists.linux.dev>; Mon, 18 Aug 2025 14:30:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755271577; cv=none; b=TfV1ksyyIXxFEm/bLsu2F124j/IAseLff8NTZnz2N/HGWKVlvLgk3LLn5Wf+tLywtgJ1DXc2ciIbuijlnVVbi7qLDJfTpwACw2cNLzbOhiJPiygdA+6dXb5DDTD+j2gP7KN8U7qQsAZnp2LfwG/+NJwJ8znoqgka4oIgGuEpY0M=
+	t=1755527450; cv=none; b=Cp7LzXBjo45zpOc4glQnD1tBWdEiK4x4EH2nqMOoGtB60ROK6QPRTG2aqItzHuAkqOcogAHwMvYeQHA4B13UNpPsmNB9rS1K8GVyYslHxakEJi2m6Q6tlZhv9ShXba3qxLFmvhBYeCx8EAMVjS7o6EB/1Ct5tyW+FS1L/eEiLro=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755271577; c=relaxed/simple;
-	bh=0/g3rLpfSNvHfwjSWC1jKGSb6nd0r7wmGjbVsVbFTJs=;
+	s=arc-20240116; t=1755527450; c=relaxed/simple;
+	bh=QG65SD9NCMoN2Iqr9StNwvND1a13nFTVDcc0BXZQxgM=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=eZ55LTFb4u7KqLuK1iCXaqphKJhvGvtSJZYjjt7Xc9FS/QTQNHctVSqxFmHs9W6dmLJWOl7H14e1rKnAqO6YVKe9tMtWr+sOCm8vl3R12iH7cth1sjqcTXlxGIyxGESpWw5R5qtjlY1XQQ/7HFOlWrvKf62f13rwrAmi50CpYk4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RfRwV8Lx; arc=none smtp.client-ip=209.85.160.172
+	 MIME-Version; b=evqgX7ugsVGRO5mfH+f/CpTmsUt3h2U6CAfcV2OtoJcyD3MMO/XOKb0Y8JHKFJfhl08uVsmqw6YCRupxXq9BXCZR+WSgWoU0b54ySGWw2FgTmGM2MIc6w08Mhg9B2uJiHanVL8k9LRQFyfPsjyLLdeOZpPQz1lyoiUrWi4qvM98=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XcMS140w; arc=none smtp.client-ip=209.85.160.171
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RfRwV8Lx"
-Received: by mail-qt1-f172.google.com with SMTP id d75a77b69052e-4b109bcba7eso20055061cf.2
-        for <iwd@lists.linux.dev>; Fri, 15 Aug 2025 08:26:15 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XcMS140w"
+Received: by mail-qt1-f171.google.com with SMTP id d75a77b69052e-4b10957f506so55775331cf.0
+        for <iwd@lists.linux.dev>; Mon, 18 Aug 2025 07:30:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1755271574; x=1755876374; darn=lists.linux.dev;
+        d=gmail.com; s=20230601; t=1755527447; x=1756132247; darn=lists.linux.dev;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Dm2iUYhwLA8ESM4dGPrl6Ah1qpqA8bO86OGqFGPXlSg=;
-        b=RfRwV8LxqpNE+uHmO3Y4FxU/TvmQU6dxjduMEvB+3qyB34nWwQ+fvAQIu1vFAoT89z
-         xUeIPT541N73DPaossWvHQegJX7U+YhNWn7Ct8dfioUOftIMQzq6OnGyDcDnmxzdLL+l
-         99wEvkc4EgKDmxMoY+FDgtieIrSn+zQNMS//pOpNWd8UsSZ4aG2XVAAAwcxaIpbKnNmC
-         Uxh/d5PSbYcgvap6eXAieZS3Xgyo83TIHL1WTU87B5cD2Sh4CDMcTQgjxS99HQsSaFgw
-         GRHthbEyrO7ousnM82tKTAqo88KpTPDmC5hzZL16VIpyzsaPZm+FMeZQy6ZleM/NJ/OE
-         CYNg==
+        bh=YAUIJ/24ryE/tigy7sFsLW0T8h5AYRjRgYhsELwF3SU=;
+        b=XcMS140wQAMuXz6zOWSZhk+QJ0INEkPaW8HJd3wla+z/ewQKcpc3+0YRJhqPMv2f3m
+         bN3NuSpVyJDZeLNKYGmqHXL2ugEblNv4EgPxJDTpDVrv78qXK1OaSqHq5awNUmoBlDXZ
+         UFO30h4w5v0OZ0N0lQepQ1pWFD5AvknfwYTsMLELF4Uk1w8rovglIvnNp9d2u34rhSmn
+         +BCQMUVNSshlh1NsuF/Jnsqhmpi2g6rbgUWGnF0CYtwjZocP3qG5E0AUgsYCebqeKY0K
+         qPPiKhSGFvpdIVjzwem6OADephhaOzGSBL97YXSvJ+jNAJCmdUU12iy17ZVHU+29LDqM
+         gvJg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755271575; x=1755876375;
+        d=1e100.net; s=20230601; t=1755527447; x=1756132247;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=Dm2iUYhwLA8ESM4dGPrl6Ah1qpqA8bO86OGqFGPXlSg=;
-        b=jZNU8tn3e6sGLK6po8ohnzjVCC/33SW2Izy8J5EA2vqIqOc1BBudja6GW0AK2nFGnM
-         tP6HPXGODBwVnQ/XMpULoUtfBs5m9NivXQemM0Dxsm61AvmFm5pXLQzkRv3/iPl5sX/L
-         6KYh3sT9Lr5MKuIYjk1uZhtCQHsuQgJf6PreDV6nzcG3dxzUOZwhOoITuxWyMqwqJa/w
-         phbg4u77Gz2gdPLAREIpMA2Sv0o8/aay1lAIeLIYFsVco0f7l+n6jXKm7lYJnFkkO7Kn
-         RXJwfYHnuPOpKPNBK9KG7ryVtbuhkGD6wMP1gMegKhCt7i3dYMTsKIoVNYEHWsT12lCg
-         +fjg==
-X-Gm-Message-State: AOJu0YzvDm2NonYjVq7RtEXlY5DI8DPGBhd3X4lY7EIPeGE3uqMq2jE+
-	fRlBOlmysESgPv4JMfL7PjXENqDW6rGQnSV7pdpsZWGFQAT2QONgRWslDBOIBg==
-X-Gm-Gg: ASbGnct7vafwrmdiyO7Cc5nNnFOg2i0qMovdow8aBWnOcSBC6TdhRaqC0fIi3TkvpUl
-	Z1RQHzmy6V8Ab/Id9Fd/DdCzTXuH/8pkeWrDT88/QatsovRl105Jgpz+AUje5BX9QAaRiakft20
-	CbibeDqeXAzp/4MFG8oBQrBNJvLLyIKSxQUkVJdp9jUMDw4w4QtLG8kMW4iYKNphOI/t9MiZEfh
-	3dmZA6jVg3NOOvkzyHKXepJIuG5I5ZnyliP09TNO/klYVeY8RxVbt2PvTbrRDd2Skk4M49uuuiz
-	gAFgS4bbWmage+85X6DxxLrH3vi1xOfKFryMeVbIjxlA8/+6bsM0P02OJllMtIfkioBTyn6RYb+
-	TJGs0TZhQEtzXj9vWi89zojf8gH2LDJbZzWkiEStieXA=
-X-Google-Smtp-Source: AGHT+IHMyblHZYjY+28MG8s0k8G8QpnZcSByC0pNBFzfZKgjnFjbgsmV5df4pX8SAxVkh60Fwvfj1w==
-X-Received: by 2002:a05:622a:1993:b0:4b0:a034:cab0 with SMTP id d75a77b69052e-4b11e0e85fcmr30812771cf.20.1755271574456;
-        Fri, 15 Aug 2025 08:26:14 -0700 (PDT)
+        bh=YAUIJ/24ryE/tigy7sFsLW0T8h5AYRjRgYhsELwF3SU=;
+        b=h62NY+UNTsyl0laMs9zvwoMIuVbOr0vFDe/f/JClD3H4sh+zC0ZpXGi9aktpmtkMaR
+         hqQc/fcDj1iUexgJkmE2X3H3tLGXTiIoQJpjPHWCr/ln8qVnfQnwJNOejkFU3BUewv1/
+         b4+EUYWwFtrDmCbAFcsgl1z2fAORSln+C2H+stL1FD2ccNhGlgiFY8awWSLB1+XN1CXH
+         pPmPxGpShZnSvSPA1p7RQMIGoFBymyag/I2XwGFAV+wWU2Wvr+KMXcoXd4anGB/EWywf
+         PKxPjVbRVWdzDJjO0nvp2/dkIGzNlHSRzdqLok8NX4+Q5FLq5nXNee2qNSXl2k0Ppf4m
+         RPbw==
+X-Gm-Message-State: AOJu0YwcrKF8az7xHJ9+JfaP80nPFcKEKdsKY8Le0kthPG2/Y8QuXI4q
+	GhmdPWSbF6HYxC2/lzbMEbemg2wkDJiOqqw6rttBjs3RwpmQfoTYzyYe3YoPiw==
+X-Gm-Gg: ASbGncsycj8jvYvQx2kFwRHBImUI79ZuRJ0K67c4Z59QwyJ2UlKMyGZ0nAd8LQPzuLy
+	dKjRRHyA+bogBJMxwv9q6bfhF0OIY+MoS55MK/aoa/ZsRebL9U/MOfcWdGs/rdXvfvst0PK2kMN
+	cMV1zIq38HT1LK3+yRiA6FEmBwQndLhwOxS9jTTLkgiIW++Rjw0FFFVY0OQBU9eVJFq+LwRr7U/
+	xptDAkloCTZ0pkhoA7oUWJfhEcwkJU8c2/nEft1E7dmg3tRB72f+JCZX8mzI6MeuteIDK7/U4Gs
+	lF1eYwECgIIns2ZFKjpV0Xgi2DRt2wTbMkvW6FAfKP4d+q7F67vjgY2sXc5RbVsum2ViG4bEGlK
+	kZmDMH1Sjw9Lu+aG/S3CXfrlrVjlXyzIf
+X-Google-Smtp-Source: AGHT+IFTsiPaqeuOMpk2C2JiCc1A5C0/1zYC7+mQwnBjoUfvV7XYvn+gKRA9IH4YpugnVBSfLIa27A==
+X-Received: by 2002:ac8:5e47:0:b0:4ab:722e:3b39 with SMTP id d75a77b69052e-4b11d14addcmr141650941cf.1.1755527446690;
+        Mon, 18 Aug 2025 07:30:46 -0700 (PDT)
 Received: from LOCLAP699.localdomain ([152.193.78.90])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4b11de0d731sm10393851cf.40.2025.08.15.08.26.13
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4b11dc5aeaasm52781531cf.19.2025.08.18.07.30.45
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 15 Aug 2025 08:26:13 -0700 (PDT)
+        Mon, 18 Aug 2025 07:30:46 -0700 (PDT)
 From: James Prestwood <prestwoj@gmail.com>
 To: iwd@lists.linux.dev
 Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 3/3] netdev: handle local CMD_ASSOCIATE failures (for FT)
-Date: Fri, 15 Aug 2025 08:26:04 -0700
-Message-Id: <20250815152604.175977-3-prestwoj@gmail.com>
+Subject: [PATCH v2 2/4] netdev: disconnect rather than deauth in FT association failure
+Date: Mon, 18 Aug 2025 07:30:39 -0700
+Message-Id: <20250818143041.283887-2-prestwoj@gmail.com>
 X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20250815152604.175977-1-prestwoj@gmail.com>
-References: <20250815152604.175977-1-prestwoj@gmail.com>
+In-Reply-To: <20250818143041.283887-1-prestwoj@gmail.com>
+References: <20250818143041.283887-1-prestwoj@gmail.com>
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
@@ -74,28 +74,48 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The issue surrounding this was described in detail in the previous
-patch. The netdev piece simple and does two things:
+After CSA IE parsing was added to the kernel this opened up the
+possibility that associations could be rejected locally based on
+the contents of this CSA IE in the AP's beacons. Overall, it was
+always possible for a local rejection but this case was never
+considered by IWD. The CSA-based rejection is something that can
+and does happen out in the wild.
 
-1. Don't deauthenticate and fail the connection if the CMD_ASSOCIATE
-   ACK comes back with a failure. A local rejection like this should
-   not change the kernels internal state, so we can recover. In this
-   case call the connect callback directly with a failure which
-   station will handle.
+When this association rejection happens it desync's IWD and the
+kernel's state:
 
-2. Upon a successful CMD_ASSOCIATE ACK, signal
-   NETDEV_EVENT_ASSOCIATING to let station know. This did require
-   modifying the netdev_associate_event() to not duplicate event
-   calls, specifically when FT is being used.
+1. IWD begins an FT roam. Authenticates successfully, then proceeds
+   to calling netdev_ft_reassociate().
+2. Immediately IWD transitions to a ft-roaming state and waits for
+   an association response.
+3. CMD_ASSOCIATE is rejected by the kernel in the ACK which IWD
+   handles by sending a deauthenticate command to the kernel (since
+   we have a valid authentication to the new BSS).
+4. Due to a bug IWD uses the target BSSID to deauthenticate which
+   the kernel rejects since it has no knowledge of this auth. This
+   error is not handled or logged.
+5. IWD proceeds, assuming its deauthenticated, and transitions to a
+   disconnected state. The kernel remains "connected" which of course
+   prevents any future connections.
+
+A simple fix for this is to address the bug (4) in IWD that deauths
+using the current BSS roam target. This is actually legacy behavior
+from back when IWD used CMD_AUTHENTICATE. Today the kernel is unaware
+that IWD authenticated so a deauth is not going to be effective.
+Instead we can issue a CMD_DISCONNECT. This is somewhat of a large
+hammer, but since the handshake and internal state has already been
+modified to use the new target BSS we cannot go back and maintain the
+existing connect (though it is _possible_, see the TODO in the
+patch).
 ---
- src/netdev.c | 32 +++++++++++++++++++++++++++-----
- 1 file changed, 27 insertions(+), 5 deletions(-)
+ src/netdev.c | 17 +++++++++++++++--
+ 1 file changed, 15 insertions(+), 2 deletions(-)
 
 diff --git a/src/netdev.c b/src/netdev.c
-index ca8bfea0..e45423be 100644
+index ca8bfea0..d896c907 100644
 --- a/src/netdev.c
 +++ b/src/netdev.c
-@@ -2993,15 +2993,32 @@ static void netdev_cmd_ft_reassociate_cb(struct l_genl_msg *msg,
+@@ -2993,13 +2993,26 @@ static void netdev_cmd_ft_reassociate_cb(struct l_genl_msg *msg,
  						void *user_data)
  {
  	struct netdev *netdev = user_data;
@@ -104,48 +124,26 @@ index ca8bfea0..e45423be 100644
  	netdev->connect_cmd_id = 0;
  
 -	if (l_genl_msg_get_error(msg) >= 0)
-+	/*
-+	 * If CMD_ASSOCIATE was accepted we're committed to association and
-+	 * can no longer go back. Signal this to station so the state can
-+	 * transition to ft-roaming.
-+	 */
-+	if (err >= 0) {
-+		if (netdev->event_filter)
-+			netdev->event_filter(netdev, NETDEV_EVENT_ASSOCIATING,
-+						NULL, netdev->user_data);
++	l_debug("%d", err);
++
++	if (err >= 0)
  		return;
-+	}
  
 -	netdev_deauth_and_fail_connection(netdev,
--					NETDEV_RESULT_ASSOCIATION_FAILED,
--					MMPDU_STATUS_CODE_UNSPECIFIED);
-+	l_debug("failed FT reassocaition (%d)", err);
-+
 +	/*
-+	 * A failed ACK should not have changed the kernel's state. This means
-+	 * we should still be connected to the current AP and can proceed to
-+	 * trying more BSS's.
++	 * TODO: It is possible to not trigger a disconnect here and maintain
++	 *       the current connection. The issue is that IWD has already
++	 *       modified the handshake and we've lost all reference to the old
++	 *       BSS keys.
++	 *
++	 *       This could be remedied in the future by creating an entirely
++	 *       new handshake_state object for the association and only when
++	 *       the ack indicates success do we clear out the old object.
 +	 */
-+
-+	netdev->connect_cb(netdev, NETDEV_RESULT_ASSOCIATION_FAILED, NULL,
-+				netdev->user_data);
++	netdev_disconnect_and_fail_connection(netdev,
+ 					NETDEV_RESULT_ASSOCIATION_FAILED,
+ 					MMPDU_STATUS_CODE_UNSPECIFIED);
  }
- 
- static bool kernel_will_retry_auth(uint16_t status_code,
-@@ -3185,7 +3202,12 @@ static void netdev_associate_event(struct l_genl_msg *msg,
- 	if (!netdev->connected || netdev->aborting)
- 		return;
- 
--	if (netdev->event_filter)
-+	/*
-+	 * For FT this event is sent in the CMD_ASSOCIATE ack to indicate
-+	 * association was successfully started in the kernel, don't duplicate
-+	 * and send here too.
-+	 */
-+	if (!netdev->in_ft && netdev->event_filter)
- 		netdev->event_filter(netdev, NETDEV_EVENT_ASSOCIATING,
- 					NULL, netdev->user_data);
- 
 -- 
 2.34.1
 
