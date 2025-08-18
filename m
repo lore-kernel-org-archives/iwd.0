@@ -1,68 +1,68 @@
-Received: from mail-qt1-f180.google.com (mail-qt1-f180.google.com [209.85.160.180])
+Received: from mail-qt1-f176.google.com (mail-qt1-f176.google.com [209.85.160.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99C2723815D
-	for <iwd@lists.linux.dev>; Mon, 18 Aug 2025 14:30:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A59B23AB9C
+	for <iwd@lists.linux.dev>; Mon, 18 Aug 2025 14:30:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755527451; cv=none; b=AUTytyWZbVewUGcIZd7diFI716vLO+35/oPhS0qPcB1saudbKniDNqI6/AMni1zqfZrRjoWaX6S2qHGuxU0zoSH+6VSpzLxoAIbFVLBA8BuT/iDh3LK7/F1fOAz7hla6lI6KMqs8UzwbAnX5TDUio46e38nVNeKV18g/o259T+A=
+	t=1755527452; cv=none; b=uuyFv0cy3QEy2wLu0zmAgK/8sJY0cmc45viN7DS/LggrpgWbQoIFL+zhIIsod3CvpuHcQcf5x/uNJXQ9tAMwOJu7EUd1Qcw6w69zhJLQRVD8iNlLQ2pdgACUtsnDq4dTtIDk06in7PPHClSw3GLkBwHR6v6GoWxA2sgSPNjU2oM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755527451; c=relaxed/simple;
-	bh=/SVU+LSZyM37qXKjw8N8K/lt2sahZ1DksE7zIZz7TeM=;
+	s=arc-20240116; t=1755527452; c=relaxed/simple;
+	bh=mboWUDA+zvrbGxqGt0SRYna/Rm/nKM3DzQaqo/0R6Nw=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=VELdKJjW/N3z/9FQtbu3me7xuoY5i1gy4sHhFBGeWtyiXFd5n6I30+2IzlJBipOOSHxKTAZjmZbNgmO8oe36liy2aLI97hbxjCWgmgGbCrFPQIoSMOHHACraFCsg2Fr3V/nqQ6Zyagz4xd1ZDBCAlvsoA/ahCVb4cI9/gkmA1Zs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ddt96BZw; arc=none smtp.client-ip=209.85.160.180
+	 MIME-Version; b=CxXyWccbJLW/FMySgqIodSmFhGkKHN6FCiB4LYkzwRvHqlAZcHQaKgwnqL8Is9GWpeZXWlBwK704Sd+/bqJ/Tnc7RmDDBevDlnQGJPRDFqTD51BkUkEkcW7KwNXUfxG+HA+Ux4PC2yXPO6iTINPw1TRyiBHpr4fM7PkKsjguMhs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Gz4MJ8/f; arc=none smtp.client-ip=209.85.160.176
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ddt96BZw"
-Received: by mail-qt1-f180.google.com with SMTP id d75a77b69052e-4b121dc259cso19650891cf.1
-        for <iwd@lists.linux.dev>; Mon, 18 Aug 2025 07:30:49 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Gz4MJ8/f"
+Received: by mail-qt1-f176.google.com with SMTP id d75a77b69052e-4b28184a8b3so2160101cf.1
+        for <iwd@lists.linux.dev>; Mon, 18 Aug 2025 07:30:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1755527448; x=1756132248; darn=lists.linux.dev;
+        d=gmail.com; s=20230601; t=1755527450; x=1756132250; darn=lists.linux.dev;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=nq9cyefCN3AtJdFLPIIEsjhVMplCGGt1dNkEoMLdxxc=;
-        b=Ddt96BZwXLL5MAgwsxY76XY2hxXwj47P4ycYuNX6yZaXp8Tu00ztmHrzEThmP10+8p
-         VkJ5KgXxypllkIdE7HNALwFo6hmaeKTYSmxp1F7ICB3ffoso0C9DpFoK7QUW7Ldtpq/z
-         wkM9C8m/RyfqvFxfYF+mN7NhaaXoZNvgRAL3ha6yVtLOosl8fnMAY3lMjiP2H3PKOUoV
-         Xq5zOmrKxBcgCtoMEwqvlNODu5cJQl1Jkcxp0a0Q+64ZyyC5py2rfnzxZl1w0aFhpiBv
-         2qFxR+VUxmXoqI9TOvQWAVMQQOTcCYnUJp2p8aZF9K92hfGqq6T32NxjE+ZKq460tHJc
-         cHDQ==
+        bh=nwekLZwr1/4RyZAu+VaE/klf2//gTYcLMwryfFF8aKE=;
+        b=Gz4MJ8/fity9B6bqpYsivg2eKppUzx2lkkiON4L+PZKdD1X+gyWddHxAZODfqb4fh8
+         s6ONi8giAAFVX27B/sgvdHolAj7972Wh8MGvQ1DZfw0HMO5hu6SSxo3vXfbeHpGblyhr
+         E8GRZEaXqHn7c4zxNWTB3LFsuAXVa/bPwH8xpjdiBGcyY8+foTWF0EaGJ/YTQnHJp8X9
+         qj78uzwNJgVK593ML3kzcG25gevH/Yvnhz8DMXL9gv3+7HgExnWaBnCQjJNzCqNr9eZt
+         tIAb8fDnCqz9gX2EcbW//rmGPRgXZ3kAWJ34W4hxCLF+ADXFBO9XvBRmgyVqFl7DnDQq
+         kUog==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755527448; x=1756132248;
+        d=1e100.net; s=20230601; t=1755527450; x=1756132250;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=nq9cyefCN3AtJdFLPIIEsjhVMplCGGt1dNkEoMLdxxc=;
-        b=NABfMjglplegPubC8X4go/6gTpsIHi6JTNTHXKS6hMEMuP/rBl/72isqpy89oa+1mU
-         T7wumDnb2317M22T/S/4nCh7HsyNu3IoYDoh6xUOPRNq03l1DmgWPbmKpSZniodmuB+j
-         BoZPmsuA8VcwNsmjIvRJ0weTWwVJNj2bkbV027C46zagsoFtvYy64eXDjVMJzuOMWnAX
-         +03dCugq5jjy5M9sEAh0lxTvut7Uc3MAv5t+ZZJgXvGSy2ld9QziS8fbmgSmzYLJtBqx
-         PWUq9I9dusnm1/PcO7YbOKM6j9ZMGpyKhWMhA5Xm6HRJzYyrPc5Or6EhR00V1Q2hq/yR
-         3yag==
-X-Gm-Message-State: AOJu0YzxWlRNTQLwcC9jXnIgVYbrs+2KBuL1TQoHA1iDj4ICL8JZ6FeN
-	aMSr8Zt7KY68DePTC6AAyWnF5Gjc6rlz8+Abucw7ct1m3uwGgW/OXDp22CNy1w==
-X-Gm-Gg: ASbGncvMVqjq/UPbYah2kIhXFMuqpQguBNSmTX+c/iCwiYpSP8267em9kzo92e6ViFm
-	UGzFCEhW+6+DXgi+S07bGZO/Aqzlb/aQletZk11xfNCtpMaVySOx8D7c2fLbZlXK/kie96FJB5y
-	KEdk+kehduVtVGpU82WOpc5JAB0QBIOxS8Ie8XbSTh7ykUvCeZMj/scrDX3Vy0eNQPrZIrcZiSr
-	pqbPpeHHP8WFSOQa0zAsLPooaCqynOlNwHKaWl/TMsf9J/gCUiHWyJBUdxd9wJnGQyVrNLGHm1c
-	NGAOY7RAhIHRqOR4ksnQWO5sXm9KGZCdJ4bbSvwSlcCMGHFZPXLxhlnSuUBFw8EYvKcB1uZ0eCs
-	w/3JHXVUiGxETe0RUNTpTKsRxB/FZPO9A
-X-Google-Smtp-Source: AGHT+IGgjI22EZyb+OROBwF9rZkz3iNtpnQLSd9I+wF4F3QLabtE9jFY4QpC/TnKj3xoVYEDGbfSbg==
-X-Received: by 2002:a05:622a:418d:b0:4af:1bfb:1658 with SMTP id d75a77b69052e-4b11e0a14bamr192404831cf.12.1755527448046;
-        Mon, 18 Aug 2025 07:30:48 -0700 (PDT)
+        bh=nwekLZwr1/4RyZAu+VaE/klf2//gTYcLMwryfFF8aKE=;
+        b=ltXxsnC+PeI5EGXog2TYJn+9JwJnT2TkUoymqZXZcmREXfCOc91ZzBNaLD79gTFFkO
+         rFkvaf3dCjvaYTit8xj8KJ8i0WDHjd9V16pA66a8pD6HV/JJB/ZFL7nrJ/R6o2Tx/OTA
+         eAnTRyNnF9xYTAgRhm4XUfpGXD642NRYxQV313l2isN3CazQI0/fwxBXX4LdxMYrCiik
+         1pPLIvPvaDhFQWBQcB4HgdXmpdcVrQbLAjXgSCGgS4wF5Jw4A+BdqIcc11CRofMMU1JC
+         +1sqx6EeX5OabJsxD+xuIZRMkvKCaGbwH5Bm5lPNlcrPLxMKlwTxznNZO26emr1J70HT
+         AoAA==
+X-Gm-Message-State: AOJu0YxLHHcbMI5wkCDFghVfwaFeKIHXWrAYt2xpxogrgNj63VpoTrr1
+	I9QC6NqKef5iSt2izkfomdxQeAFgpukWBXLKQX9wGC7Xvj0ZW4SyoWzPtbBEwA==
+X-Gm-Gg: ASbGncviHx06bBGy/OGbyN8DpsGtyrtc+igXf9dnOsVM6FEOIVcYyjOEDu0SUVe4RDi
+	QznyAN4HBR7+zKaFcgTgdn8mygebkSVCkrQ9Vd+Km/ezSmbbDYo8nV9HYH4jzd1+djh53aJds+X
+	NZ2uegWiqnv+uOsCjan4Qsunj3f9twrIWB5AQ1WZKM2dBx9q1Nhs8OggvTSZogValEumPzw+dPB
+	VNtNQMvlj4i1lX1zvBTzzT8ofu10787ffYC06dqtpoQ0l5bUhZG5DIrEhykmPry+uUiRfbx9ax9
+	Xvrf0RW2pdE6J8ozEvQHnlcZiwGV+1LmLke+kxHhVRUjATCySYkyfMasewxV0DvioARTUvPJE7+
+	Rfy963P/C2VgWwchPzl5l4S/hGMeO0ACUQe9+jV3G1WY=
+X-Google-Smtp-Source: AGHT+IEVNnLQ2jmk65CTce9P//eRvAIQmDDRiRTyagNAErcaPZiz2Wexo6LbS4++siKVRx5l/ZJC5A==
+X-Received: by 2002:a05:622a:a0f:b0:4aa:9393:7b5b with SMTP id d75a77b69052e-4b11e28044cmr182328521cf.41.1755527449421;
+        Mon, 18 Aug 2025 07:30:49 -0700 (PDT)
 Received: from LOCLAP699.localdomain ([152.193.78.90])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4b11dc5aeaasm52781531cf.19.2025.08.18.07.30.46
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4b11dc5aeaasm52781531cf.19.2025.08.18.07.30.48
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 18 Aug 2025 07:30:47 -0700 (PDT)
+        Mon, 18 Aug 2025 07:30:48 -0700 (PDT)
 From: James Prestwood <prestwoj@gmail.com>
 To: iwd@lists.linux.dev
 Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH v2 3/4] auto-t: make waiting for channel switch configurable
-Date: Mon, 18 Aug 2025 07:30:40 -0700
-Message-Id: <20250818143041.283887-3-prestwoj@gmail.com>
+Subject: [PATCH v2 4/4] auto-t: add test for channel switch during roam
+Date: Mon, 18 Aug 2025 07:30:41 -0700
+Message-Id: <20250818143041.283887-4-prestwoj@gmail.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20250818143041.283887-1-prestwoj@gmail.com>
 References: <20250818143041.283887-1-prestwoj@gmail.com>
@@ -74,32 +74,134 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
+In kernel 6.8 a new CMD_ASSOCIATE failure path was added which checks
+if the AP has a channel switch in progress. Eariler patches update
+IWD into handling this case better, and this new test exercises that.
 ---
- autotests/util/hostapd.py | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+ autotests/testPSK-roam/chan_switch_test.py | 114 +++++++++++++++++++++
+ 1 file changed, 114 insertions(+)
+ create mode 100644 autotests/testPSK-roam/chan_switch_test.py
 
-diff --git a/autotests/util/hostapd.py b/autotests/util/hostapd.py
-index 611d8a63..5db5ef21 100644
---- a/autotests/util/hostapd.py
-+++ b/autotests/util/hostapd.py
-@@ -288,13 +288,15 @@ class HostapdCLI(object):
-         cmd = 'RESEND_M3 %s' % address
-         self.ctrl_sock.sendall(cmd.encode('utf-8'))
- 
--    def chan_switch(self, channel):
-+    def chan_switch(self, channel, wait=True):
-         if channel > len(chan_freq_map):
-             raise Exception("Only 2.4GHz channels supported for chan_switch")
- 
-         cmd = self.cmdline + ['chan_switch', '50', str(chan_freq_map[channel])]
-         ctx.start_process(cmd).wait()
--        self.wait_for_event('AP-CSA-FINISHED')
+diff --git a/autotests/testPSK-roam/chan_switch_test.py b/autotests/testPSK-roam/chan_switch_test.py
+new file mode 100644
+index 00000000..2e2154cf
+--- /dev/null
++++ b/autotests/testPSK-roam/chan_switch_test.py
+@@ -0,0 +1,114 @@
++#! /usr/bin/python3
 +
-+        if wait:
-+            self.wait_for_event('AP-CSA-FINISHED')
- 
-     def _get_status(self):
-         ret = {}
++import unittest
++import sys, os
++
++sys.path.append('../util')
++from iwd import IWD
++from iwd import NetworkType
++from hostapd import HostapdCLI
++from packaging import version
++from subprocess import run
++import re
++import testutil
++
++#
++# The CSA handling was added in kernel 6.8, so for any earlier kernel this test
++# won't pass.
++#
++def kernel_is_newer(min_version="6.8"):
++    proc = run(["uname",  "-r"], capture_output=True)
++
++    version_str = proc.stdout.decode("utf-8")
++    match = re.match(r"(\d+\.\d+)", version_str)
++    if not match:
++        return False
++
++    return version.parse(match.group(1)) >= version.parse(min_version)
++
++class Test(unittest.TestCase):
++    def test_channel_switch_during_roam(self):
++        wd = self.wd
++
++        device = wd.list_devices(1)[0]
++
++        ordered_network = device.get_ordered_network('TestFT', full_scan=True)
++
++        self.assertEqual(ordered_network.type, NetworkType.psk)
++
++        condition = 'not obj.connected'
++        wd.wait_for_object_condition(ordered_network.network_object, condition)
++
++        self.assertFalse(self.bss_hostapd[0].list_sta())
++        self.assertFalse(self.bss_hostapd[1].list_sta())
++
++        device.connect_bssid(self.bss_hostapd[0].bssid)
++
++        condition = 'obj.state == DeviceState.connected'
++        wd.wait_for_object_condition(device, condition)
++
++        self.bss_hostapd[0].wait_for_event('AP-STA-CONNECTED %s' % device.address)
++
++        testutil.test_iface_operstate(device.name)
++        testutil.test_ifaces_connected(self.bss_hostapd[0].ifname, device.name)
++        self.assertRaises(Exception, testutil.test_ifaces_connected,
++                          (self.bss_hostapd[1].ifname, device.name, True, True))
++
++        # Start a channel switch and wait for it to begin
++        self.bss_hostapd[1].chan_switch(6, wait=False)
++        self.bss_hostapd[1].wait_for_event("CTRL-EVENT-STARTED-CHANNEL-SWITCH")
++        # Initiate a roam immediately which should get rejected by the kernel
++        device.roam(self.bss_hostapd[1].bssid)
++
++        # IWD should authenticate, then proceed to association
++        device.wait_for_event("ft-authenticating")
++        device.wait_for_event("ft-roaming")
++
++        # The kernel should reject the association, which should trigger a
++        # disconnect
++        condition = 'obj.state == DeviceState.disconnected'
++        wd.wait_for_object_condition(device, condition)
++
++        condition = 'obj.state == DeviceState.connected'
++        wd.wait_for_object_condition(device, condition)
++
++
++    def tearDown(self):
++        os.system('ip link set "' + self.bss_hostapd[0].ifname + '" down')
++        os.system('ip link set "' + self.bss_hostapd[1].ifname + '" down')
++        os.system('ip link set "' + self.bss_hostapd[0].ifname + '" up')
++        os.system('ip link set "' + self.bss_hostapd[1].ifname + '" up')
++
++        for hapd in self.bss_hostapd:
++            hapd.default()
++
++        self.wd.stop()
++        self.wd = None
++
++    def setUp(self):
++        self.wd = IWD(True)
++
++    @classmethod
++    def setUpClass(cls):
++        if not kernel_is_newer():
++            raise unittest.SkipTest()
++
++        IWD.copy_to_storage('TestFT.psk')
++
++        cls.bss_hostapd = [ HostapdCLI(config='ft-psk-ccmp-1.conf'),
++                            HostapdCLI(config='ft-psk-ccmp-2.conf'),
++                            HostapdCLI(config='ft-psk-ccmp-3.conf') ]
++
++        unused = HostapdCLI(config='ft-psk-ccmp-3.conf')
++        unused.disable()
++
++        cls.bss_hostapd[0].set_address('12:00:00:00:00:01')
++        cls.bss_hostapd[1].set_address('12:00:00:00:00:02')
++        cls.bss_hostapd[2].set_address('12:00:00:00:00:03')
++
++        HostapdCLI.group_neighbors(*cls.bss_hostapd)
++
++    @classmethod
++    def tearDownClass(cls):
++        IWD.clear_storage()
++        cls.bss_hostapd = None
 -- 
 2.34.1
 
