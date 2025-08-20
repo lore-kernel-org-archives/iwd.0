@@ -1,97 +1,95 @@
-Received: from mail-qt1-f179.google.com (mail-qt1-f179.google.com [209.85.160.179])
+Received: from mail-oa1-f54.google.com (mail-oa1-f54.google.com [209.85.160.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6710823FC54
-	for <iwd@lists.linux.dev>; Mon, 18 Aug 2025 14:31:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49ACD32275C
+	for <iwd@lists.linux.dev>; Wed, 20 Aug 2025 16:20:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755527485; cv=none; b=r2FZkJSaQeEituwG+glgPk91Sf4IvUc0RX2ijuWrQdhUze/cdqx9B88ErRUY/+r7jkuy4wbTB6nptNWKqDIbct51vZu6KOyGzUOkeLUHCkklr2rEhq0zJP0Wd/7nw3Dix0sXDI/SJuP8XpvK6uw4IdsaQmWikzDAcdSrIL9JT+0=
+	t=1755706817; cv=none; b=aoCKpyqo0a/59x1lhjPeGDYCpTbeydXagD1j7HyVj+N4WFpNWXficQjdDietnlX0qkImfktaBkvVeN24z8XAFu0oN6LnprG0vneSst/8Rv89YPJQaJgfp59Ohv5GqIOCAuJ7SEqbJQ36FmgIeq6YVLhI790FpKxdcLshJAbkCx0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755527485; c=relaxed/simple;
-	bh=/6wP3ihWMuMPzzAhTk2pJzckLS+bjxnKqgscxfZWDX8=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Ns0iuJ+1sS6WdeuAJOefRLB+JCvnuZ9HZDQhrU8QWXYSTrxtsgnHoisWhhoYL/ONqODqEz32/v6nluNCmSjW9r7dOgwBJjLo131p5aSTad+imIoQ0ypMI37Plx4Xlmb6W/YRjVxFAN+pPWqwYPrJMfey+uMm1IMFGmF2jyp1YnY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FgT6KBv2; arc=none smtp.client-ip=209.85.160.179
+	s=arc-20240116; t=1755706817; c=relaxed/simple;
+	bh=gL67sHEGhjPMav1OMdECVo+v2HaO/4DlrUx4vXwOTXE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=QO9c1KaIuw7EXSNKvwliSRGlh38IbuaBWE6V1oYFDpvDjgcOMlig/ztK1EfPjYwa0C6BjiSZrSPPJDn5bX8BU3wcLLDJf99BGUdrpy4E8TcADvgWzfh43tBiEuMeEDDa+k8BPU3F13W0F0KfrKjqYazcqMZTJsqEuP/Qy1Nb4l8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dyxfkJnu; arc=none smtp.client-ip=209.85.160.54
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FgT6KBv2"
-Received: by mail-qt1-f179.google.com with SMTP id d75a77b69052e-4b134f1c451so16941461cf.1
-        for <iwd@lists.linux.dev>; Mon, 18 Aug 2025 07:31:24 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dyxfkJnu"
+Received: by mail-oa1-f54.google.com with SMTP id 586e51a60fabf-30cce83fb5fso85836fac.1
+        for <iwd@lists.linux.dev>; Wed, 20 Aug 2025 09:20:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1755527483; x=1756132283; darn=lists.linux.dev;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=Ha+y6ZlFXVVPDK+CFCdyAFjVQHHk7LaZkerjVDrRvbc=;
-        b=FgT6KBv2i02+nBeGgaU0dJCmOhJntVO7MXOlx18ZfOYNEMbiXoCoc/An9+3ajx3N8v
-         fxzFZv7/xg/ul/tGZKP4Lf6CPRhAxnes29rBeKbhlMGjNyLnUeyTE1N03pPUUWkRBcgH
-         toHq5W4nRDgQBy/yhlNcClECtHQ0nIoZp9OzY2Auy2HNHpt5ugWOpRLiBBbbAa+/t0pG
-         +LK9B2D1RiEauDeHywtswCUxKtb+SEOuTM+WIp6LIHPCLMXhU0cLBjoLILyxCExv3Xfc
-         FpsmxdZD1BiM+PQBFj4RtuvvTbTQJ+I2yV5eQMTKsgvkhXJL0Mw9ZEMDcwvrj0kSET+n
-         7PeA==
+        d=gmail.com; s=20230601; t=1755706815; x=1756311615; darn=lists.linux.dev;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:to:subject:user-agent:mime-version:date:message-id:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=kDSxkrijfCWDJoY0/gci6b0A8pGGiKRG85YLX4eRAQY=;
+        b=dyxfkJnu6N696nzGx6BDlFL9PZ8UXkZtB+UfTSy6wWjtXg9hYndqVx65XAKWQYLOkL
+         yXJGgABLllRPU5kbwoCXJQYRGx5wLMuNZ63xBtzSPPT41WHpDbPNBZSjjVdGVsm/SFYV
+         3eQ1eNtSFOcFI7111dJvj7deUeytotgnTu4ZUiRAE5+Ke34Q+wB9ak6SpST8GD3WdQlY
+         wcAKhbV9BhHT3U5m8pta9BIls+vWFCTR6yMhbf+qQcRyJ9UwPO1nUfyMKFxrbBWAI0pl
+         Bd7mSKPRncgeI2FNmALt0eZzzwwHxcUl+4Mk8YWv7TOhmz36WGZQ3foEqtVqI6gUrfcU
+         A5zg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755527483; x=1756132283;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Ha+y6ZlFXVVPDK+CFCdyAFjVQHHk7LaZkerjVDrRvbc=;
-        b=r5kBHnfkB335tIvtN2/E2/5Oj58pYUnUZyHUZSTVT5VRD/xGaBPa/H7CZJTqtARmhM
-         Yka+VL5khym0g3ozI19fC2QAYfm9a5y2z9MQrAT3RSxQDMQbKAI+wqKiSwryQGlJUsAr
-         qeZ6iil9sCMPbeMiTRqsZLxjWQmodU20I2aBW4VfZCi7Ak1ew68+OuBFDOA5Hmbrb30E
-         4vhQ2lt8hHZJ22QaGc+o3yKDZxrvv2vxs6yvSv1nlRj1/wX8NujIVWNFlBuOU7weH1Sq
-         HzUcYpaUjcrmFlG7dvBkr40zQCrm72zGEBcAeHPVPuro17P4zHgOGKzlRVaDCuiI0T2o
-         pcYw==
-X-Gm-Message-State: AOJu0YwWFbHJOLIrajEZjHiFLQaUz3afgcgXLklNdm9VRtY+Plk8OiNX
-	a2+ViNZF6IOlncjp5JVcDrSZZjWhllH7xSlssSdULzrUVRQy1lW+LmFiq/v0Qw==
-X-Gm-Gg: ASbGncs0GnggqziXlnZUpsT99FPBg6ZpQqywvK8H0b3HiFiANqMQLjpGIHZ+7iyBu6R
-	2q2FFUekoMYmT8xC4h5GjgRzKNDJYeK9OYasoONP1vaThuuQcu62sq4Z47gxFm5Dd6ynndAMpU8
-	dv+1CR8RoqlE8nE12XcS5HF0EiKTqcwAtp/Q2KEZxDzhVAha1X8GObpGTCxXZKSS0cUZlxcZgSF
-	0DjZsAajajo9gRJMHGeAgro6n0ZwEjogh1wKdDp3Jq3pv4EliHBpCeZ5y+1E4gDoHbEbBm7QUn/
-	9bxBVAr5IW5L4o+oeZkPhH+G87mMJC1MMyAXPDT+Y9jnurU7wIvqcROL/jMF69vOR7Bpgkc9jfV
-	H988+CVgllFqqKdkmZxjgAU8TvM2apDjP
-X-Google-Smtp-Source: AGHT+IG35jKkU6fDUUfHX1lJOiwGcEwQokrRkkjsveJKIpefFu3dhj7/86LAfFn/HwHssEowPdjCag==
-X-Received: by 2002:ac8:7d92:0:b0:4af:f25d:e2b0 with SMTP id d75a77b69052e-4b12a5cde92mr125437841cf.8.1755527445459;
-        Mon, 18 Aug 2025 07:30:45 -0700 (PDT)
-Received: from LOCLAP699.localdomain ([152.193.78.90])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4b11dc5aeaasm52781531cf.19.2025.08.18.07.30.44
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 18 Aug 2025 07:30:44 -0700 (PDT)
-From: James Prestwood <prestwoj@gmail.com>
-To: iwd@lists.linux.dev
-Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH v2 1/4] netdev: check connected in channel switch event
-Date: Mon, 18 Aug 2025 07:30:38 -0700
-Message-Id: <20250818143041.283887-1-prestwoj@gmail.com>
-X-Mailer: git-send-email 2.34.1
+        d=1e100.net; s=20230601; t=1755706815; x=1756311615;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=kDSxkrijfCWDJoY0/gci6b0A8pGGiKRG85YLX4eRAQY=;
+        b=rsaqSgDuimw8cM3S4m3UaRnLLJjd00Zd7JyZKPsLEFSQRBSEE7zGQOcZHDHXOozTNw
+         fbfCgz4h/RaCftsEcZVdy5rhvsT9+WohD30+gTuVszltXjUHluzMBd8syF16gnodUiXx
+         G+q2oW7XS12gD+yON5PrwmGSZCVXlT9rH+z5xpN3CCFY5I98aqVzLsqQXjV+5ELPIjxV
+         b3qP/YObvAAq95qsuWsOvpseJ4lkZhxDz6W3OOiHzgO4I7SvV2qdtyMtCENDCXUoCmsP
+         WTPVj9B1V3sThif/eNN7e1bm2eWhLNGQ2QX4USuA3imeLGC+GFfN/uaTHJddgZncwT9O
+         reNg==
+X-Forwarded-Encrypted: i=1; AJvYcCVVmZdC3hTZR9uBMvJyP/UCrMOFZxhlPv7zviAm2dlE6c+MFzYfUTJ6FzXUneeAlIQ8wZI=@lists.linux.dev
+X-Gm-Message-State: AOJu0YzwJbnC00ud43EE0VaJ6PPmiVaFepHuT67haXPre4Sps+gJM9np
+	YtGVdxkvgLvo20O5nk7TffIhefWeJPnVnHlaHZ9QX4aYftkSozl0h50u
+X-Gm-Gg: ASbGncuvzb8CvQ37NpjQjg5C3MQ/yYh5iskopoUJ/Vbom2p/gio0x2vFZBWTXcAxMr8
+	WATCiIKg60BnkQZJ9v4lCOEIjPRixcutGLw5++yaN6u4qhnviHrV30t4oTtUU/hJX34DZ9Mx/LL
+	5mU0FViH+BZL04Nr/eIl801BVAWu8yiK+z2FJqllqEBaqtJOrqeSSXxdYTpa4MM6zwWDA0Ox7O8
+	unkLWLoGtVhVWD5RATVjYhV2iPO8nLD/jxNFbIcGIG+47C+aFE7bVFjzCXjXzo0XKQJtTfUARuD
+	ABH68RcrMc3eFepV0uxDFYoUH7rIAqUI9WWREoSR0+7XHx/uNnTmsCjnI2KIjpYFbr+i7onijoa
+	7KELy5pcNqw7gT7OZ9L6Bv88uEjNkUIrsJdOWAqpRplDEJikuVrLiufZMD8QAC3fmJoLLXtRoFl
+	8=
+X-Google-Smtp-Source: AGHT+IHlq/OoQ5KMMelaXDRUkBrJLPQktrSkWMTA4WOuOfQlV9a/1e2dWuPUGHg4Hr1rWrQhxmGDmQ==
+X-Received: by 2002:a05:6870:e070:b0:30b:aeca:d9b1 with SMTP id 586e51a60fabf-31122a56200mr1877024fac.38.1755706815045;
+        Wed, 20 Aug 2025 09:20:15 -0700 (PDT)
+Received: from [172.16.49.130] (syn-070-114-247-242.res.spectrum.com. [70.114.247.242])
+        by smtp.googlemail.com with ESMTPSA id 586e51a60fabf-310abbb405asm4307373fac.30.2025.08.20.09.20.14
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 20 Aug 2025 09:20:14 -0700 (PDT)
+Message-ID: <efd97b52-0b85-4429-8760-01ae21b5d04f@gmail.com>
+Date: Wed, 20 Aug 2025 11:20:13 -0500
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 1/4] netdev: check connected in channel switch event
+To: James Prestwood <prestwoj@gmail.com>, iwd@lists.linux.dev
+References: <20250818143041.283887-1-prestwoj@gmail.com>
+Content-Language: en-US
+From: Denis Kenzior <denkenz@gmail.com>
+In-Reply-To: <20250818143041.283887-1-prestwoj@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-In an ideal world userspace should never be getting a channel switch
-event unless connected to an AP, but alas this has been seen at least
-with ath10k hardware. This causes IWD to crash since the logic
-assumes netdev->handshake is set.
----
- src/netdev.c | 3 +++
- 1 file changed, 3 insertions(+)
+Hi James,
 
-diff --git a/src/netdev.c b/src/netdev.c
-index 53a97cbd..ca8bfea0 100644
---- a/src/netdev.c
-+++ b/src/netdev.c
-@@ -5402,6 +5402,9 @@ static void netdev_channel_switch_event(struct l_genl_msg *msg,
- 	if (netdev->type != NL80211_IFTYPE_STATION)
- 		return;
- 
-+	if (L_WARN_ON(!netdev->connected))
-+		return;
-+
- 	chandef = l_new(struct band_chandef, 1);
- 
- 	if (nl80211_parse_chandef(msg, chandef) < 0) {
--- 
-2.34.1
+On 8/18/25 9:30 AM, James Prestwood wrote:
+> In an ideal world userspace should never be getting a channel switch
+> event unless connected to an AP, but alas this has been seen at least
+> with ath10k hardware. This causes IWD to crash since the logic
+> assumes netdev->handshake is set.
+> ---
+>   src/netdev.c | 3 +++
+>   1 file changed, 3 insertions(+)
+> 
 
+All applied, thanks.
+
+Regards,
+-Denis
