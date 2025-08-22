@@ -1,95 +1,159 @@
-Received: from mail-oa1-f54.google.com (mail-oa1-f54.google.com [209.85.160.54])
+Received: from mail-qt1-f175.google.com (mail-qt1-f175.google.com [209.85.160.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49ACD32275C
-	for <iwd@lists.linux.dev>; Wed, 20 Aug 2025 16:20:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61C348F7D
+	for <iwd@lists.linux.dev>; Fri, 22 Aug 2025 19:51:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755706817; cv=none; b=aoCKpyqo0a/59x1lhjPeGDYCpTbeydXagD1j7HyVj+N4WFpNWXficQjdDietnlX0qkImfktaBkvVeN24z8XAFu0oN6LnprG0vneSst/8Rv89YPJQaJgfp59Ohv5GqIOCAuJ7SEqbJQ36FmgIeq6YVLhI790FpKxdcLshJAbkCx0=
+	t=1755892286; cv=none; b=uNH0mVd0/WEZROD3su0kFfJJfuB4YZDttFUkJiqOkDi1bVTSwdNV+L7g+sf+9woHKo2uQeb9mujepMkyKDEPwsyV2pGNH8t9eT4+I7YcwkxE4cy3AtrvbjTuLdq8m36Qb8Py9vrhFhZn8E47TuExd3RtOBX7RigD3oScThR5YLQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755706817; c=relaxed/simple;
-	bh=gL67sHEGhjPMav1OMdECVo+v2HaO/4DlrUx4vXwOTXE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=QO9c1KaIuw7EXSNKvwliSRGlh38IbuaBWE6V1oYFDpvDjgcOMlig/ztK1EfPjYwa0C6BjiSZrSPPJDn5bX8BU3wcLLDJf99BGUdrpy4E8TcADvgWzfh43tBiEuMeEDDa+k8BPU3F13W0F0KfrKjqYazcqMZTJsqEuP/Qy1Nb4l8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dyxfkJnu; arc=none smtp.client-ip=209.85.160.54
+	s=arc-20240116; t=1755892286; c=relaxed/simple;
+	bh=VW7fFTrUwSHKn8l8z6LnoD7sgr3QBsPPrILqdX+KHEw=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Sk3asO/frS0EyZ7qHYeCh4KYTaUNeHEMv9i3AHdWMtMPCLPRNEts4jl8trNkcv1ePT0pqCAxcs/bYxfWguOkyJIkzox8qubTL2/9zoA5dHETZLlNGqylM7JPI3FnNDKwecIPsowjrHjkLPGFqpuN2svLplrRbcOCLpQcETW2Bh8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Wl7Gy3jr; arc=none smtp.client-ip=209.85.160.175
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dyxfkJnu"
-Received: by mail-oa1-f54.google.com with SMTP id 586e51a60fabf-30cce83fb5fso85836fac.1
-        for <iwd@lists.linux.dev>; Wed, 20 Aug 2025 09:20:16 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Wl7Gy3jr"
+Received: by mail-qt1-f175.google.com with SMTP id d75a77b69052e-4b1098f9e9eso37029831cf.0
+        for <iwd@lists.linux.dev>; Fri, 22 Aug 2025 12:51:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1755706815; x=1756311615; darn=lists.linux.dev;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=kDSxkrijfCWDJoY0/gci6b0A8pGGiKRG85YLX4eRAQY=;
-        b=dyxfkJnu6N696nzGx6BDlFL9PZ8UXkZtB+UfTSy6wWjtXg9hYndqVx65XAKWQYLOkL
-         yXJGgABLllRPU5kbwoCXJQYRGx5wLMuNZ63xBtzSPPT41WHpDbPNBZSjjVdGVsm/SFYV
-         3eQ1eNtSFOcFI7111dJvj7deUeytotgnTu4ZUiRAE5+Ke34Q+wB9ak6SpST8GD3WdQlY
-         wcAKhbV9BhHT3U5m8pta9BIls+vWFCTR6yMhbf+qQcRyJ9UwPO1nUfyMKFxrbBWAI0pl
-         Bd7mSKPRncgeI2FNmALt0eZzzwwHxcUl+4Mk8YWv7TOhmz36WGZQ3foEqtVqI6gUrfcU
-         A5zg==
+        d=gmail.com; s=20230601; t=1755892284; x=1756497084; darn=lists.linux.dev;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=p+ewRJy0huCgKqJ8wJH8W0YxPlOZmCMzdNyDGxm7NR8=;
+        b=Wl7Gy3jr/Y3jW/RsQWB6dS80hL+I11VbIgsICX4JY8u/YcR5qJdUVlFdd2abnqAtqV
+         duMAMzjVFtBdSaNBcFpAfoFkOGdisLKkvtoiTsmU+BBhOrsn+ZcGpQcIlyT4XnlJ9b3Y
+         rPzYlzQPiaMuIZjUsD2nrwZuz0sDi8Eb8tJYd7xAD+1oLSKGnVYt26om+xfPWl0rzOTs
+         bZJkqrgHvxR6GasxboIs5M8GwWctKyl0B1FtSvxRSx/sBBmbUukXuSaN3MoHBHxsMIHI
+         0mXi+unjlaZ9wiTTZEoCQ0eG+U+lLTgcrSnogEXJGe+L2+DwtCSsroa8EJGzWGUFD2cR
+         GTVw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755706815; x=1756311615;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=kDSxkrijfCWDJoY0/gci6b0A8pGGiKRG85YLX4eRAQY=;
-        b=rsaqSgDuimw8cM3S4m3UaRnLLJjd00Zd7JyZKPsLEFSQRBSEE7zGQOcZHDHXOozTNw
-         fbfCgz4h/RaCftsEcZVdy5rhvsT9+WohD30+gTuVszltXjUHluzMBd8syF16gnodUiXx
-         G+q2oW7XS12gD+yON5PrwmGSZCVXlT9rH+z5xpN3CCFY5I98aqVzLsqQXjV+5ELPIjxV
-         b3qP/YObvAAq95qsuWsOvpseJ4lkZhxDz6W3OOiHzgO4I7SvV2qdtyMtCENDCXUoCmsP
-         WTPVj9B1V3sThif/eNN7e1bm2eWhLNGQ2QX4USuA3imeLGC+GFfN/uaTHJddgZncwT9O
-         reNg==
-X-Forwarded-Encrypted: i=1; AJvYcCVVmZdC3hTZR9uBMvJyP/UCrMOFZxhlPv7zviAm2dlE6c+MFzYfUTJ6FzXUneeAlIQ8wZI=@lists.linux.dev
-X-Gm-Message-State: AOJu0YzwJbnC00ud43EE0VaJ6PPmiVaFepHuT67haXPre4Sps+gJM9np
-	YtGVdxkvgLvo20O5nk7TffIhefWeJPnVnHlaHZ9QX4aYftkSozl0h50u
-X-Gm-Gg: ASbGncuvzb8CvQ37NpjQjg5C3MQ/yYh5iskopoUJ/Vbom2p/gio0x2vFZBWTXcAxMr8
-	WATCiIKg60BnkQZJ9v4lCOEIjPRixcutGLw5++yaN6u4qhnviHrV30t4oTtUU/hJX34DZ9Mx/LL
-	5mU0FViH+BZL04Nr/eIl801BVAWu8yiK+z2FJqllqEBaqtJOrqeSSXxdYTpa4MM6zwWDA0Ox7O8
-	unkLWLoGtVhVWD5RATVjYhV2iPO8nLD/jxNFbIcGIG+47C+aFE7bVFjzCXjXzo0XKQJtTfUARuD
-	ABH68RcrMc3eFepV0uxDFYoUH7rIAqUI9WWREoSR0+7XHx/uNnTmsCjnI2KIjpYFbr+i7onijoa
-	7KELy5pcNqw7gT7OZ9L6Bv88uEjNkUIrsJdOWAqpRplDEJikuVrLiufZMD8QAC3fmJoLLXtRoFl
-	8=
-X-Google-Smtp-Source: AGHT+IHlq/OoQ5KMMelaXDRUkBrJLPQktrSkWMTA4WOuOfQlV9a/1e2dWuPUGHg4Hr1rWrQhxmGDmQ==
-X-Received: by 2002:a05:6870:e070:b0:30b:aeca:d9b1 with SMTP id 586e51a60fabf-31122a56200mr1877024fac.38.1755706815045;
-        Wed, 20 Aug 2025 09:20:15 -0700 (PDT)
-Received: from [172.16.49.130] (syn-070-114-247-242.res.spectrum.com. [70.114.247.242])
-        by smtp.googlemail.com with ESMTPSA id 586e51a60fabf-310abbb405asm4307373fac.30.2025.08.20.09.20.14
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 20 Aug 2025 09:20:14 -0700 (PDT)
-Message-ID: <efd97b52-0b85-4429-8760-01ae21b5d04f@gmail.com>
-Date: Wed, 20 Aug 2025 11:20:13 -0500
+        d=1e100.net; s=20230601; t=1755892284; x=1756497084;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=p+ewRJy0huCgKqJ8wJH8W0YxPlOZmCMzdNyDGxm7NR8=;
+        b=WmP62snOWhifGumcTAiaJDLZG9N363f38cM4SlVe3rR/CNGvPeK7IOtAnD4xu1PmKW
+         LspVHqgR6LAW+F2itRvCUqtoF/2sU+6ril9uWWxpTCaKDV6Qr2RtLi5X4iFAtUtBJ6mK
+         wYhaOHjC3PtGbK6GzATpaXNRkWJOiB5HdXuXV0Wm8GTAphRKXRSfLuhPPDHlZCnKV8zX
+         THKpJH9+brDVX9FOJS9KKn3uhzi81cIR5AxXnF4P030Kkq1p6JDerpcCdKUJ+1NQEA1t
+         g1x0jkAe3Kq2b5uzBxiLch9lAZZQT+uQpwtJubKpnUFSGKeQp39nrontZCI8gBCkfxoh
+         LhRg==
+X-Gm-Message-State: AOJu0YwtuEGoMxOHH5O0N72i2pFJJtUXDSN4N8h0OF7uXurjGFULjniH
+	+N6+2LVvZvjdZV3cIvVmauTQsIZbeFFpPYUALHCSnL1r/LBR3ylGAbr6TjnRFQ==
+X-Gm-Gg: ASbGncvRbREM5yzG2aUu43PehBbXOezxHXTNYQ0pTxrz+2XWmGqgcNwDjIPcmcTbwns
+	Dko8skJqGHo/4IR59oel8K8i8b3O0tJBR99G3eyidqjp0EI1W+ngBhflGjxp20AXeWhI/g6VX69
+	0oPmImRD59jwdXZYH9xmEcENn4nhi6rBYcjlIr0OgDm6v0W80HaYftb/hvXsteMUTUfG/Ud3jTa
+	2RoOyCCRSfkLusA/C5j1hFR9RJh3hbRG2uHOpW543hjszgF5lcyTCmFi5KkP2BgkSl31Hf61mkM
+	+15SZn5EPTZgFkgfIE7gMDn6/xhdexdsBbqN9tl56w+F+/DZTQb9DwZ3bNKOUU4qCXgFmWx86fo
+	lA6VpXic65od0P9VE4cNqVrQvwRLUqPmF
+X-Google-Smtp-Source: AGHT+IHzomhYImD2vJD7qk57Gr3GkwDGBx1uKgJNvj6R3VjaCAwogFEO52/Fe9LHdPKxgqwYpOC8ew==
+X-Received: by 2002:a05:622a:1993:b0:4b0:8057:1de9 with SMTP id d75a77b69052e-4b2aaa19f21mr51027041cf.3.1755892283827;
+        Fri, 22 Aug 2025 12:51:23 -0700 (PDT)
+Received: from LOCLAP699.localdomain ([152.193.78.90])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4b2b8e45c4asm4913221cf.46.2025.08.22.12.51.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 22 Aug 2025 12:51:23 -0700 (PDT)
+From: James Prestwood <prestwoj@gmail.com>
+To: iwd@lists.linux.dev
+Cc: James Prestwood <prestwoj@gmail.com>
+Subject: [PATCH 01/15] wiphy: add driver quirk for the colocated scan flag
+Date: Fri, 22 Aug 2025 12:51:04 -0700
+Message-Id: <20250822195118.271122-1-prestwoj@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 1/4] netdev: check connected in channel switch event
-To: James Prestwood <prestwoj@gmail.com>, iwd@lists.linux.dev
-References: <20250818143041.283887-1-prestwoj@gmail.com>
-Content-Language: en-US
-From: Denis Kenzior <denkenz@gmail.com>
-In-Reply-To: <20250818143041.283887-1-prestwoj@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-Hi James,
+Some drivers do not handle the colocated scan flag very well and this
+results in BSS's not being seen in scans. This of course results in
+very poor behavior.
 
-On 8/18/25 9:30 AM, James Prestwood wrote:
-> In an ideal world userspace should never be getting a channel switch
-> event unless connected to an AP, but alas this has been seen at least
-> with ath10k hardware. This causes IWD to crash since the logic
-> assumes netdev->handshake is set.
-> ---
->   src/netdev.c | 3 +++
->   1 file changed, 3 insertions(+)
-> 
+This has been seen on ath11k specifically but after some
+conversations [1] on the linux-wireless mailing list others have
+reported issues with iwlwifi acting similarly. Since there are many
+hardware variants that use both ath11k and iwlwifi this new quirk
+isn't being forced to those drivers, but let users configure IWD to
+disable the flag if needed.
 
-All applied, thanks.
+[1] https://lore.kernel.org/linux-wireless/d1e75a08-047d-7947-d51a-2e486efead77@candelatech.com/
+---
+ src/wiphy.c | 23 +++++++++++++++++------
+ src/wiphy.h |  1 +
+ 2 files changed, 18 insertions(+), 6 deletions(-)
 
-Regards,
--Denis
+diff --git a/src/wiphy.c b/src/wiphy.c
+index fb544fe6..c7f2805e 100644
+--- a/src/wiphy.c
++++ b/src/wiphy.c
+@@ -75,6 +75,8 @@ enum driver_flag {
+ 	OWE_DISABLE = 0x8,
+ 	MULTICAST_RX_DISABLE = 0x10,
+ 	SAE_DISABLE = 0x20,
++	/* Disables use of the NL80211_SCAN_FLAG_COLOCATED_6GHZ flag in scans */
++	COLOCATED_SCAN_DISABLE = 0x40,
+ };
+ 
+ struct driver_flag_name {
+@@ -103,12 +105,13 @@ static const struct driver_info driver_infos[] = {
+ };
+ 
+ static const struct driver_flag_name driver_flag_names[] = {
+-	{ "DefaultInterface",   DEFAULT_IF },
+-	{ "ForcePae",           FORCE_PAE },
+-	{ "PowerSaveDisable",   POWER_SAVE_DISABLE },
+-	{ "OweDisable",         OWE_DISABLE },
+-	{ "MulticastRxDisable", MULTICAST_RX_DISABLE },
+-	{ "SaeDisable",         SAE_DISABLE },
++	{ "DefaultInterface",     DEFAULT_IF },
++	{ "ForcePae",             FORCE_PAE },
++	{ "PowerSaveDisable",     POWER_SAVE_DISABLE },
++	{ "OweDisable",           OWE_DISABLE },
++	{ "MulticastRxDisable",   MULTICAST_RX_DISABLE },
++	{ "SaeDisable",           SAE_DISABLE },
++	{ "ColocatedScanDisable", COLOCATED_SCAN_DISABLE },
+ };
+ 
+ struct wiphy {
+@@ -963,6 +966,11 @@ bool wiphy_supports_multicast_rx(const struct wiphy *wiphy)
+ 				!(wiphy->driver_flags & MULTICAST_RX_DISABLE);
+ }
+ 
++bool wiphy_supports_colocated_flag(const struct wiphy *wiphy)
++{
++	return !(wiphy->driver_flags & COLOCATED_SCAN_DISABLE);
++}
++
+ const uint8_t *wiphy_get_ht_capabilities(const struct wiphy *wiphy,
+ 						enum band_freq band,
+ 						size_t *size)
+@@ -1382,6 +1390,9 @@ static void wiphy_print_basic_info(struct wiphy *wiphy)
+ 		if (wiphy->driver_flags & SAE_DISABLE)
+ 			flags = l_strv_append(flags, "SaeDisable");
+ 
++		if (wiphy->driver_flags & COLOCATED_SCAN_DISABLE)
++			flags = l_strv_append(flags, "ColocatedScanDisable");
++
+ 		joined = l_strjoinv(flags, ' ');
+ 
+ 		l_info("\tDriver Flags: %s", joined);
+diff --git a/src/wiphy.h b/src/wiphy.h
+index 9fcbdcd2..19d79405 100644
+--- a/src/wiphy.h
++++ b/src/wiphy.h
+@@ -144,6 +144,7 @@ bool wiphy_country_is_unknown(struct wiphy *wiphy);
+ bool wiphy_supports_uapsd(const struct wiphy *wiphy);
+ bool wiphy_supports_cmd_offchannel(const struct wiphy *wiphy);
+ bool wiphy_supports_multicast_rx(const struct wiphy *wiphy);
++bool wiphy_supports_colocated_flag(const struct wiphy *wiphy);
+ 
+ const uint8_t *wiphy_get_ht_capabilities(const struct wiphy *wiphy,
+ 						enum band_freq band,
+-- 
+2.34.1
+
