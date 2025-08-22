@@ -1,68 +1,68 @@
-Received: from mail-qt1-f173.google.com (mail-qt1-f173.google.com [209.85.160.173])
+Received: from mail-qt1-f180.google.com (mail-qt1-f180.google.com [209.85.160.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 455F22D63F8
-	for <iwd@lists.linux.dev>; Fri, 22 Aug 2025 19:51:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7ECC02D6619
+	for <iwd@lists.linux.dev>; Fri, 22 Aug 2025 19:51:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755892301; cv=none; b=quXbSwEt0YjX6wq3QYiX2TN6vngGkBDX/M8ex1qoW4AoQuAVowRjAmAQSI/FYy7JVGebpOC+LNLxuzL4EPmLrfUC0YffebeTkttOOsZX9oeO1AbJp3rPqrmATafhyBCTJqpmD4VV6/SLV2uF/J1So5YWWd4v6lU+L4Si6u2lz7w=
+	t=1755892303; cv=none; b=Hqr1/vX0uTJIM5Fn+ZfIPcy1s4griYZjQpgY1IPn2mxfwlC3EfXVSwyRvQAnugae3TBykVuJNd02p3J7TkhadWEyjh6WlaViFyhavblb+QUwj9rUR68WrYFFbP0U5rZBph7A4At5JAlLfxNATwGc7EO7UyKFHfK520F+zoB9PsE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755892301; c=relaxed/simple;
-	bh=+FoAYuymTJ81sP4i7Ah69UN0+sTLWD+4RVb7gxMxN0g=;
+	s=arc-20240116; t=1755892303; c=relaxed/simple;
+	bh=7VlNY/851JRO4RvwESB27kQxwaGJL0z6s/t27dLog7E=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=MsYjvKpwNJ1gA+LecKtHVLaM6R9QjI9l27OAGe3SrpBG8HOlFHWPzmUinm3ybMecqg8L/8dV1KO3Nr8Pei3ex1HICIY/DZVESz3ik3KQ32guE327DEDNHGbU8e2pAuhAUGPbEizJtMZfFAF2XSjNSXf/O/POw6Ov8htNLdSc7bw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EUjhLane; arc=none smtp.client-ip=209.85.160.173
+	 MIME-Version; b=F4lJZ5fUWnn533YfMRudb4fPd1MYgoeWc8a3DmBFycwEIaBNhXXDxX0BN4QXlfyMRBwoTCribwDkLxVOwbOG4D80x8PvgnnmEgjW+DZv83ikB4kvcHGtJ1pKWZ17ISpKlV53HX/X6TBCrRBa8+ezcLLIXDR9ApiK/Mg3VbZvZII=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bjUsRFiR; arc=none smtp.client-ip=209.85.160.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EUjhLane"
-Received: by mail-qt1-f173.google.com with SMTP id d75a77b69052e-4b0fa7ed37dso35765551cf.0
-        for <iwd@lists.linux.dev>; Fri, 22 Aug 2025 12:51:40 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bjUsRFiR"
+Received: by mail-qt1-f180.google.com with SMTP id d75a77b69052e-4b2b859ab0dso4322721cf.1
+        for <iwd@lists.linux.dev>; Fri, 22 Aug 2025 12:51:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1755892299; x=1756497099; darn=lists.linux.dev;
+        d=gmail.com; s=20230601; t=1755892300; x=1756497100; darn=lists.linux.dev;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=9CC0BmGamT1D4MDMJVNXRH0F7SgMDOadEDPNFc3yG9s=;
-        b=EUjhLaneJJ4F0k3EcCQZvmv90uX4ZPmLiRodxiobQiGxk5/B8Pq7NpxwevkwzU3Phx
-         Ekm7mrvmZQCX7+Fwb2QvIv1rvBifVAR2HAOtFbVk+AVxwWFM4AVLponJxcpDxGCNvs7p
-         iFtdvJ7sVv6V8LJHviOh2O/tnDq3amWFtDMzRs/Gq18lheS7hk4UKoQEp/sZychyD31Z
-         b1VKZR2H0+ce5wHUZyb8mjO4gt1GYxwFTqIIvb+n4j0VIuFnOw6PCUpWpDBK4OWa7W+s
-         9/zhYNVZ+2/yPkNp+Z24bHvBUn/p/+fONZGGN6iSWjhXVoEwGRsGNl5aZhRveKMozmXU
-         wPqQ==
+        bh=AUKbYEpSS4YycBHtvd76BDCBoxH58/4gnu2INf/V0Lg=;
+        b=bjUsRFiR6L/L2is0KIkpkFrVuMwpqvquAz+qdEgDBJUnESr9UU2S3BMopXlKH/HElR
+         2j0EMW8uv0h58tXR4amM47r2zLdgXpCNL1csRDZRBtfCX17iEYZ6fUUXk83KvHAWNjj/
+         nDltqVEeuYIzi2PyxQ/8dr5fK1YRT12dppwYrz9mSqFBXmv2G6+PUIkdlbWoQ7j5qNoO
+         GqaPwA91ww6xCriKGBRpDnQab+zshJRDeKg+oyvoOwahT+9miNwLQum7l9gME5r61rjR
+         N2BLN2GbgY1q/UL6Z1TfKNrk1mq443mgbw1XadyMOsivyNbz4lg2NQxR9qF7y8NTNf7I
+         S+DQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755892299; x=1756497099;
+        d=1e100.net; s=20230601; t=1755892300; x=1756497100;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=9CC0BmGamT1D4MDMJVNXRH0F7SgMDOadEDPNFc3yG9s=;
-        b=XJDjYkdmxb6dE0bZdTzHBBLLTH0luDzH9kHQ2jy2TSehB1FV7WSNgirQrS8COLz4p4
-         6XU44a21iNq2veT79+TDHCcyCm4J0/FDudz/Kt4fH6mo6bu7806IZgPlUmFbiUXW6Nnt
-         B1KpcXcWkyctB6uOQIWdRLntiIa0+IF0O84JZeAmWsjX1auDTdmktUB54pSj2zcaXAsc
-         MjfuCQxZQoS9ZPdW6Csr5PUF4Rsy7EYfmlBRAXEOkDnQFPypGzyvDPPl1hIWJ20mEiPJ
-         XtMAyoWXKiFsPn11eW09STlACdvRI78RPmavfcUuTpF98yvp4NfNuDx9/gA6xGvAzWC9
-         00rA==
-X-Gm-Message-State: AOJu0Yzd5ZEV9+WoSBEsv2txBtmSDDwMy0WFmOrWrbw75qld2x66Fy5j
-	2AjuGklpO4kvAj9Jl9Vhi+3LxmKZKfHFngSitn1k5HvbvVKEDkqnI0aYMv/DVg==
-X-Gm-Gg: ASbGncsGbsNS4uUcWKSy1b6Xnkzf9OniGdgghMKj0epWjRYzSJvfkzlJ4xmsbyfwfsG
-	CaSlbRoadQknDPh4wCovPYOI5+PadZkkC7ECCgjmhOeilJt87tk0YNhdsGA49DlNPCzUWcevVrK
-	BusAZS/KOFQ/fwlTeyFgFXh5y2yq9ru9xBWIAtDeUFtLKvA4+R3llqS8F0KGZ/rc2azQ97egZBz
-	P0b5g2+2DeWoexy7q2W2YoXnqQ5QLgZMIPTmg6VAA4jXTWdvKegitrjhDOfsST2brBhulES3xpa
-	b6Qtjh2R8FfE5/KgZvy2MD11qh5PTA2HsURLpQgQ+y0UstTD5kPIxCp0M/RNzg715rHZe6hFmMp
-	PTs+XOqBLPbefBc/gBePv8GQY3pg5PT16
-X-Google-Smtp-Source: AGHT+IEmlJhaCrUEL76QVG2vtzJN/RMIRSEZx3OycMW/HTe4bjezUGUip0KXAUijtxQeEp7B2RZJww==
-X-Received: by 2002:a05:622a:438f:b0:4b1:22af:3984 with SMTP id d75a77b69052e-4b29ff900b2mr64265531cf.16.1755892298720;
-        Fri, 22 Aug 2025 12:51:38 -0700 (PDT)
+        bh=AUKbYEpSS4YycBHtvd76BDCBoxH58/4gnu2INf/V0Lg=;
+        b=G+6In0AWnLbdp+i/LQjOYQ+qCQUNTnfSLdrAUjQKBcAAqke8vtmR/DsRDbAD0R4NGL
+         JEdH+QPEBEZM4iuk6/p2RFqN+iB4zC3knMhAA67S3G4seTEhX/E9mDZlghaRuyoXtSPX
+         xXNr4Jkda9a7dH67rOhn8F0tRp1EFbuRyCQrI+oLzYVbkakIysvVzkr77icGKpzQhRc4
+         5Oas/we5vjYUCKgbQmG4LetdnaatJ+JC6V2F5GfVFeyo0AbwNKzAH6ZEV8cIdAmXS0Gb
+         PYCzLUPTAR428K5jPgL7RmpOEPoP7GteZ1j/rgzua2X6hXLJz5OHL5FMApflxR6WPcgH
+         Skfg==
+X-Gm-Message-State: AOJu0YwyvlQXxa/xeCTb0rCfCP6tVRNSKS1J2CfHPHw1KSudfNDhPZ+Z
+	VY29bwqiyrJnGF8/rSx4Bz+1UsHDyRpneJHB9YFA9/rvVOrfb0dU36foQDvVpQ==
+X-Gm-Gg: ASbGncsUhWbrrCWe3pnKcxaTwAsZnfEfMjSoWg6Hn159aG+2jCAiANv9pTmhYB8xjkc
+	jcKwg5sAVFIBp5/JVbJXtYvDI3g+BA/c1fe0BercFsUQtpnPGrz4gK0NFDypSmPDt7TwGjqDuKo
+	jkzIhSGcbOdYdqWUCqhEW+az6vVgeqDBWyUV5LJP5Wrms82AduFwM3DYwh5k7WPo3HfpVgNRwxt
+	0zKv5R/i2A+8S60PoaOfoWWfuI01dpSLZOeVPNt0GmVj26TJH0+fL9BYGVZWszXHCq6Z1AX/fq8
+	BCuido2YNk7NpEnj9g/jyXiIt7czPljgnIZEl+T4ta7SEP8ejBkqJ2TVTmX5+6Hz3R45EARwQ5f
+	ZDN/sQsbm6x/rZKJmpOyFkdfFOB3FIds2
+X-Google-Smtp-Source: AGHT+IFhtdvC/TWhPfYooy5X8Tyhlxbqp+69J+U6/4z3EKxOMtJX+iExvcwqk63izBQoHjaTAYx/1g==
+X-Received: by 2002:a05:622a:2512:b0:4b2:9b6b:3e with SMTP id d75a77b69052e-4b2aaaa4fd4mr50360191cf.36.1755892300010;
+        Fri, 22 Aug 2025 12:51:40 -0700 (PDT)
 Received: from LOCLAP699.localdomain ([152.193.78.90])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4b2b8e45c4asm4913221cf.46.2025.08.22.12.51.37
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4b2b8e45c4asm4913221cf.46.2025.08.22.12.51.38
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 22 Aug 2025 12:51:38 -0700 (PDT)
+        Fri, 22 Aug 2025 12:51:39 -0700 (PDT)
 From: James Prestwood <prestwoj@gmail.com>
 To: iwd@lists.linux.dev
 Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH 13/15] station: check vendor quirk for BSS TM request candidate list
-Date: Fri, 22 Aug 2025 12:51:16 -0700
-Message-Id: <20250822195118.271122-13-prestwoj@gmail.com>
+Subject: [PATCH 14/15] station: clear roam_freqs on delayed roam
+Date: Fri, 22 Aug 2025 12:51:17 -0700
+Message-Id: <20250822195118.271122-14-prestwoj@gmail.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20250822195118.271122-1-prestwoj@gmail.com>
 References: <20250822195118.271122-1-prestwoj@gmail.com>
@@ -74,35 +74,29 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-If the AP vendor has known issues with the preferred candidate list
-ignore it and jump directly to requesting a neighbor report.
+If there were no BSS candidates found after trying to roam make
+sure the old roam_freqs list gets cleared so IWD doesn't end up
+scanning potentially old frequencies on the next retry.
 ---
- src/station.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+ src/station.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
 diff --git a/src/station.c b/src/station.c
-index 4919f89e..3424964d 100644
+index 3424964d..968aafb0 100644
 --- a/src/station.c
 +++ b/src/station.c
-@@ -64,6 +64,7 @@
- #include "src/eap-tls-common.h"
- #include "src/storage.h"
- #include "src/pmksa.h"
-+#include "src/vendor_quirks.h"
+@@ -2407,6 +2407,11 @@ static void station_roam_retry(struct station *station)
+ 	station->roam_scan_full = false;
+ 	station->ap_directed_roaming = false;
  
- #define STATION_RECENT_NETWORK_LIMIT	5
- #define STATION_RECENT_FREQS_LIMIT	5
-@@ -3378,7 +3379,9 @@ static void station_ap_directed_roam(struct station *station,
- 	l_timeout_remove(station->roam_trigger_timeout);
- 	station->roam_trigger_timeout = NULL;
- 
--	if (req_mode & WNM_REQUEST_MODE_PREFERRED_CANDIDATE_LIST) {
-+	if ((req_mode & WNM_REQUEST_MODE_PREFERRED_CANDIDATE_LIST) &&
-+				!(station->connected_bss->vendor_quirks &
-+				VENDOR_QUIRK_BAD_BSS_TM_CANDIDATE_LIST)) {
- 		l_debug("roam: AP sent a preferred candidate list");
- 		station_neighbor_report_cb(station->netdev, 0, body + pos,
- 				body_len - pos, station);
++	if (station->roam_freqs) {
++		scan_freq_set_free(station->roam_freqs);
++		station->roam_freqs = NULL;
++	}
++
+ 	if (station->signal_low)
+ 		station_roam_timeout_rearm(station, roam_retry_interval);
+ }
 -- 
 2.34.1
 
