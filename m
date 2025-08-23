@@ -1,20 +1,20 @@
 Received: from mail.holtmann.org (coyote.holtmann.net [212.227.132.17])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 09AFE2DE71A
-	for <iwd@lists.linux.dev>; Sat, 23 Aug 2025 14:46:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 356821E412A
+	for <iwd@lists.linux.dev>; Sat, 23 Aug 2025 14:48:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.132.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755960392; cv=none; b=iCrd1tp1LG5Aicz2QXP6CtsC9IHnc1k3WtVcNPRta0XKb5LfVquPsJJ4j9C/IbFuTjGt04zppgNvNJR7OerUuaMqnptemDbYMpXtr50gxNji7RQmxlngFMKN0ChYsgTHoHb3I1yXfL0G8/rRItbkm+XObsu/Bz1XGiE3lewtmOg=
+	t=1755960514; cv=none; b=mxurjg5sX1X1EvPjdYUWhpW5wFH5pcVMYui/h0CbqDjpHJt8DOB9UB3F27AHRmMd3r7WXFBFaLvhO6LimBmXUpsOzUZxdBZPz58m3/r0Q0XFSMGvd027qtWIZczLVVAOp7xDnGWBO8L/QXv0Z1cz9LctxJvNRz1y3FuKQ8seXPM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755960392; c=relaxed/simple;
-	bh=jpnXWZe6QAQWnMYq8T57G2wH5V0qTSeM+9FhstnUlhI=;
+	s=arc-20240116; t=1755960514; c=relaxed/simple;
+	bh=1lXsgZSlMHeOU7hKGmHdMtinGxf7U2uuohU2AOTWct8=;
 	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
-	 Message-Id:References:To; b=Y7CjW603CH7sdlBWj31YUO+k1EJEiw3apeC+OTOC67AZUTrI+AtpeyXU1J+G9+Eu9vOZuwP4QqrCkyKLMyCnbCw9xl1pzooEDz29V6Zfiic32FHvljHFKUrH3BMJ42G+1Q579iMFN6AvLjLPpsVpKYrtEDOIINrnv2pKU/Cs1kc=
+	 Message-Id:References:To; b=VVcxhH22XfwZsvLO/j0q8zTC8VbGVVrj66W9+zB8bE5ZtAfkQ7VeldEh4AVx1/tx7g8hwW4hBAOTJip3yvzyS00TxJUG/KcPmQAl47LlbaRoGSlc5+ADwdNtg2ebGbISwewXXPjpdrAaw5zFSkgdgKrbKVJA0fp54gdzlAZGNfA=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=holtmann.org; spf=pass smtp.mailfrom=holtmann.org; arc=none smtp.client-ip=212.227.132.17
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=holtmann.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=holtmann.org
 Received: from smtpclient.apple (p4ff9f066.dip0.t-ipconnect.de [79.249.240.102])
-	by mail.holtmann.org (Postfix) with ESMTPSA id BB121CECC5;
-	Sat, 23 Aug 2025 16:46:28 +0200 (CEST)
+	by mail.holtmann.org (Postfix) with ESMTPSA id D7214CECC5;
+	Sat, 23 Aug 2025 16:48:30 +0200 (CEST)
 Content-Type: text/plain;
 	charset=us-ascii
 Precedence: bulk
@@ -23,53 +23,55 @@ List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3826.700.81\))
-Subject: Re: [PATCH 06/15] vendor_quirks: add two new vendor quirks
+Subject: Re: [PATCH 13/15] station: check vendor quirk for BSS TM request
+ candidate list
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20250822195118.271122-6-prestwoj@gmail.com>
-Date: Sat, 23 Aug 2025 16:46:18 +0200
+In-Reply-To: <20250822195118.271122-13-prestwoj@gmail.com>
+Date: Sat, 23 Aug 2025 16:48:20 +0200
 Cc: iwd@lists.linux.dev
-Content-Transfer-Encoding: 7bit
-Message-Id: <E8A1EBD8-1747-4961-A27B-CBFE37065866@holtmann.org>
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <326D0476-1D08-4666-B820-EBAB74265608@holtmann.org>
 References: <20250822195118.271122-1-prestwoj@gmail.com>
- <20250822195118.271122-6-prestwoj@gmail.com>
+ <20250822195118.271122-13-prestwoj@gmail.com>
 To: James Prestwood <prestwoj@gmail.com>
 X-Mailer: Apple Mail (2.3826.700.81)
 
 Hi James,
 
-> VENDOR_QUIRK_BAD_BSS_TM_CANDIDATE_LIST:
->  When a BSS requests a station roam it can optionally include a
->  list of BSS's that can be roamed to. IWD uses this list and only
->  scans on those frequencies. In some cases though the AP's list
->  contains very poor options and it would be better for IWD to
->  request a full neighbor report.
-> 
-> VENDOR_QUIRK_REPLAY_COUNTER_MISMATCH:
->  On some Aruba APs there is a mismatch in the replay counters
->  between what is seen in scans versus authentications/associations.
->  This difference is not allowed in the spec, therefore IWD will
->  not connect. This quirk is intended to relax that check.
+> If the AP vendor has known issues with the preferred candidate list
+> ignore it and jump directly to requesting a neighbor report.
 > ---
-> src/vendor_quirks.c |  5 ++++-
-> src/vendor_quirks.h | 15 +++++++++++++++
-> 2 files changed, 19 insertions(+), 1 deletion(-)
-> 
-> diff --git a/src/vendor_quirks.c b/src/vendor_quirks.c
-> index ccfcb444..e005ba3b 100644
-> --- a/src/vendor_quirks.c
-> +++ b/src/vendor_quirks.c
-> @@ -34,7 +34,10 @@ static const struct {
-> uint8_t oui[3];
-> uint32_t quirks;
-> } quirk_db[] = {
-> - { }
-> + /* Cisco Meraki */
-> + { { 0x00, 0x18, 0x0a }, VENDOR_QUIRK_BAD_BSS_TM_CANDIDATE_LIST },
-> + /* Hewlitt Packard, owns Aruba */
-> + { { 0x00, 0x0b, 0x86 }, VENDOR_QUIRK_REPLAY_COUNTER_MISMATCH },
-> };
+> src/station.c | 5 ++++-
+> 1 file changed, 4 insertions(+), 1 deletion(-)
+>=20
+> diff --git a/src/station.c b/src/station.c
+> index 4919f89e..3424964d 100644
+> --- a/src/station.c
+> +++ b/src/station.c
+> @@ -64,6 +64,7 @@
+> #include "src/eap-tls-common.h"
+> #include "src/storage.h"
+> #include "src/pmksa.h"
+> +#include "src/vendor_quirks.h"
+>=20
+> #define STATION_RECENT_NETWORK_LIMIT 5
+> #define STATION_RECENT_FREQS_LIMIT 5
+> @@ -3378,7 +3379,9 @@ static void station_ap_directed_roam(struct =
+station *station,
+> l_timeout_remove(station->roam_trigger_timeout);
+> station->roam_trigger_timeout =3D NULL;
+>=20
+> - if (req_mode & WNM_REQUEST_MODE_PREFERRED_CANDIDATE_LIST) {
+> + if ((req_mode & WNM_REQUEST_MODE_PREFERRED_CANDIDATE_LIST) &&
+> + !(station->connected_bss->vendor_quirks &
+> + VENDOR_QUIRK_BAD_BSS_TM_CANDIDATE_LIST)) {
 
-are you sure the name is Hewlitt ;)
+this is unreadable in the long term. I would either add a variable or =
+add a helper for the quirks.
+
+As a side note, you might want to actually somewhere print the quirks =
+which are active. Otherwise your debugging in the future will become a =
+nightmare.
 
 Regards
 
