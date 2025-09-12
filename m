@@ -1,46 +1,46 @@
-Received: from AM0PR02CU008.outbound.protection.outlook.com (mail-westeuropeazon11013068.outbound.protection.outlook.com [52.101.72.68])
+Received: from DUZPR83CU001.outbound.protection.outlook.com (mail-northeuropeazon11012010.outbound.protection.outlook.com [52.101.66.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6272D2DF150
-	for <iwd@lists.linux.dev>; Fri, 12 Sep 2025 10:09:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.72.68
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F130B2E03E4
+	for <iwd@lists.linux.dev>; Fri, 12 Sep 2025 10:09:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.66.10
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757671770; cv=fail; b=bR/8gYMlIerCmeJh1jrSdoVtQkRx3pMb/v7ZWRgNOWOcRJTSLKK4TccmQ+AHzR5l5jBI0q4tfyRFbKdPd8kw0PFUNr4DT+uZwyLrv2Ypqx/BH0qa6J95MlchwTL3CD4C/6ymsXaYanWLVcG9x24b7sGmwLOa6kMoOYQY7WyFfpM=
+	t=1757671773; cv=fail; b=piP4Znw2mDYNNW/UJJYt+KlDl2WQPuxXWaX3iGEOK0qGsXhB1+8J2gX0oh3tRQKKgXSla3HQx6Aafh70VvuBYpXjjzr+pz9+Zck2058Ee3nfggJ8JXx8+q5qxl8AZM4YteSeiHHuayBllpB6yo2gSB10V3EvlNXEcvBsdbpcIa0=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757671770; c=relaxed/simple;
-	bh=8+MGEy4s+LsqP7PwKkvAaEro+qyD7nhB9rHovBM4C4k=;
+	s=arc-20240116; t=1757671773; c=relaxed/simple;
+	bh=kzTXAzvuZ5JeGniy5lzjEbhe9uM/0sLGU/p4ddTB7zE=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-ID:References:
-	 In-Reply-To:To; b=hhWadPp6ZoDVjL4X+UwuvGpqhThtw0/4BRPXqNBp6du599mVMlO3mEhnaLp8zjWMIZpMJQ+von94DsMe4Aq2Kd42lg68zlxxmh0gfnqxdbAmcnF7mEQ4+DJ4fJVWxcHz323I0FUcVtvwyghnrT9+4om5Nsp+0TySzR9kiZTcDs8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=axis.com; spf=pass smtp.mailfrom=axis.com; dkim=pass (1024-bit key) header.d=axis.com header.i=@axis.com header.b=Qc7rnGrn; arc=fail smtp.client-ip=52.101.72.68
+	 In-Reply-To:To; b=Bq0A3iFZzmLH55pNsswG20MEw7u+XoqHA2N0bXyRGjnrWrqvGx0Lru1+Rmg6AL0YxASvHeEqidDE53R/UKmWoHiBQp3HmoOCwB8Oke4Pt7CrXqzZ0Xcc/PmIZcdWPZvk9gA72U8scoFLrFlXV77bJv/Jxh4eJBPytd7+K5JArss=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=axis.com; spf=pass smtp.mailfrom=axis.com; dkim=pass (1024-bit key) header.d=axis.com header.i=@axis.com header.b=L2W40lHf; arc=fail smtp.client-ip=52.101.66.10
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=axis.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=axis.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=axis.com header.i=@axis.com header.b="Qc7rnGrn"
+	dkim=pass (1024-bit key) header.d=axis.com header.i=@axis.com header.b="L2W40lHf"
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=agHiVYd47F+czLp+ypv3izVXoMUOLdSUb5L08oc1aSeGXXBK2lpzYfZLL6KqJbXDHrFxaGt4JOJEAsg88Cn8d3/EKUprqdlgXqLhLTLTLgww7UyL+rdXu2lBotbZiToe4tJbTjZINjh327s3ERmcPUFMdr0GShSdSSyrHsON80tn8jzRXtRAQnQ5sNVS8ueGzf0UFmvQa7fLP0S//BYZp3kvudVLB6/YQzmWxgiHYlfhJpp008ETB1PuQunF0lJbq64nVVdj+/L3wRorOd52gxFkIT83zqtsCe9+rSih6F34vUZQ3kKAOdf7FsTnbliUTY7fhJ+6dZZfVMrE9srGzg==
+ b=Y+rDxZd2JL6fWY66/wdZP8u654QVyL4ImtQOtm+P5XdQbY0BCLxoRNW/Eb1ei6V8IcenRgJUB4sUcco37+/g2V7wzSXOdhHu9U2pyIujSrJnRLERyRV2bVnqFd6JUhP1G5KnkBwuwHdQ4g6OEM5CjQWW1sHpeToLEz78VwO5cbMIdwGzIVKZnnZI26DYGlbIHZagQDgSUljjrh4oCm/WUQRUhOYQhOc2BZPmYhfclt8ofCjmXvamRn4nKqBWNyxKZtx5aKnYtVx6bFznv8XKLfVpkw13g8kZ1ivbxDlL49hCTCf9ZnO5/19Iro2ADx2T88F6jp6MdhBw1dOEkq0g1Q==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=YyNiCFoJnISmHBUOiNH3J91qKObt4yQlhkdMXClx3OA=;
- b=VOk8U9RbuMdDqZUB0m1uDAUgfA7bD6GJ5r3QPxAo/dlvgYWnj88Wf2NeJR4faQi1jU13YeXgvbS/FUGNFW1TLOuzpWUzHdPbhv5tCtA7jqL5615v1lX8OV50z23TgCAPVSUff7N92yKLJVFCymXl7/kUne2vDFCWgWsj7FcgHbzAF3LZ7TSRO88lfVtzSmdWqkiYfRG9BuXF1iUWaqxi3rjeLlqQ66QBfz7QsK+jp1yl60Jtj75HkahR5C9s9vLE3D4kxKzSwQm/lWcgO8bEI97/ZI0ODE7WpabxeY+Ez3AUXsPZFk8CJXlYxsedSQKklFp2suJaidH/CTGMJJCDxw==
+ bh=6qFKJXojW7beiNygSHq4mq4gsvPUVOBoBw5kLnpFihs=;
+ b=mH3F9ak4PTwKMy/YlWzCqgkwIwhmz4ip14ric5fbsGRthEDoAx2KdFIlanijDeOCIR243CzSHBzrFAnbBcJylFEF0gzNfjsE9dbqaRU2DwPZ9x8HczQz/lV4MhsIIRJ+zMnTOLg2q9ZtUuymnDW9lvd7+wdVsfkRvf7VHkHQgHPVsU2sfYtdEMfT5oAaxMhEzdy0Ff5acN6afQfhth3zWuL3VE25VJyMB2I4gk2wE2leAD1R3c8w/X6pHLZD+P6AftZffgZ6FGIQcKJe+3rmOhhIkNu01nSe9Q17cUSf8MA5kUVbnHVChi+IxORbGk4K6iD/CT/zZZokkDeSpdRiLw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  195.60.68.100) smtp.rcpttodomain=lists.linux.dev smtp.mailfrom=axis.com;
  dmarc=pass (p=none sp=none pct=100) action=none header.from=axis.com;
  dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=axis.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=YyNiCFoJnISmHBUOiNH3J91qKObt4yQlhkdMXClx3OA=;
- b=Qc7rnGrn/TlAL6F1qU10iZzyZTalc6B+xAAkhqWvHCrQFjwQN2YI+3hNqFx5Nh5hDylgaBRITJe4WQi7yVNdkZx02Q4jsPiOWmeRYWllK6ub0Smnxs4vRuyQb6dXICegD6z/3GYKU+6S6u48cbyTYgh1hx+8/KbWng8YzPGCGHk=
-Received: from DUZPR01CA0259.eurprd01.prod.exchangelabs.com
- (2603:10a6:10:4b9::7) by PR3PR02MB6426.eurprd02.prod.outlook.com
- (2603:10a6:102:76::8) with Microsoft SMTP Server (version=TLS1_2,
+ bh=6qFKJXojW7beiNygSHq4mq4gsvPUVOBoBw5kLnpFihs=;
+ b=L2W40lHfoYMvWyUh44QZda7KTMh03WJcVBajl+Fkwb5nSk/x9ULp3cuWjoslfXxp5FIbFvhcW2+bnUPwV/qbHCojnk9yQeO/XESBcVgz1bFPGQLFSb44gVZw85jkjARiHybHSXAY5x3FGh5GakgFIIOU+8YZ+BhJiJ8UzUUXBzE=
+Received: from AM0PR01CA0166.eurprd01.prod.exchangelabs.com
+ (2603:10a6:208:aa::35) by AM7PR02MB6465.eurprd02.prod.outlook.com
+ (2603:10a6:20b:1bb::8) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9094.22; Fri, 12 Sep
  2025 10:09:22 +0000
-Received: from DB5PEPF00014B8E.eurprd02.prod.outlook.com
- (2603:10a6:10:4b9:cafe::9a) by DUZPR01CA0259.outlook.office365.com
- (2603:10a6:10:4b9::7) with Microsoft SMTP Server (version=TLS1_3,
+Received: from AM3PEPF00009B9C.eurprd04.prod.outlook.com
+ (2603:10a6:208:aa:cafe::b6) by AM0PR01CA0166.outlook.office365.com
+ (2603:10a6:208:aa::35) with Microsoft SMTP Server (version=TLS1_3,
  cipher=TLS_AES_256_GCM_SHA384) id 15.20.9115.18 via Frontend Transport; Fri,
- 12 Sep 2025 10:09:47 +0000
+ 12 Sep 2025 10:09:35 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 195.60.68.100)
  smtp.mailfrom=axis.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=axis.com;
@@ -48,24 +48,24 @@ Received-SPF: Pass (protection.outlook.com: domain of axis.com designates
  195.60.68.100 as permitted sender) receiver=protection.outlook.com;
  client-ip=195.60.68.100; helo=mail.axis.com; pr=C
 Received: from mail.axis.com (195.60.68.100) by
- DB5PEPF00014B8E.mail.protection.outlook.com (10.167.8.202) with Microsoft
+ AM3PEPF00009B9C.mail.protection.outlook.com (10.167.16.21) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
  15.20.9115.13 via Frontend Transport; Fri, 12 Sep 2025 10:09:22 +0000
-Received: from se-mail02w.axis.com (10.20.40.8) by se-mail02w.axis.com
- (10.20.40.8) with Microsoft SMTP Server (version=TLS1_2,
+Received: from se-mail01w.axis.com (10.20.40.7) by se-mail01w.axis.com
+ (10.20.40.7) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.58; Fri, 12 Sep
  2025 12:09:22 +0200
-Received: from se-intmail02x.se.axis.com (10.4.0.28) by se-mail02w.axis.com
- (10.20.40.8) with Microsoft SMTP Server id 15.1.2507.58 via Frontend
+Received: from se-intmail02x.se.axis.com (10.4.0.28) by se-mail01w.axis.com
+ (10.20.40.7) with Microsoft SMTP Server id 15.1.2507.58 via Frontend
  Transport; Fri, 12 Sep 2025 12:09:22 +0200
 Received: from pc48844-2217.se.axis.com (pc48844-2217.se.axis.com [10.92.172.48])
-	by se-intmail02x.se.axis.com (Postfix) with ESMTP id 192E31E8D
+	by se-intmail02x.se.axis.com (Postfix) with ESMTP id 1B53B1791
 	for <iwd@lists.linux.dev>; Fri, 12 Sep 2025 12:09:22 +0200 (CEST)
 Received: by pc48844-2217.se.axis.com (Postfix, from userid 13016)
-	id 160E4287A99D; Fri, 12 Sep 2025 12:09:22 +0200 (CEST)
+	id 141A8287A98F; Fri, 12 Sep 2025 12:09:22 +0200 (CEST)
 From: Alexander Ganslandt <alexander.ganslandt@axis.com>
-Date: Fri, 12 Sep 2025 12:08:53 +0200
-Subject: [PATCH v3 3/3] station: improve roam scan strategy
+Date: Fri, 12 Sep 2025 12:08:52 +0200
+Subject: [PATCH v3 2/3] station: improve scan_freqs_order channel subsets
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
@@ -74,489 +74,279 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-ID: <20250912-roam-scan-improvements-v3-3-ebfd61dc6239@axis.com>
+Message-ID: <20250912-roam-scan-improvements-v3-2-ebfd61dc6239@axis.com>
 References: <20250912-roam-scan-improvements-v3-0-ebfd61dc6239@axis.com>
 In-Reply-To: <20250912-roam-scan-improvements-v3-0-ebfd61dc6239@axis.com>
 To: <iwd@lists.linux.dev>
 X-Mailer: b4 0.15-dev-c25d1
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DB5PEPF00014B8E:EE_|PR3PR02MB6426:EE_
-X-MS-Office365-Filtering-Correlation-Id: b417be55-e98e-4b01-5235-08ddf1e47219
+X-MS-TrafficTypeDiagnostic: AM3PEPF00009B9C:EE_|AM7PR02MB6465:EE_
+X-MS-Office365-Filtering-Correlation-Id: c63dcf94-df46-475f-995c-08ddf1e4724e
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|82310400026|1800799024|376014|36860700013;
+	BCL:0;ARA:13230040|1800799024|376014|82310400026|36860700013;
 X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?dTd5aVBSMENTN2lmUStBekpmTTFVT2NRVHE1Tys4QmluWXAyOFp1UHZEZTda?=
- =?utf-8?B?NDhlb1ZSeTdNNHk2RlpRby94R2dtN2RmcXhmakZDV3Q0YS9NRTArRElSK2J5?=
- =?utf-8?B?RWlHbHFTOUVXNlBodWxkOGZyNnVPbzJaSUdZVnlPYjZRMGw3UnFOTnVZL2xv?=
- =?utf-8?B?bG5OOC9vdUhaUmlFaEhpcjZxV0dWQTFHc1NvOWVUMU1vdGpaYmFOTitXRUVs?=
- =?utf-8?B?K0NLUXZEeHJRYVhtZkY0bnhpSEF4bkovd3FXUGRqRjN6Y3hrZjJ0d1JSaVhs?=
- =?utf-8?B?RkNEQzI0RHlTNXN6Vm5GdXhKdE5BcTlteEtTam15UkdienBXeDhnL004WXNv?=
- =?utf-8?B?TnRNQlNLTjI3Yk5SbnpsUUc5ZUs3NW92RCtvZXdFSlhKNWNZN0MrTXJXWUpR?=
- =?utf-8?B?bVdxZ2k4U01scDZkRkY4N0xSaC95R20wczBBZm54ZURra3NGTXVwSzdxa0NQ?=
- =?utf-8?B?T1pTL0lYakVBZFVmMHhLVkQ5WUwrUXJZbW00cktkRFpGYm8rajROS1NnUjFT?=
- =?utf-8?B?RG4ySGFUYVdlYXQ0OVcxSWhHRW45dXdJRFMyeURkeExYOG93YVlkMU1PYzN1?=
- =?utf-8?B?MVJ0Q29laWFmbTVwL2hOZ0EvTlMyMmM0d2VuVFVGemNLNHNWR0RrNjVuRmRr?=
- =?utf-8?B?cUxxQ09aQ2VIclV3Wk4xQWt5ZjZRTlcvVUtRdFkwM09PcjFKWEJXMEpaQjVa?=
- =?utf-8?B?UkU0Sm9hck04aXkvSEgzcnQ0MStEeDJVclp3TlhZNGFpWXhJTmU5SVhCRUlL?=
- =?utf-8?B?SEJpTWcyTGV2VTJoTExnbGNpKzhCUUdQelp6WnVjMHpBOEJnL3A0WkQwZHNk?=
- =?utf-8?B?OFFkZmlkeDM2NFVCQzdsWmhEaHBPNnFRSmRvbjgrWUJOdDdkQjJqanpyN0x4?=
- =?utf-8?B?eC95TUVYbGNQYzN2Y3poRGpyTEE0Q212bk5CNXZWMHZRSkJ1eG1kdFFrNjlL?=
- =?utf-8?B?SnNVZnQzdVUvSm5RSms1MGV3ZEVPalFpOGhOa2VPbVRVT25iNjF4ZEZxcTM5?=
- =?utf-8?B?V3N1NEtNYnFneDZ5MnplSk1OU2RQQnRQdldnOXh6MG1SZDhVT1duaVdnZk1h?=
- =?utf-8?B?TXJYazFiSmJjWHVENVlMMGRySGhsVk5UcEtRcDNHUFVhMWZkTXNOcVdhQkdv?=
- =?utf-8?B?UDdpSWl6UElQYS9GcjYvcXFDUmc3WWRvdUQ0RXY1RjU2TncySFRNM0ZyZ2lM?=
- =?utf-8?B?bytka2VnMU44QWRMOGUwUHl3RmVYMExSdHlaZGxKZmRPR3cwQmROTW5ENk9N?=
- =?utf-8?B?MklEVUgvQXQxNkdTWmFTOEZ6TlBkWGlrNkxhbmREWmxyM0xlOXBTQnZ6eTMw?=
- =?utf-8?B?S2FBNTdyL0hnanZwT1JQVTdCMDAwKy9tc2MwSFlya3c3R2RhVVB2WTk0cHhj?=
- =?utf-8?B?TTBYdXROUzhpMFBzOFFKa3d0Z1NLM2hkUTFSZkJYN050bGZoYWxGdWZEaWU4?=
- =?utf-8?B?eUhxS2hWZ0lXam1GYUcwcVZjNzlaYkEyY1ZucmwzZzFyYnZlejBDY1NVd0k4?=
- =?utf-8?B?ZHJiZmFSdGU5MHpuUWxlcGhBaFMxeWloV1VvVElrWDBLcXJIdm1GZWxLV3M5?=
- =?utf-8?B?cUFycWQ2eWRubXdyOW5WZ21lSlZoUXdrSHQySGpndDJZcFVGQkxNUTNxUXEr?=
- =?utf-8?B?eHRucS9hdDhqYVVERE5qQndwMS9qZHhJK3lmdXRZUGJZZXUrSkE2Z0p0WVo3?=
- =?utf-8?B?eGZCT3RNNXVqTnBnWFRMSlU4R2RQN3lLcFpYVEVVRHEzZ0F6V1dJWjNoRmsw?=
- =?utf-8?B?QklzK3pEc1ZkOTkvMW5tR0tuV2FZOFE0U1RMZDdUZlpjbjJmZDFSNDQrcWh6?=
- =?utf-8?B?QURZSFJRa2xXTlF5ZldkUVR1a0ZhMG5SVk9NR0tlNXIvajVhWGlRN1plWUpx?=
- =?utf-8?B?ZnhzYVRvcGxkaUFPWW5XdlRSUWpEZVQ0d3Q4NWx4aUpxL3l6dmRUdXhsclNx?=
- =?utf-8?B?blI0WnJuMXVLMXpxcEljRzJHZWkzUVM4UU1OVjlzYTBacjZST01mYWNremNU?=
- =?utf-8?B?NUFzcVVOM3IrSkFOWmdqd0QzYUxMOGhKWkNJRXlZWFFHTDEraUVBY2RacGZE?=
- =?utf-8?Q?jJvE2O?=
+	=?utf-8?B?QlcxRGh2WnVSSXBEODJzWHg5KzZUblMxazI0dk1ZemxsVHVSOCsrRDZMZXh5?=
+ =?utf-8?B?VHZQM0hyWWQ1WDhCbHBHaFd0ZjBpanRNbFFzZ3dyOGJxSFlpWjlwazNuSit1?=
+ =?utf-8?B?RlgvS2pvOXl5UHQ3cnYvckZqMnM2cGwvTWRWOUQva0s3L0pHd0x0MS9xRVU3?=
+ =?utf-8?B?eGF6WXNoSEkyL25lU0hYUlRQditUaGVFdzZHZS9MbGdKOVF4ODYzcExhWGxN?=
+ =?utf-8?B?ZDhqQUJQQk1oZWRzalRROVpsNitEZ2N6QnlhZmwwbGlMK0FzY29oR3UxUFBT?=
+ =?utf-8?B?SzA4aStndEVWTlNza2FvYXppT3BoRGJ4ZU1PK245UlhjeVJSZllwaGJyWFNu?=
+ =?utf-8?B?dk5VVXRUS3crdkJveG0yVjcyV04xWDh1RmE4RHJ5Z2ZkenZPdVRtUGdFbUll?=
+ =?utf-8?B?OGRpSHJ0UkQ1R1Q5RFFieURmVG5jMFIyUzZXaEpEWW80djlENHJ2aUhsdExQ?=
+ =?utf-8?B?UURlT0NTZkYvQk9EUUxrenpWUm1nR3F3NGxlUEhJTE8wYmFQMWJGZDdWRUJ4?=
+ =?utf-8?B?TGdmTHFLM3c5WnFGTVRKUnJxd2VZeTIwV0gyNWYzYTBBT0xtdG9nLzBDUzlZ?=
+ =?utf-8?B?VkhIUmZsdkdMd1c4cTU0Q3Uwc2xIdGF4NWJRcDdkeGdKRDN4WlJNSlZhTlBV?=
+ =?utf-8?B?bTFWaEkvaEd3TUtFVTlid05VWjF2TGp4Z2JCQVAwellVRnZ2ZG4zK1VzNTVz?=
+ =?utf-8?B?SVNEdzhTcU05WmxlRWZnSlRBNjRTZzdmd1pjcWszQlZYRDFEVVNzZm5QYk01?=
+ =?utf-8?B?dUZCb3diMmN4YkVMYzJleXU4QlJ2Umc5Sks3VU55Wnh2QlIrV3FTekJmVzVS?=
+ =?utf-8?B?RkRTQ2hmbXRRb05TUGJzaTlVZ2NaZk8rQUp3ZUgxVUI2dEdPZUw1d3ZvOTUw?=
+ =?utf-8?B?citsOFlFMTZKQ3Bnck15b216ZE9mamFiWnZTRkcrM0xUVEkrekUxamhaUCts?=
+ =?utf-8?B?MHZHUWVjWFhYbkxmaHkwYVJRRWkzdmErNll6MFNHR1d0b0V6cHI3VkpkRUNF?=
+ =?utf-8?B?ZERJLzFMaGhzK05rZGcxUTU0QW5iZTNVb1ZIeVhrZys4bmpmSlhXMkxucVA1?=
+ =?utf-8?B?SlBCVnE1ajVSUzhSblc5VGZIaXdNWnh2YUlxcUdqbGxkWkc0Q1JtYkpraE00?=
+ =?utf-8?B?ZXdSbDBjQmF0OFFQZHRpRk4vdmZxYUp5RHd4R3BtcWsvY0dSWksyUVZyVFR6?=
+ =?utf-8?B?aE9IeDR0bGF6ZjUzNkdld1daTGRvcjNOTEw5UDZBbEMvLzFHdE82RnpGQXVX?=
+ =?utf-8?B?ZWhTVDdrOEd0cSt0VWFPTWtUUStzSGxubHRQRjBYTEQvZkFiOW4zZDBadDhE?=
+ =?utf-8?B?NTNzWDJJSjYxQytvMys0dFJqKzRZYWJUSndkVWpCYzJsZ2kwQWlsNlVKYXBW?=
+ =?utf-8?B?QUJBdkhRalZycjdEcFpQSituSUJQcHN2SnhDSUZ5MTJ5RzErTnIwYmN2MkJw?=
+ =?utf-8?B?R1VobS9wczYwTXNRTTk5cnI5VWs5VEkxM3RZNkYvZDc4NExRL2laM200cEFI?=
+ =?utf-8?B?TTJoOTh6d3RBQUxzZU5KYWwvQlVzdjhPd1ppYnFTR0ZMVGc2dXoxVXF4dk5u?=
+ =?utf-8?B?d2NsVWg3aTFBejd2MllIMXNWVlAyNmtxYXJxaDZRN2c4NndMT3FCQUhSYzU3?=
+ =?utf-8?B?YWY3K05MZHU1Nkd6WkJGNjBvR2ZsVWdYZVZ0VlFCMVM5NG1PTlZRczd2WUdo?=
+ =?utf-8?B?dmpIcVk1cXpFRGhaOHhscEpRZFcvc3IzS2gwc2hvNFpua2U2TmU0ZWZSUXhi?=
+ =?utf-8?B?ZkpjNjlYZGpLK05WK3ZBNXBkY2kxdVZlK0phb3pVUzVhMEh2dzNDdUVUUE50?=
+ =?utf-8?B?ZENPNlh0UFNPZVlJNkZsOWtzeGdFUG1LYlBmb0ZvbDZxcElXZ2pTRVpMbWJS?=
+ =?utf-8?B?RDRTNFhUcWZHdDg1MW82b1NCREcybU54U0ErRC9zSVUrRWNVZ1orODNva2FI?=
+ =?utf-8?B?UU5UVVNqYWlIQWtJNVZqY1NJUE9ENlJYMmttQXk0bUkwY3FpZzduN01CSnVx?=
+ =?utf-8?B?VWl1SFZsTUEzTmMwRk0wMURSd1owRCtjYjRhRG1FRzc5aWFlQWJMRFd1MUFh?=
+ =?utf-8?Q?uOOXq/?=
 X-Forefront-Antispam-Report:
-	CIP:195.60.68.100;CTRY:SE;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.axis.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(82310400026)(1800799024)(376014)(36860700013);DIR:OUT;SFP:1101;
+	CIP:195.60.68.100;CTRY:SE;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.axis.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(1800799024)(376014)(82310400026)(36860700013);DIR:OUT;SFP:1101;
 X-OriginatorOrg: axis.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Sep 2025 10:09:22.5045
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Sep 2025 10:09:22.8662
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: b417be55-e98e-4b01-5235-08ddf1e47219
+X-MS-Exchange-CrossTenant-Network-Message-Id: c63dcf94-df46-475f-995c-08ddf1e4724e
 X-MS-Exchange-CrossTenant-Id: 78703d3c-b907-432f-b066-88f7af9ca3af
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=78703d3c-b907-432f-b066-88f7af9ca3af;Ip=[195.60.68.100];Helo=[mail.axis.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	DB5PEPF00014B8E.eurprd02.prod.outlook.com
+	AM3PEPF00009B9C.eurprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PR3PR02MB6426
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM7PR02MB6465
 
 From: Alexander Ganslandt <alexanga@axis.com>
 
-When iwd decides to roam, it scans either neighbor freqs or known freqs
-(if neighbors are not available). If it fails to roam after getting the
-scan results, it scans ALL freqs. There's a high chance that both
-neighbor and/or known scans fail to roam and we end up scanning all
-freqs. This is very slow and if you're already moving away from the
-current BSS, there's a high chance you will lose connection
-completely before the scan is finished.
+Splits the scan frequencies into more subsets that have been ordered
+such that the more common frequencies appear first, and the more uncommon
+frequencies last. Non-DFS channels are also added to the earlier
+subsets to prioritize fast-scanning frequencies.
 
-Instead of scanning all freqs at once, use the already-defined subsets
-to optimize the scans. The subsets contain a handful of freqs each and
-are ordered to increase the chance of finding a good BSS early. In order
-to not scan the same freq multiple times, use a list (scanned_freqs) to
-keep track of which freqs have been scanned in the current roam attempt.
-
-When a roam scan is triggered, add the most prioritized freqs to the
-list of freqs that should be scanned. The order of priority is:
-
-1. Neighbor freqs
-2. Known freqs
-3. Subsets, starting with index 0 and incrementing if the subset is
-   exhausted
-
-A freq is only added to the scan if it has not yet been scanned in the
-current roam attempt. An exception to this are neighbor freqs. They have
-a higher chance of containing good BSSes, so they're scanned every 3rd
-scan (defined by STATION_SCANS_BEFORE_NEIGHBOR_SCAN).
-
-This approach results in more scans, but fewer freqs per scan, leading
-to shorter delays between scan results. It also avoids scanning the same
-freqs back-to-back, which is generally not very useful. In combination
-with the subset ordering, this increases the chance of finding a good
-BSS early and results in better roaming performance.
+This approach allows iwd to scan the frequencies with the statistically
+highest chance for BSSes first, resulting in shorter scan times until a
+good BSS is found. In future patches this will also be used when
+roaming.
 ---
- src/station.c | 230 +++++++++++++++++++++++++++-------------------------------
- 1 file changed, 108 insertions(+), 122 deletions(-)
+ src/station.c | 137 +++++++++++++++++++++++++++++++++++++---------------------
+ 1 file changed, 88 insertions(+), 49 deletions(-)
 
 diff --git a/src/station.c b/src/station.c
-index 1b4dd1c8..523cfb0e 100644
+index f8069d89..1b4dd1c8 100644
 --- a/src/station.c
 +++ b/src/station.c
-@@ -68,6 +68,8 @@
- 
- #define STATION_RECENT_NETWORK_LIMIT	5
- #define STATION_RECENT_FREQS_LIMIT	5
-+#define STATION_MAX_SCAN_FREQS	10
-+#define STATION_SCANS_BEFORE_NEIGHBOR_SCAN	2
- 
- static struct l_queue *station_list;
- static uint32_t netdev_watch;
-@@ -123,6 +125,9 @@ struct station {
- 	/* Set of frequencies to scan first when attempting a roam */
- 	struct scan_freq_set *roam_freqs;
+@@ -125,7 +125,7 @@ struct station {
  	struct l_queue *roam_bss_list;
-+	struct scan_freq_set *scan_freqs;
-+	struct scan_freq_set *scanned_freqs;
-+	uint8_t roam_scans_since_neighbor_scan;
  
  	/* Frequencies split into subsets by priority */
- 	struct scan_freq_set *scan_freqs_order[5];
-@@ -141,7 +146,6 @@ struct station {
- 	struct handshake_state *hs;
+-	struct scan_freq_set *scan_freqs_order[3];
++	struct scan_freq_set *scan_freqs_order[5];
+ 	unsigned int dbus_scan_subset_idx;
  
- 	bool preparing_roam : 1;
--	bool roam_scan_full : 1;
- 	bool signal_low : 1;
- 	bool ap_directed_roaming : 1;
- 	bool scanning : 1;
-@@ -1940,7 +1944,6 @@ static void station_roam_state_clear(struct station *station)
- 	l_timeout_remove(station->roam_trigger_timeout);
- 	station->roam_trigger_timeout = NULL;
- 	station->preparing_roam = false;
--	station->roam_scan_full = false;
- 	station->signal_low = false;
- 	station->netconfig_after_roam = false;
- 	station->last_roam_scan = 0;
-@@ -2205,27 +2208,6 @@ static void parse_neighbor_report(struct station *station,
+ 	uint32_t wiphy_watch;
+@@ -4500,8 +4500,7 @@ static bool station_dbus_scan_results(int err, struct l_queue *bss_list,
+ 		return false;
  	}
- }
  
--static void station_early_neighbor_report_cb(struct netdev *netdev, int err,
--						const uint8_t *reports,
--						size_t reports_len,
--						void *user_data)
--{
--	struct station *station = user_data;
--
--	if (err == -ENODEV)
--		return;
--
--	l_debug("ifindex: %u, error: %d(%s)",
--			netdev_get_ifindex(station->netdev),
--			err, err < 0 ? strerror(-err) : "");
--
--	if (!reports || err)
--		return;
--
--	parse_neighbor_report(station, reports, reports_len,
--				&station->roam_freqs);
--}
--
- static bool station_try_next_bss(struct station *station)
+-	last_subset = next_idx >= L_ARRAY_SIZE(station->scan_freqs_order) ||
+-		station->scan_freqs_order[next_idx] == NULL;
++	last_subset = next_idx >= L_ARRAY_SIZE(station->scan_freqs_order);
+ 	station->dbus_scan_subset_idx = next_idx;
+ 
+ 	station_set_scan_results(station, bss_list, freqs, false);
+@@ -4516,6 +4515,15 @@ static bool station_dbus_scan_subset(struct station *station)
  {
- 	struct scan_bss *next;
-@@ -2360,9 +2342,32 @@ static bool netconfig_after_roam(struct station *station)
- 	return true;
- }
+ 	unsigned int idx = station->dbus_scan_subset_idx;
  
-+static void station_neighbor_report_cb(struct netdev *netdev, int err,
-+					const uint8_t *reports,
-+					size_t reports_len, void *user_data)
-+{
-+	struct station *station = user_data;
++	/* Find the next non-empty subset */
++	while (idx < L_ARRAY_SIZE(station->scan_freqs_order) &&
++			scan_freq_set_isempty(station->scan_freqs_order[idx]))
++		idx++;
++	station->dbus_scan_subset_idx = idx;
 +
-+	if (err == -ENODEV)
-+		return;
++	if (idx >= L_ARRAY_SIZE(station->scan_freqs_order))
++		return false;
 +
-+	l_debug("ifindex: %u, error: %d(%s)",
-+			netdev_get_ifindex(station->netdev),
-+			err, err < 0 ? strerror(-err) : "");
-+
-+	if (!reports || err) {
-+		l_debug("no neighbor report results");
-+		return;
-+	}
-+
-+	parse_neighbor_report(station, reports, reports_len, &station->roam_freqs);
-+}
-+
- static void station_roamed(struct station *station)
- {
--	station->roam_scan_full = false;
-+	scan_freq_set_free(station->scanned_freqs);
-+	station->scanned_freqs = scan_freq_set_new();
-+	station->roam_scans_since_neighbor_scan = STATION_SCANS_BEFORE_NEIGHBOR_SCAN;
- 
- 	/*
- 	 * Schedule another roaming attempt in case the signal continues to
-@@ -2382,7 +2387,7 @@ static void station_roamed(struct station *station)
- 
- 	if (station->connected_bss->cap_rm_neighbor_report) {
- 		if (netdev_neighbor_report_req(station->netdev,
--					station_early_neighbor_report_cb) < 0)
-+					station_neighbor_report_cb) < 0)
- 			l_warn("Could not request neighbor report");
- 	}
- 
-@@ -2404,8 +2409,10 @@ static void station_roam_retry(struct station *station)
- 	 * time.
- 	 */
- 	station->preparing_roam = false;
--	station->roam_scan_full = false;
- 	station->ap_directed_roaming = false;
-+	scan_freq_set_free(station->scanned_freqs);
-+	station->scanned_freqs = scan_freq_set_new();
-+	station->roam_scans_since_neighbor_scan = STATION_SCANS_BEFORE_NEIGHBOR_SCAN;
- 
- 	if (station->roam_freqs) {
- 		scan_freq_set_free(station->roam_freqs);
-@@ -2416,6 +2423,8 @@ static void station_roam_retry(struct station *station)
- 		station_roam_timeout_rearm(station, roam_retry_interval);
- }
- 
-+static void station_start_roam(struct station *station);
-+
- static void station_roam_failed(struct station *station)
- {
- 	l_debug("%u", netdev_get_ifindex(station->netdev));
-@@ -2438,39 +2447,22 @@ static void station_roam_failed(struct station *station)
- 	}
- 
- 	/*
--	 * We were told by the AP to roam, but failed.  Try ourselves or
--	 * wait for the AP to tell us to roam again
-+	 * Keep trying to roam if the signal is still low, or we were told by the AP
-+	 * to roam but failed.
- 	 */
--	if (station->ap_directed_roaming) {
--		/*
--		 * The candidate list from the AP (or neighbor report) found
--		 * no BSS's. Force a full scan
--		 */
--		if (!station->roam_scan_full)
--			goto full_scan;
--
--		goto delayed_retry;
--	}
--
--	/*
--	 * If we tried a limited scan, failed and the signal is still low,
--	 * repeat with a full scan right away
--	 */
--	if (station->signal_low && !station->roam_scan_full) {
-+	if (station->signal_low || station->ap_directed_roaming) {
- 		/*
- 		 * Since we're re-using roam_scan_id, explicitly cancel
- 		 * the scan here, so that the destroy callback is not called
- 		 * after the return of this function
- 		 */
--full_scan:
- 		scan_cancel(netdev_get_wdev_id(station->netdev),
- 						station->roam_scan_id);
- 
--		if (!station_roam_scan(station, NULL))
--			return;
-+		station_start_roam(station);
-+		return;
- 	}
- 
--delayed_retry:
- 	station_roam_retry(station);
- }
- 
-@@ -3057,7 +3049,6 @@ static int station_roam_scan(struct station *station,
- 	}
- 
- 	if (!freq_set) {
--		station->roam_scan_full = true;
- 		params.freqs = allowed;
- 		station_debug_event(station, "full-roam-scan");
- 	} else
-@@ -3080,108 +3071,95 @@ static int station_roam_scan(struct station *station,
+ 	station->dbus_scan_id = station_scan_trigger(station,
+ 						station->scan_freqs_order[idx],
+ 						station_dbus_scan_triggered,
+@@ -5046,67 +5054,101 @@ int station_hide_network(struct station *station, struct network *network)
  	return 0;
  }
  
--static int station_roam_scan_known_freqs(struct station *station)
-+static void station_filter_roam_scan_freq(uint32_t freq, void *user_data)
- {
--	const struct network_info *info = network_get_info(
--						station->connected_network);
--	struct scan_freq_set *freqs = network_info_get_roam_frequencies(info,
--					station->connected_bss->frequency,
--					STATION_RECENT_FREQS_LIMIT);
--	int r = -ENODATA;
+-static void station_add_2_4ghz_freq(uint32_t freq, void *user_data)
+-{
+-	struct scan_freq_set *set = user_data;
 -
--	if (!freqs)
--		return r;
-+	struct station *station = user_data;
- 
--	if (!wiphy_constrain_freq_set(station->wiphy, freqs))
--		goto free_set;
-+	if (scan_freq_set_size(station->scan_freqs) >= STATION_MAX_SCAN_FREQS)
-+		return;
- 
--	r = station_roam_scan(station, freqs);
-+	/* Skip freq if already scanned */
-+	if (scan_freq_set_contains(station->scanned_freqs, freq))
-+		return;
- 
--free_set:
--	scan_freq_set_free(freqs);
--	return r;
-+	scan_freq_set_add(station->scan_freqs, freq);
-+	scan_freq_set_add(station->scanned_freqs, freq);
- }
- 
--static void station_neighbor_report_cb(struct netdev *netdev, int err,
--					const uint8_t *reports,
--					size_t reports_len, void *user_data)
-+static void station_populate_roam_scan_freqs(struct station *station)
+-	/* exclude social channels added in initial scan request */
+-	if (freq < 3000 && freq != 2412 && freq != 2437 && freq != 2462)
+-		scan_freq_set_add(set, freq);
+-}
+-
+ static void station_fill_scan_freq_subsets(struct station *station)
  {
--	struct station *station = user_data;
--	struct scan_freq_set *freq_set;
--	int r;
-+	struct scan_freq_set *tmp;
-+	const struct network_info *info;
- 
--	if (err == -ENODEV)
--		return;
-+	station->scan_freqs = scan_freq_set_new();
- 
--	l_debug("ifindex: %u, error: %d(%s)",
--			netdev_get_ifindex(station->netdev),
--			err, err < 0 ? strerror(-err) : "");
-+	/* Add current frequency, always scan this to get updated data for the
-+	 * current BSS */
-+	scan_freq_set_add(station->scan_freqs, station->connected_bss->frequency);
-+	scan_freq_set_add(station->scanned_freqs, station->connected_bss->frequency);
+ 	const struct scan_freq_set *supported =
+ 				wiphy_get_supported_freqs(station->wiphy);
+ 	unsigned int subset_idx = 0;
  
 -	/*
--	 * Check if we're still attempting to roam -- if dbus Disconnect
--	 * had been called in the meantime we just abort the attempt.
+-	 * Scan the 2.4GHz "social channels" first, 5GHz second, if supported,
+-	 * all other 2.4GHz channels last.  To be refined as needed.
 -	 */
--	if (!station->preparing_roam || err == -ENODEV)
-+	/* Add neighbor frequencies */
-+	if (station->roam_scans_since_neighbor_scan >=
-+			STATION_SCANS_BEFORE_NEIGHBOR_SCAN && station->roam_freqs) {
-+		station->roam_scans_since_neighbor_scan = 0;
-+		scan_freq_set_merge(station->scan_freqs, station->roam_freqs);
-+		scan_freq_set_merge(station->scanned_freqs, station->roam_freqs);
- 		return;
-+	}
-+	station->roam_scans_since_neighbor_scan++;
- 
--	if (!reports || err) {
--		r = station_roam_scan_known_freqs(station);
--
--		if (r == -ENODATA)
--			l_debug("no neighbor report results or known freqs");
--
--		if (r < 0)
--			station_roam_failed(station);
--
-+	/* Add known frequencies */
-+	info = network_get_info(station->connected_network);
-+	tmp = network_info_get_roam_frequencies(info,
-+					station->connected_bss->frequency,
-+					STATION_RECENT_FREQS_LIMIT);
-+	scan_freq_set_foreach(tmp, station_filter_roam_scan_freq, station);
-+	scan_freq_set_free(tmp);
-+	if (scan_freq_set_size(station->scan_freqs) >= STATION_MAX_SCAN_FREQS) {
- 		return;
++	station->scan_freqs_order[subset_idx] = scan_freq_set_new();
++
++	/* Subset 0: 2.4GHz "social channels" and low 5GHz non-DFS channels */
+ 	if (allowed_bands & BAND_FREQ_2_4_GHZ) {
+-		station->scan_freqs_order[subset_idx] = scan_freq_set_new();
++		/* Channels 1, 6, 11 */
+ 		scan_freq_set_add(station->scan_freqs_order[subset_idx], 2412);
+ 		scan_freq_set_add(station->scan_freqs_order[subset_idx], 2437);
+ 		scan_freq_set_add(station->scan_freqs_order[subset_idx], 2462);
+-		subset_idx++;
  	}
  
--	parse_neighbor_report(station, reports, reports_len, &freq_set);
+-	/*
+-	 * TODO: It may might sense to split up 5 and 6ghz into separate subsets
+-	 *       since the channel set is so large.
+-	 */
+-	if (allowed_bands & (BAND_FREQ_5_GHZ | BAND_FREQ_6_GHZ)) {
+-		uint32_t mask = allowed_bands &
+-					(BAND_FREQ_5_GHZ | BAND_FREQ_6_GHZ);
+-		struct scan_freq_set *set = scan_freq_set_clone(supported,
+-								mask);
 -
--	r = station_roam_scan(station, freq_set);
--
--	if (freq_set)
--		scan_freq_set_free(freq_set);
-+	/* Add frequencies based on the prioritized subsets */
-+	for (uint8_t i = 0; i < L_ARRAY_SIZE(station->scan_freqs_order); i++) {
-+		scan_freq_set_foreach(station->scan_freqs_order[i], station_filter_roam_scan_freq, station);
-+		if (scan_freq_set_size(station->scan_freqs) >= STATION_MAX_SCAN_FREQS) {
-+			return;
-+		}
+-		/* 5/6ghz didn't add any frequencies */
+-		if (scan_freq_set_isempty(set)) {
+-			scan_freq_set_free(set);
+-		} else
+-			station->scan_freqs_order[subset_idx++] = set;
+-	}
++	if (allowed_bands & BAND_FREQ_5_GHZ)
++		/* Channels 32 - 48 */
++		for (int i = 5160; i <= 5240; i+=20)
++			scan_freq_set_add(station->scan_freqs_order[subset_idx], i);
++
++	scan_freq_set_constrain(station->scan_freqs_order[subset_idx], supported);
++	station->scan_freqs_order[++subset_idx] = scan_freq_set_new();
++
++	/* Subset 1: Remaining common 2.4GHz channels and high 5GHz non-DFS channels */
++	if (allowed_bands & BAND_FREQ_2_4_GHZ)
++		/* Channels 2 - 10, except 6 */
++		for (int i = 2417; i < 2462; i+=5)
++			if (i != 2437)
++				scan_freq_set_add(station->scan_freqs_order[subset_idx], i);
++
++	if (allowed_bands & BAND_FREQ_5_GHZ)
++		/* Channels 149 - 177 */
++		for (int i = 5745; i <= 5885; i+=20)
++			scan_freq_set_add(station->scan_freqs_order[subset_idx], i);
+ 
+-	/* Add remaining 2.4ghz channels to subset */
++	scan_freq_set_constrain(station->scan_freqs_order[subset_idx], supported);
++	station->scan_freqs_order[++subset_idx] = scan_freq_set_new();
++
++	/* Subset 2: Uncommon 2.4GHz channels and 5GHz DFS channels */
+ 	if (allowed_bands & BAND_FREQ_2_4_GHZ) {
+-		station->scan_freqs_order[subset_idx] = scan_freq_set_new();
+-		scan_freq_set_foreach(supported, station_add_2_4ghz_freq,
+-					station->scan_freqs_order[subset_idx]);
++		/* Channels 12 - 14 */
++		scan_freq_set_add(station->scan_freqs_order[subset_idx], 2467);
++		scan_freq_set_add(station->scan_freqs_order[subset_idx], 2472);
++		scan_freq_set_add(station->scan_freqs_order[subset_idx], 2484);
 +	}
- 
--	if (r < 0)
--		station_roam_failed(station);
-+	if (scan_freq_set_size(station->scan_freqs) <= STATION_MAX_SCAN_FREQS) {
-+		/* All freqs have been scanned after this, so empty the list of scanned
-+		 * freqs to restart */
-+		scan_freq_set_free(station->scanned_freqs);
-+		station->scanned_freqs = scan_freq_set_new();
++
++	if (allowed_bands & BAND_FREQ_5_GHZ) {
++		/* Channels 52 - 68 */
++		for (int i = 5260; i <= 5340; i+=20)
++			scan_freq_set_add(station->scan_freqs_order[subset_idx], i);
++
++		/* Channels 96 - 144 */
++		for (int i = 5480; i <= 5720; i+=20)
++			scan_freq_set_add(station->scan_freqs_order[subset_idx], i);
 +	}
- }
++
++	scan_freq_set_constrain(station->scan_freqs_order[subset_idx], supported);
++	station->scan_freqs_order[++subset_idx] = scan_freq_set_new();
++
++	/* Subset 3: 6GHz channels */
++	if (allowed_bands & BAND_FREQ_6_GHZ) {
++		struct scan_freq_set *set = scan_freq_set_clone(supported, BAND_FREQ_6_GHZ);
++
++		if (!scan_freq_set_isempty(set))
++			scan_freq_set_merge(station->scan_freqs_order[subset_idx], set);
++
++		scan_freq_set_free(set);
+ 	}
  
- static void station_start_roam(struct station *station)
- {
--	int r;
--
- 	station->preparing_roam = true;
- 
++	scan_freq_set_constrain(station->scan_freqs_order[subset_idx], supported);
++	station->scan_freqs_order[++subset_idx] = scan_freq_set_clone(supported, allowed_bands);
++
++	/* All channels that are both supported and allowed should be in the subsets,
++	 * if this is not the case then some new channel has been added that we are
++	 * not tracking, put it in the last subset to make sure it's scanned */
++	for (int i = 0; i < L_ARRAY_SIZE(station->scan_freqs_order) - 1; i++)
++		scan_freq_set_subtract(station->scan_freqs_order[subset_idx],
++				station->scan_freqs_order[i]);
++
++	if (!scan_freq_set_isempty(station->scan_freqs_order[subset_idx]))
++		l_warn("Final subset is not empty");
++
  	/*
--	 * If current BSS supports Neighbor Reports, narrow the scan down
--	 * to channels occupied by known neighbors in the ESS. If no neighbor
--	 * report was obtained upon connection, request one now. This isn't
--	 * 100% reliable as the neighbor lists are not required to be
--	 * complete or current.  It is likely still better than doing a
--	 * full scan.  10.11.10.1: "A neighbor report may not be exhaustive
--	 * either by choice, or due to the fact that there may be neighbor
--	 * APs not known to the AP."
-+	 * If no neighbor report was obtained upon connection, request one now if BSS
-+	 * supports it. This isn't 100% reliable as the neighbor lists are not
-+	 * required to be complete or current.
-+	 * 10.11.10.1: "A neighbor report may not be exhaustive either by choice, or
-+	 * due to the fact that there may be neighbor APs not known to the AP."
-+	 *
-+	 * Continue roaming while waiting for the neighbor report, the neighbors will
-+	 * be added to the roam scan when/if they're available.
+-	 * This has the unintended consequence of allowing DBus scans to
+-	 * scan the entire spectrum rather than cause IWD to be completely
+-	 * non-functional. Rather than prevent DBus scans from working at all
+-	 * print a warning here.
++	 * Loop through all subsets to see that there's at least one non-empty
++	 * subset, otherwise iwd will not function as expected and the user
++	 * should be warned.
  	 */
--	if (station->roam_freqs) {
--		if (station_roam_scan(station, station->roam_freqs) == 0) {
--			l_debug("Using cached neighbor report for roam");
--			return;
--		}
--	} else if (station->connected_bss->cap_rm_neighbor_report) {
-+	if (!station->roam_freqs && station->connected_bss->cap_rm_neighbor_report) {
- 		if (netdev_neighbor_report_req(station->netdev,
- 					station_neighbor_report_cb) == 0) {
- 			l_debug("Requesting neighbor report for roam");
--			return;
- 		}
- 	}
- 
--	r = station_roam_scan_known_freqs(station);
--	if (r == -ENODATA)
--		l_debug("No neighbor report or known frequencies, roam failed");
+-	if (station->scan_freqs_order[0] == NULL)
++	for (subset_idx = 0; subset_idx < L_ARRAY_SIZE(station->scan_freqs_order); subset_idx++)
++		if (!scan_freq_set_isempty(station->scan_freqs_order[subset_idx]))
++			break;
++
++	if (subset_idx == L_ARRAY_SIZE(station->scan_freqs_order))
+ 		l_warn("All supported bands were disabled by user! IWD will not"
+ 			" function as expected");
 -
--	if (r < 0)
--		station_roam_failed(station);
-+	station_populate_roam_scan_freqs(station);
-+	station_roam_scan(station, station->scan_freqs);
-+	scan_freq_set_free(station->scan_freqs);
-+	station->scan_freqs = NULL;
  }
  
- static bool station_cannot_roam(struct station *station)
-@@ -3624,7 +3602,7 @@ static void station_connect_ok(struct station *station)
- 	 */
- 	if (station->connected_bss->cap_rm_neighbor_report) {
- 		if (netdev_neighbor_report_req(station->netdev,
--					station_early_neighbor_report_cb) < 0)
-+					station_neighbor_report_cb) < 0)
- 			l_warn("Could not request neighbor report");
- 	}
+ static void station_wiphy_watch(struct wiphy *wiphy,
+@@ -5273,11 +5315,8 @@ static void station_free(struct station *station)
  
-@@ -5229,6 +5207,9 @@ static struct station *station_create(struct netdev *netdev)
- 	station->roam_bss_list = l_queue_new();
- 	station->affinities = l_queue_new();
+ 	l_queue_destroy(station->anqp_pending, remove_anqp);
  
-+	station->scanned_freqs = scan_freq_set_new();
-+	station->roam_scans_since_neighbor_scan = STATION_SCANS_BEFORE_NEIGHBOR_SCAN;
-+
- 	return station;
- }
+-	scan_freq_set_free(station->scan_freqs_order[0]);
+-	scan_freq_set_free(station->scan_freqs_order[1]);
+-
+-	if (station->scan_freqs_order[2])
+-		scan_freq_set_free(station->scan_freqs_order[2]);
++	for (uint8_t i = 0; i < L_ARRAY_SIZE(station->scan_freqs_order); i++)
++		scan_freq_set_free(station->scan_freqs_order[i]);
  
-@@ -5327,6 +5308,11 @@ static void station_free(struct station *station)
- 
- 	l_queue_destroy(station->affinities, l_free);
- 
-+	scan_freq_set_free(station->scanned_freqs);
-+
-+	if (station->scan_freqs)
-+		scan_freq_set_free(station->scan_freqs);
-+
- 	l_free(station);
- }
+ 	wiphy_state_watch_remove(station->wiphy, station->wiphy_watch);
  
 
 -- 
