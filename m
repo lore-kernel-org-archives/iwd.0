@@ -1,43 +1,43 @@
-Received: from AM0PR83CU005.outbound.protection.outlook.com (mail-westeuropeazon11010051.outbound.protection.outlook.com [52.101.69.51])
+Received: from GVXPR05CU001.outbound.protection.outlook.com (mail-swedencentralazon11013055.outbound.protection.outlook.com [52.101.83.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4140632572C
-	for <iwd@lists.linux.dev>; Fri, 28 Nov 2025 11:55:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.69.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 089C2316180
+	for <iwd@lists.linux.dev>; Fri, 28 Nov 2025 11:55:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.83.55
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764330917; cv=fail; b=CCHcaSO/zbNRBT+XF8q00neJdwnANzp3rp4kE9AYDdKyJyKY8YA/m70/LAq2xtPTVp+XrDDqfhBEdUmhnPwPXNRiRntR80abrv5cn3YkwBhOZa3KLKQN9ttjpQW6xbOUfs+CCzMe0NyhfERabw2yLiS37FOxVRkS7ecAxPy2Ssk=
+	t=1764330918; cv=fail; b=A/BQJIQGoZ2e4OniFP6dkjTbTXwdTPj/Urz+ukFWWRGI2c9dTE7IXCRGBqDj8Sle6/HTQN2OFr1ZufdEpNJ0jmYrZz1XPRjDYhc5Y3iAgsV48o36ga7xPN5NvghC8qVW6QZOutTzEDYbdFTDNDCmOrgxZd78zpFCv0U+YUm8YkY=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764330917; c=relaxed/simple;
-	bh=DXKSYT6x/8CSAYf+7jqVPGr2RI5H7hlhsLB2/0ZHJuA=;
+	s=arc-20240116; t=1764330918; c=relaxed/simple;
+	bh=ppM0NLns+s+djsPZt3vDYLM/V9ZpvkJ3f1VwlCK/vkU=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-ID:References:
-	 In-Reply-To:To; b=UM0hqndk+ZqNQfDYWLk9GkjXxcDlZG1PGloAOLA3Og6U8h+yjFNmBENuLH5K5xxlogolmJkqNR8jjdxsxuTOwG3UWi98+Pp0LnD/NfB9i7AUjKuUL84Zq5qSIMt7h6AdzrAduMaA7lWVqXxtNEPXbQs2LM27VZkYRW3+8NbRr1Y=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=axis.com; spf=pass smtp.mailfrom=axis.com; dkim=pass (1024-bit key) header.d=axis.com header.i=@axis.com header.b=PTVSwhMj; arc=fail smtp.client-ip=52.101.69.51
+	 In-Reply-To:To; b=huqzz5ixPXs4ldyC/tZLD4DCZGhAY7Ul/q6IxsmldwUHYNTo29pcqNxXEPIFV6CxmmtG42F9kLMAFtMXWjWHhnawp3W7QpaUrOLRL31AA6ENHMKT4pY5hR4NbmZsUzB9gUVPX6/6odA9m6VFvend7FRlG5pTnWsbT43i2LpAhGs=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=axis.com; spf=pass smtp.mailfrom=axis.com; dkim=pass (1024-bit key) header.d=axis.com header.i=@axis.com header.b=rbmndM23; arc=fail smtp.client-ip=52.101.83.55
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=axis.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=axis.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=axis.com header.i=@axis.com header.b="PTVSwhMj"
+	dkim=pass (1024-bit key) header.d=axis.com header.i=@axis.com header.b="rbmndM23"
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=TnyBz5VqowHuXsgtngNg/2WL2SytwVEw36P0xahcTYPV7UM3sjaD3h4mH7D3B3TB65/KnbYXHYgc2Bm3Ra99vtInf9xwP/hVZV6wMxsxZDk+8WunzoNm+wNJtO8KCQjoXkuegUuQAZ8QTJ0urzSCUL7iGqp0ZeBPQb/GGpXF6FyNOU160Ii+KYATWfza8vFolvjTGNEwPcziArydbZjIS8xvFFqE2ZJWYVNHg9VPO4RqV6vCAPInscS3FC3SsaMbHhTRehcb1aCiEy3PoVRNDdR8d9pyF4k6xekH8RPCFbRuHf5jvFxgFbIiXFAJQBIaV/2fwCE+d/3HEAIZGMuGYA==
+ b=k8CxqqSkHgutkI/ZLHLmow1+yPBXUWmALNG4LuLld4xjbah8CYkygJz0xTUmb3onGUZ6i7qgCxJI2L2s6q5Zy2vcG+msWgs3Ib5+pOzDgqV40mqWT+KoIU8Dpo2mY3lsqAmTXcCKtepIVGysAel8PDiaJsWDDS4UvAoujechB3FSFpMCC+5tb2Cr9hG13Y5+ICVAt+YUVMWUG1RbgbLFrH7B5S23oOQR1c7VOY2odM2evUa+KCn/UQVZ8mZj55B4OjKdocEAXjD0MHmslMyuj1FGuDdknehlVCueyvw1Mt3TCUptBub+XTO2tAVEsP+F0SW5vcUb2lTdkIHbLuKQTw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=dPWqDnqRK7cAblFOfRt1wS6lCiTDHcpMjJ/pDIyAGME=;
- b=MXoiBLfgpUwtZjVQFeCXoJGNVDdaBj9mACGpKmE3OQn20WIxlM3d8/ABONCu3f6gEztAvYGldXGGNMtHcX10hPZHxge0xe47UwqeHWVDxdYNCr5TxaTIxG1kt4sqkaevwVZmyv0ufMzPMaLQLTXIltBZmNXID2vJWepXpq//3AM4iMRhSKoUO/CYxAZIPYp0R6BbSKV1AA2uMzXsMgjUz1wq2oJo/T96PJKJZR2oB/ZTiVx6snoksAYNJAkgkfqPcbq55TbZ5+xsKIojJyITfjhMD9LWqvt5c4ryyXbkb7/5wWpDIH9u3EF0RPi+EiA0u8Ll01Ep3Hhv6cYWNcnxNQ==
+ bh=DSLL56cCWlzM0MRhAga3eTrd9McHXK2ygqLcT6moPyU=;
+ b=uMf+cLKrrqAvRr/syVe0sUiwi8r/cvHe7TOtY+qnGfRzma5nxvElecdJ3b8hbj/rrM7Qvo8bKfQlfOe7HM6qz7Ok4ww4YP6X5/B3hgHmM1pagFwdpEjO6ci43ixoAgD6OIJLVs/9FN7JggXb0rhTtLMJ3PGUDm7rkxKxVtO2gPsiy8qdikh7geMp5d/PyYzGvPvJIV8zhG/XIMLYVGn6+Dm/z0+0M78IymtgRnG8tWVYsCg+BtuhjYfY4FutWKkk8esGcu8KrBojflLGibyifwPli7dDmhQgalXzc1VgsxXyR/zsJivpnTuzfvxBdl7DZAlXzySv9Y6ZxANNwfTh1w==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  195.60.68.100) smtp.rcpttodomain=lists.linux.dev smtp.mailfrom=axis.com;
  dmarc=pass (p=none sp=none pct=100) action=none header.from=axis.com;
  dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=axis.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=dPWqDnqRK7cAblFOfRt1wS6lCiTDHcpMjJ/pDIyAGME=;
- b=PTVSwhMjC6uaDuUOHKFVg8MVfD3ZSJNEpKOqtO7sYC3HyF8+4TjL0QMKz8pgefu47pY5YzTSULLQxDzn/ApL7wivWLgcpyLmGzdUUFML19oUD/ISBiVOq3ITPePG/vg10OiktELv9VxVBgBybaGRGo6tL4aX364+/YMuDyy7oqM=
+ bh=DSLL56cCWlzM0MRhAga3eTrd9McHXK2ygqLcT6moPyU=;
+ b=rbmndM23MdtTBtCmzOpEr4KGpYegb4tMU8dxkK+yoNUgUneyDaOhrG83AschbkDoHPb8bDnc9NBMYhMgfJ/OreVTytw3ayOOZZY4XC9wr1yH7/FkWKJrGHwoJ9rXs4RiURInbtOhhpzwu+6VNq01eZXZO6OxDzaXjjE1GcJNNJg=
 Received: from DUZPR01CA0028.eurprd01.prod.exchangelabs.com
- (2603:10a6:10:46b::7) by PA1PR02MB11617.eurprd02.prod.outlook.com
- (2603:10a6:102:557::14) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9366.17; Fri, 28 Nov
- 2025 11:55:10 +0000
+ (2603:10a6:10:46b::7) by PA1PR02MB11542.eurprd02.prod.outlook.com
+ (2603:10a6:102:555::14) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9366.13; Fri, 28 Nov
+ 2025 11:55:12 +0000
 Received: from DU6PEPF00009528.eurprd02.prod.outlook.com
- (2603:10a6:10:46b:cafe::b3) by DUZPR01CA0028.outlook.office365.com
+ (2603:10a6:10:46b:cafe::5f) by DUZPR01CA0028.outlook.office365.com
  (2603:10a6:10:46b::7) with Microsoft SMTP Server (version=TLS1_3,
  cipher=TLS_AES_256_GCM_SHA384) id 15.20.9366.16 via Frontend Transport; Fri,
  28 Nov 2025 11:55:07 +0000
@@ -55,21 +55,21 @@ Received: from se-mail01w.axis.com (10.20.40.7) by se-mail10w.axis.com
  (10.20.40.10) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.2.1748.39; Fri, 28 Nov
  2025 12:55:07 +0100
-Received: from se-mail02w.axis.com (10.20.40.8) by se-mail01w.axis.com
+Received: from se-mail01w.axis.com (10.20.40.7) by se-mail01w.axis.com
  (10.20.40.7) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.61; Fri, 28 Nov
  2025 12:55:07 +0100
-Received: from se-intmail02x.se.axis.com (10.4.0.28) by se-mail02w.axis.com
- (10.20.40.8) with Microsoft SMTP Server id 15.1.2507.61 via Frontend
+Received: from se-intmail01x.se.axis.com (10.4.0.28) by se-mail01w.axis.com
+ (10.20.40.7) with Microsoft SMTP Server id 15.1.2507.61 via Frontend
  Transport; Fri, 28 Nov 2025 12:55:07 +0100
 Received: from pc48844-2217.se.axis.com (pc48844-2217.se.axis.com [10.92.172.48])
-	by se-intmail02x.se.axis.com (Postfix) with ESMTP id 6F6D72DB
+	by se-intmail01x.se.axis.com (Postfix) with ESMTP id 7A55A936
 	for <iwd@lists.linux.dev>; Fri, 28 Nov 2025 12:55:07 +0100 (CET)
 Received: by pc48844-2217.se.axis.com (Postfix, from userid 13016)
-	id 6FAD6286516A; Fri, 28 Nov 2025 12:55:07 +0100 (CET)
+	id 7920B286516A; Fri, 28 Nov 2025 12:55:07 +0100 (CET)
 From: Alexander Ganslandt <alexander.ganslandt@axis.com>
-Date: Fri, 28 Nov 2025 12:54:23 +0100
-Subject: [PATCH v5 2/8] station: improve scan_freqs_order channel subsets
+Date: Fri, 28 Nov 2025 12:54:28 +0100
+Subject: [PATCH v5 7/8] auto-t: Fix test_ignore_candidate_list_quirk
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
@@ -78,281 +78,148 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-ID: <20251128-roam-scan-improvements-v5-2-285ff0104188@axis.com>
+Message-ID: <20251128-roam-scan-improvements-v5-7-285ff0104188@axis.com>
 References: <20251128-roam-scan-improvements-v5-0-285ff0104188@axis.com>
 In-Reply-To: <20251128-roam-scan-improvements-v5-0-285ff0104188@axis.com>
 To: <iwd@lists.linux.dev>
 X-Mailer: b4 0.15-dev-c25d1
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DU6PEPF00009528:EE_|PA1PR02MB11617:EE_
-X-MS-Office365-Filtering-Correlation-Id: 197130ec-ef15-4416-36fa-08de2e74fb7f
+X-MS-TrafficTypeDiagnostic: DU6PEPF00009528:EE_|PA1PR02MB11542:EE_
+X-MS-Office365-Filtering-Correlation-Id: caeb9e7b-23b3-406a-ed23-08de2e74fbb1
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|36860700013|82310400026|376014|1800799024|30052699003;
+	BCL:0;ARA:13230040|36860700013|1800799024|376014|82310400026;
 X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?VVgxRGdCUkFiMFduQ0FEOU53TjByZ1I3TzcvMURTMStvYUxEelYxdzI5aEdl?=
- =?utf-8?B?SVlEQ1VJMmVaTnBzbDEyNlJrMWtrNllkcG1tS2FWVTRhaUFQY0YyS0Q4WDNh?=
- =?utf-8?B?RGwxTlpnanJnTGE1SEQ4d1hSemlQeTZiQ2FmQ0ZhYVZGZWlVUXFiTEl6WlBn?=
- =?utf-8?B?SmVBbDBwWEU4ZElreTg0NnBlV0hLc0hTS0ZvTnhSaVcydzhHVStvTFBhdEEw?=
- =?utf-8?B?eURrNEFNWkNxQjBkQUFZWVdoR3BCVzFFWUZLc2RnYjM2eXhhMGNrN1pQRFpu?=
- =?utf-8?B?eUZMUDR4TWxwbDVSUE9peWIyREJTWmNLTVdmREVsU2VCUGVyTWlBWDFpT2tD?=
- =?utf-8?B?VXJHWU9ybHNQdDlpNjVXMmk2OVNSQm1RcmwyaU8zc1FwMVJLNmd5NTVYbGRK?=
- =?utf-8?B?V3U0ZkhtQmF6YkduU2p0TWhDTDFmQ1RsMTA3Ti8xUWlTMEJNZjhlemJVMW5E?=
- =?utf-8?B?YUlkYWFnNUdOOXpZL2pwTXZzTVpaV3FyeXpITnRFbGFBWC9CR0kySzdKT0Fn?=
- =?utf-8?B?K1dKQkZBbkhOUFcxbFV0ZEsrbEF4c1lCdTdaYnQ5eXNCUGFRWnAyZXlwQmND?=
- =?utf-8?B?dkJkZklYRzI4VVJlbDVsVnMzMDh6T1JHZjB3TnViNEhGU3JYK21ZUC95LzQ4?=
- =?utf-8?B?QVVFNWlzTEwrbmlNMkFqa0tPNmE2SStnRDM5Wlczd3JLZnlZM0V4czFEamV3?=
- =?utf-8?B?WlZpVGJ1bUU3TGY1MVgxVVd5L0dxazdZV2hLb1F3ZEVuRkU3VmRBaW1GT3FC?=
- =?utf-8?B?Rjl0cTh1c2xTaEp0U29tUncwTlkwcGo1MVVFRDJoaCtDQ1hkbk9JOXdTMWht?=
- =?utf-8?B?L1pvN1NOSEI1dXYrclhxckNYZUlpb2J1OGk4Z3NZR1Zlc3NVb21zZTZBZysr?=
- =?utf-8?B?dHJlVlR4SE9oaDJ1SUJza2hsOEVGRmVEUGNCbENhUE9uV3VlZHdvMnNjdVF6?=
- =?utf-8?B?VFcydnAyaW1lS0wzODlRcFdPa0ttVVNtVzNFeDBkeUZvY1I2MEFUaE90QmVS?=
- =?utf-8?B?R092dVg1NnE3MVM0blUzTEVBUjJVSnkxNEJXYzVQTkJZWE5JQjZnQ3p4RDdV?=
- =?utf-8?B?dmtqQXlvc00rOW9YOXBlWHBMcW9GSzI5KzF1RWs1TGExY25sOXdyNER1N1Nw?=
- =?utf-8?B?bTBvUzZGL21uYVFNaG5nK2ZlcjVWRURTZXpmK3JQOUZjeHpOS2RTNWRiblI2?=
- =?utf-8?B?Q29wMUorZkR6Si9xa0VqR1ljbFVxUFhMa25RdWQyWTN3ZDZqNmd1R05sVFpC?=
- =?utf-8?B?WE5RVyttQnBhcDc4TU5tYXhQdWI3QW5aMFNSZXZaVzM3UWxpdFNwNG1hZFRT?=
- =?utf-8?B?anNQRnNqVGwxYzRwM2pUUlM0SDJiN01XTW1FQUpZUnBRODgwc3NaQktqeWky?=
- =?utf-8?B?MndPdW1xVitDbW5UTytmTnVhS3FzZWcwZjV6c0EzdVVIOWxJdGE1V01qQXlD?=
- =?utf-8?B?RC8yY3gzNTlMakxkNThnUHdPVzUzNnNkUEthYU01c1pCZmpFYXphRVZiNEhu?=
- =?utf-8?B?QkI1ZzBvN2libEYrUTNpNnJNWFhVeGVTdkMycGpPVm1GSGw4bHFCVHZqTG11?=
- =?utf-8?B?eXdvS2huLzdsdERxd2g0U3JTOCsreWZjTmxYTGVoVDlYanU3K3V3TXNUaVc2?=
- =?utf-8?B?VEQ1a0YycUxUUUZBdGtGd1lxVmtHc1gxQVZrRkFWYmZIemREOS9nRzZhTEJI?=
- =?utf-8?B?YnVwR3h6M0NBcE9VVjZUVmZrMTBlVjhHazRVYys2TjFMMmFaOVhnREVrSElI?=
- =?utf-8?B?SXkxNGgrRGNLZGdZRVZLQmtqdHkxM2p1RlFWTXdxek1vTHpINTh2Qjl3cG5l?=
- =?utf-8?B?bVZSVU9rcktLWnMxQkpWeGZ0WVdESUh0b05uZnpDcFA5YTVaeXJZT2oxVG9Z?=
- =?utf-8?B?eEcwM3IxMmxiSEJRbnEvL1R4Mm9TNzYwVVdkYUMwcmN4TWpaWTBqeEc1OEtZ?=
- =?utf-8?B?QjNYdlJISDlteHpqZ0N2Nks2dzJ2R0FQVk00TGp0T0ZrTm1ydmxlZ1NMOGVn?=
- =?utf-8?B?MW90dFNvZ1MzMng4NjlUbG96anB2bDJNVnhQaWJ4N1EzOGtYWVZvazVCZVpI?=
- =?utf-8?B?NmsvZ0NIaUl5V2h4OFJMK2lIYmZYVk9CU0U1bmtXaHU3R2U2aEM0SHRscS9W?=
- =?utf-8?Q?u3bU=3D?=
+	=?utf-8?B?ajNlZi8vZXNSU0RvYUQ0djJJaDh5VnV6QUl0Ujc1a0JLSnpGczBjNU1CVnd1?=
+ =?utf-8?B?SHZqcXhVN3RibWhwRHVtVFdsTVk0N3dSbzRlMy9aYStCN2hKeWhPUU02MVhS?=
+ =?utf-8?B?YklaTXk0MFI3U2RxWXUzL1lqNEl4NzVid0xzbm1wcklXYUFJRUZza3o0eERn?=
+ =?utf-8?B?Mkg4UkJpYTVNaXBaUXNWZjBtaVRtQk9vUUFzamFpQy92cWxVdXFIVjVmMU93?=
+ =?utf-8?B?NlU0NU5HeFRCL1JocjlIYTUwWmhrcHE2RkxpTDNacFphaXV4VS9GTDJpNEpN?=
+ =?utf-8?B?M3owbE9TdkNMZ0s2a2FQV3BDTmNzWFdLS1A0MFhvU2ZzVkJ6djNUUTAweEdB?=
+ =?utf-8?B?b1dXR2E3bWdGdnVQSnFjMjNidzRsQW1BKzhjcDZnejEzZ1h6Zk9JTEVadHpq?=
+ =?utf-8?B?czAvV2VJYW5nUktOKzdPNHVpbHhqU3ZxbC80MVJ3cjU5ZTlCMnJST1RoU1I1?=
+ =?utf-8?B?NWhMb2R3UzBId3JIVGM0ZTBpanpNSnAwZkpCaUJtME13L2pTU1ZqSTRTL1Qr?=
+ =?utf-8?B?Y3F0N1ZMREU2WkdSU0lpckJuRlFVSGdhUXJURW5laW9DN25xdW92YnFqbHNS?=
+ =?utf-8?B?clE2WmV0VnFzLzl3b0k0UEJOM0tqZVQ3cGtNdjVod1RvL1R0U1ZSUU5paTFK?=
+ =?utf-8?B?MitBOHRaTi9KMFN3MnZKVFJHVUJiejBEU0VIa2JNMUhGcllDcmNQZ2dpbW1T?=
+ =?utf-8?B?TCs1WFVhRXg1L3FUUGxyYWUzNjdYY0JZcHhGZ3FtekxBREM4Uk5Rb1VKVWdV?=
+ =?utf-8?B?VFFVNHNPcThodnBwd2dtZkhKNXcwMzBNdno0TXlTaWZxMEFSbGxDTC9ESHZw?=
+ =?utf-8?B?ZVhMMFVLSkg1ZE4zTVRzNS9ROW80L2poTHNQRmRVdU1YYTkxc1NZOWZWNmtr?=
+ =?utf-8?B?T2lIbXFXbnpCSUhqRVFjWDN1djFVbEkzcVlWMExQdHFuaWFqSHh3cUI5UDZP?=
+ =?utf-8?B?aUt0OE9KcCtQQWREMkd1bFN3OGN2eDlwSFI3RmR5cUZSZ1hNa2UxTWpEM1BY?=
+ =?utf-8?B?STZDNGk4WU40eWU4eHNGZTlJdUJlWjNTUTFnZlJ2clVMWFUrU2VRQTJzczBL?=
+ =?utf-8?B?ampobzJRY05BUUJTZ002QTM3bmlCcC90NHY2dW1CYXJHUCs4ZlVQbzdTT0Na?=
+ =?utf-8?B?aGp3ZVJtb3NqNTNZOFIvRGpmSkpFeSs2MUJuRk40SkY5bVlkeG1DTzBZZFVt?=
+ =?utf-8?B?TXgzUHJBZGdTSHhDRWVzK2dZbUxtQStPVlVRNU1OU2VRQVdiWm9iSHJua3pM?=
+ =?utf-8?B?L2E3TUJpQ01ja0hIdE9ZZS9hYWMwTGxyTUpPY0lpekRZN0VaUld5Nm9jVFp6?=
+ =?utf-8?B?WnBWK2QxUmEyc3NlTndhQU5VaU11WVBPZlRSYUFLa2h3UUFZM3RMRTY1Y3lw?=
+ =?utf-8?B?di9DTjFjd1RvdlpuSGhuK2l1bktLODZkbEhqY0tadTNqeWxHUG5KaWh3K3pZ?=
+ =?utf-8?B?d1R2aVlDWW1UNjVhR1dNLzFXUVpDQ3dEM1YrUjNyeURrSmlEd1oyVzJNQU1w?=
+ =?utf-8?B?ZXpuRVJnb0VnVzlZdVh3cUQwK2JVMlZmOXpCYWRVOU0rTlZNREREUXIwQTVJ?=
+ =?utf-8?B?QmlEeGZFaFdCYUxhb1VtTHhpN05Ub0ZOczVtSjhJU2M1cktVdDZtbWhGcmxm?=
+ =?utf-8?B?VWNZVUsxamJyTWlMR1k2dEpGQnU3L0Y2eklLK2VLL0dSM0JPZEdwT2JLY25s?=
+ =?utf-8?B?bC9WUFdiV3RiY2hCQVJyWEUvbThmcnZpc3VHVytUNy9mVkRGeWh5WXhtUVRD?=
+ =?utf-8?B?QkFhNVdMNmgyeG8rUmdzOGFoUWs1cGpVSi9Kck5ud0NQWGJuTnRoUzlnTE5J?=
+ =?utf-8?B?WnVqdmpwQXovUzhrNm5LbVZTd1dVVFd4STlPaE9VVVU3YTFkU2Z4ZUhQdkhn?=
+ =?utf-8?B?ZHRFVm9reW1YcndIamJlaTFjOFAvT05FZTVsYVpFN3IvWEtGYk9rdXlTcXBZ?=
+ =?utf-8?B?cktoR3Q1MFE2VTNlWjJ6Qmx0bHJna09va2JHRWhBOTBsRGJvREFyWnZob0hz?=
+ =?utf-8?B?VzhsM1pta3FxbGE0c3hGRkhja3A4OEpmeDkzdnNqYzhIZWs0OWUzTGhwUkVI?=
+ =?utf-8?B?aHlkNENVcm9CRXF1Y2NDS2k1NjZONnJ5RlFiY2tkWFRRTmtGTjNjOHExOG0w?=
+ =?utf-8?Q?EA3Y=3D?=
 X-Forefront-Antispam-Report:
-	CIP:195.60.68.100;CTRY:SE;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.axis.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(36860700013)(82310400026)(376014)(1800799024)(30052699003);DIR:OUT;SFP:1101;
+	CIP:195.60.68.100;CTRY:SE;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.axis.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(36860700013)(1800799024)(376014)(82310400026);DIR:OUT;SFP:1101;
 X-OriginatorOrg: axis.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Nov 2025 11:55:10.3119
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Nov 2025 11:55:10.6456
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 197130ec-ef15-4416-36fa-08de2e74fb7f
+X-MS-Exchange-CrossTenant-Network-Message-Id: caeb9e7b-23b3-406a-ed23-08de2e74fbb1
 X-MS-Exchange-CrossTenant-Id: 78703d3c-b907-432f-b066-88f7af9ca3af
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=78703d3c-b907-432f-b066-88f7af9ca3af;Ip=[195.60.68.100];Helo=[mail.axis.com]
 X-MS-Exchange-CrossTenant-AuthSource:
 	DU6PEPF00009528.eurprd02.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PA1PR02MB11617
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PA1PR02MB11542
 
-From: Alexander Ganslandt <alexanga@axis.com>
+This test no longer triggers a full scan. Instead, we verify that it
+doesn't scan the bad candidate channel, which is verified by not getting
+"no-roam-candidates". Then we also verify that it roams to the other
+available BSS, which it should do immediately because that BSS is on a
+channel that's in the first subset of channels to be scanned. This means
+it should roam directly without getting "no-roam-candidates" in-between.
 
-Splits the scan frequencies into more subsets that have been ordered
-such that the more common frequencies appear first, and the more uncommon
-frequencies last. Non-DFS channels are also added to the earlier
-subsets to prioritize fast-scanning frequencies.
-
-This approach allows iwd to scan the frequencies with the statistically
-highest chance for BSSes first, resulting in shorter scan times until a
-good BSS is found. In future patches this will also be used when
-roaming.
+To allow for this, add an optional "disallow" list of events to
+wait_for_event(). This functionality already exists in hostapd.py, so
+the same solution was copied to iwd.py.
 ---
- src/station.c | 137 +++++++++++++++++++++++++++++++++++++---------------------
- 1 file changed, 88 insertions(+), 49 deletions(-)
+ autotests/testAPRoam/bad_neighbor_report_test.py |  9 ++++-----
+ autotests/util/iwd.py                            | 13 ++++++++-----
+ 2 files changed, 12 insertions(+), 10 deletions(-)
 
-diff --git a/src/station.c b/src/station.c
-index f8069d89..15937fbe 100644
---- a/src/station.c
-+++ b/src/station.c
-@@ -125,7 +125,7 @@ struct station {
- 	struct l_queue *roam_bss_list;
+diff --git a/autotests/testAPRoam/bad_neighbor_report_test.py b/autotests/testAPRoam/bad_neighbor_report_test.py
+index c8e4e45a..5a8be635 100644
+--- a/autotests/testAPRoam/bad_neighbor_report_test.py
++++ b/autotests/testAPRoam/bad_neighbor_report_test.py
+@@ -114,15 +114,14 @@ class Test(unittest.TestCase):
  
- 	/* Frequencies split into subsets by priority */
--	struct scan_freq_set *scan_freqs_order[3];
-+	struct scan_freq_set *scan_freqs_order[5];
- 	unsigned int dbus_scan_subset_idx;
+         self.initial_connection()
  
- 	uint32_t wiphy_watch;
-@@ -4500,8 +4500,7 @@ static bool station_dbus_scan_results(int err, struct l_queue *bss_list,
- 		return false;
- 	}
+-        # Send with a candidate list (should be ignored)
++        # Send with a bad candidate list (should be ignored)
+         self.bss_hostapd[0].send_bss_transition(
+             self.device.address,
+             [(self.bss_hostapd[1].bssid, "8f0000005105060603000000")]
+         )
+-        # IWD should ignore the list and trigger a full scan since we have not
+-        # set any neighbors
+-        self.device.wait_for_event("full-roam-scan")
+-        self.device.wait_for_event("roaming", timeout=30)
++        # IWD should ignore the list and not try to scan the bad channel,
++        # so we shouldn't get no-roam-candidates before we roam
++        self.device.wait_for_event("roaming", timeout=30, disallow=["no-roam-candidates"])
+         self.device.wait_for_event("connected")
  
--	last_subset = next_idx >= L_ARRAY_SIZE(station->scan_freqs_order) ||
--		station->scan_freqs_order[next_idx] == NULL;
-+	last_subset = next_idx >= L_ARRAY_SIZE(station->scan_freqs_order);
- 	station->dbus_scan_subset_idx = next_idx;
+     def setUp(self):
+diff --git a/autotests/util/iwd.py b/autotests/util/iwd.py
+index 37eb4943..c79afc83 100755
+--- a/autotests/util/iwd.py
++++ b/autotests/util/iwd.py
+@@ -297,8 +297,11 @@ class StationDebug(IWDDBusAbstract):
+         frequencies = dbus.Array([dbus.UInt16(f) for f in frequencies])
+         self._iface.Scan(frequencies)
  
- 	station_set_scan_results(station, bss_list, freqs, false);
-@@ -4516,6 +4515,15 @@ static bool station_dbus_scan_subset(struct station *station)
- {
- 	unsigned int idx = station->dbus_scan_subset_idx;
+-    def _poll_event(self, event):
++    def _poll_event(self, event, disallow):
+         for idx, e in enumerate(self._events):
++            for d in disallow:
++                if d in e:
++                    raise Exception('Event %s found while waiting for %s' % (d, event))
+             if event == e[0]:
+                 # Consume any older events
+                 self._events = self._events[:idx]
+@@ -309,8 +312,8 @@ class StationDebug(IWDDBusAbstract):
+     def clear_events(self):
+         self._events = []
  
-+	/* Find the next non-empty subset */
-+	while (idx < L_ARRAY_SIZE(station->scan_freqs_order) &&
-+			scan_freq_set_isempty(station->scan_freqs_order[idx]))
-+		idx++;
-+	station->dbus_scan_subset_idx = idx;
-+
-+	if (idx >= L_ARRAY_SIZE(station->scan_freqs_order))
-+		return false;
-+
- 	station->dbus_scan_id = station_scan_trigger(station,
- 						station->scan_freqs_order[idx],
- 						station_dbus_scan_triggered,
-@@ -5046,67 +5054,101 @@ int station_hide_network(struct station *station, struct network *network)
- 	return 0;
- }
+-    def wait_for_event(self, event, timeout=10):
+-        return ctx.non_block_wait(self._poll_event, timeout, event,
++    def wait_for_event(self, event, timeout=10, disallow=[]):
++        return ctx.non_block_wait(self._poll_event, timeout, event, disallow,
+                                     exception=TimeoutError("waiting for event"))
  
--static void station_add_2_4ghz_freq(uint32_t freq, void *user_data)
--{
--	struct scan_freq_set *set = user_data;
--
--	/* exclude social channels added in initial scan request */
--	if (freq < 3000 && freq != 2412 && freq != 2437 && freq != 2462)
--		scan_freq_set_add(set, freq);
--}
--
- static void station_fill_scan_freq_subsets(struct station *station)
- {
- 	const struct scan_freq_set *supported =
- 				wiphy_get_supported_freqs(station->wiphy);
- 	unsigned int subset_idx = 0;
+     def event_ocurred(self, event):
+@@ -886,8 +889,8 @@ class Device(IWDDBusAbstract):
+     def debug_scan(self, frequencies):
+         self._station_debug.scan(frequencies)
  
--	/*
--	 * Scan the 2.4GHz "social channels" first, 5GHz second, if supported,
--	 * all other 2.4GHz channels last.  To be refined as needed.
--	 */
-+	station->scan_freqs_order[subset_idx] = scan_freq_set_new();
-+
-+	/* Subset 0: 2.4GHz "social channels" and low 5GHz non-DFS channels */
- 	if (allowed_bands & BAND_FREQ_2_4_GHZ) {
--		station->scan_freqs_order[subset_idx] = scan_freq_set_new();
-+		/* Channels 1, 6, 11 */
- 		scan_freq_set_add(station->scan_freqs_order[subset_idx], 2412);
- 		scan_freq_set_add(station->scan_freqs_order[subset_idx], 2437);
- 		scan_freq_set_add(station->scan_freqs_order[subset_idx], 2462);
--		subset_idx++;
- 	}
+-    def wait_for_event(self, event, timeout=10):
+-        self._station_debug.wait_for_event(event, timeout)
++    def wait_for_event(self, event, timeout=10, disallow=[]):
++        self._station_debug.wait_for_event(event, timeout, disallow)
  
--	/*
--	 * TODO: It may might sense to split up 5 and 6ghz into separate subsets
--	 *       since the channel set is so large.
--	 */
--	if (allowed_bands & (BAND_FREQ_5_GHZ | BAND_FREQ_6_GHZ)) {
--		uint32_t mask = allowed_bands &
--					(BAND_FREQ_5_GHZ | BAND_FREQ_6_GHZ);
--		struct scan_freq_set *set = scan_freq_set_clone(supported,
--								mask);
--
--		/* 5/6ghz didn't add any frequencies */
--		if (scan_freq_set_isempty(set)) {
--			scan_freq_set_free(set);
--		} else
--			station->scan_freqs_order[subset_idx++] = set;
--	}
-+	if (allowed_bands & BAND_FREQ_5_GHZ)
-+		/* Channels 32 - 48 */
-+		for (int i = 5160; i <= 5240; i+=20)
-+			scan_freq_set_add(station->scan_freqs_order[subset_idx], i);
-+
-+	scan_freq_set_constrain(station->scan_freqs_order[subset_idx], supported);
-+	station->scan_freqs_order[++subset_idx] = scan_freq_set_new();
-+
-+	/* Subset 1: Remaining common 2.4GHz channels and high 5GHz non-DFS channels */
-+	if (allowed_bands & BAND_FREQ_2_4_GHZ)
-+		/* Channels 2 - 10, except 6 */
-+		for (int i = 2417; i < 2462; i+=5)
-+			if (i != 2437)
-+				scan_freq_set_add(station->scan_freqs_order[subset_idx], i);
-+
-+	if (allowed_bands & BAND_FREQ_5_GHZ)
-+		/* Channels 149 - 177 */
-+		for (int i = 5745; i <= 5885; i+=20)
-+			scan_freq_set_add(station->scan_freqs_order[subset_idx], i);
- 
--	/* Add remaining 2.4ghz channels to subset */
-+	scan_freq_set_constrain(station->scan_freqs_order[subset_idx], supported);
-+	station->scan_freqs_order[++subset_idx] = scan_freq_set_new();
-+
-+	/* Subset 2: Uncommon 2.4GHz channels and 5GHz DFS channels */
- 	if (allowed_bands & BAND_FREQ_2_4_GHZ) {
--		station->scan_freqs_order[subset_idx] = scan_freq_set_new();
--		scan_freq_set_foreach(supported, station_add_2_4ghz_freq,
--					station->scan_freqs_order[subset_idx]);
-+		/* Channels 12 - 14 */
-+		scan_freq_set_add(station->scan_freqs_order[subset_idx], 2467);
-+		scan_freq_set_add(station->scan_freqs_order[subset_idx], 2472);
-+		scan_freq_set_add(station->scan_freqs_order[subset_idx], 2484);
-+	}
-+
-+	if (allowed_bands & BAND_FREQ_5_GHZ) {
-+		/* Channels 52 - 68 */
-+		for (int i = 5260; i <= 5340; i+=20)
-+			scan_freq_set_add(station->scan_freqs_order[subset_idx], i);
-+
-+		/* Channels 96 - 144 */
-+		for (int i = 5480; i <= 5720; i+=20)
-+			scan_freq_set_add(station->scan_freqs_order[subset_idx], i);
-+	}
-+
-+	scan_freq_set_constrain(station->scan_freqs_order[subset_idx], supported);
-+	station->scan_freqs_order[++subset_idx] = scan_freq_set_new();
-+
-+	/* Subset 3: 6GHz channels */
-+	if (allowed_bands & BAND_FREQ_6_GHZ) {
-+		struct scan_freq_set *set = scan_freq_set_clone(supported, BAND_FREQ_6_GHZ);
-+
-+		if (!scan_freq_set_isempty(set))
-+			scan_freq_set_merge(station->scan_freqs_order[subset_idx], set);
-+
-+		scan_freq_set_free(set);
- 	}
- 
-+	scan_freq_set_constrain(station->scan_freqs_order[subset_idx], supported);
-+	station->scan_freqs_order[++subset_idx] = scan_freq_set_clone(supported, allowed_bands);
-+
-+	/* All channels that are both supported and allowed should be in the subsets,
-+	 * if this is not the case then some new channel has been added that we are
-+	 * not tracking, put it in the last subset to make sure it's scanned */
-+	for (unsigned int i = 0; i < L_ARRAY_SIZE(station->scan_freqs_order) - 1; i++)
-+		scan_freq_set_subtract(station->scan_freqs_order[subset_idx],
-+				station->scan_freqs_order[i]);
-+
-+	if (!scan_freq_set_isempty(station->scan_freqs_order[subset_idx]))
-+		l_warn("Final subset is not empty");
-+
- 	/*
--	 * This has the unintended consequence of allowing DBus scans to
--	 * scan the entire spectrum rather than cause IWD to be completely
--	 * non-functional. Rather than prevent DBus scans from working at all
--	 * print a warning here.
-+	 * Loop through all subsets to see that there's at least one non-empty
-+	 * subset, otherwise iwd will not function as expected and the user
-+	 * should be warned.
- 	 */
--	if (station->scan_freqs_order[0] == NULL)
-+	for (subset_idx = 0; subset_idx < L_ARRAY_SIZE(station->scan_freqs_order); subset_idx++)
-+		if (!scan_freq_set_isempty(station->scan_freqs_order[subset_idx]))
-+			break;
-+
-+	if (subset_idx == L_ARRAY_SIZE(station->scan_freqs_order))
- 		l_warn("All supported bands were disabled by user! IWD will not"
- 			" function as expected");
--
- }
- 
- static void station_wiphy_watch(struct wiphy *wiphy,
-@@ -5273,11 +5315,8 @@ static void station_free(struct station *station)
- 
- 	l_queue_destroy(station->anqp_pending, remove_anqp);
- 
--	scan_freq_set_free(station->scan_freqs_order[0]);
--	scan_freq_set_free(station->scan_freqs_order[1]);
--
--	if (station->scan_freqs_order[2])
--		scan_freq_set_free(station->scan_freqs_order[2]);
-+	for (uint8_t i = 0; i < L_ARRAY_SIZE(station->scan_freqs_order); i++)
-+		scan_freq_set_free(station->scan_freqs_order[i]);
- 
- 	wiphy_state_watch_remove(station->wiphy, station->wiphy_watch);
- 
+     def clear_events(self):
+         self._station_debug.clear_events()
 
 -- 
 2.39.5
