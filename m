@@ -1,79 +1,166 @@
-Received: from out-171.mta1.migadu.com (out-171.mta1.migadu.com [95.215.58.171])
+Received: from mail-10624.protonmail.ch (mail-10624.protonmail.ch [79.135.106.24])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 598CE23D2B4
-	for <iwd@lists.linux.dev>; Tue, 16 Dec 2025 19:07:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F9042571C5
+	for <iwd@lists.linux.dev>; Sun, 21 Dec 2025 13:58:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=79.135.106.24
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765912081; cv=none; b=frH9eoeE4WDc0tSf/MCKMEdh+Zl5tj1jdj3wfZCxh2HtuTAf6mcvza+ci4j9k3S6sdFDMAbBl3h19N9QlK4V7BeOGnX21XxUP1UKb2NYETcN+y5P7D4BX1VqG6TIIzpgpb9pbx67lhudywH/CHh/6kydLgfSSl01RhvgHKonWoA=
+	t=1766325503; cv=none; b=lDf6XIRc/yYpTW9RMD5CiAFWd6jHerKMXlWUrbGHqVTkNvnVy1qPgRYPGxXeYkpIyDV2yJqslZXsPVkX49jpfviP19o5Kjdljrcu7usZk0ciG78GWF497vRcJcrRG2i6HMuqvHwbW9tVonqFLz+erU4f4emAPWO0esSZBeEklqw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765912081; c=relaxed/simple;
-	bh=wGitl2EZXYDc83nm7t458MGlv6r4f2svx+IhKGQjGDc=;
-	h=MIME-Version:Date:Content-Type:From:Message-ID:Subject:To:Cc:
-	 In-Reply-To:References; b=bTQtyJ05z5Q8OTfBCFX7kI2wEgoOyO7ktn/2G6CD+2kSGn6h6740+YTsD1viP1VbuiOK3v0fK/d08u807heyB+qGMHX7ACVRnzTLm4I3ZW9APKG/hY5lpDOxZNWsG4s5WBcJDrkXzeL6SVfRLOT7zMNiQkcIti2xi8nHW0FJ6XQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=rjp.ie; spf=pass smtp.mailfrom=rjp.ie; dkim=pass (1024-bit key) header.d=rjp.ie header.i=@rjp.ie header.b=Sl3Ur+fD; arc=none smtp.client-ip=95.215.58.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=rjp.ie
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rjp.ie
+	s=arc-20240116; t=1766325503; c=relaxed/simple;
+	bh=V8nZ0Iqk3QUzy4itkLisr6n/DI0ok1eV3aPTmAh2DaM=;
+	h=Date:To:From:Subject:Message-ID:MIME-Version:Content-Type; b=IbWFLgw5Rn5Nj0SW0Iu1YzrH0xquTD8QhsJBZ6Xv5mIX3oNU0/S6DZ2Bc4XikrLWZSRL7L7X9qSUbE7uYvI2zns1jhwrz6ePLvyL92QvkhFRffYBlF6Hs2MgrrZD7/G9Fwo3/dn2wLgQslWeWaNY/XLRM0p4c5ccXz/j1wp3V2s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=deschouwer.co.za; spf=pass smtp.mailfrom=deschouwer.co.za; dkim=pass (2048-bit key) header.d=deschouwer.co.za header.i=@deschouwer.co.za header.b=EVh1yWM/; arc=none smtp.client-ip=79.135.106.24
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=deschouwer.co.za
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=deschouwer.co.za
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=rjp.ie header.i=@rjp.ie header.b="Sl3Ur+fD"
+	dkim=pass (2048-bit key) header.d=deschouwer.co.za header.i=@deschouwer.co.za header.b="EVh1yWM/"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=deschouwer.co.za;
+	s=protonmail; t=1766325492; x=1766584692;
+	bh=N/SXv60tuKY4gAyhg7v/tE+fh477XOM4HsrZtfIBEpE=;
+	h=Date:To:From:Subject:Message-ID:Feedback-ID:From:To:Cc:Date:
+	 Subject:Reply-To:Feedback-ID:Message-ID:BIMI-Selector;
+	b=EVh1yWM/ZA9WGO2xm5T5cYgAJo3WPtMHvv7GqL2vcgfUtNoYL1TSB9egWvD4wPeQ8
+	 ZaobOBMCfiEvxu0ItvBql8C8gJ9LeOP7dvlMDmqBUz7gRhIMKvH05Nn4ifMUwK4zDx
+	 zvCTRROA01i8bj6TdWBA1zx5RdgWAxlVKpvZeF3xkW2JktiWAc2qCwBM5bQ70OyFQz
+	 c+sej60jQDsw0YYNETzA+LcBym6eV+yTa+HDiiW0Q15x3oBwXr+rWv+ItG7xTk1kay
+	 GMAEh1KMT10nC2J8r372TobbG92Qq01k8NI81NVgD6SRf3iKMOA0GkaNkyXF2/QT5m
+	 y53CWtszOLFrQ==
+Date: Sun, 21 Dec 2025 13:58:06 +0000
+To: iwd@lists.linux.dev
+From: berend <berend@deschouwer.co.za>
+Subject: Quirks with Garmin hardware
+Message-ID: <f213002696d221c03c0cd102083259792808349a.camel@deschouwer.co.za>
+Feedback-ID: 50941660:user:proton
+X-Pm-Message-ID: 277b75657e9b8aa752e96507a0c47665d1bfdf5b
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=rjp.ie; s=key1;
-	t=1765912073;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=wGitl2EZXYDc83nm7t458MGlv6r4f2svx+IhKGQjGDc=;
-	b=Sl3Ur+fDFQVJS9it2divIPa2Z6ip42JCQDj6XKlobT4vmKIa54DAG52RvOKSbA0pIXVJBD
-	uO5enrwqF9H9u0cCt2NfedlpLVEWb7xgkygnTePNYB3Lf7afeOdmBIA1Xf+a1/hptmP60/
-	mw56pJSX0KTKWw9EH+BDWe7n9isQdBw=
-Date: Tue, 16 Dec 2025 19:07:50 +0000
-Content-Type: text/plain; charset="utf-8"
+Content-Type: multipart/signed; protocol="application/pgp-signature"; micalg=pgp-sha256; boundary="------2e04510b5628d0b44e4b008466a1df91451b050618f0d0c6d9d19e1e52ad4b32"; charset=utf-8
+
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--------2e04510b5628d0b44e4b008466a1df91451b050618f0d0c6d9d19e1e52ad4b32
+Content-Type: multipart/mixed;
+ boundary=094da99e3955b2fd1fd57dbfe7e57fab0c59a0a152e8c98a28fe42ae3023
+Message-ID: <f213002696d221c03c0cd102083259792808349a.camel@deschouwer.co.za>
+Subject: Quirks with Garmin hardware
+From: berend <berend@deschouwer.co.za>
+To: iwd@lists.linux.dev
+Date: Sun, 21 Dec 2025 15:58:04 +0200
+User-Agent: Evolution 3.58.2 (3.58.2-1.fc43) 
+MIME-Version: 1.0
+
+--094da99e3955b2fd1fd57dbfe7e57fab0c59a0a152e8c98a28fe42ae3023
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: "Ronan Pigott" <ronan@rjp.ie>
-Message-ID: <a617faab5535d79dc08d83f55ee2a16665688517@rjp.ie>
-TLS-Required: No
-Subject: Re: 6GHz only?
-To: "James Prestwood" <prestwoj@gmail.com>
-Cc: iwd@lists.linux.dev
-In-Reply-To: <b580ecf6-2d21-4e6a-bd6f-0309f20e9488@gmail.com>
-References: <a0121c7c60a6485d24b79f5313fd1e481c3ced55@rjp.ie>
- <b580ecf6-2d21-4e6a-bd6f-0309f20e9488@gmail.com>
-X-Migadu-Flow: FLOW_OUT
 
-Hi James,
+Hi,
 
-Thanks for the reply.
+Some Garmin device firmware fails to clear the nonce in message 4 of
+the handshake.  It's still the same nonce as in message 2.
 
-> The original reason for this was based on the behavior of a few cards I=
- initially tested when implementing 6GHz support in IWD. The only way to =
-utilize 6GHz was after scanning either 2.4/5ghz to allow the kernel to id=
-entify the country it was in, thereby allowing 6GHz operation.
+If iwd is an AP, it fails the handshake, according to the spec.
 
-Oh, I see.
+I can make a quirk; by looking for a Garmin mac, or looking for an
+identical nonce in messages 2 and 4.  Is it acceptable to add
+workarounds for other hardware?
 
-> This may have changed now, and admittedly this restriction was implemen=
-ted based on only a few hardware samples. If there is different hardware =
-that doesn't need this, or things have changed in the kernel I have no pr=
-oblem removing this restrictions.
->=20
->=20Would you be able to remove this check on your side, rebuild, and tes=
-t if 6GHz only operation works as you expect? I know that all the hardwar=
-e I have still is what I originally tested with, so I'm pretty sure I wou=
-ld get the same result as before.
 
-Unfortunately, I quickly discovered that 6GHz is not functional at all on=
- my hardware [1] :/. I had hoped to coerce it to connect, but clearly tha=
-t won't work. So you may have made the correct decision after all.
+Berend
 
-[1] https://bbs.archlinux.org/viewtopic.php?id=3D311005
+--094da99e3955b2fd1fd57dbfe7e57fab0c59a0a152e8c98a28fe42ae3023
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="publickey - Berend De Schouwer -
+ 0x128CD671.asc"; name="publickey - Berend De Schouwer - 0x128CD671.asc"
+Content-Type: application/pgp-keys; filename="publickey - Berend De Schouwer
+ - 0x128CD671.asc"; name="publickey - Berend De Schouwer - 0x128CD671.asc"
 
-Cheers,
+LS0tLS1CRUdJTiBQR1AgUFVCTElDIEtFWSBCTE9DSy0tLS0tCkNvbW1lbnQ6IGh0dHBzOi8vZ29w
+ZW5wZ3Aub3JnClZlcnNpb246IEdvcGVuUEdQIDIuOC4yCgp4c0ZOQkZXS2tVRUJFQURYdWlFWVcx
+WUlnTm5yYXpFby8wemVsVHp4YkhDRy93V3huN0FTdWQ4eEhMMWpxWks1CnF4UVMvNldSYm5RdjVj
+NURQdmsxT2Y2RS8yWFZzRlVRSmdSMVlGeEd0TnQxUUFsNVIwdmo3cnZyOG5CYmVRaGMKbUhzdndH
+cFQ3YWJrZXZXRnZtY0hiTktmWGJjL3NmRHJDTW90UkZRQm9oYzdveW8rTnpPSk9RcEpxQ2J6d2sr
+awpWbVZoVkhwdzhZenZuRDJzVkRxYlFPeHRXbXJjb2ZtOURiMjhORTBOY04yUDlBQmJOSnV0MVFV
+Wld0WjFsbVc2CnJ5aGdLckM0dXhTei9ZTmNjNXpzMlo3NjFTR0tPU1k4UFZ6dlZrTGJLOWZiZFk3
+amNnR0NGZDZHUllPQjJJM0IKN0NPOXVhZnVUb0NEeWhscWx1Z1dYcEdvQTVCN28vYTRaMWI3cWxO
+c0VtcWxHaCtlRDk0SDhNL0xXOGR3WU5SSQpvVU5ZSWF5UkYxT1FwcmM1UHozaUN4YW9ub0lpR2Z4
+R1pxTktUOVFXb0lnOHJPQzA4dGNyOHVqNG0xUmpKcnN6ClNqdGt3c29tMFV3cEJ5Z0hlLzNCcDR4
+WlN4Z2FmTXc2ZEdTS1JzRFRBSGoyRkpGV2N0Tmx1WTRqdnhSWDdDdVcKNTlRMzVKSUU4bStPZ1li
+Z0xrR1FmRWRVeWhjUnFCMCtWUjJXUmxYNXNLVVprV2cxQWhnY0w3RmltTmxsM2YwNgp5ZS91emJy
+YVVZSFg3eGMzdjVDSjJaNnd4Nk1waFp6aGh4dUJxTGNZSkViTjlmTnNldlRPWWtFUUlzR0M3Tldv
+ClQyaHkzdWplWUJQajNjbzJOZDRpV085dHB5c0xaOGdLMTUvZE5qTUJUc3ByUys5UlBxZ3o1QnRG
+bXdBUkFRQUIKelN4Q1pYSmxibVFnUkdVZ1UyTm9iM1YzWlhJZ1BHSmxjbVZ1WkVCa1pYTmphRzkx
+ZDJWeUxtTnZMbnBoUHNMQgplQVFUQVFJQUlnVUNWWXFSUVFJYkF3WUxDUWdIQXdJR0ZRZ0NDUW9M
+QkJZQ0F3RUNIZ0VDRjRBQUNna1EyMjdnCmNaT0FvT25YZGcvOUVGZFJyL1h0T1liQmVsdGIwc05I
+YVNQN1M0dmtscWNBdE9udFRZVjN5TUZOdjlYQlhYdkYKU0thR2wwbTVMaGVOQWtJdS9ZYkFkR1h5
+U3pOVWQ3V3NmeWIrMjNpcTVVS0d0K3dEK1JvY0xaWTA5NHVBS2NRUQpUWndKS1R3NHRLSWdONHFC
+dE9hTmlKd0x1cnNOWllBUDdKSUpGUFFZNTVwYSt5ZWMzanhmVFgwYTdydWllY29zCm16YXZRMTgy
+VitMZGV2Mmtvckd2WTFjejQzclA4eGlMMURqdGNCVW5laWdiajUrTjBaOFVsam5SNlFrU1J1YWoK
+ZHNHQkFYSG1rT3NCVi9vOE04dkZXYThOODN1czFHa3k1SzU0eFFPYVZ5TlJWclI0RUlTdjh5MGkz
+M3J3R1l2UApCRCtSS2FMYWN1S2I4KzhLTlZ1UTVNMHYrNHBHci9GZVhwUCtuUHpWRGZiWlpoWDFp
+d2VRMDY5TEthOXJlZjhxCkV3NFZWdDdBdVlGU3dlSFZNSUNBMFpHeUtKNWhaejdMZEkwdkFGQU55
+VXQwS29XZWVLNjl4aWs4cnZGNzVlbzQKZnovV0p0Zi9BZG5DdVlwNjBvYm94L3NKQTdLclpyV1FO
+YkRjbEplZmlTWlY3dHVIaDdqTEpxUXVma201RDVnbwp3QUFvNWdyTS82V0FOSFZ3NWlvak0vVUc2
+ZjArdEZaWGdGTXlrMkpaeTljMnM4VlFnSTJVenJiVThKc0N0ZERqCkJVU1RDNjRSN2tsdlY1Ymt1
+MzFBbTNSUEMyOWwxaGZZKzNVTGc0dzhtbXBKMjhwcSsvejBvS0g4Q3d5aWN1RlAKRkJHOTVsbi83
+dHRlNGlmV2tmek1MOE9oMmJwdUtFYjJQV1I0NHNRMVpxOCtJQWpTMlh3TDQ1N093VTBFVllxUgpR
+UUVRQUtYYUwvaEhueXdzRnlVUVVHNVdxYm9xSHRWODNTNEc5aEpMQ25MOWhnU0J2Z2twbTRjNi85
+Mmt6Lzh5CmdvRTRjUjNHSmZsZm40OHRUNFkvWDZzTkZiSXY5VkhpWVo4aW9YVUc0bHBhMFIyN3pk
+MVZZT1pXUStvS3RjRnoKb1djVlViOHQrT1BoM2tuME5WQWxFRnlya0k5YWdUc0p1OFJ0alNpMEV6
+Wi9iQ0xaTStFMU9UQnpZUzFuelZlcgp1NVVid1FWbXAzbUlzS2JSVTRRbnpZSElWVGNFeDF5SGxC
+M1ZkZFd6M0pnenVsWlF4SDdRREVGaTVBaDhjcUVDCjJSZ2w2K2JkdVBqYnJBK2RwV2VaTGtvUGhH
+d0xZcVM0YnJxN0ZBbmtMMjFSTGVGQzkvY203dTNaMnozd1o5QXkKZWt2bmtPNnhxdGlqcDB2Y0RD
+V3kxbldiV0tpN2Y5K1NQWW5xTTNKVFBqWnlobk9CQ2pWTFhUcnlYQ3BhRGFCYgpnWGZRSlpMOWwx
+bTRqVzBoQjNEdlU5eGQ2Zi8zdW1vODMzS1BnMm5XenpnZ0tRODREUUd3L0hYdkFSdDVtR0ZTCmQv
+REtkMlliTHc5QjJKSlpqb2kzc2VGWlN6YVZKZ0FWZk9neUk0NHRnN3pJSlVUZDk2VzVpeEE3SEVP
+TkV4cG0KQ0JrZ3ArMmswZEg1SU84c1lXd1o0c3lXQk5kZ1cxeGd2Qzc1dm94TmZTZGJmcGRhMG91
+YU5xYVR0YjdzcnlVZApsTFZ3bExZZkV4NU9EeFFVY1VyNHRKUDhsR1I4dkEwemhGSEJhTEdCcjBa
+SU16UU5TcS9jS3NrNnNESXI0Wms1ClZMT0VVN3R3SFRrZjQ3bXpWTExCQmZ6alJJc2hXRnJvNnBj
+NDFBaGk5Y3ArQ3hLYkFCRUJBQUhDd1Y4RUdBRUMKQUFrRkFsV0trVUVDR3d3QUNna1EyMjdnY1pP
+QW9PbXkzUkFBdGpNMGtPQjN1OTZ0S0pieGpERnlUTjZhTk9WLwo5WXk2V2doRjJITldvN0hzbk55
+dnNRTkF1cHhWMndBTGF0UGVjUFgrL04vdWVGUUtyQTMvd3FVUTkwMkw0VXhWCnJMa1d5a2RZb09P
+cGd4TUxkUXB6Z2NRT1RTV1BDdlAwVi9jVnNYY1dKaVZFRGg5VGp1SzBLc1loRm1XR2E2bmUKNHVS
+MVY2VkJ5SUtaay9vRGthSVhCanJaU1ZUT1M2ZzZWRi9XaWhHKy9NL0MyZU94eEJZMzdqWm5xREpR
+bjNxWApoWTJjVE4wbTlrTFFQdjJqUE9LcjAzUHIvbFdIV1Rpc1EzRkNWbG1ZUTBJSUcyRlpKSmNS
+RGNELzhOOGpoMWVhCnpFQmowK1lSMitMUUxzVWN6bDBQSkM0TGV4eERTUVg4MlRlV21nUklXc3Mv
+UTM2VUNIOVNyOFl6Sk9BSkxWWEYKNUJMQXgybFlVQWk4bmN0cjhIMmdML0RQOHlOT3hBZ05QSVhy
+QjNnQk9XYTF4MmNROHNOeDMvVXVYZFIyNXQyYgo3eGpseFdlWmM5ejJnTzlyZUVKRWt6a21HVjhR
+Sk1QSFAvejZRdTZIUVlqUFlyL3I0T1FSSGFpN1RMSkZsTFBNCkJLQTJGVWlZNzFaTUxZWHRXUms1
+WG85SnVGL0F0dncwU3JxcFoyRE5PeUtLZmJzMTRNOS84RXkzUUFVTklTSXQKUDQyMlJNQUQxdzha
+WGcxWlBqSEo4TGo3Qms3RTJGN0YzVlUwSXFCSVVsc1J5eUJvMUs3SDdRT1pwdmJFeERRSgpnMWx4
+YlhhS1lrRFEwREdhb2FnT3pVYVo5ckxCdkpFNHo3QzBTZ3BjWFpaMHJuT3lkdm5GMGhCWG93djdX
+YkYrCmk0WlB5REJjM242OHJxcz0KPTlTWGwKLS0tLS1FTkQgUEdQIFBVQkxJQyBLRVkgQkxPQ0st
+LS0tLQ==
+--094da99e3955b2fd1fd57dbfe7e57fab0c59a0a152e8c98a28fe42ae3023--
 
-Ronan
+--------2e04510b5628d0b44e4b008466a1df91451b050618f0d0c6d9d19e1e52ad4b32
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: ProtonMail
+
+wsGpBAEBCABdBYJpR/ztCZDbbuBxk4Cg6TUUAAAAAAAcABBzYWx0QG5vdGF0
+aW9ucy5vcGVucGdwanMub3Jn8SIyuikbilri7mQyKZljnhYhBBKM1nGLSON6
+q6UFAttu4HGTgKDpAAAo3xAAhtOGagj6Uh5IRYFzClLoZrjvxGD7PZWK7V8j
+c4DX4H+/PdEHE50ONvLhjg9RIDi/GjDjyR/tZMH2uYS5XvIosZDT9h9wAmiK
+9EI8mBadBnZ9gwRiKti2T7l5wMnlBgm2lRDieaINWljTulYDbcHathQFBG2H
+VUbipzpIaqJPcudIsJOlfHZJObipqXINoxksfYEXpjyqmcj5VOoX6Oh7NKMn
+A7RTzAVFplF/cZo79avGVzuUKeyCr4HE9xzRQzXv+BNzXweJXxVBs1JTw3Xv
+AL0A8AxqbJZtMpZZm1cQI1Li3Y1YLUFLMS8ieOtvdMsuk5neetC/UYQb2byO
+ms50G/yLJVz0Ab13XA1V5CtlSy/wnQYhHv7SeZiRSrUxAN8KGchFpK1RdEdV
+yIgVqNoTQtSVKvRSOnPXGjSrsdDV8v0yIrw1m6TaLgNN2varwb9MNXkkKNTX
+gAZdT9Bo/+NuqPO5P9ih95/oWnO6Q+NlLfyUDe6TOeqLQrjDUD30aY6G2q/7
+ckQWH4Dv5QgkKXLO5vW1CmDrsmqMc6TF6waBAOmIwFF2gJ9Z8N1vvPSPjmum
+xYFqKm2PntaxSk1XsVGL6IxnzqgdTj56jveCEBzo7C/dVGd+FqBODE4v9XC2
+Z5ara0yPk51Nn0tuWJvQmXm9mBgclE2ftOx7+JbMC0bzPq4=
+=T2go
+-----END PGP SIGNATURE-----
+
+
+--------2e04510b5628d0b44e4b008466a1df91451b050618f0d0c6d9d19e1e52ad4b32--
+
