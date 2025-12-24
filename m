@@ -1,77 +1,274 @@
-Received: from mail-10624.protonmail.ch (mail-10624.protonmail.ch [79.135.106.24])
+Received: from mail-4396.protonmail.ch (mail-4396.protonmail.ch [185.70.43.96])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F9042571C5
-	for <iwd@lists.linux.dev>; Sun, 21 Dec 2025 13:58:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=79.135.106.24
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D76F1F03C5
+	for <iwd@lists.linux.dev>; Wed, 24 Dec 2025 10:28:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.70.43.96
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766325503; cv=none; b=lDf6XIRc/yYpTW9RMD5CiAFWd6jHerKMXlWUrbGHqVTkNvnVy1qPgRYPGxXeYkpIyDV2yJqslZXsPVkX49jpfviP19o5Kjdljrcu7usZk0ciG78GWF497vRcJcrRG2i6HMuqvHwbW9tVonqFLz+erU4f4emAPWO0esSZBeEklqw=
+	t=1766572138; cv=none; b=bX0pqZbrss+2o4x+fujZPmJV+kN3tIWbwjlXjv4RFpvNQXHkPjh5T+LKoBI3PWSddH1duzr3+yk+tX5T04D5WlfNJP90sV4gKrx9T6gdspqnN20u4hfMDFhx0SD66hBFBNAHRC4Kt4Tbcw8rdkAdmW3E7+7MKOUi2fwyfJGouIM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766325503; c=relaxed/simple;
-	bh=V8nZ0Iqk3QUzy4itkLisr6n/DI0ok1eV3aPTmAh2DaM=;
-	h=Date:To:From:Subject:Message-ID:MIME-Version:Content-Type; b=IbWFLgw5Rn5Nj0SW0Iu1YzrH0xquTD8QhsJBZ6Xv5mIX3oNU0/S6DZ2Bc4XikrLWZSRL7L7X9qSUbE7uYvI2zns1jhwrz6ePLvyL92QvkhFRffYBlF6Hs2MgrrZD7/G9Fwo3/dn2wLgQslWeWaNY/XLRM0p4c5ccXz/j1wp3V2s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=deschouwer.co.za; spf=pass smtp.mailfrom=deschouwer.co.za; dkim=pass (2048-bit key) header.d=deschouwer.co.za header.i=@deschouwer.co.za header.b=EVh1yWM/; arc=none smtp.client-ip=79.135.106.24
+	s=arc-20240116; t=1766572138; c=relaxed/simple;
+	bh=9RvJWrcPHwJ4NkC+EXYxKNVxazhk1dVQiyYO5LnxyEA=;
+	h=Date:To:From:Subject:Message-ID:MIME-Version:Content-Type; b=TcpOraBI6nwTzbgC0l23+GHaWHi0Mpi+d9e+JltQurPJtx59uHuCBs/76IjpkfulZxGSWhOGKczdA5HICB4UWloenfumzzxvRM4XF0kMBI5vD57E7dXVMkFQnc/LQh/xTGz1uXvjju9t8X1LjyU4KPeBtMsi70Zq/eyqTj8zTIQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=deschouwer.co.za; spf=pass smtp.mailfrom=deschouwer.co.za; dkim=pass (2048-bit key) header.d=deschouwer.co.za header.i=@deschouwer.co.za header.b=NAsyUuRj; arc=none smtp.client-ip=185.70.43.96
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=deschouwer.co.za
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=deschouwer.co.za
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=deschouwer.co.za header.i=@deschouwer.co.za header.b="EVh1yWM/"
+	dkim=pass (2048-bit key) header.d=deschouwer.co.za header.i=@deschouwer.co.za header.b="NAsyUuRj"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=deschouwer.co.za;
-	s=protonmail; t=1766325492; x=1766584692;
-	bh=N/SXv60tuKY4gAyhg7v/tE+fh477XOM4HsrZtfIBEpE=;
+	s=protonmail; t=1766572123; x=1766831323;
+	bh=AIgqXc+8nhy/UNjVT0FMUR4CBbguauW0/MbGsQxPofs=;
 	h=Date:To:From:Subject:Message-ID:Feedback-ID:From:To:Cc:Date:
 	 Subject:Reply-To:Feedback-ID:Message-ID:BIMI-Selector;
-	b=EVh1yWM/ZA9WGO2xm5T5cYgAJo3WPtMHvv7GqL2vcgfUtNoYL1TSB9egWvD4wPeQ8
-	 ZaobOBMCfiEvxu0ItvBql8C8gJ9LeOP7dvlMDmqBUz7gRhIMKvH05Nn4ifMUwK4zDx
-	 zvCTRROA01i8bj6TdWBA1zx5RdgWAxlVKpvZeF3xkW2JktiWAc2qCwBM5bQ70OyFQz
-	 c+sej60jQDsw0YYNETzA+LcBym6eV+yTa+HDiiW0Q15x3oBwXr+rWv+ItG7xTk1kay
-	 GMAEh1KMT10nC2J8r372TobbG92Qq01k8NI81NVgD6SRf3iKMOA0GkaNkyXF2/QT5m
-	 y53CWtszOLFrQ==
-Date: Sun, 21 Dec 2025 13:58:06 +0000
+	b=NAsyUuRjaHMMs8PZKsiaixeFm8NZLS0DkR1SYyUaysw8eL9kM1VW3OkK1ico0DcTq
+	 J3wwrd3UyIh/a3wAM0W8HX37l/oYSyhBFcjATRJHhp9HOTViA1KjokDSjcrVd2RSRY
+	 Pc1PlvSEc+LfgG5LJRgtIENvGApATl3KH1LgXtzHWv/UFox7ooWb/V7G7rwqX5yQAi
+	 tSNQF0NBcB5+qY+6XhRLk0kRdn1ecUB2kik/d2+G5Pr26Spv8K1Z/L2UusMM7O2ZDA
+	 JzyochDrv/c8kUiPb4VF1Mkl5E7wanSZJKDAJuG47wd0Y+7FS+IUol5+Fexbx5OSnj
+	 wzoHwOqCkDjNA==
+Date: Wed, 24 Dec 2025 10:28:40 +0000
 To: iwd@lists.linux.dev
 From: berend <berend@deschouwer.co.za>
-Subject: Quirks with Garmin hardware
-Message-ID: <f213002696d221c03c0cd102083259792808349a.camel@deschouwer.co.za>
+Subject: [PATCH] ap: add vendor quirk for reused nonce in handshake
+Message-ID: <475b4065883774c297edb6e26c494e72bc094575.camel@deschouwer.co.za>
 Feedback-ID: 50941660:user:proton
-X-Pm-Message-ID: 277b75657e9b8aa752e96507a0c47665d1bfdf5b
+X-Pm-Message-ID: 16ec42c4f8ea6af59d0104566120916f15ccbfec
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: multipart/signed; protocol="application/pgp-signature"; micalg=pgp-sha256; boundary="------2e04510b5628d0b44e4b008466a1df91451b050618f0d0c6d9d19e1e52ad4b32"; charset=utf-8
+Content-Type: multipart/signed; protocol="application/pgp-signature"; micalg=pgp-sha256; boundary="------52cc4b944b3c16770ea46776d0beb1706030ab98695a5edfb73d0c327314159d"; charset=utf-8
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---------2e04510b5628d0b44e4b008466a1df91451b050618f0d0c6d9d19e1e52ad4b32
+--------52cc4b944b3c16770ea46776d0beb1706030ab98695a5edfb73d0c327314159d
 Content-Type: multipart/mixed;
- boundary=094da99e3955b2fd1fd57dbfe7e57fab0c59a0a152e8c98a28fe42ae3023
-Message-ID: <f213002696d221c03c0cd102083259792808349a.camel@deschouwer.co.za>
-Subject: Quirks with Garmin hardware
+ boundary=555c03b5285c6ef426ed57ee823b8febfc4cfbb03b7056604f8bc59a0e8e
+Message-ID: <475b4065883774c297edb6e26c494e72bc094575.camel@deschouwer.co.za>
+Subject: [PATCH] ap: add vendor quirk for reused nonce in handshake
 From: berend <berend@deschouwer.co.za>
 To: iwd@lists.linux.dev
-Date: Sun, 21 Dec 2025 15:58:04 +0200
+Date: Wed, 24 Dec 2025 12:28:31 +0200
 User-Agent: Evolution 3.58.2 (3.58.2-1.fc43) 
 MIME-Version: 1.0
 
---094da99e3955b2fd1fd57dbfe7e57fab0c59a0a152e8c98a28fe42ae3023
+--555c03b5285c6ef426ed57ee823b8febfc4cfbb03b7056604f8bc59a0e8e
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 
-Hi,
+commit 486cd7b1cd20bfa81437d89cdd7c8f8df7e23bfa
+Author: Berend De Schouwer <berend@deschouwer.co.za>
+Date:   Wed Dec 24 11:28:17 2025 +0200
 
-Some Garmin device firmware fails to clear the nonce in message 4 of
-the handshake.  It's still the same nonce as in message 2.
+    ap: add vendor quirk for reused nonce in handshake
+   =20
+    Add a vendor quirk when IWD is an AP, to allow some
+    Garmin IoT devices to connect.
+   =20
+    handshake_reuse_nonce:
+      When a supplicant does a handshake, the nonce in message 4 should
+      be set to zero.  On some devices it's left identical to message
+2.
 
-If iwd is an AP, it fails the handshake, according to the spec.
+diff --git a/src/ap.c b/src/ap.c
+index af6a1709..1f805a81 100644
+--- a/src/ap.c
++++ b/src/ap.c
+@@ -59,6 +59,7 @@
+ #include "src/diagnostic.h"
+ #include "src/band.h"
+ #include "src/common.h"
++#include "src/vendor_quirks.h"
+=20
+ struct ap_state {
+        struct netdev *netdev;
+@@ -143,6 +144,7 @@ struct sta_state {
+        struct l_dhcp_lease *ip_alloc_lease;
+        bool ip_alloc_sent;
+        uint64_t rekey_time;
++       struct vendor_quirk vendor_quirks;
+=20
+        bool ht_support : 1;
+        bool ht_greenfield : 1;
+@@ -1384,6 +1386,7 @@ static void ap_start_handshake(struct sta_state
+*sta, bool use_eapol_start,
+        handshake_state_set_ssid(sta->hs, (void *) ap->ssid, strlen(ap-
+>ssid));
+        handshake_state_set_authenticator_address(sta->hs, own_addr);
+        handshake_state_set_supplicant_address(sta->hs, sta->addr);
++       handshake_state_set_vendor_quirks(sta->hs, sta->vendor_quirks);
+=20
+        ap_set_rsn_info(ap, &rsn);
+        /*
+@@ -2974,6 +2977,7 @@ static void ap_handle_new_station(struct ap_state
+*ap, struct l_genl_msg *msg)
+        const void *data;
+        const uint8_t *mac =3D NULL;
+        uint8_t *assoc_rsne =3D NULL;
++       const char *vendor_quirks;
+=20
+        if (!l_genl_attr_init(&attr, msg))
+                return;
+@@ -3014,6 +3018,13 @@ static void ap_handle_new_station(struct
+ap_state *ap, struct l_genl_msg *msg)
+        sta->assoc_rsne =3D assoc_rsne;
+        sta->aid =3D ++ap->last_aid;
+=20
++       vendor_quirks_append_for_mac(sta->addr, &sta->vendor_quirks);
++
++       vendor_quirks =3D vendor_quirks_to_string(sta->vendor_quirks);
++       if (vendor_quirks)
++               l_debug("vendor quirks for "MAC": %s",
++                               MAC_STR(sta->addr), vendor_quirks);
++
+        sta->associated =3D true;
+=20
+        if (!ap->sta_states)
+diff --git a/src/eapol.c b/src/eapol.c
+index ab77746f..b603ae39 100644
+--- a/src/eapol.c
++++ b/src/eapol.c
+@@ -605,7 +605,8 @@ bool eapol_verify_ptk_3_of_4(const struct eapol_key
+*ek, bool is_wpa,
+        return true;
+ }
+=20
+-bool eapol_verify_ptk_4_of_4(const struct eapol_key *ek, bool is_wpa)
++bool eapol_verify_ptk_4_of_4(const struct eapol_key *ek, bool is_wpa,
++                               const uint8_t *quirk_nonce)
+ {
+        uint16_t key_len;
+=20
+@@ -636,7 +637,9 @@ bool eapol_verify_ptk_4_of_4(const struct eapol_key
+*ek, bool is_wpa)
+        key_len =3D L_BE16_TO_CPU(ek->key_length);
+        L_WARN_ON(key_len !=3D 0);
+=20
+-       VERIFY_IS_ZERO(ek->key_nonce);
++       if ((!quirk_nonce) || memcmp(ek->key_nonce, quirk_nonce,
++                                       sizeof(ek->key_nonce)))
++               VERIFY_IS_ZERO(ek->key_nonce);
+        VERIFY_IS_ZERO(ek->eapol_key_iv);
+        VERIFY_IS_ZERO(ek->key_rsc);
+        VERIFY_IS_ZERO(ek->reserved);
+@@ -2122,10 +2125,15 @@ static void eapol_handle_ptk_4_of_4(struct
+eapol_sm *sm,
+                                        const struct eapol_key *ek)
+ {
+        const uint8_t *kck;
++       const uint8_t *quirk_nonce =3D NULL;
+=20
+        l_debug("ifindex=3D%u", sm->handshake->ifindex);
+=20
+-       if (!eapol_verify_ptk_4_of_4(ek, false))
++       if (sm->handshake->vendor_quirks.handshake_nonce_reuse &&
++                       sm->handshake->have_snonce)
++               quirk_nonce =3D sm->handshake->snonce;
++
++       if (!eapol_verify_ptk_4_of_4(ek, false, quirk_nonce))
+                return;
+=20
+        if (L_BE64_TO_CPU(ek->key_replay_counter) !=3D sm-
+>replay_counter)
+diff --git a/src/eapol.h b/src/eapol.h
+index 43dc224d..36946017 100644
+--- a/src/eapol.h
++++ b/src/eapol.h
+@@ -70,7 +70,8 @@ bool eapol_verify_ptk_1_of_4(const struct eapol_key
+*ek, size_t mic_len,
+ bool eapol_verify_ptk_2_of_4(const struct eapol_key *ek, bool
+ptk_complete);
+ bool eapol_verify_ptk_3_of_4(const struct eapol_key *ek, bool is_wpa,
+                                size_t mic_len);
+-bool eapol_verify_ptk_4_of_4(const struct eapol_key *ek, bool is_wpa);
++bool eapol_verify_ptk_4_of_4(const struct eapol_key *ek, bool is_wpa,
++                               const uint8_t *quirk_nonce);
+ bool eapol_verify_gtk_1_of_2(const struct eapol_key *ek, bool is_wpa,
+                                size_t mic_len);
+ bool eapol_verify_gtk_2_of_2(const struct eapol_key *ek, bool is_wpa);
+diff --git a/src/vendor_quirks.c b/src/vendor_quirks.c
+index 4fba0c33..001fcb13 100644
+--- a/src/vendor_quirks.c
++++ b/src/vendor_quirks.c
+@@ -47,6 +47,17 @@ static const struct {
+        },
+ };
+=20
++static const struct {
++       uint8_t mac[3];
++       struct vendor_quirk quirks;
++} mac_quirk_db[] =3D {
++       {
++               /* Garmin International */
++               { 0x90, 0xf1, 0x57 },
++               { .handshake_nonce_reuse =3D true },
++       },
++};
++
+ void vendor_quirks_append_for_oui(const uint8_t *oui,
+                                        struct vendor_quirk *quirks)
+ {
+@@ -65,6 +76,22 @@ void vendor_quirks_append_for_oui(const uint8_t
+*oui,
+        }
+ }
+=20
++void vendor_quirks_append_for_mac(const uint8_t *mac,
++                                       struct vendor_quirk *quirks)
++{
++       size_t i;
++
++       for (i =3D 0; i < L_ARRAY_SIZE(mac_quirk_db); i++) {
++               const struct vendor_quirk *quirk =3D
+&mac_quirk_db[i].quirks;
++
++               if (memcmp(mac_quirk_db[i].mac, mac, 3))
++                       continue;
++
++               quirks->handshake_nonce_reuse |=3D
++                               quirk->handshake_nonce_reuse;
++       }
++}
++
+ const char *vendor_quirks_to_string(struct vendor_quirk quirks)
+ {
+        static char out[1024];
+@@ -77,6 +104,9 @@ const char *vendor_quirks_to_string(struct
+vendor_quirk quirks)
+        if (quirks.replay_counter_mismatch)
+                s +=3D snprintf(pos, sizeof(out) - s,
+"ReplayCounterMismatch");
+=20
++       if (quirks.handshake_nonce_reuse)
++               s +=3D snprintf(pos, sizeof(out) - s,
+"HandshakeNonceReuse");
++
+        if (!s)
+                return NULL;
+=20
+diff --git a/src/vendor_quirks.h b/src/vendor_quirks.h
+index b5d726ca..0e199c3a 100644
+--- a/src/vendor_quirks.h
++++ b/src/vendor_quirks.h
+@@ -29,11 +29,15 @@
+ struct vendor_quirk {
+        bool ignore_bss_tm_candidates : 1;
+        bool replay_counter_mismatch : 1;
++       bool handshake_nonce_reuse : 1;
+ };
+=20
+ void vendor_quirks_append_for_oui(const uint8_t *oui,
+                                        struct vendor_quirk *quirks);
+=20
++void vendor_quirks_append_for_mac(const uint8_t *oui,
++                                       struct vendor_quirk *quirks);
++
+ const char *vendor_quirks_to_string(struct vendor_quirk quirks);
+=20
+ #endif /* __IWD_VENDOR_QUIRKS_H */
 
-I can make a quirk; by looking for a Garmin mac, or looking for an
-identical nonce in messages 2 and 4.  Is it acceptable to add
-workarounds for other hardware?
-
-
-Berend
-
---094da99e3955b2fd1fd57dbfe7e57fab0c59a0a152e8c98a28fe42ae3023
+--555c03b5285c6ef426ed57ee823b8febfc4cfbb03b7056604f8bc59a0e8e
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename="publickey - Berend De Schouwer -
  0x128CD671.asc"; name="publickey - Berend De Schouwer - 0x128CD671.asc"
@@ -134,9 +331,9 @@ WGcxWlBqSEo4TGo3Qms3RTJGN0YzVlUwSXFCSVVsc1J5eUJvMUs3SDdRT1pwdmJFeERRSgpnMWx4
 YlhhS1lrRFEwREdhb2FnT3pVYVo5ckxCdkpFNHo3QzBTZ3BjWFpaMHJuT3lkdm5GMGhCWG93djdX
 YkYrCmk0WlB5REJjM242OHJxcz0KPTlTWGwKLS0tLS1FTkQgUEdQIFBVQkxJQyBLRVkgQkxPQ0st
 LS0tLQ==
---094da99e3955b2fd1fd57dbfe7e57fab0c59a0a152e8c98a28fe42ae3023--
+--555c03b5285c6ef426ed57ee823b8febfc4cfbb03b7056604f8bc59a0e8e--
 
---------2e04510b5628d0b44e4b008466a1df91451b050618f0d0c6d9d19e1e52ad4b32
+--------52cc4b944b3c16770ea46776d0beb1706030ab98695a5edfb73d0c327314159d
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
@@ -144,23 +341,23 @@ Content-Disposition: attachment; filename="signature.asc"
 -----BEGIN PGP SIGNATURE-----
 Version: ProtonMail
 
-wsGpBAEBCABdBYJpR/ztCZDbbuBxk4Cg6TUUAAAAAAAcABBzYWx0QG5vdGF0
-aW9ucy5vcGVucGdwanMub3Jn8SIyuikbilri7mQyKZljnhYhBBKM1nGLSON6
-q6UFAttu4HGTgKDpAAAo3xAAhtOGagj6Uh5IRYFzClLoZrjvxGD7PZWK7V8j
-c4DX4H+/PdEHE50ONvLhjg9RIDi/GjDjyR/tZMH2uYS5XvIosZDT9h9wAmiK
-9EI8mBadBnZ9gwRiKti2T7l5wMnlBgm2lRDieaINWljTulYDbcHathQFBG2H
-VUbipzpIaqJPcudIsJOlfHZJObipqXINoxksfYEXpjyqmcj5VOoX6Oh7NKMn
-A7RTzAVFplF/cZo79avGVzuUKeyCr4HE9xzRQzXv+BNzXweJXxVBs1JTw3Xv
-AL0A8AxqbJZtMpZZm1cQI1Li3Y1YLUFLMS8ieOtvdMsuk5neetC/UYQb2byO
-ms50G/yLJVz0Ab13XA1V5CtlSy/wnQYhHv7SeZiRSrUxAN8KGchFpK1RdEdV
-yIgVqNoTQtSVKvRSOnPXGjSrsdDV8v0yIrw1m6TaLgNN2varwb9MNXkkKNTX
-gAZdT9Bo/+NuqPO5P9ih95/oWnO6Q+NlLfyUDe6TOeqLQrjDUD30aY6G2q/7
-ckQWH4Dv5QgkKXLO5vW1CmDrsmqMc6TF6waBAOmIwFF2gJ9Z8N1vvPSPjmum
-xYFqKm2PntaxSk1XsVGL6IxnzqgdTj56jveCEBzo7C/dVGd+FqBODE4v9XC2
-Z5ara0yPk51Nn0tuWJvQmXm9mBgclE2ftOx7+JbMC0bzPq4=
-=T2go
+wsGpBAEBCABdBYJpS8BXCZDbbuBxk4Cg6TUUAAAAAAAcABBzYWx0QG5vdGF0
+aW9ucy5vcGVucGdwanMub3JnClxNvSea8Ztxt9NaU71bwhYhBBKM1nGLSON6
+q6UFAttu4HGTgKDpAADaQRAAtwGWgQiGlE8PoJKnR/GKoRorEXMXDspZgPQs
+TFmGqS+ndFaVNxPtOsGglhaOv8bKcpzuxCLvx4GhxpZIcbUvdL/33yomyESJ
+8puzExVIyUPStxz5xEUL9OB0DN1ah5Ssxus8O33Xm3Wrz+8S3jblonoLMHAF
+WVpISxh1fvrVe0wj9vBGMYMmAHrxzN5pz9vhMf4xlfYeR0F+yR7+TYMqWJCF
+JqbDWaUMjkh9xSNskVK/9Fo0kR3ylLAWdpdypXBUo8LkKE7z04Fyu+DHugkK
+REV/+BbscT8uH1KeBVkLzg7DyHPqVcpUgU8qm8dl1ymYvrBFeziY0JzKU4v1
+Bg6bT2JfewE+giCoeiT+YVuICAGyyOg09rIE43GZRlW22Ve1cn/jNwIWcaJD
+oa5rnDVGwgGhA6jcY+K3uy00n+NCZKU/qWClpxUbEoCrbZ0eM2oS+4yfhPyT
+1I0VgvY+8HZ5FS/U1kG/N+vmTvKfqFn2kH7Ezd9sClr1wJiV5xzGLCXIzGk0
+s0yQ+ek1tQ7Ks67BSuRLQDqC5boyERh4GtghJM1LRAbYBmf4okuYH3ByCG6A
+7P1+cV31nhZFl1BmT10H/AFI/jvOFZHA93A7fy6VP8vU97bTtmJYG/t7P0Cu
+nh69pFDsvkX9MqD2fuVESv5sUAHb8+ibmBZ8tiB1bS3XFxk=
+=1mnd
 -----END PGP SIGNATURE-----
 
 
---------2e04510b5628d0b44e4b008466a1df91451b050618f0d0c6d9d19e1e52ad4b32--
+--------52cc4b944b3c16770ea46776d0beb1706030ab98695a5edfb73d0c327314159d--
 
