@@ -1,150 +1,151 @@
-Received: from mail-ot1-f44.google.com (mail-ot1-f44.google.com [209.85.210.44])
+Received: from mail-yw1-f170.google.com (mail-yw1-f170.google.com [209.85.128.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39386342529
-	for <iwd@lists.linux.dev>; Fri, 30 Jan 2026 15:45:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 941013570BF
+	for <iwd@lists.linux.dev>; Fri, 30 Jan 2026 17:21:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769787921; cv=none; b=nhF5x6uhmehHE3YJNZxuB6Qjc6h3SJa5SBia+Prf4hpY1CvdZ6SZu9Vp9+cgUlphwHfl94Sfb0US+XPu/uQBqcH5pod2bEsooCGxMNT+1yTOioJMFcXVbEPiJUQbk0/00hGu97im/MK9ZRUZ5HbOfQOfJq3apgCS/NMQTD8Eawg=
+	t=1769793685; cv=none; b=Yi4yDUb0KMYABnQO/BAeaAFUNC/mZzGJ9CJuzTBaujx+G2O1F7UL+hScQI7nArjJshIeU3RV3l7utS3GNQ0doMalePjxfa9HsEwhV4GQ6Xkx3lSOGvupJ+HwLa+c23/XbCJEew8+/ppRcdk3Mo+oEmP32IOmpKwd3pJARngY3Ec=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769787921; c=relaxed/simple;
-	bh=wXegCcLEXDDLqSV1G6n3e9ew5Tl594KJcR6ek6/KuOI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=VuRtigPZ5XKATe+gYyG5uXcbuPP9hsj0NkjcEZMGlwf13Ti2/ew1QHas+EZfHpmBrEomdIu+wcfXhy2eeiv+hsOXW6xADQAk+sVH0rS92kpeZeJ1VdsLuUy9PLjLcF5ZtF9wyh9CgYXcEpKtmOxbvc/2M03CFeXojJwBgNLMaGg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ni4ZYPKJ; arc=none smtp.client-ip=209.85.210.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+	s=arc-20240116; t=1769793685; c=relaxed/simple;
+	bh=CEng0TWE0bD63AFOI9aI2e42VUvR7j/xkP/WtBhCyqo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=qxAYbSHQXiMu/xao0HqjO6yCMz8pRhz1fG6lmiD1uwrLfQyI1fSzSB0FmLHISBlImBuqHcaRb499tO1kEfYemGJ6x7GXIjI0dM2IQIW8jDeTjGgYTgm6VI5RtchemO81rqgUVEsOuJkiW7iVawooonxPfwjwSw7t7CE7l4XPJGI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=redpinelabs.com; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.128.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=redpinelabs.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ni4ZYPKJ"
-Received: by mail-ot1-f44.google.com with SMTP id 46e09a7af769-7d1866473b0so1416274a34.1
-        for <iwd@lists.linux.dev>; Fri, 30 Jan 2026 07:45:19 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1769787919; x=1770392719; darn=lists.linux.dev;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=JEzG+1G3XEkLEruElOnbqO3QUNNc272TQzlFazsWJeo=;
-        b=ni4ZYPKJ42dtAtCCO1gWmbN+6lbfm+HEh8gYVMDNdsu7/Xj/YLehbzoghajG+K42yu
-         2cuY9o2/etvbiAnR1Bom5SAc0b3FGgaUyCFXkbOjzD5wZXMXgOBSRZgCF8ep+viGakZL
-         dWwiYAjmAVhLJO92puge0A4qX/dx+hhc5AIKqtqIvgxOSXVoChmFCuJ3lkq8DzDuk2Gl
-         n/Ex+qDFh5FQLWZTZmRH6lSI4+kYbMZOwsMUyNdxxsdK+EpTWAfI+3eV0yuWleCo3GIr
-         MvluD57eZLub150BzgsNudV4v3O5rjnzD128S6X5kPzhKcndiYPZ2D6qzQ95gccp4M/A
-         GLoA==
+Received: by mail-yw1-f170.google.com with SMTP id 00721157ae682-794911acb04so22776937b3.0
+        for <iwd@lists.linux.dev>; Fri, 30 Jan 2026 09:21:22 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769787919; x=1770392719;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=JEzG+1G3XEkLEruElOnbqO3QUNNc272TQzlFazsWJeo=;
-        b=fNQm6DMxxRiip4gpy03wgXnVVFNVpWQUBxcceaALEdSrPCANzmM9gL3ykdsoRwoXeG
-         cLDvQF6jt/VSlhFs3JstIjeBJvClZHgAgJ22FE6u31B6Jtag/ywbwgZEwtTq9CpaFJLw
-         3otmwq6ne3zl/woOd4b8y+1GGzzdsGVvxnRVQ8nHogT78wo/NSlfpwmdh2/4WHMOI1Pd
-         Fc2L7xPHnt7mqaQdhMU7ylUm+l/FNbcZvpkvNRpJGe22Bsah8ewWK333e5RmsYgOGePd
-         RKSHkXRV8QwBhfmby3hSX4UKC2RWNzFVY9zwVmecpOQ4pmCBPWw4TNMsBWvLyK/yuM2+
-         z6Ow==
-X-Forwarded-Encrypted: i=1; AJvYcCUDnwhndJ9MmYomuVb4CF6GWsxMSspNNNh0b/DwQWsAQgi7aFXOF8Roq59JPS4sK4Y8/sc=@lists.linux.dev
-X-Gm-Message-State: AOJu0YyOZQLDLVqqVtZAwnNyPNfEQ7QbtH+q+ltMLp4DerbNgtTZPa2m
-	jn3Dnd45v4luo+0qEy1FQOFoP6NxVE6n/sBnMEZfCLhsXPrCuU/FktsCMNm8Dg==
-X-Gm-Gg: AZuq6aIYbpKpYQaBwuu8oEFIhkVegtirUPelBZ/OHkx4ovRBKFdVj4Wymd7cGmM8VbP
-	y+Vdzai6tGppJdWY3emJs2wSenQ5gpBUjrfUih49cwg7Odno9qW0CWHSFvnNaNf9xqgVHyGFB2z
-	j3AshR8MK2eBifkghyxUI2qGfcDEec+m2FH9/ehoGg8fBL+9Scecd3igaMyIPFogxBeKYhdMHD4
-	tSDPzJd/QwssKq391ATKLFcdBZFDop80H5BjIh9lR1vVI2dx5z6j8UZR7Ry2XyfFe/yxy1Z08zf
-	MIS+4qhgN0ZHpcdPnOve+7+ZTFMGD8Ntq/aQeExbm6o3L9IqMWugpTjOJBBi9k57qAHkhhhwRW3
-	Mxnfq772DtA9lAyqUND4PTuCx9WtCas0rvG8pA2TSoRSmlGtT2Fw/Mugg3bJ2xNMrEuBIZa6nof
-	yBqkWXGnogrH8bOBq9g/wB
-X-Received: by 2002:a05:6830:6aaa:b0:7cf:ddb7:8823 with SMTP id 46e09a7af769-7d1a52624e0mr2461781a34.11.1769787918928;
-        Fri, 30 Jan 2026 07:45:18 -0800 (PST)
-Received: from [172.16.49.130] ([70.112.199.191])
-        by smtp.googlemail.com with ESMTPSA id 46e09a7af769-7d18c6708e1sm5785646a34.5.2026.01.30.07.45.18
+        d=1e100.net; s=20230601; t=1769793680; x=1770398480;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=kGM24k3MsclIXb6Q/3z59z8NlPQaEQMOOdc3UzPBbFE=;
+        b=xOytnCbA2CUX6zmR4s9Bj20tZjU6mRHCEvFOY6SL4Sk/aHKdjv2fcHo1eDwsTvR9lH
+         S/49wpWxSqB/jxkfOg+pKYOd+SxuDk41GcuBpyFFArlN3YC7BoEX4yQy0EEMH5WvghST
+         y+h5s5jjYQiMX8OMVx56k6arquXPBA0vxBkGJROTbL5EpAAX/r/qJqbrdLzPJ6mteNU9
+         ev0R/urszc/fWfBxgEyF0onE4+8gnMS7UCEGKjKnhWWZ4XNuyJkYBLAlAsFUfx89pciZ
+         UT+QFnv5FLo1QuE7Owkmj5dI+vaGJyiHv1G28J+j7ZKwmbZHDpSc9/UR3+uJDIL4ISdc
+         YNSg==
+X-Gm-Message-State: AOJu0Yxo3DSCQipWWU4tgJ9VhEeBIe1TYIheus9LoGyGfC0OQjHEdgEl
+	XBdfz56C9EfGVcrh07m+BezNjLMd//YJGa+SK3E0pj4MwY/N6jETV6V5cazziQ==
+X-Gm-Gg: AZuq6aJ5F7JRhQottgWcSWNRXX9g+Dzi9CeXRAZH6GhToboKuF1y7QB9HkaOWo4p6lP
+	Hftu5omWUnb/jXm+tDDJ0ny6SuPJr9aHd/V6K0ZnlulKvEsYsBg6mzRD+WwmyBxZF3P+0TqOsHL
+	bzSx+QZr3QLglR0hCFgfvYHGqTmgewaEqXhh3EfIpWZ52q6VfiIxWeZn959o7aM4Qj/nTXJD/L+
+	+6IvxS0CSXusSg4vXvJa/JF1vn/48N/Opk2gJzUv0grXkEkzXoS2fsNb99OcXDq+oLEeGQ2JzKp
+	Sb5AB2EgWAsZv7xLlf3aQHJfSdt2yftgXKzaAIcU92bfXzwdsEksfrGYM5hLm6ojbMmbeomvpzZ
+	t1rC9e2bRkY08MIXTbgL+sS2L05urEDOhI/6Sr59aQhffFOtZ4C6cuSdW/45PrdKQrUWUNBPDnu
+	E1Uxj1IY9vyfEuQLYd1xSFysQMIV4u0laagT9Z5cJdMH+/5C98y5MuHFy6qzbCYi/h
+X-Received: by 2002:a05:690c:460e:b0:794:2bd4:fe2 with SMTP id 00721157ae682-7949dfa900dmr23074557b3.32.1769793679885;
+        Fri, 30 Jan 2026 09:21:19 -0800 (PST)
+Received: from mail-yw1-f171.google.com (mail-yw1-f171.google.com. [209.85.128.171])
+        by smtp.gmail.com with ESMTPSA id 00721157ae682-79482763934sm38236977b3.2.2026.01.30.09.21.19
+        for <iwd@lists.linux.dev>
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 30 Jan 2026 07:45:18 -0800 (PST)
-Message-ID: <35652eba-2aa9-4b6e-8bcd-a742fde28645@gmail.com>
-Date: Fri, 30 Jan 2026 09:45:17 -0600
+        Fri, 30 Jan 2026 09:21:19 -0800 (PST)
+Received: by mail-yw1-f171.google.com with SMTP id 00721157ae682-794911acb04so22776677b3.0
+        for <iwd@lists.linux.dev>; Fri, 30 Jan 2026 09:21:19 -0800 (PST)
+X-Received: by 2002:a05:690e:b89:b0:641:f5bc:6950 with SMTP id
+ 956f58d0204a3-649a8521a3cmr2789400d50.84.1769793678923; Fri, 30 Jan 2026
+ 09:21:18 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] dbus: register interface before acquiring name
-To: Ronan Pigott <ronan@rjp.ie>, iwd@lists.linux.dev
-References: <20260127224325.86027-3-ronan@rjp.ie>
-Content-Language: en-US
-From: Denis Kenzior <denkenz@gmail.com>
-In-Reply-To: <20260127224325.86027-3-ronan@rjp.ie>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <CADXxVSJ5FrxYs_s_tz5y6LeGbVLnCgJP3YO8TQEXTnXs+rFuug@mail.gmail.com>
+ <3d09fed3-9728-43e4-840d-13052b5fbf6e@gmail.com> <CADXxVS+_B2r0yAUKKD5X_xJ6GmfkfkngwW_XHQyti=+9cMmzqg@mail.gmail.com>
+ <4ab7e9b9-be27-402b-834c-3e71bd58a476@gmail.com>
+In-Reply-To: <4ab7e9b9-be27-402b-834c-3e71bd58a476@gmail.com>
+From: Bryce Johnson <bryce@redpinelabs.com>
+Date: Fri, 30 Jan 2026 10:21:08 -0700
+X-Gmail-Original-Message-ID: <CADXxVSKsC=gmYoXk9UiPDfHW0a_MbfKpDc2YYH=qprA5bGNfSg@mail.gmail.com>
+X-Gm-Features: AZwV_Qi8A0IV7_35xdIXCEC4of7re8fvAXojI7z6ouj_A-Fv8PlKlFaSH92hulE
+Message-ID: <CADXxVSKsC=gmYoXk9UiPDfHW0a_MbfKpDc2YYH=qprA5bGNfSg@mail.gmail.com>
+Subject: Re: Is there a way to manually force the security protocol with IWD?
+To: James Prestwood <prestwoj@gmail.com>
+Cc: iwd@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Ronan,
+Hi James,
 
-On 1/27/26 4:40 PM, Ronan Pigott wrote:
-> If the interface isn't available by the time we acquire the well-known
-> name, clients can get confused when the expected interfaces are missing
-> during bus activation.
-> ---
-> This code seems backwards to me. Presently, if IWD is not running,
-> calling any IWD methods will fail:
-> 
->    $ busctl call net.connman.iwd /net/connman/iwd net.connman.iwd.Daemon GetInfo
->    Call failed: No matching method found
-> 
-> only to succeed immediately after once the bus activation is complete:
-> 
->    $ busctl call net.connman.iwd /net/connman/iwd net.connman.iwd.Daemon GetInfo
->    a{sv} 3 "NetworkConfigurationEnabled" b false "StateDirectory" s "/var/lib/iwd" "Version" s "3.10"
-> 
-> With this patch, we register IWD methods before acquiring the well-known
-> name, and the abovve call succeeds on the first try.
-> 
->   src/main.c | 46 +++++++++++++++++++++-------------------------
->   1 file changed, 21 insertions(+), 25 deletions(-)
-> 
+On Fri, Jan 30, 2026 at 8:07=E2=80=AFAM James Prestwood <prestwoj@gmail.com=
+> wrote:
+>
+> Hi,
+>
+> On 1/30/26 7:01 AM, Bryce Johnson wrote:
+> > Hi James
+> >
+> > On Fri, Jan 30, 2026 at 7:48=E2=80=AFAM James Prestwood <prestwoj@gmail=
+.com> wrote:
+> >> Hi Bryce,
+> >>
+> >> On 1/30/26 6:43 AM, Bryce Johnson wrote:
+> >>> Hi All
+> >>> We are working to get our product through wifi certification.  Our
+> >>> testing company mentioned there was several negative test cases that
+> >>> were failing where IWD was connecting anyways because it would decide
+> >>> on the security type based on the AP.  Is there a way to force IWD to
+> >>> use a security type that is different than the AP so it would fail th=
+e
+> >>> connection?  Can we disable WPA1-only connection or force WPA2 only
+> >>> connection?
+> >> There unfortunately isn't at the moment. We do have a "developer mode"
+> >> by specifying "-E" to IWD and this seems like it would fall into that
+> >> category, support would need to be added of course.
+> >>
+> >> But I'm somewhat confused (and maybe this is just poor test cases by
+> >> WFA?), why would you need to certify that IWD fails when using a
+> >> different security type than the AP? A client should not ever use a
+> >> security type the AP doesn't advertise support for... This feels like
+> >> its testing the AP, not IWD :)
+> >>
+> > I'm was requesting what test case fails and if I could get a copy of
+> > it.  The only thing I can think of is that they want to disable WPA1
+> > for example and show that the device won't connect to a WPA1 only AP.
+> > Or maybe for a product you only want to connect WPA3 and fail and not
+> > connect or not allow the AP to downgrade the connection.
+> Yeah I'd be interested in the test case.
+> >
+> > Maybe it would make sense to allow a blacklist of protocols you won't
+> > allow IWD to use?  For our product we wouldn't allow open or WEP
+> > connections for example (but we perform that check outside of IWD).
+>
+> IWD already won't connect to a WEP network, so we're ok there. You may
+> be able to coax out some behavior with the following options:
+>
+> main.conf
+>
+> [General].ManagementFrameProtection
+>
+> network profile:
+>
+> [Settings].TransitionDisable
+>
+> [Settings].DisabledTransitionModes
+>
+> Anyways, lets hope you can get the test case. Shouldn't be too hard to
+> add some support for specific test/dev type requirements.
 
-<snip>
+Here were the test cases
+For test case 10153_1:  The test bed AP beacons with no security.  The
+test case requires the STAUT to connect with WPA2-PSK only.  Because
+of the mismatch of security protocols, the connection will fail.
 
-> @@ -249,12 +228,29 @@ static void dbus_ready(void *user_data)
->   {
->   	struct l_dbus *dbus = user_data;
->   
-> -	l_dbus_name_acquire(dbus, "net.connman.iwd", false, false, false,
-> -				request_name_callback, NULL);
-> -
->   	l_dbus_register_interface(dbus, IWD_DAEMON_INTERFACE,
->   					iwd_setup_deamon_interface,
->   					NULL, false);
-> +
-> +	if (!l_dbus_object_manager_enable(dbus, "/"))
-> +		l_warn("Unable to register the ObjectManager");
-> +
-> +	if (!l_dbus_object_add_interface(dbus, IWD_BASE_PATH,
-> +						IWD_DAEMON_INTERFACE,
-> +						NULL) ||
-> +			!l_dbus_object_add_interface(dbus, IWD_BASE_PATH,
-> +						L_DBUS_INTERFACE_PROPERTIES,
-> +						NULL))
-> +		l_info("Unable to add %s and/or %s at %s",
-> +			IWD_DAEMON_INTERFACE, L_DBUS_INTERFACE_PROPERTIES,
-> +			IWD_BASE_PATH);
-> +
-> +	/* TODO: Always request nl80211 for now, ignoring auto-loading */
-> +	l_genl_request_family(genl, NL80211_GENL_NAME, nl80211_appeared,
-> +				NULL, NULL);
+For test case 10165_1: The test bed AP advertises at WPA2-Personal
+only.  The test case requires the STAUT to connect with WPA3-Personal.
+Because of the mismatch of security protocols, the connection will
+also fail.
 
-nit: I would preserve some of the original behavior and not request the NL80211 
-family until we know that the DBus name request succeeded.  If we can't jump on 
-the bus, we can't manage NL80211, so having the subsystem loaded, etc is wasteful.
+I got the PDFs of the test cases I can share offlist as well.  10153_1
+looks like it would not connect, but apparently hung up on the setting
+the STAUT to WPA2-PSK only.  So it looks like I need a way to restrict
+IWD from using other security types for these tests.  If you have any
+suggestions on a good way to do this, let me know.
 
-> +
-> +	l_dbus_name_acquire(dbus, "net.connman.iwd", false, false, false,
-> +				request_name_callback, NULL);
->   }
-
-Otherwise, looks reasonable.
-
->   
->   static void dbus_disconnected(void *user_data)
-
-Regards,
--Denis
+Thanks
+Bryce
