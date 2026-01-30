@@ -1,134 +1,75 @@
-Received: from out-174.mta1.migadu.com (out-174.mta1.migadu.com [95.215.58.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f175.google.com (mail-yw1-f175.google.com [209.85.128.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31E2178F2E
-	for <iwd@lists.linux.dev>; Tue, 27 Jan 2026 22:46:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 268EE1D5147
+	for <iwd@lists.linux.dev>; Fri, 30 Jan 2026 14:43:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769553983; cv=none; b=ecVCY27BsWCbr2qgzNo52PUAEZ63WHYkisRYx/0db6zGozWwQnj9t2k4vt8q8gI/gp6X2iEgSIrCIJZYiY8bdNbwTL4of+Z/cNfNeazGz0ycZArApoXU9gievbFPGDtyLYamcHd7EmhVqxYsFsrQEBCBMYRQPVp8XL3Bbd8s3L8=
+	t=1769784201; cv=none; b=Z7wmMLUcVJJ2ocWAVXCIPb4Q7ws2kNByDFspT7yy2mJNSoSfdt4ZVtA5oNQyFdhW1Paw1r5xQjlxl91r3WgtCL08T1xNkrP452bG3gm+cLu1ppf6BvvKU1ciha7HRcaZLx5AU/s9duZWsHT0jqY2SZ+wESqPnHXo9msrD8nDiK8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769553983; c=relaxed/simple;
-	bh=KAO8DOVEPyaFbj0hNLiM2cLOTChrN3itjQs6xF0Czhc=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=n/zHFm+DCHPSjqKjgHZTHWvYl8e9o2sR7qLtu5JtuvPMSjNN7xEgKAI7j6tv6tbmjy3FAUPuclIZ5NgnvOzb9HEoikRCVJikOuWJl+DoQDkLhHQCDi6tcpLSXSCE/oVaRq1sbEwAZsFXaKyifnjJ42SIxH2tGdUZg//nS04l3kk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=rjp.ie; spf=pass smtp.mailfrom=rjp.ie; dkim=pass (1024-bit key) header.d=rjp.ie header.i=@rjp.ie header.b=QJHrvGjc; arc=none smtp.client-ip=95.215.58.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=rjp.ie
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rjp.ie
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=rjp.ie header.i=@rjp.ie header.b="QJHrvGjc"
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=rjp.ie; s=key1;
-	t=1769553979;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=24mbL4NGxaFbUnKLZwzklEESqk+YxpHyUX0lArnYUiU=;
-	b=QJHrvGjcL36IV4w34jX+b5yzne3LY8rCGb+NRhscFquCH9nMm31gI/dfylfzB1zaaMXc8u
-	S0/jlZMMnP32gyrsuy0YK3oakBqaQ+2+u3ZRmS89cxZkHhP8pJOMhFAso3fhxHSUgdbTNq
-	/fHVw9FhLboXMxtB34DLOvxZ04lKM58=
-From: Ronan Pigott <ronan@rjp.ie>
-To: iwd@lists.linux.dev
-Cc: Ronan Pigott <ronan@rjp.ie>
-Subject: [PATCH] dbus: register interface before acquiring name
-Date: Tue, 27 Jan 2026 15:40:27 -0700
-Message-ID: <20260127224325.86027-3-ronan@rjp.ie>
+	s=arc-20240116; t=1769784201; c=relaxed/simple;
+	bh=kmzrFzdf5W39dnThhTyps47PdLoGATwoml8VaI5RWQw=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Content-Type; b=i/Uewebq0Omu8auQt4usln5OuobjuU7iNNVGOuno1+r3sY7NkmCh5CmFLfCE38yqHSFr2Jxrlh/G0N0XyRD80cjpNGkUkFdzI3nhmFjMd1IcI5G120bwtAs7Yx1ySVyyrARJk7Zog7dlzSCEBX46O+W9VLqIaXVZuNdSYQqZyLQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=redpinelabs.com; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.128.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=redpinelabs.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yw1-f175.google.com with SMTP id 00721157ae682-793fdbb8d3aso20976617b3.3
+        for <iwd@lists.linux.dev>; Fri, 30 Jan 2026 06:43:19 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1769784199; x=1770388999;
+        h=to:subject:message-id:date:from:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=CJsTl2dlyCmKY/Jha90vpva2+AvJ0Ohg5sncJ9084D0=;
+        b=IdplPJ7YBUC9HAb+YuAbuD0SQlu4DtwSMBrFl4zzKvbcKRa3XE8dkfpKmAW8yfGvuq
+         lmETumEB+Mcu6k0pEO/rCJ2zYQQjkGhtX9PsUpXRi7UXvSzwJRu5As3DqhmUoLFaZm8j
+         hTUXkYz9mQHqVTB4BSfDxPl6xsxjinBVrPz8lEalg/zzh+Zgg2/KOR7Vrh/vT/SqTVi0
+         PfndJA6eRh+KdLo75H5M02vwVf+XIbst80zY9hidLdcedIAjCUcYbhrJck+7HD5Q5nnx
+         77XewKrwwOgL7J5XVE+uqM590zKyOgh4Dk/OhCngAVqAZDCM/US1zvGWwmvgPBBT73e+
+         GTfA==
+X-Gm-Message-State: AOJu0YxExo4fSneTRXkXp+t27qkmNR7y2ZyvmlfgyPmIYTYgK6lskjDq
+	pr2a5JGQOIf8nQCREDp/E5bbWx2gCkcxDJtERrFFid45WUQzli0Iq6YjZ14H9w==
+X-Gm-Gg: AZuq6aJiwbZBE4Ww/ildbHKmkN3C8vT0ay/EBKZUUTaOJu7pv1sfLjKz3x60eDy5/iI
+	KqCkY9E9Ua+l0mKWJYGI9DlYEu/vgbXa5AH16CR1rewQxdjY86tUcW5QpQ0XeuCYR0LEKRMikKH
+	RZs5XIO15rIAmskhzwS7GaYSkjOTuYzM0j+AX0mXbyL4Woq1fgneAvS7HqeWFbLHwm0Jyi3mE0N
+	AJSaCwptO6Xue6mDIo/YuGePCeUyPaPzHpv5K8wbdjol7g3ubiSIg4CNj7QbJFDI3crn8QJZ9JC
+	vABwpGXtEvwzFf8q/p1Oem8qAjOi79Y5ZeVzRcG8fx8hiyjYpIjq5D7KMfvTSrgyBaBMj+ozSlZ
+	HXgI9v0djh8sTss5e9ZFGId9QVLCaBVMnu3lO4ZF7bV7T3qccwDaixTdriV4RpTiZGU8QROH4CH
+	yvNpo6trBweeQ/c1STx2s1SQPMSdNiql7qvmmGL6MpOQIEmHf6RQ==
+X-Received: by 2002:a05:690c:4d43:b0:78e:1aa5:e96d with SMTP id 00721157ae682-7949ded8a57mr28608087b3.19.1769784198966;
+        Fri, 30 Jan 2026 06:43:18 -0800 (PST)
+Received: from mail-yx1-f41.google.com (mail-yx1-f41.google.com. [74.125.224.41])
+        by smtp.gmail.com with ESMTPSA id 00721157ae682-794828a9d1asm36290287b3.31.2026.01.30.06.43.18
+        for <iwd@lists.linux.dev>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 30 Jan 2026 06:43:18 -0800 (PST)
+Received: by mail-yx1-f41.google.com with SMTP id 956f58d0204a3-649523de91fso2037826d50.2
+        for <iwd@lists.linux.dev>; Fri, 30 Jan 2026 06:43:18 -0800 (PST)
+X-Received: by 2002:a53:ebcb:0:b0:63f:ab00:1a07 with SMTP id
+ 956f58d0204a3-649a84b97d7mr1644233d50.49.1769784198257; Fri, 30 Jan 2026
+ 06:43:18 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+From: Bryce Johnson <bryce@redpinelabs.com>
+Date: Fri, 30 Jan 2026 07:43:07 -0700
+X-Gmail-Original-Message-ID: <CADXxVSJ5FrxYs_s_tz5y6LeGbVLnCgJP3YO8TQEXTnXs+rFuug@mail.gmail.com>
+X-Gm-Features: AZwV_QhmFN3uZLuDrQwPCCFR-WRlBg76vBXQmNZngSH9NGoEDrA-suThvP4mJBc
+Message-ID: <CADXxVSJ5FrxYs_s_tz5y6LeGbVLnCgJP3YO8TQEXTnXs+rFuug@mail.gmail.com>
+Subject: Is there a way to manually force the security protocol with IWD?
+To: iwd@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
 
-If the interface isn't available by the time we acquire the well-known
-name, clients can get confused when the expected interfaces are missing
-during bus activation.
----
-This code seems backwards to me. Presently, if IWD is not running,
-calling any IWD methods will fail:
+Hi All
+We are working to get our product through wifi certification.  Our
+testing company mentioned there was several negative test cases that
+were failing where IWD was connecting anyways because it would decide
+on the security type based on the AP.  Is there a way to force IWD to
+use a security type that is different than the AP so it would fail the
+connection?  Can we disable WPA1-only connection or force WPA2 only
+connection?
 
-  $ busctl call net.connman.iwd /net/connman/iwd net.connman.iwd.Daemon GetInfo
-  Call failed: No matching method found
-
-only to succeed immediately after once the bus activation is complete:
-
-  $ busctl call net.connman.iwd /net/connman/iwd net.connman.iwd.Daemon GetInfo
-  a{sv} 3 "NetworkConfigurationEnabled" b false "StateDirectory" s "/var/lib/iwd" "Version" s "3.10"
-
-With this patch, we register IWD methods before acquiring the well-known
-name, and the abovve call succeeds on the first try.
-
- src/main.c | 46 +++++++++++++++++++++-------------------------
- 1 file changed, 21 insertions(+), 25 deletions(-)
-
-diff --git a/src/main.c b/src/main.c
-index beaf228fb3cd..0f27488211d0 100644
---- a/src/main.c
-+++ b/src/main.c
-@@ -197,29 +197,8 @@ static void request_name_callback(struct l_dbus *dbus, bool success,
- {
- 	if (!success) {
- 		l_error("Name request failed");
--		goto fail_exit;
-+		l_main_quit();
- 	}
--
--	if (!l_dbus_object_manager_enable(dbus, "/"))
--		l_warn("Unable to register the ObjectManager");
--
--	if (!l_dbus_object_add_interface(dbus, IWD_BASE_PATH,
--						IWD_DAEMON_INTERFACE,
--						NULL) ||
--			!l_dbus_object_add_interface(dbus, IWD_BASE_PATH,
--						L_DBUS_INTERFACE_PROPERTIES,
--						NULL))
--		l_info("Unable to add %s and/or %s at %s",
--			IWD_DAEMON_INTERFACE, L_DBUS_INTERFACE_PROPERTIES,
--			IWD_BASE_PATH);
--
--	/* TODO: Always request nl80211 for now, ignoring auto-loading */
--	l_genl_request_family(genl, NL80211_GENL_NAME, nl80211_appeared,
--				NULL, NULL);
--	return;
--
--fail_exit:
--	l_main_quit();
- }
- 
- static struct l_dbus_message *iwd_dbus_get_info(struct l_dbus *dbus,
-@@ -249,12 +228,29 @@ static void dbus_ready(void *user_data)
- {
- 	struct l_dbus *dbus = user_data;
- 
--	l_dbus_name_acquire(dbus, "net.connman.iwd", false, false, false,
--				request_name_callback, NULL);
--
- 	l_dbus_register_interface(dbus, IWD_DAEMON_INTERFACE,
- 					iwd_setup_deamon_interface,
- 					NULL, false);
-+
-+	if (!l_dbus_object_manager_enable(dbus, "/"))
-+		l_warn("Unable to register the ObjectManager");
-+
-+	if (!l_dbus_object_add_interface(dbus, IWD_BASE_PATH,
-+						IWD_DAEMON_INTERFACE,
-+						NULL) ||
-+			!l_dbus_object_add_interface(dbus, IWD_BASE_PATH,
-+						L_DBUS_INTERFACE_PROPERTIES,
-+						NULL))
-+		l_info("Unable to add %s and/or %s at %s",
-+			IWD_DAEMON_INTERFACE, L_DBUS_INTERFACE_PROPERTIES,
-+			IWD_BASE_PATH);
-+
-+	/* TODO: Always request nl80211 for now, ignoring auto-loading */
-+	l_genl_request_family(genl, NL80211_GENL_NAME, nl80211_appeared,
-+				NULL, NULL);
-+
-+	l_dbus_name_acquire(dbus, "net.connman.iwd", false, false, false,
-+				request_name_callback, NULL);
- }
- 
- static void dbus_disconnected(void *user_data)
--- 
-2.52.0
-
+Thanks
+Bryce
