@@ -1,113 +1,143 @@
-Received: from mail-yw1-f172.google.com (mail-yw1-f172.google.com [209.85.128.172])
+Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51751256C8D
-	for <iwd@lists.linux.dev>; Fri, 30 Jan 2026 15:02:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE3B42BE04B
+	for <iwd@lists.linux.dev>; Fri, 30 Jan 2026 15:07:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769785337; cv=none; b=bMOPlHEKv8sMksEa8AXi5kVqWFIcAtTO6KAr5bKMcEpKAmmB24RdgJoOuEtKW3oBDxkECLCFfrLDR6l0pYfmQwb/Qs6hxQPUZ2vrHdDgWbHgZTa+rjr19aMgqqbQ3kNJaQiAH2gykg/bIQt/LoAO0rKOxPJh5Zk3oDhg7d2PDdA=
+	t=1769785648; cv=none; b=Ax5JxYfF+JQKPFPowb/MDj+ZD3BvUfvsASD6pA54glqpIkvCyz8MhvIzpsqjK8T4LGfZkXf/LkzKit5kvwyMuTj/pUV+823VuUzuae8Yi+PvZIX+3yXej5voGcRrzBvbLj/v2TaJWekU1fo5lxqikNqZ40n/aQeLBftQMa0AhrQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769785337; c=relaxed/simple;
-	bh=4tv7cYo56DH1vCRjyRX2YX9t0dA77zDIzSsSNGNq44o=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=c0/tX+4oQkBVzCOaQlNZINvBVuDehZzfvMxvVKs30E+5vd4Sv25ZCJ4l+SdAu1SKo/eWA5VQRueMgkG2L9vMOMqSI3pd5UjCRjZUR+KOcuHDfq+75yQ+A50OQqcCoo8qD2OdiNjeHZzZq4j7bPMTVUjbDpgnP0XipbB89HIi0as=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=redpinelabs.com; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.128.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=redpinelabs.com
+	s=arc-20240116; t=1769785648; c=relaxed/simple;
+	bh=URMwsEyoTDSDxH2rN4vl4DJMpqcf14Kjs1AmM9LZDM8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=d6XopatkAwLNf3GWEN7h/FPd4aZagI6Lg149TL+4a7oBMJ6bq4ZZtXWRmUbjyIKx6FbroobyFxI0RXckRSFid7BomoyiROS0sjm8gM4h5bk3avH8LEVgJzjtQHhOtlrE3Z/F5J12i+92GG6HCAzhliBHZnWPdptTvUUSbtLZxK4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dQwkhGpY; arc=none smtp.client-ip=209.85.214.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f172.google.com with SMTP id 00721157ae682-7944693b824so22561727b3.3
-        for <iwd@lists.linux.dev>; Fri, 30 Jan 2026 07:02:16 -0800 (PST)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dQwkhGpY"
+Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-2a2ea96930cso16320825ad.2
+        for <iwd@lists.linux.dev>; Fri, 30 Jan 2026 07:07:27 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1769785647; x=1770390447; darn=lists.linux.dev;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=hAN88uLQ/STGfk1zPNxcR+SPUoFVOw68Vfm9h9NIYqY=;
+        b=dQwkhGpYpPt3X5hu4xH/U8sbABGpAHYf4l7IEM+QT9HyqbAMao3igXuYUJ7JfZK6kC
+         jBNFEyrUgPXfoTcnXnmO0hvBPAXxME3QT5jeogbVagvwMWLfxYFL93Ck0vSTl2eHpTem
+         EcMmyB3D9y22vjf5Njj7FaVDpOLuqE5nX34g/mqzST9s0fXc6HDpzXm/WyQVbyYmjqvl
+         jGt+nMR0vteb2onnioPBKa/Tzrx5Rx6m9ll8BHTgFayFj2593kyQg+cVyNoyImFJzRdd
+         X0BjVaYRjIpy9Gu2LYTcndgo0ZL9OpU9h1nec+pvfaufGBxj5K0tJrGvl1R3koq9lMYe
+         vkPQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769785335; x=1770390135;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=+uQ7NKq1h7scvh9VO7rwffUO0CZ1Vprj8iqeZ0h9eEA=;
-        b=eU6ir829lR7e0Aqdgp7E4OykgfMMNQxIZmuTo9NHQZP9u1o1w0MXA/Wg47z8TyjUmF
-         hdNq199ZKEsSaCjvbYSnuYlRwwa63Bg2stKWj2j4UBXKnOK3vZj2HIt0gsCz4pxx7qkP
-         OPDdUxztDT1OqxzSOMyuOZRBBJexJypwe964yxEJKgP9tZEAQNfQGsdKOtbrLcg2Us5j
-         AxOll+dOAUJKelikqQg2esRhpd1QMipg1T96yXKeDk0SyREEUJYyiFM0ziW8QYAtulUi
-         KxX8iNNxopytMPAOXMGkuoCz/SJM/KSiv4pHHe7jwUO4z51Gu/Cv2quZsmGHP+oe/NuZ
-         7DdA==
-X-Gm-Message-State: AOJu0YwWJV9CHiaIRAi52TZj5hbe069X5+hfUMYT0DFjVKLBPXb/v2qZ
-	WkmKrMWEyTIgbTUfUwEszssu+ZVqrrVBP4j7b4VcVasEHFoJnc4tEx4yq11hbw==
-X-Gm-Gg: AZuq6aKFMJFpBNRXyCG5z5/UWCLO2MkjYBr3SrwLH/FkPKttiAr4uUWJdwo49VTi5eM
-	ai9dDtbK6SVN85CDGy4h+NF2uSV65HUyve8dzaBoOQIL7Wig+0w1D0HnQ/N1Bro+8JmYgunOQbY
-	I2xP2RJIum8rRgEdo+OkeFfFqMKVjCQfeSyUddsvvJXG2G/IpGbhz1/CfTLOpATwJK5XYTtFauC
-	kR2IZZRnvXDsenoVzGP3qTLVqUOBAmRaW9mtJRqb/+BoDJeXsKbMgwkqKczhq3Os1d5P6XOu1gP
-	u0UsleP1561AXlgckOC7LWk3h5Kd/imjH6K6i5CHc07D+QFww4DW0gpGQoSPdFJSrXjd0uwtezX
-	NEKsDuTg0V54/tj8TzXWYyBZEMdym32/wItO14b9vdT8T/mapJITVXtk6pHJgqSrsQacl0uR/ZC
-	pamoFGUqTT47RDDu2CO/CD4o7gYOHpoILsLaok23EI7qfVp8bZXw==
-X-Received: by 2002:a05:690c:6d84:b0:794:6fed:95a7 with SMTP id 00721157ae682-7949dfa9191mr28905407b3.37.1769785333236;
-        Fri, 30 Jan 2026 07:02:13 -0800 (PST)
-Received: from mail-yx1-f50.google.com (mail-yx1-f50.google.com. [74.125.224.50])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-79482767fb2sm37506567b3.6.2026.01.30.07.02.12
-        for <iwd@lists.linux.dev>
+        d=1e100.net; s=20230601; t=1769785647; x=1770390447;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=hAN88uLQ/STGfk1zPNxcR+SPUoFVOw68Vfm9h9NIYqY=;
+        b=dfwW7fGsHBmfXOAFFMJmN6YFlfxb4KMDd1GVVdDsgcqQTNMwivrFEmWRy5eJP28Tj8
+         LBN6s4O163vR03a09Kzv10VkR3N5/leNCPPzEzo8+qxaGt4TI2aQYgDLQD08B8J6IOtF
+         2/KE4cuw4Fn9Eda1tZwpkYAJiZ2FGJ2I9TK6zYqZbeuGoUETuAp/0PkfzU/Ldk6WTGEi
+         D6tEQ+lMQlIOUr/CjqaHJksGbEpt3a8iOwn/t+D6zrAgHPXhwL/h5g+jpgTWrnZGk6X9
+         mqPaTvLlDUORRWpLq07hqm1tvfCmSTuBkiGZTPlzyYMtXAVZmMGUnKoPmBoR55Zah5pF
+         oOXQ==
+X-Gm-Message-State: AOJu0Yxv5KuUJ4NOZvvBWiWKubXp4UOC6ZGsG/weYwGlKIgCQcQ71cmX
+	hrJKuP4lVE/AU9oducH54/VSfIDmU76wM7ZGCHvLQTaQBMeG+lodyQ1M4XUueA==
+X-Gm-Gg: AZuq6aKHi/TVNNk8jcIiDifCHI+DwBII/Wsri3Gf+DStxd2rf+qheledMnAgjyVuDVR
+	CyTecmiQ8jE39ekNRYp6Txo81JWx4CLtY45uen4YdABrOZM2gu/1sRbiNpUu8ocZvzGCst8tNL5
+	Ot2TfPVOjA0UG4QwB6A+ombnLMFxrDl6yzVzq4+sBhp8EqtCeoVEnBGkh/brY8/TBbvC+xCcK2c
+	Vujcan75lxo+5/pEHb/w9JL/L2rw1iiXzMLYZRbXpKsdqRfYjfLcuBi8yPRWF1Y3gfIo1NcOZtY
+	Rua6wxSXksN0+LnvF1xj2QfkqDwWjw/3RvMF7Ngy//vbjIhsjHMLh/sE8bz5YXWO7xyISuNjvBS
+	+PYqfyBkFbK4OPNFj0MSqKxUPRJwnwdAzezZ1Mj30zkHlQEpNMJvx2oBKNsaIbLvV8ankNJlTLa
+	NWQ5INT9dcujQtAUGLt+ZQLA==
+X-Received: by 2002:a17:902:f60d:b0:2a7:682b:5098 with SMTP id d9443c01a7336-2a8d959b11emr28998285ad.9.1769785646839;
+        Fri, 30 Jan 2026 07:07:26 -0800 (PST)
+Received: from [10.201.20.209] ([71.181.84.66])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2a8b47f4717sm63745665ad.18.2026.01.30.07.07.25
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 30 Jan 2026 07:02:12 -0800 (PST)
-Received: by mail-yx1-f50.google.com with SMTP id 956f58d0204a3-649655f14d7so2205181d50.1
-        for <iwd@lists.linux.dev>; Fri, 30 Jan 2026 07:02:12 -0800 (PST)
-X-Received: by 2002:a05:690e:4183:b0:644:535a:67cc with SMTP id
- 956f58d0204a3-649a84fbf82mr2011688d50.69.1769785331664; Fri, 30 Jan 2026
- 07:02:11 -0800 (PST)
+        Fri, 30 Jan 2026 07:07:26 -0800 (PST)
+Message-ID: <4ab7e9b9-be27-402b-834c-3e71bd58a476@gmail.com>
+Date: Fri, 30 Jan 2026 07:07:23 -0800
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: Is there a way to manually force the security protocol with IWD?
+To: Bryce Johnson <bryce@redpinelabs.com>
+Cc: iwd@lists.linux.dev
 References: <CADXxVSJ5FrxYs_s_tz5y6LeGbVLnCgJP3YO8TQEXTnXs+rFuug@mail.gmail.com>
  <3d09fed3-9728-43e4-840d-13052b5fbf6e@gmail.com>
-In-Reply-To: <3d09fed3-9728-43e4-840d-13052b5fbf6e@gmail.com>
-From: Bryce Johnson <bryce@redpinelabs.com>
-Date: Fri, 30 Jan 2026 08:01:59 -0700
-X-Gmail-Original-Message-ID: <CADXxVS+_B2r0yAUKKD5X_xJ6GmfkfkngwW_XHQyti=+9cMmzqg@mail.gmail.com>
-X-Gm-Features: AZwV_QioEwkMWUHis-za-QYAAhduzZlrXQ7by1_FyjzirHWhaBbuTmvtoZgmGBk
-Message-ID: <CADXxVS+_B2r0yAUKKD5X_xJ6GmfkfkngwW_XHQyti=+9cMmzqg@mail.gmail.com>
-Subject: Re: Is there a way to manually force the security protocol with IWD?
-To: James Prestwood <prestwoj@gmail.com>
-Cc: iwd@lists.linux.dev
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+ <CADXxVS+_B2r0yAUKKD5X_xJ6GmfkfkngwW_XHQyti=+9cMmzqg@mail.gmail.com>
+Content-Language: en-US
+From: James Prestwood <prestwoj@gmail.com>
+In-Reply-To: <CADXxVS+_B2r0yAUKKD5X_xJ6GmfkfkngwW_XHQyti=+9cMmzqg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-Hi James
+Hi,
 
-On Fri, Jan 30, 2026 at 7:48=E2=80=AFAM James Prestwood <prestwoj@gmail.com=
-> wrote:
+On 1/30/26 7:01 AM, Bryce Johnson wrote:
+> Hi James
 >
-> Hi Bryce,
+> On Fri, Jan 30, 2026 at 7:48 AM James Prestwood <prestwoj@gmail.com> wrote:
+>> Hi Bryce,
+>>
+>> On 1/30/26 6:43 AM, Bryce Johnson wrote:
+>>> Hi All
+>>> We are working to get our product through wifi certification.  Our
+>>> testing company mentioned there was several negative test cases that
+>>> were failing where IWD was connecting anyways because it would decide
+>>> on the security type based on the AP.  Is there a way to force IWD to
+>>> use a security type that is different than the AP so it would fail the
+>>> connection?  Can we disable WPA1-only connection or force WPA2 only
+>>> connection?
+>> There unfortunately isn't at the moment. We do have a "developer mode"
+>> by specifying "-E" to IWD and this seems like it would fall into that
+>> category, support would need to be added of course.
+>>
+>> But I'm somewhat confused (and maybe this is just poor test cases by
+>> WFA?), why would you need to certify that IWD fails when using a
+>> different security type than the AP? A client should not ever use a
+>> security type the AP doesn't advertise support for... This feels like
+>> its testing the AP, not IWD :)
+>>
+> I'm was requesting what test case fails and if I could get a copy of
+> it.  The only thing I can think of is that they want to disable WPA1
+> for example and show that the device won't connect to a WPA1 only AP.
+> Or maybe for a product you only want to connect WPA3 and fail and not
+> connect or not allow the AP to downgrade the connection.
+Yeah I'd be interested in the test case.
 >
-> On 1/30/26 6:43 AM, Bryce Johnson wrote:
-> > Hi All
-> > We are working to get our product through wifi certification.  Our
-> > testing company mentioned there was several negative test cases that
-> > were failing where IWD was connecting anyways because it would decide
-> > on the security type based on the AP.  Is there a way to force IWD to
-> > use a security type that is different than the AP so it would fail the
-> > connection?  Can we disable WPA1-only connection or force WPA2 only
-> > connection?
->
-> There unfortunately isn't at the moment. We do have a "developer mode"
-> by specifying "-E" to IWD and this seems like it would fall into that
-> category, support would need to be added of course.
->
-> But I'm somewhat confused (and maybe this is just poor test cases by
-> WFA?), why would you need to certify that IWD fails when using a
-> different security type than the AP? A client should not ever use a
-> security type the AP doesn't advertise support for... This feels like
-> its testing the AP, not IWD :)
->
+> Maybe it would make sense to allow a blacklist of protocols you won't
+> allow IWD to use?  For our product we wouldn't allow open or WEP
+> connections for example (but we perform that check outside of IWD).
 
-I'm was requesting what test case fails and if I could get a copy of
-it.  The only thing I can think of is that they want to disable WPA1
-for example and show that the device won't connect to a WPA1 only AP.
-Or maybe for a product you only want to connect WPA3 and fail and not
-connect or not allow the AP to downgrade the connection.
+IWD already won't connect to a WEP network, so we're ok there. You may 
+be able to coax out some behavior with the following options:
 
-Maybe it would make sense to allow a blacklist of protocols you won't
-allow IWD to use?  For our product we wouldn't allow open or WEP
-connections for example (but we perform that check outside of IWD).
+main.conf
 
-> >
-> > Thanks
-> > Bryce
-> >
+[General].ManagementFrameProtection
+
+network profile:
+
+[Settings].TransitionDisable
+
+[Settings].DisabledTransitionModes
+
+Anyways, lets hope you can get the test case. Shouldn't be too hard to 
+add some support for specific test/dev type requirements.
+
+Thanks,
+
+James
+
+>
+>>> Thanks
+>>> Bryce
+>>>
