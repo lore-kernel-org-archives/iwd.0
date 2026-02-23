@@ -1,154 +1,145 @@
-Received: from mail-pf1-f180.google.com (mail-pf1-f180.google.com [209.85.210.180])
+Received: from mail-oi1-f169.google.com (mail-oi1-f169.google.com [209.85.167.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C106931984E
-	for <iwd@lists.linux.dev>; Mon, 23 Feb 2026 17:11:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.180
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771866676; cv=none; b=kgcANzZ+39PM9pzD2ZK89GQlVjsMVAbPoMDxcOUyBH/moRjtgOMs6jziP/2iqzVvaQqP+4xxp6QHVSBVrDpqvPGHPFMfxQD+HhCqOyyRQHBG2VYkUONtMUyA6hzMBj2oa2xM5u8BjQGGa7oU9hLw4VpipVaIUkOV7cwGJGCMcEc=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771866676; c=relaxed/simple;
-	bh=YUund9TQVKbN6wA/Q1DO/K9fhLY1bLkC8ViRxC6CcuU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=uXZrmTHAUVBEUEy1n7RCSPlxPy/TrTr85WLCTX9lERZ/0/xeKH4JRIQYXjSQi4gW1jVoarRJUaYpIblzZsT5Pex1yKe3HbC/8CELl+tP+MIsPCqqAHsqPCv3JvtBp5YUB91NAGen3dstHgphALrHslhmwgU/iQi0F1NXu+fCi5U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SE2ZZqdN; arc=none smtp.client-ip=209.85.210.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E42A6331A70
+	for <iwd@lists.linux.dev>; Mon, 23 Feb 2026 17:31:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.167.169
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1771867874; cv=pass; b=DruaKr4UyBZp1H0hvApI7nxAvU+uFjZP1F/6d4i3jUa1Bw7uWA2/GoSuBNSDGctiO2Svyg5o/kZZGNa0RtJMrSp3BH2/v2qN7gE357G+1MkrHlEVzFGJ4+iTtdyjuP4ehn8RpaD692X3GWieVC1SL7jIPTzYh2lAfgHzy2ZJ3Og=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1771867874; c=relaxed/simple;
+	bh=J3JxO0uDadCUiQOxk6Jvb1O0l4XMk3dcALoxXqO1oFo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Content-Type; b=mFVBByMAzi040rHsiX1Sor4VA1ta3qMoR+VdGWaAnZkON4zFn887XRf7s+l3oAsLEOlbV9qifUlPIXkrY0VTAqpTx5CNUZxLEpuKU+xdf04HlZu9SFr7maCYWoyQK1dZaG5wcEl3Mh9PzfTTwXuBXcRFUOpIsUvaEOSOrspNRzA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ig6TxTtk; arc=pass smtp.client-ip=209.85.167.169
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SE2ZZqdN"
-Received: by mail-pf1-f180.google.com with SMTP id d2e1a72fcca58-824a3ba5222so2425217b3a.2
-        for <iwd@lists.linux.dev>; Mon, 23 Feb 2026 09:11:15 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ig6TxTtk"
+Received: by mail-oi1-f169.google.com with SMTP id 5614622812f47-45f171cb842so3326465b6e.1
+        for <iwd@lists.linux.dev>; Mon, 23 Feb 2026 09:31:12 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1771867872; cv=none;
+        d=google.com; s=arc-20240605;
+        b=FEp8D2bJWEAHswOijM2hBCUT4Y+paEQ1m3v0UmYX+9eX4Dcs53hnubtZ5BuBItemx5
+         AvaZ5DI+VGSVR2eNXJDKnPodYfFroujxjwQ4Fiu2gMnJKKLM0D+qJL2zYNUGHupbIZ/x
+         KY+y5AbX1Su5Iyub0jl1yPf+cFsXwHVqe0+jReE6pbmd4FOyq/tguskFnLw1xEv/BUkB
+         W4ee5jf9lCg3pwA9+ZzNPF2/WgT/sb3AOq9OgyBftLtQ/apdX6zgbpXOo34k/3oZo88o
+         ZRvi03W9Eflqyuufyxp452+1OXZLWEJ4Jbx8eWNXmyT4c98e6oh7azC5Qrv73Dv6ThVh
+         20mQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=J3JxO0uDadCUiQOxk6Jvb1O0l4XMk3dcALoxXqO1oFo=;
+        fh=LVwSdJJT2poHpWJpvI73c3fFqaJVA08Td3ZAiex6+kI=;
+        b=lFDotpRT3A8jrYTQKmATX3TiFFMZaqLljYTJG+VAvpUXuu90niKb8J9C3021ol0QtT
+         UXDesRndZBUAhxtMMvH+3xux62gy1O0ham/5AcZc9wANQsdNRlaUjkOxIL1yWKBaCb3F
+         m7Xc2ae3NH0N4f4aAmovEci+NAmF6ZlgsQ9V2bl2TNf9i0ae2UTidAjrKFDTuYB3ufuQ
+         MMt+xW54XlvmA0ScBMtUw9YsCwFG5X8GftBuSMxMxaUSxYjulmUS2o4znAAwTX4sVuaP
+         RYXzF7nMJx0BIIsN+GGoQGOoX4/+oao1kC613IE/xAmPPCB+kCsSdMUdvkYpqJd7ugly
+         HyVg==;
+        darn=lists.linux.dev
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1771866675; x=1772471475; darn=lists.linux.dev;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=W6g+L1cHBv/qiIoo18sapl/OoSgp1mMxWJfDxS8gfhg=;
-        b=SE2ZZqdNuLIOTIFoficuy1YotWuKIG6fFRdg7uWnWu/c0K/oOJcZQg5N+HkhxfzQgt
-         /k4Xb43wYJd1ObTLgH92DvHZN0t2N3F4atReGFuSsuTuLulB4jvS95gGDlvvcRHsww34
-         +0UdNTvJ+0ul+44zxMG5Ot55RKnxCDDu6HL++oygWB4xGWca/iGIlIM4FVdO7Mbt8ZoM
-         DujqYs/UBT7n4OK8nom0M1g31VGGAiclD9dlqMaU1gale6lGOJgUfjnSwzj5O46bvnRh
-         0DhZ/ldDCc4UE+BBbjNjlNbiZ2HKQPFA5qSlGL+PNT+9FiQcLfXomhNOfiQB4GQbz2IL
-         FezQ==
+        d=gmail.com; s=20230601; t=1771867872; x=1772472672; darn=lists.linux.dev;
+        h=content-transfer-encoding:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=J3JxO0uDadCUiQOxk6Jvb1O0l4XMk3dcALoxXqO1oFo=;
+        b=ig6TxTtk6XGdyo/Q4rIGCNAwS15j+IUxeC3jrioUbNxT8O3M1CG0o/zyAUWDJjzplI
+         Y7d7EHIt3rostOeBuOIHCyXLez9hTpZqvOEK3Tcu67kcneWc6X/eAkCQm0g92PvqbHsK
+         Vp/dIMOJH2GCPKJy9cxQ9krHjZ0Zv0WxtkzfWG7OfvHiHe0Q5GkXGk52Cal/BLD6RrSZ
+         aJDUMWOxy7nRfz220iUiVDNv7aK0X4xGu+rGb89a4KkJdGp/IW7eP6qkU/+u/V0ceUXy
+         PPxskGxsGEaGCH7Luwhm9JnTrVSj6v+cCr8JWFZe0tSZ5JFufcI5dp6NZt++WWQmaQzY
+         ZDPA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1771866675; x=1772471475;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=W6g+L1cHBv/qiIoo18sapl/OoSgp1mMxWJfDxS8gfhg=;
-        b=Jfu5iK7r+tYxcXx1IURsI5eNLAUttCI+Z/qZw0l2tI5ofX7lNFLWdtVYUxqf86MjBX
-         /TuuBTf/RwEwTMVhIRqg9C4u46bRYTkqzjZaxXhN98TbLgqT929KJ/z9hIs9dBwW5wu6
-         mu3skQujgZ+xHGRQ2JywtFHbhYrPFB6ega+967b3s/rTywYskNueflCFZIZd+gEA1uTI
-         +CKClFzwsH9gabDgSaD0IcHQnipT/B7BHdm9sMU8QeHTv2JmqHznP4d0QnwPYNg3i/JE
-         ekELlWyEvbLy3KLNyjQRlaD3rj8wuUVMX1UawnUdk4cG2iJzmGbiOhbBi9yakTPCqUqC
-         AsJQ==
-X-Gm-Message-State: AOJu0YwguR2Cm8iw4wQkWZBSqDKU9sehvBylgDOYInWbbf9fO0p3b0KN
-	x3k6Q1AwIA7yGThLeUS6a9V9xtngXok5QPv0H+eESii69c/vLdOc7q7FdYABWQ==
-X-Gm-Gg: AZuq6aLCBr4rcc2BwWYHqZGr5Yo9dnFQW0+kcvpS2woML/km8kW4Op0pNkejjxfGzjp
-	1xuGUJTWJfNazHwqx1Via2lsEkQVacv/cDHkwxAego2ez92ys0IkG7O6YB39DUJm1ZShAniGQZd
-	xxpdxdTl+QqzgpUQa7XvjSKk5oRLZKdJkjlj2mBkfUdboTCkUE3uSTKi4c/GtWssoto5PD0dJ2a
-	KSc+UfQS3XlF+7SbGdFNJAMlMOUEdRFT9DggLoSbfMeqq7s3MxkvdMQ/Y2JxbpzVIADqgdlUjfx
-	0LDun/A98pc4ArCdjOLnzvjT6tFy+BukfHs6bIzUO6wMCeOVWOqpdOuPnq7AyvHq/I4MXxBH1zu
-	3SMCd4TPRECnYe6v9q+I+onH8BBEH9pVnxExVsS7VO2trzn6tQE8hzb7TExxNWK/Fvkw5fbvdgU
-	UtvWEJoyZNmXYiUegsszOjXUhu6P0DJ3nQlY4BJ3Wbe0bUVgg0nnutacwN
-X-Received: by 2002:a05:6a00:84b:b0:81f:4f05:4fe6 with SMTP id d2e1a72fcca58-826da8e26c1mr7307004b3a.1.1771866674861;
-        Mon, 23 Feb 2026 09:11:14 -0800 (PST)
-Received: from [10.100.120.15] ([152.193.78.90])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-826dd640d16sm8524099b3a.13.2026.02.23.09.11.13
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 23 Feb 2026 09:11:13 -0800 (PST)
-Message-ID: <8de64523-bffa-4455-9928-dfe924ac2220@gmail.com>
-Date: Mon, 23 Feb 2026 09:11:11 -0800
+        d=1e100.net; s=20230601; t=1771867872; x=1772472672;
+        h=content-transfer-encoding:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=J3JxO0uDadCUiQOxk6Jvb1O0l4XMk3dcALoxXqO1oFo=;
+        b=dVtNBDDI80scBlInnRpwooDNRjlju/d9Lwu/H9JLFaoDsuWGKWHbTptEm56Bi14zuz
+         EpvWgQyfkVBRC1Tdgto/hKBo4S9Sxvy49btK6p7yheZw56iBSxB48kJQRmOtHgVg/rUu
+         RU6tBXMVDMXfDosvXb5gXx/F8PsLwzYh0KjXymbuTbEo/HgPtUg1HVvbQF1vVYIa0EL7
+         jV1LchaesuDZOLQOrw5iyOUE0E7UucW1/XBbLxQVlGHQpB1AiVhGI1ejZbJvZefl71Ns
+         fJDi3jgOxIUD3YJg55S+7Iw0sqrCSfkBSj6kvY14PYXjF8eegZCcJgyRz53V/q5o5IT9
+         Hqtw==
+X-Gm-Message-State: AOJu0Ywd5i62SyAJnLVgdb5xYHTm9GDSv34IeLUqnUHQLU+5ymleP068
+	G6ZXN0gKSnod/IJ55NgADYDh80J+KulohpPjzWLoQnoUPyi1iR+qHXzVajaGRk+s8xgFn0FBszU
+	KyL84fvVvDZ9Ur393p1aqnZqKlqKQ3BTVXk7S
+X-Gm-Gg: AZuq6aIEaO0nLQuJZ7eoebq2rqQcshIiy5nMo2vH2nkr29jW9jRQjJ6ZLwYHhcwlHkn
+	DlMTKGUOsTYwnTwtwMjeMorvsNzbCbe1KpNlvKdReUa9NjYShz/eNWkgzCDM62vLEfVTtRyW+Cv
+	TkAIfy058GSTGfWT/D1U0tb0U1tE76US0JicNOXuXtupD/sBQ7+UxYqvgJISyHRfrpeejnBqLIh
+	URJNxgGuMcMtTLmZsQwcoDUtm6wFuoZlAqaYPAMYLw+vtOVCYWY3GzywvXhkYKtYUT6wITDx7yN
+	/fdkdQW33g==
+X-Received: by 2002:a05:6808:308b:b0:450:d4b5:3527 with SMTP id
+ 5614622812f47-4642761c69cmr7747417b6e.24.1771867871825; Mon, 23 Feb 2026
+ 09:31:11 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: does not connect with intel 3168 past kernel 6.16
-To: Rosen Penev <rosenp@gmail.com>
-Cc: iwd@lists.linux.dev
-References: <CAKxU2N9ED1tuKM6ygCb1Ln9VrrMEHGOoc_NhNTn3md87-wH8Mw@mail.gmail.com>
- <d0aa9904-1af1-4505-bbc6-3c75b784e3a9@gmail.com>
- <CAKxU2N_sUr_rmbV5i=MP6c1J7pgZM=f7b1yAUSjg+fDgXNPqTQ@mail.gmail.com>
-Content-Language: en-US
-From: James Prestwood <prestwoj@gmail.com>
-In-Reply-To: <CAKxU2N_sUr_rmbV5i=MP6c1J7pgZM=f7b1yAUSjg+fDgXNPqTQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+References: <CANZiGuEaFwDLHD8jGk4-POxfnJAWeER1ss7COtur8b0ohEi3Fw@mail.gmail.com>
+ <72a14187-ae0c-4de1-898c-c416de541e7f@gmail.com> <CANZiGuHAzX4GDQvEKHDRoWF-CMdaR26pVarEzr1PSG6HLyrj3A@mail.gmail.com>
+ <baacf3fb-aee1-4b9a-9d42-0e5909719091@gmail.com>
+In-Reply-To: <baacf3fb-aee1-4b9a-9d42-0e5909719091@gmail.com>
+From: =?UTF-8?B?Um9tYW4gxb1pbGth?= <roman.zilka@gmail.com>
+Date: Mon, 23 Feb 2026 18:30:59 +0100
+X-Gm-Features: AaiRm51syG7qByYyzDqgGIm5bVNlhYoXIre9BWIQnioe4SxIQzzTYwS6CuLF17w
+Message-ID: <CANZiGuE+kw9pRM1MvNjY0uJtcWh83poiWwZK2ULGTrk4dBQS4g@mail.gmail.com>
+Subject: Re: systemd-networkd MAC address randomization stops working when iwd restarts
+To: iwd@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Rosen,
-
-On 2/19/26 4:26 PM, Rosen Penev wrote:
-> On Thu, Feb 19, 2026 at 10:03 AM James Prestwood <prestwoj@gmail.com> wrote:
->> Hi Rosen,
->>
->> On 2/11/26 3:15 PM, Rosen Penev wrote:
->>> Output from 6.17 dmesg:
->>>
->>> iwlwifi 0000:08:00.0: enabling device (0000 -> 0002)
->>> iwlwifi 0000:08:00.0: Detected crf-id 0x0, cnv-id 0x0 wfpm id 0x0
->>> iwlwifi 0000:08:00.0: PCI dev 24fb/2110, rev=0x220, rfid=0xd55555d5
->>> iwlwifi 0000:08:00.0: Detected Intel(R) Dual Band Wireless-AC 3168
->>> iwlwifi 0000:08:00.0: loaded firmware version 29.0bd893f3.0
->>> 3168-29.ucode op_mode iwlmvm
->>> iwlwifi 0000:08:00.0: base HW address: xx:xx:xx:xx:xx:xx, OTP minor version: 0x0
->>>
->>> There's also iwd dmesg spam:
->>>
->>> invalid HE capabilities for xx:xx:xx:xx:xx:x1
->>> invalid HE capabilities for xx:xx:xx:xx:xx:x0
->>> event: connect-info, ssid: X, bss: xx:xx:xx:xx:xx:x1, signal: -76, load: 52/255
->>> event: state, old: autoconnect_quick, new: connecting (auto)
->>> event: authentication-timeout,
->>> event: connect-failed, status: 1
->>> event: connect-info, ssid: X, bss: xx:xx:xx:xx:xx:x0, signal: -78, load: 96/255
->>> event: authentication-timeout,
->>> event: connect-failed, status: 1
->>> event: state, old: connecting (auto), new: disconnected
->>> event: state, old: disconnected, new: autoconnect_full
->>> invalid HE capabilities for xx:xx:xx:xx:xx:x1\
->> Is there any kernel output during this time?
-> It's basically this continuously. I use impala to manage iwd but even
-> if remove it and use iwctl manally, same thing.
->>> 6.16 output:
->>>
->>> iwlwifi 0000:08:00.0: enabling device (0000 -> 0002)
->>> iwlwifi 0000:08:00.0: Detected crf-id 0x0, cnv-id 0x0 wfpm id 0x0
->>> iwlwifi 0000:08:00.0: PCI dev 24fb/2110, rev=0x220, rfid=0xd55555d5
->>> iwlwifi 0000:08:00.0: Detected Intel(R) Dual Band Wireless-AC 3168
->>> iwlwifi 0000:08:00.0: loaded firmware version 29.0bd893f3.0
->>> 3168-29.ucode op_mode iwlmvm
->>> iwlwifi 0000:08:00.0: base HW address: xx:xx:xx:xx:xx:xx, OTP minor version: 0x0
->>> iwlwifi 0000:08:00.0: Registered PHC clock: iwlwifi-PTP, with index: 1
->>>
->>> Note the extra PHC clock message.
->>>
->>> This is still an issue with kernel 6.18. I work around this by using a
->>> USB WiFi adapter, which is not ideal.
->> So the USB adapter does work with 6.18? Do you have any other adapters
->> to try? Does wpa_supplicant + iwlwifi adapter work on 6.18?
-> Not sure, I can try later.
->> Trying to determine where the issue is. To me, if a USB adapter works
->> that tells me its not necessarily an IWD issue, but something with
->> iwlwifi and that kernel version. I'd be most interested if
->> wpa_supplicant + iwlwifi works, if so we can try getting some iwmon
->> logging of the two setups to see what differs.
-> It's definitely a kernel issue introduced between 6.16 and 6.17. Still
-> present on 6.18.
+On Mon, Feb 23, 2026 at 5:57=E2=80=AFPM James Prestwood <prestwoj@gmail.com=
+> wrote:
+> On 2/23/26 8:43 AM, Roman =C5=BDilka wrote:
+> > On Mon, Feb 23, 2026 at 2:36=E2=80=AFPM James Prestwood <prestwoj@gmail=
+.com> wrote:
+> >> Looks like the issue is in the configuration. IWD removes/creates a ne=
+w
+> >> fresh interface on startup, which conflicts with how you want to use
+> >> randomization with systemd. If you want systemd to manage the interfac=
+e
+> >> you need to tell IWD to use the interface systemd/udev creates by usin=
+g
+> >> this option in main.conf:
+> >>
+> >> [DriverQuirks]
+> >> DefaultInterface=3D<driver>
+> > thank you, that fixed it. It has no bad side effects, does it?
+> >
+> > I have to say, the situation still looks like a bug. Having systemd
+> > manage the interface and using iwd for 802.11 is a supported
+> > configuration, I assume, so iwd shouldn't collide with systemd
+> > components then. Also, I would never think of looking at
+> > DefaultInterface: there is no driver quirk, the name sounds unrelated
+> > to the issue and I actually don't understand the terse description
+> > (what is a default interface?).
 >
-> Interestingly enough, If I boot to Windows and then reboot to Linux,
-> it works. But booting directly to Linux fails. That just tells me
-> firmware loading is broken in some way. Or something is not being
-> initialized.
-This all smells like a driver regression to me. Or at the very least 
-something in iwlwifi/mac80211 changed, and IWD is passing or not passing 
-some attribute that is now expected/unexpected. If you can successfully 
-get wpa_supplicant to work with this setup I'd be very curious to see 
-the iwmon logs with wpa_supplicant vs IWD.
->> Thanks,
->>
->> James
->>
+> Having IWD manage the interface was a design decision made since IWD's
+> inception. But there has always been a way to use the interface the
+> system creates via "default interface" options. So yes this is a
+> supported configuration.
+
+Oh...
+
+> I'll admit, the use of [DriverQuirks].DefaultInterface in this context
+> isn't typical. The reason for this option in the first place was because
+> some drivers didn't support removing the default interface, or at the
+> very least would cause issues. brcmfmac is one example. In you're case
+> the driver itself supports interface removal/addition but you're trying
+> to also have systemd manage the interface when IWD expects to manage it.
+> There's no other way to tell IWD this situation except this DriveQuirks
+> option.
+>
+> In case I wasn't clear a "default interface" is the network interface
+> that the kernel/driver creates during initialization.
+
+It would never have crossed my mind that iwd might remove and
+re-create an interface in the first place.
+
+Anyway, I'm off the mailinglist. Thanks again,
+Roman
