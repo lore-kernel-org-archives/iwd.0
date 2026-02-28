@@ -1,100 +1,92 @@
-Received: from mail-oo1-f46.google.com (mail-oo1-f46.google.com [209.85.161.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-181.mta0.migadu.com (out-181.mta0.migadu.com [91.218.175.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEEEE2620DE
-	for <iwd@lists.linux.dev>; Fri, 27 Feb 2026 02:22:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00FF547B41D
+	for <iwd@lists.linux.dev>; Sat, 28 Feb 2026 15:34:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772158966; cv=none; b=tsmN+d7NvNk9uOlm4vK/Tee07E91mm73Fph0lnz+taXmr/hnBu5ujepH2dsiYvmrhzk22vQJV+hjyddUs+jEkC68F//wGXZ0roNs+iM/bSiXdEl/bfdwWHoDqWfQKNyvWkyN7O9BS7Gw+cg84fqrrqfyRxmLs+krcDDReVGHWI8=
+	t=1772292860; cv=none; b=cVLUpkgQVTyavJCkygdzi9nJ0EyNTpghJTn0OODGkRqZ11/nF/AVC2XorYPe8zNaNJX0qKhskQ/0kv1Uf9O5X8bi7dDleuQJCIhj/Q0dsP3pcdBnA/KEYQ2wT1y19lMDuYgZ4VX0Iv4/qi5VgmXoXIdTFQAyk9yV2hwLKaeJ9WU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772158966; c=relaxed/simple;
-	bh=a2b2O6B6zWV2wK3IJ+NgGPvFqsJarsVoTMEYnfNMIT0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=udOYlAInCgrS7Pc66ELbPvQ2vreuKKQwGyoOCzxfr/hpO8/QJkcNAGBR+821VTxuVluQyJ5I09r7yo8Q8hlBlfjfzXm6cVZU+lGcXBS8ProZxmGPOQJSCeei2PtiSoZdk0lgXb5dyMNtIQdUzKP7/+qJDPxzjZpiLseAKoDKsfA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=akgJVdjN; arc=none smtp.client-ip=209.85.161.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1772292860; c=relaxed/simple;
+	bh=kGyIhlaHBiWfkw/sKpPoXj0lV8NUGLo41Hxr6hBH5lw=;
+	h=Mime-Version:Content-Type:Date:Message-Id:Subject:From:To:
+	 References:In-Reply-To; b=rlTuRfzMfMb3VrDnzY9DxMgMTVB/EtFRXgneMM44y+4W72eTQSVNHKcJY+jk5/PHVMvpYhaZpFpvWQLFuJLd4vQnCTniJjruZsPOpTCfWMCHp9erJgLiddKQ38VKULlJs3l9fSViqhmoJtlieoHsKYIkjzT63ov7ZuR5d6qWOGA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=cknow-tech.com; spf=pass smtp.mailfrom=cknow-tech.com; dkim=pass (2048-bit key) header.d=cknow-tech.com header.i=@cknow-tech.com header.b=U98Qt03P; arc=none smtp.client-ip=91.218.175.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=cknow-tech.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cknow-tech.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="akgJVdjN"
-Received: by mail-oo1-f46.google.com with SMTP id 006d021491bc7-677bb1c3a9dso572951eaf.3
-        for <iwd@lists.linux.dev>; Thu, 26 Feb 2026 18:22:44 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1772158964; x=1772763764; darn=lists.linux.dev;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=nnG9dEdLo9hUpGHzV/6+fJeR/DOLW4Zsw/Gd85fDoGU=;
-        b=akgJVdjNHtka1Hu64F6/d2fyUM/m+00+0l76RD0qJ2WSHc/rdzPmYWku4FncSnwdDL
-         YH2S3nRoZniXH6fDgoFbCf4RsH0/ip7YdiVj8orDqI76gEz8uZw5Br3vZzwvXDfnoWSI
-         7GA3+SIXRFsxrFk8caXDYOyo+Ze0/ZF9idfIHz0SeBov1ZviqOmJ53GeLCiT7DUqi7yA
-         UVr8ee5/LJ5ollliiKgistWVRqkSubeL3suPkCeNziiPL3sQ9Y/v8TYqNslSEplRGTHv
-         tE1WbH91eMTlf44t+VG33Gu9qOn7n7GfPk51W3DqBzQxWHUp7NSPihwlAOuXNNC/1VfX
-         stgw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772158964; x=1772763764;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=nnG9dEdLo9hUpGHzV/6+fJeR/DOLW4Zsw/Gd85fDoGU=;
-        b=TqnJbzUlTOWBHinjOf1DPkHffTFmRBX6e1OnJ9YSyI8vK5ODCpr5D/SC0NAuLbCPL4
-         2ARXMNnSOHA4P6/cW5C/mH2tHFpJD1wuMnhxkxfGlQ73/kE1sKbu2dJtatQ5olkTRzxa
-         XFrysrNRoOxf13EUjhmGTlybmXk+CSdo1kJZzAV9v/BskJd+MxRRZerKOzp73waEj2jh
-         V/k4XVbcYJdN088AGpsw0oLvE9Coz3oir91p7WvTfvvOD/Wjh9RYr2eLvv0G86fh9tXV
-         sp2wXjDoCVs1enFsnM9EG9ke1c3D+yXY+hwKt6tdW4udPeQD6etIH1Z1m++BoCkG5DDh
-         r2xw==
-X-Forwarded-Encrypted: i=1; AJvYcCXNzVwNc6ZmKSg8CR3x5du7xl3yQUpkKG2AKJwPd8zXn2n0fTD+SiVOpE0nOhYuuGvR5VY=@lists.linux.dev
-X-Gm-Message-State: AOJu0YxAE81phrYmpu+kiOvUOUV8+LzuuEres88gYVbuRqt6gOOMNMCy
-	jGBywe5s5jqgqZiTK15CgLa+nw1eHPZG/qt7uzZWB5LVV6bUKIhTAb6MQLmr2w==
-X-Gm-Gg: ATEYQzyP90vpWMO9sL7K4Ib1oOatBf8K/3YwJ/lELggONINlLGgJL2LH2+jutNMxcNy
-	FTW+TFWcdClfeY3nCN59j9PiwFne5rabf8AdiRzHObYRJxPvHUerDQTWhFcvcA10k4j5UCBz0rS
-	XbsZcCTIKHtLLTa159P+Y4HANLeVVcBfhOk2mEwZ/wT5j9jvgVeHAUCTVRYr3oCX/g1mgyCnetB
-	fPjsBM/r9rbRC0V1KL4zQjf1IInxUQULlUxTAmgk8ZA5shch5aC5WJCQ8xDPBYFAUyYaoH6qR8X
-	3KzOpYn5nGpJVwZ7InJN34VljWLMGJFAbyEzWOAKKAdOUX/9SRP8ZRlhiLvZjrJvpJKEk87uGz4
-	WxFP7g/4gYLx/RgbX42KuWOyx+S/NLnyR/VtYILGLVpnzrm5rlaIHj4rR72+oOEK57pJjUSHIH6
-	LDORrMRe/Gh7QKZ0IxflYHDL5+vgj0KHba
-X-Received: by 2002:a05:6820:1990:b0:66e:4279:3e12 with SMTP id 006d021491bc7-679faf73d09mr989600eaf.65.1772158963673;
-        Thu, 26 Feb 2026 18:22:43 -0800 (PST)
-Received: from [172.16.49.130] ([70.112.199.191])
-        by smtp.googlemail.com with ESMTPSA id 006d021491bc7-679f2bcd3c5sm2590852eaf.1.2026.02.26.18.22.42
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 26 Feb 2026 18:22:43 -0800 (PST)
-Message-ID: <9acd2b81-5459-483a-a959-b33600d4f733@gmail.com>
-Date: Thu, 26 Feb 2026 20:22:41 -0600
+	dkim=pass (2048-bit key) header.d=cknow-tech.com header.i=@cknow-tech.com header.b="U98Qt03P"
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: iwd not honoring AutoConnect=false
-To: Alexander Huemer <ietha0weefee@xx.vu>, iwd@lists.linux.dev
-References: <3p56uq4uboudnyuit6hlc3d4jvfllv3y7gjyor72vokio2msmy@xpfpjfqdknj7>
-Content-Language: en-US
-From: Denis Kenzior <denkenz@gmail.com>
-In-Reply-To: <3p56uq4uboudnyuit6hlc3d4jvfllv3y7gjyor72vokio2msmy@xpfpjfqdknj7>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=cknow-tech.com;
+	s=key1; t=1772292854;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=OurS2AGRgHqCnwvi2srLVr2y6To+FQhEmAIchQ61JxY=;
+	b=U98Qt03Pd3lCyZIQ/n2iHnR0RmIlk2obHBsWVFW8WJADBaK7dbVjOg5jXIh7J5ywXkV7am
+	RQ5IgZ9/V8XHlYFG1F1bJex7LeMW6AMwL87Nks7iSxO42fGymIlDubdqTD+1tnH34KMJ/6
+	m1HnVDx67XxecywOm3j7o2iXFBjJgN5zBqdWbhJ0mfuCKpdzSQ2eefa5RajNxmbpnw6b1l
+	RAduWC5Jgmqn2jidZdzx7yZdd4Omlo+4mB0O5hGUGSWHNR3ktZ0V5FL2iJU+XB2EnpOTdz
+	QeTzpQAu9IWdbW8pNaEha6uw2YjBk6/mnPRtogWxryoLEqGlopGYDkbDGNzZvQ==
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Sat, 28 Feb 2026 16:34:11 +0100
+Message-Id: <DGQPDS5MRW5U.2M870OU746RO3@cknow-tech.com>
+Subject: Re: iwd doesn't work with openresolv
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: "Diederik de Haas" <diederik@cknow-tech.com>
+To: "Denis Kenzior" <denkenz@gmail.com>, "iwd at lists.linux.dev"
+ <iwd@lists.linux.dev>
+References: <2249097a-97e0-175a-6b02-e5d6be484498@gmail.com>
+In-Reply-To: <2249097a-97e0-175a-6b02-e5d6be484498@gmail.com>
+X-Migadu-Flow: FLOW_OUT
 
-Hi Alex,
+On Mon Jan 3, 2022 at 8:05 PM CET,  wrote:
+>> [Service]
+>> ReadWritePaths=3D/etc/resolv.conf.bak
+>> ReadWritePaths=3D/etc/resolv.conf
+>>=20
+>> Others suggested another way to fix it:
+>>=20
+>> RuntimeDirectory=3Dresolvconf
+>> ReadWritePaths=3D/etc/resolv.conf
+>>=20
+>> https://bugs.archlinux.org/task/67069
+>>=20
+>> Can src/iwd.service.in be adjusted?
+>
+> I think this or a similar issue has come up before.  The problem is that =
+iwd=20
+> supports either systemd-resolved or resolvconf.  So for systems that use=
+=20
+> systemd-resolved (which iwd defaults to), punching this security policy=
+=20
+> exception is not needed and arguably it should not be enabled by default.
+>
+> Perhaps as a compromise we may be able to ship service.in with these line=
+s added=20
+> & commented out.  Not sure if this would be of any help though.  Other id=
+eas are=20
+> welcome.
 
-On 2/26/26 4:12 AM, Alexander Huemer wrote:
-> Hi
-> 
-> I am using iwd 3.8 with systemd-networkd 257.9 on Debian stable (trixie)
-> on an amd64 machine.
-> There is a wireless network with a PreSharedKey with a .conf file in
-> /etc/iwd that I do not want iwd to connect to automatically if the
-> signal strength becomes better than an alternative.
-> The manpage iwd.network advises to use
+FWIW, this issue has come up again, but now in the Debian bug tracker:
+https://bugs.debian.org/1129196
 
-You talk about iwd.network manpage, but also about /etc/iwd.  Note that iwd 
-network configuration details are typically stored in /var/lib/iwd.  The manpage 
-mentions this explicitly.
+And Debian's iwd package version 3.11-2 added a patch to add the
+ReadWritePaths to iwd.service.in.
+https://tracker.debian.org/news/1723586/accepted-iwd-311-2-source-into-unst=
+able/
 
-Otherwise, there's just not enough information.  We'd really need some logs 
-(i.e. produced by running iwd with the '-d' option) to comment further.
+I don't know what the best/correct solution is, but it seems helpful
+that it's documented somewhere (service file, man page, etc) so that
+different people don't run into the same issue again and again and have
+to search for a solution to it.
 
-Regards,
--Denis
+Cheers,
+  Diederik
