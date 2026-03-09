@@ -1,68 +1,69 @@
-Received: from mail-qt1-f172.google.com (mail-qt1-f172.google.com [209.85.160.172])
+Received: from mail-qv1-f43.google.com (mail-qv1-f43.google.com [209.85.219.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64CCB3D1CB5
-	for <iwd@lists.linux.dev>; Mon,  9 Mar 2026 15:36:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCEE53D9045
+	for <iwd@lists.linux.dev>; Mon,  9 Mar 2026 15:36:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773070598; cv=none; b=CsKcivG3ii2LKGvMHjHTPhSnAaUhjLjaS5d/v5FArCia3Pr9LnInQfxfSx2gapsMXIGsr/jmoBPfiKZ3eJsIv4+JtIh/YaIaoeBzsWo6dlqReYmXczeYBGxuHmeu+bwaPDOvJ2f65Q/nfGY0iGR4GrWyQkMfqctzhYGSzQa+woU=
+	t=1773070600; cv=none; b=Ml1w9jiddXDKUQlH4QmmypAP7W7F6dfKJ/kslyJDI+WcsTZRIdJT6A2RtC+9trjbDYFdFhv8koNopxCpE0Hf5WXgTCwN0Rw0qy4BVB6gRcTgQICVvG1QwZIQXfpzqdOAIVYyERi9ZXxXj+sVlQmx8V6oj+URnoy3CHYrWsRO29s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773070598; c=relaxed/simple;
-	bh=KlcoMpB6lG0dff8DR49v/qKK9DFfcMZMxjkThSm/v4A=;
+	s=arc-20240116; t=1773070600; c=relaxed/simple;
+	bh=HQJ+NfiWeXICyRX9anbONUTBR2J0Ce9nXvBZl+O2I/s=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=qltH1V5FwnvZcwfJtkdXP+bT+8nJJWBAfDABNUlc/h4KpPh2Z/VpoN+o69P2+UQXxeVB3pzkGMDcvq6jnuBoswV/2GnFREqjxWfdjyjZQrn3kEELPF8UZlYMX3aFuOYFVvD3idgkpgNqGWVZJOJaQ/6yNfhtjm3ZXtIuqpZK6WI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OT9WM5VE; arc=none smtp.client-ip=209.85.160.172
+	 MIME-Version; b=h9IQ/qXYO5ki/vtJ0DenuZmg0renZpI0LqAzpFLOxDQE0/6b78D7Im7YiZ/yeND+UwHOdScNAXQikTiyouRtVy4CdqQpH87XcU/ETCz5G9IjBAl0E8whKpLO5QAmvwWkgusuZQp+pGFFFRYbP7J/1B6MaHkvupWgC33bnHw4gHI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=McYtdheY; arc=none smtp.client-ip=209.85.219.43
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OT9WM5VE"
-Received: by mail-qt1-f172.google.com with SMTP id d75a77b69052e-509134ab2d2so13103261cf.0
-        for <iwd@lists.linux.dev>; Mon, 09 Mar 2026 08:36:37 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="McYtdheY"
+Received: by mail-qv1-f43.google.com with SMTP id 6a1803df08f44-89a000f5adeso145348556d6.3
+        for <iwd@lists.linux.dev>; Mon, 09 Mar 2026 08:36:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1773070596; x=1773675396; darn=lists.linux.dev;
+        d=gmail.com; s=20230601; t=1773070597; x=1773675397; darn=lists.linux.dev;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=xp40bbvJ8hG2xf+xBnXYTOEpBlzUQ1N414T2repOCeg=;
-        b=OT9WM5VEiqDn9sroroJ4N0UZDzlKyxNBoJtc7XW1qeoQQJkaSk4fuaLBqSCF5MOiRc
-         L4lpyS5WlvukPlVXPyxD1roggBAINRFCJrpXdTmL7hoJ6lRASGHFpAqEqTOiHBC79pI4
-         nbCyE+aL8M/uOT9J7FiP7INaLNZFpptRSUeOxpH8oKXOqgoL2SIwThGoCZjlVhmoqAyD
-         TBcqvd/j+XGEn67Gx8bxFGQm2NAcLJkHJLONeZuygZMEAQndGng6BCkTDcIy6TpViy50
-         tsmTfZr15R1XGxyOjn9UNgJ2FCBgLcFm/7VALuo0fKT/l4fKNas+PD0p0X+/JHGUoWIX
-         L5Vw==
+        bh=WOTB3Ob+U7+LLw0n4+Z3KDfkLUaNPKW6rK+zrYEl6LY=;
+        b=McYtdheYNH1DnxhN/bBHX00DKcvusfPYk2WZHIDo77svC2wNcN5sc8VOgpqhfHLTtU
+         9Cwf9sMpTDR2eTYEI0cL4ap4XrXVZm04Bfeuss4kbOxPpxSOoSsVq1Vr+YIO7UXX08/x
+         WfQE5wpe+ggC3MSGrkvqQdQG1M9JIyrVEV0Nd0rEKBHZkrm9ial3Lj5Dg4x2aveI07Kd
+         CvIVIEbu6B6ZocJ/EqIFeP7q2gl+dt26ETYJBKGKxgXZ7LtwiRg8rrUAx0XldEFJtUgs
+         dCrPEDs7CIS3fhOpi8f43jnfOtNBM9dBvVtBPbaFxr97TuK2b2AQsR9epJpO79jazW+S
+         QklA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1773070596; x=1773675396;
+        d=1e100.net; s=20230601; t=1773070597; x=1773675397;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=xp40bbvJ8hG2xf+xBnXYTOEpBlzUQ1N414T2repOCeg=;
-        b=McQpQDzj8KVreg1bWTzjJ+REbqQY0laIYNU8IVZpXPqSFEY5sqsPXa4VbSA3Mm4Ea1
-         oHQNbDTXCVL/rG11g63meXSv2IgAI4xHz50QoEb7Z++hAdJmnA/vaKAWBpj3zkjoiuDj
-         BaUsV56oiSAHWNpXTXn3o3D49Y0QwwxIe78oAL8i9SdXShxSpjP2g77gCSWwR1liOYpw
-         p52jm9NLa8GALwZUVP42oWtGzrSVb4RA1/xv9m/a+Zl8DerZr+BBoXuLeieEMHKPD1cr
-         djypxqcFHqKCqddSmrwbRlUGxCSxiPpu9AE2AC+TRMOi/QVpMWNmdlFzUi02jpvFcvXF
-         IbvA==
-X-Gm-Message-State: AOJu0YzHRM6JymSBxMuxHDMoAwyvJLyM726dkfvBgqzrIs0to4LEDKb3
-	HaPRDxjRQx3jYlKlBzROqfYya28NF/hYPIlF/0ZlDt9v/MIZqMYaBRTbsRwOcA==
-X-Gm-Gg: ATEYQzwe2nMI9vm2YRTZPJShgMuOgeUflctkCi/B35oKbp3SKXMZTEmj69cWE0WuwQM
-	2574f0aE5eGpKzWSCnnJL2HeNk7Himl42W9jaGLxRWGmCLsW2kj4TgTJwMS/phHBbeQRIKds0YO
-	e0DAFHHi3KcLUe9cotHSsABUSqcUnCvILPFgJwtINI7DpmQTCyznVkkpk1tV9JMCRg7CeGVJfuC
-	8D7e91/P4xKQL2j7MIYGlcTJeVmyzEMWBc1HJla8rcGvp+ab0BdTH2eCfDYEMx4lfOlTiRHjF0Z
-	IbhHn3mMigSeTuduApu1LFD6bxSdCa5rE9T2ZgLxcKSqfEBWYEO8SgMfcJHD3IyBQ5ynv49ACk6
-	0vnyZjI83OQeoohjsPdpuHvWcL+9VPC42YhFFd0TY+a7XDlV+J/AWiLxfpIu1KH42bBYma8MqpP
-	0+uOppyOkwshlrOXSs9A9QevkogPJcmWcVAF1tcQy5GvMGxpVith2qxQR+xK40iQC+
-X-Received: by 2002:a05:6214:f07:b0:899:edde:c4d8 with SMTP id 6a1803df08f44-89a30a37fe8mr169022076d6.17.1773070596257;
-        Mon, 09 Mar 2026 08:36:36 -0700 (PDT)
+        bh=WOTB3Ob+U7+LLw0n4+Z3KDfkLUaNPKW6rK+zrYEl6LY=;
+        b=por36H+yF37JEmByFcMOp+OOlwJkGYuRY0A7pBhtgMzB4jW95Ci6CQmgUzcf8Z7zml
+         7sCecqojCkeAv+cjt369oB47YPihRpjw5N8ABaHzsyODEXzKMWS9/uU7/wJRqx9FaISC
+         WER7fpAmIYW0wavL3qqyW1cyqOOpCF3WfSUJFDuvIsnAjCprYKL80WjMvbl1N0YXf8JE
+         GLE1mmq6AHyNMJJOlEdKa7ljfxc5JWnhWmGfVCYGjlXK68crnS7AW+olK7Olgg4/aH8n
+         tdCryTssYz0E+zPH4aCXRh9zPW8yTM+K3Z4ObpFEiR1vk7EyMlPaRV20BYwvn/MkYHDJ
+         W2jQ==
+X-Gm-Message-State: AOJu0YzDwRXXY3GzSbliti/Lsgsdx+JFETbxksm8xwqbsF1uBxKXXlPp
+	KTzopiN4rtFym7Rv9MQKgi6KSb5cfT0C1sF80uh0e6RiwKL0XcAsf+AdYng+/A==
+X-Gm-Gg: ATEYQzwo6JEs/K/RMOBQvlayD7zTPgxxfhYwrmTkpgAPDqogOsQi8KZOYS4fSiUtrPo
+	KLJoOS3rWE3zBpQkRptEQMBqb5McF9BhiPpXcMqzdj+xp+yvNhm7fUfu1cwhNNlQSWRU1Fz4iiU
+	1YQ1gGpCIHkmcaW/PseLILOoQLchWIlhHwQ2tbu8u8qVaSeRAx6NPAx9ExO6sgG3qjuHsXRN8St
+	DdhGECmNl5kcPntulYgHDFYAybYswhd9xCAnKjq1YeUhq1SYj8TnJkYmZr52P/By2ZWWebcvbfp
+	Zjivd4jdz5vxqimzqWiHdaA/x++7nhf62LwpnyWXqVWoXOO4VS8FIH5a2p8sYOvKjZ2Igxg1B+i
+	s3gMICvlrtkK+O9kyl2O3VsAHpEqBZIBFevEkU7fQUW1k5v8JdIf0ed7pzPlv0mo27r29KXpX4d
+	Hz3SL06S3KtVNijTDzrfPVHsfr3TA6skBJZ64iP+a/ORrA1CaIWJLJFFGdQ47yZPKOMyArV7aSo
+	Ws=
+X-Received: by 2002:a05:6214:2467:b0:899:fcce:b1f7 with SMTP id 6a1803df08f44-89a30acd555mr183415196d6.45.1773070597474;
+        Mon, 09 Mar 2026 08:36:37 -0700 (PDT)
 Received: from LOCLAP699.localdomain ([152.193.78.90])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-89a57c21650sm151716d6.39.2026.03.09.08.36.35
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-89a57c21650sm151716d6.39.2026.03.09.08.36.36
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 09 Mar 2026 08:36:35 -0700 (PDT)
+        Mon, 09 Mar 2026 08:36:37 -0700 (PDT)
 From: James Prestwood <prestwoj@gmail.com>
 To: iwd@lists.linux.dev
 Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH v2 3/4] auto-t: Add test to roam back to BSS with existing PMKSA
-Date: Mon,  9 Mar 2026 08:36:28 -0700
-Message-Id: <20260309153629.2012710-3-prestwoj@gmail.com>
+Subject: [PATCH v2 4/4] handshake: check expiration propery in set_pmksa()
+Date: Mon,  9 Mar 2026 08:36:29 -0700
+Message-Id: <20260309153629.2012710-4-prestwoj@gmail.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20260309153629.2012710-1-prestwoj@gmail.com>
 References: <20260309153629.2012710-1-prestwoj@gmail.com>
@@ -74,44 +75,33 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This test exposes a bug where if a PMKSA already exists for a BSS
-that we are roaming to IWD crashes due to a missing check in
-station.c
----
- autotests/testSAE-roam/connection_test.py | 20 ++++++++++++++++++++
- 1 file changed, 20 insertions(+)
+The existing check was only looking at s->expiration and if it was
+zero or non-zero. If a PMKSA exists for a BSS the expiration will
+be non-zero, but that shouldn't preclude us from setting that into
+the handshake.
 
-diff --git a/autotests/testSAE-roam/connection_test.py b/autotests/testSAE-roam/connection_test.py
-index c813f00f..243178a4 100644
---- a/autotests/testSAE-roam/connection_test.py
-+++ b/autotests/testSAE-roam/connection_test.py
-@@ -109,6 +109,26 @@ class Test(unittest.TestCase):
+Instead check if the PMKSA is actually expired, and only then
+return false.
+---
+ src/handshake.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/src/handshake.c b/src/handshake.c
+index ef1a8220..5e864af3 100644
+--- a/src/handshake.c
++++ b/src/handshake.c
+@@ -1227,8 +1227,9 @@ done:
+ bool handshake_state_set_pmksa(struct handshake_state *s,
+ 					struct pmksa *pmksa)
+ {
+-	/* checks for both expiration || pmksa being set */
+-	if (s->expiration)
++	uint64_t now = l_time_now();
++
++	if (s->expiration && l_time_after(now, s->expiration))
+ 		return false;
  
-         self.validate_connection(wd, True, check_used_pmksa=True)
- 
-+    def test_ft_roam_with_pmksa(self):
-+        wd = IWD(True)
-+
-+        self.bss_hostapd[0].set_value('wpa_key_mgmt', 'FT-SAE SAE')
-+        self.bss_hostapd[0].reload()
-+        self.bss_hostapd[0].wait_for_event("AP-ENABLED")
-+        self.bss_hostapd[1].set_value('wpa_key_mgmt', 'FT-SAE SAE')
-+        self.bss_hostapd[1].reload()
-+        self.bss_hostapd[1].wait_for_event("AP-ENABLED")
-+        self.bss_hostapd[2].set_value('wpa_key_mgmt', 'FT-PSK')
-+        self.bss_hostapd[2].reload()
-+        self.bss_hostapd[2].wait_for_event("AP-ENABLED")
-+
-+        device = wd.list_devices(1)[0]
-+
-+        self.connect(wd, device, self.bss_hostapd[0])
-+
-+        self.roam(wd, device, self.bss_hostapd[0], self.bss_hostapd[1])
-+        self.roam(wd, device, self.bss_hostapd[1], self.bss_hostapd[0])
-+
-     def test_reassociate_roam_success(self):
-         wd = IWD(True)
- 
+ 	s->pmksa = pmksa;
 -- 
 2.34.1
 
