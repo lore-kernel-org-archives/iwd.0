@@ -1,123 +1,138 @@
-Received: from mail-pf1-f169.google.com (mail-pf1-f169.google.com [209.85.210.169])
+Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E32BE3BA239
-	for <iwd@lists.linux.dev>; Mon, 23 Mar 2026 15:28:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6B8D2DB7BD
+	for <iwd@lists.linux.dev>; Tue, 24 Mar 2026 19:20:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774279734; cv=none; b=ShT7sJ5/CgvjNWgMevhV3X09Ikt0hLVU1R8PrRWDQ18WLTeErHJd2Qqd+ZucH+TJfyhifsgoAcOJ4HWuT6RFjdrAsj5kSsU1O/DAvVmR40EabT6cPRZ6WEt0IjtH3aeqgdHcrDc5UOp/8QUC58rSnBjYFzSMXzKM5vhmT6RZ5u0=
+	t=1774380059; cv=none; b=E0lu+PpxTZIRXldk3ayJ+pOjm+rUEvxJZwCQnmOoS/4N9eJ9PcwtkPhoHUHE3u0OcYdqSst6suCko1YafQn1loWPBmczqjOsr1ce2Gz6O3RjQWRR8jCyUOFasHy3ngyQQGYjiCS38O/J0Eop144M0QjwtnjFzrEJhaLVnhyDqVE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774279734; c=relaxed/simple;
-	bh=bKEoJXEyMv2XYWCAfMIl6D2FUQOVj2JFK3SKwhVqEYU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=lFSc2wM5s/fgP29E/M5r5ich9qDl6jnFIlQB3LkXaZ2cFDrucO5Cznvn57Ta/UAE7DE0I1igO6/TbB7G0thv3XRDyqSrD8sXClFcLhPwzz9XDqQX65ljlhkr2JaoYRxmkShggyoPRyPiL9vragJqpTF2PyvwoXYWwxPYNN2OTzY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=b3WQWXjx; arc=none smtp.client-ip=209.85.210.169
+	s=arc-20240116; t=1774380059; c=relaxed/simple;
+	bh=nf9lEsT74M1uW/H4bkNjV3/e1LS1woGVci0IVzua3/U=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=uHDi6wucoQnqo/AAmwKAepOTLB0GpLN3LJoiHFWezVoafsMtizznHmJEmdQKSrPJe/kREMlu0qJqzQsJsYjeXyPBFa03D/0+yZL90SQuPt7MnhPOlI77/aUEeR4QdqsyTUJ9RgpXDJOZPeQbb1deDPQ+mfzT861VPrg5EV4C6S8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KDAGXFWB; arc=none smtp.client-ip=209.85.210.174
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="b3WQWXjx"
-Received: by mail-pf1-f169.google.com with SMTP id d2e1a72fcca58-8299f1ca894so2673077b3a.2
-        for <iwd@lists.linux.dev>; Mon, 23 Mar 2026 08:28:52 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KDAGXFWB"
+Received: by mail-pf1-f174.google.com with SMTP id d2e1a72fcca58-82c2239140aso1608368b3a.0
+        for <iwd@lists.linux.dev>; Tue, 24 Mar 2026 12:20:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1774279732; x=1774884532; darn=lists.linux.dev;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=m7iguK6Yn+iOR8TCYIzKixV/U3UlBOB1u0JmXVmLooY=;
-        b=b3WQWXjxwsQBqHB1bEio174HFFiwTdipExpscPAaXYA/ScXyVnphxkztwQOpyaRDmq
-         SOOZTQBCPn6Qu0OF89H2pZxXhXGHOfK9emeEQlnTNETVwfQymqj0EhvOzhkHA6W8htb+
-         Y1B3Mm8XRSuWMb/F7fVThv2FedX9DqEsjCRMLKJ1rNZntGFtO4xOiz5TPHrFc0vX9T5p
-         Augpj180a0O6qP2Ru2Vkh98vV4c7MVbh9QxoDkkGRQyE6FtQh2Ytwvi+JjNjb4Hk4PVp
-         7djfBY3IJjTs84p0ipFRyNUNnfo9Tj6wbnFJaIt3jRxVwQXQJ0XTvm5cSZu2EwkcB40o
-         ZkaA==
+        d=gmail.com; s=20251104; t=1774380057; x=1774984857; darn=lists.linux.dev;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=HKWh3E4yW4BaApzpH64ZMim/XobyUPbSEyHeo7JDcFM=;
+        b=KDAGXFWB0WqPZTUDMa5jgkiBHVvlixm8kTzMWdOk2PBFqfJRp2nGEiFwzzPTv1eMTG
+         ka98nOiGt1X3Z/d5nkkORIQWRX9PmCsY0h98AanelDq33ZOi9YEDgvoj+BSIj8ciQaqw
+         2ecrLujk47vG68HblearktW5LhlaC7G/5SSKZMIMPbAId9h4rsBm2wqsp5ta6r3gvrB0
+         6G17PE1KqyxaXNqMfsNcwnreTqj34HhyXVLPzSF2FzBOTjMi5paegXuqIzUPHDYxYB8s
+         WGV3Y3DKBWx5ePlkfRPF5SOySAfrTJJRrR3OZ9USEJoa+Mt583afuuPZkZZwfnVNzbWy
+         mFKA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774279732; x=1774884532;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=m7iguK6Yn+iOR8TCYIzKixV/U3UlBOB1u0JmXVmLooY=;
-        b=X6pNguJURYzN5HWKJpxkA+HL0R5Jiel+wxA00tG2WyCHstieqHh9JDvUVYtp+6RH/R
-         6cnWFQRdZIRVsFYJaSXbRu0fgNDs13K0XnC7d9JgrM1+ojjZFFuOER3qc0u1wrfWiTig
-         M8/v8H0Sw2YgdBQHyqozXIxs9fcXlHyANM/tvTHVeN2aESrz/SPfifWXOuNGtYXkDiAx
-         dNV7PaWaDDHC59pNxiZdozNNYA3XQOpU/x3vmru21YRuKe72W/2m+EP87OXRkh/b54pG
-         xhU6Z9aJ6CN8RzTAvCZzmfoxaku3pS0wuu7v51HtRFr5Al/W/OFkoUTJHUCyD0E98hZX
-         FoYw==
-X-Forwarded-Encrypted: i=1; AJvYcCVwRIH5lCQcEdL2Y2HUoqzm7odFKpfmOUwv/zY0gM3MAzLW3qieJ3/Ag3mvWyLYrPfmplI=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yx4oh4obcj5AalpoFnrG68K0O8WozGE9BfcG8TwfSv34EkMxJAT
-	1vZXl2IHKVOhjfF5lpmj3vYzjepy0bp+lAqF+MBqg3COdPuPuYk8srxR
-X-Gm-Gg: ATEYQzzeeIKRo0gGioU6mVFhguaKcD8DWZG2Udcnrb5lT7zzwaRcuQLU5nf67rIIrPz
-	2NDFfRSAVO9AOamdzMg1fWcZgHTp6lDOyUpIftrgD2PueLVboCEBHkHJtiCmMyhsScQTgwcUioZ
-	weM/TSypa+kgn7xYAndT1Xsm9PrpTuxbPPKMwPnmiqXfNsMUiTuv2ewxzTlNbS5cYY8eYbjdb/C
-	LrgEEIzQMXNN7ks73e2YSMGoAz0ZLwY1A+nNgcBjcDgvdHBrkWb46r50anKNM7Msoq7Fbyn0gvQ
-	xPG2FEhaDkPfXToHp8RGY9tp66do27N9SXyvhYZ/XcLIr7MwYu3vIJRFdgv3/WEnFhXX9nn4pCt
-	ipHF/4W1ARNWO7GH9pACDzSHXN+DTaDrcBRDLl/A3p9Th+wfh95kjTN+yS75nBspYIuGfAVl12q
-	7j379l7UpM0AVfFQGg66eys/peGVRehJbwmtpNkfZNhWasByYbjARx73z8hzg72Rf9rF+V
-X-Received: by 2002:a05:6a00:9093:b0:829:6f7d:3093 with SMTP id d2e1a72fcca58-82a8c39da8amr9290056b3a.48.1774279732091;
-        Mon, 23 Mar 2026 08:28:52 -0700 (PDT)
-Received: from [10.100.121.202] ([152.193.78.90])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-82b0410a3c9sm11810780b3a.56.2026.03.23.08.28.50
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 23 Mar 2026 08:28:51 -0700 (PDT)
-Message-ID: <aeaeaf5a-a21b-48b5-bd5e-e3a1a8c17204@gmail.com>
-Date: Mon, 23 Mar 2026 08:28:48 -0700
+        d=1e100.net; s=20251104; t=1774380057; x=1774984857;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=HKWh3E4yW4BaApzpH64ZMim/XobyUPbSEyHeo7JDcFM=;
+        b=Bur/MjG2czSr4XawrpwDzlDtlAyGzAhz7G9df97FP2/aNB8TolzMWPbYq2OxzWcZvL
+         t/7BiitW+twn/OF0bDtptLi8sG+1dgeWghMOY9v6MBNlBw6jAIE2yCgy3Rl89fJV4ARp
+         4MsQMP7A4j/MJ8wyF+kF97DWNn+DK48wa922GXIh2oCyB/7gyTBXO1CFbcuUwI3N9iYF
+         OkZDJqy+YN2JDD9fxIvTUSd/axFQ03DFI5NfBRnydIfU8wZL0qI2EolK2Z7MRnHNYIbg
+         4HPM+ckA11g7V7iFtxorljvTIfSpTbrXiaui/AR90CB10P9XA6h3CgMUKhzgAq0K/qOe
+         bupw==
+X-Gm-Message-State: AOJu0YxKCzRb22LJs7lg19NXjKJmm9pdGMDrfwSaclC+h022a5P4qrSp
+	KBGrKCZnpwUxzFqYZNySYNDapkyG2uK6wKIdjmt6GfYdgyOt+lS01z/8bla8GA==
+X-Gm-Gg: ATEYQzxZ+oXbAQgvxQ8a89KE2IUmIdC5YLvpdxAEH8uqN36Bc/73AWaqrk+wAqAEY+A
+	N5QgHYZFsC3H8Sveqf9bpT/uzgW2AnnUxSrgaNoJTLY/i+Yq77VhtzeKiKYkNAYIhmYURized+m
+	hlrBCZwm6M6vv1diw/QRN6znsjZrnsXigHFtp/O5byi+iy09vvwklo8ssFG58SaCtJpGh7fJsOc
+	BNABu78NXqOknB+Ne30H6YVavgW3nBz6UmH+4UMYXmCjuaRdhGodd8aHXorpDMOUjZlznDf6IzB
+	T5r+NZ116b9XEknoukkgM6HGzQZcoLb+0/dUC0rNol7m7YG65yRFw3GDLtWmR3QjjWJ4m3F7+rp
+	/k6BaZ5YPKxbq6F67g7E1dx/C5jbQ2qolAr7E+HdxTloYjD8uyhvD2m/mYsdoRS1skM6G30eKQy
+	NsRf0q5ODKmldYZwAU8M5c4v5Cmkw/XQnzcCz6rUhj8q4D3/+LUtB34wfUSewRkHst
+X-Received: by 2002:a05:6a20:94ca:b0:39c:787:f197 with SMTP id adf61e73a8af0-39c4ae05071mr796432637.36.1774380056734;
+        Tue, 24 Mar 2026 12:20:56 -0700 (PDT)
+Received: from LOCLAP699.localdomain ([152.193.78.90])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-c743a938743sm10311125a12.19.2026.03.24.12.20.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 24 Mar 2026 12:20:55 -0700 (PDT)
+From: James Prestwood <prestwoj@gmail.com>
+To: iwd@lists.linux.dev
+Cc: James Prestwood <prestwoj@gmail.com>
+Subject: [PATCH v2 1/4] pmksa: add pmksa_cache_flush_ssid
+Date: Tue, 24 Mar 2026 12:20:48 -0700
+Message-Id: <20260324192051.801196-1-prestwoj@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/3] pmksa: add pmksa_cache_flush_ssid
-To: Denis Kenzior <denkenz@gmail.com>, iwd@lists.linux.dev
-References: <20260319180525.136095-1-prestwoj@gmail.com>
- <20260319180525.136095-2-prestwoj@gmail.com>
- <4b8f1537-70d0-4b19-a861-12fd23f1d75f@gmail.com>
-Content-Language: en-US
-From: James Prestwood <prestwoj@gmail.com>
-In-Reply-To: <4b8f1537-70d0-4b19-a861-12fd23f1d75f@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-Hi Denis,
+Adds a new flushing method to remove all PMKSA entries for a given
+SSID/AKM list
+---
+ src/pmksa.c | 30 ++++++++++++++++++++++++++++++
+ src/pmksa.h |  1 +
+ 2 files changed, 31 insertions(+)
 
-On 3/23/26 8:14 AM, Denis Kenzior wrote:
-> Hi James,
->
-> On 3/19/26 1:05 PM, James Prestwood wrote:
->> Adds a new flushing method to remove all PMKSA entries for a given
->> SSID.
->> ---
->>   src/pmksa.c | 27 +++++++++++++++++++++++++++
->>   src/pmksa.h |  1 +
->>   2 files changed, 28 insertions(+)
->>
->> diff --git a/src/pmksa.c b/src/pmksa.c
->> index a50c8208..9b02d7e4 100644
->> --- a/src/pmksa.c
->> +++ b/src/pmksa.c
->> @@ -213,6 +213,33 @@ int pmksa_cache_flush(void)
->>       return 0;
->>   }
->>   +/*
->> + * Flushes all PMKSA entries that match an SSID
->> + */
->> +int pmksa_cache_flush_ssid(const char ssid[static 32])
->
-> const char is confusing here.  Either you're passing in a string 
-> (const char *) or you're passing in an array of bytes (uint8_t */[]).  
-> pmksa_cache_get() uses const uint8_t *ssid, size_t ssid_len, so maybe 
-> use that for consistency?  Or we can switch to uint8_t ssid[static 32] 
-> everywhere.
-Sure I'll pass the length as well.
->
-> Also, just ssid is not enough, you need to supply the AKMs to delete.  
-> If we're 'forgetting' a PSK network, lets make the effort not to clear 
-> out a potential 802.1X network with the same SSID.
+v2:
+ * Check AKM's as well as SSID
 
-Good point, I forgot the AKM was also a factor.
+diff --git a/src/pmksa.c b/src/pmksa.c
+index a50c8208..7f37f0c7 100644
+--- a/src/pmksa.c
++++ b/src/pmksa.c
+@@ -213,6 +213,36 @@ int pmksa_cache_flush(void)
+ 	return 0;
+ }
+ 
++/*
++ * Flushes all PMKSA entries that match an SSID
++ */
++int pmksa_cache_flush_ssid(const uint8_t *ssid, size_t ssid_len, uint32_t akms)
++{
++	int i;
++	int used = cache.used;
++	int remaining = 0;
++
++	for (i = 0; i < used; i++) {
++		/* Check that the both the AKM matches as well as the SSID */
++		if ((cache.data[i]->akm & akms) &&
++				!memcmp(ssid, cache.data[i]->ssid,
++					cache.data[i]->ssid_len)) {
++			pmksa_cache_free(cache.data[i]);
++			continue;
++		}
++
++		cache.data[remaining] = cache.data[i];
++		remaining += 1;
++	}
++
++	cache.used = remaining;
++
++	for (i = cache.used >> 1; i >= 0; i--)
++		__minheap_sift_down(cache.data, cache.used, i, &ops);
++
++	return used - remaining;
++}
++
+ int pmksa_cache_free(struct pmksa *pmksa)
+ {
+ 	if (driver_remove)
+diff --git a/src/pmksa.h b/src/pmksa.h
+index 6a624504..9f059a11 100644
+--- a/src/pmksa.h
++++ b/src/pmksa.h
+@@ -45,6 +45,7 @@ struct pmksa *pmksa_cache_get(const uint8_t spa[static 6],
+ int pmksa_cache_put(struct pmksa *pmksa);
+ int pmksa_cache_expire(uint64_t cutoff);
+ int pmksa_cache_flush(void);
++int pmksa_cache_flush_ssid(const uint8_t *ssid, size_t ssid_len, uint32_t akms);
+ int pmksa_cache_free(struct pmksa *pmksa);
+ 
+ uint64_t pmksa_lifetime(void);
+-- 
+2.34.1
 
-
->
-> Regards,
-> -Denis
