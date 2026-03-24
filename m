@@ -1,69 +1,68 @@
-Received: from mail-pg1-f170.google.com (mail-pg1-f170.google.com [209.85.215.170])
+Received: from mail-pf1-f182.google.com (mail-pf1-f182.google.com [209.85.210.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C65882D978B
-	for <iwd@lists.linux.dev>; Tue, 24 Mar 2026 19:20:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 289B22C11E2
+	for <iwd@lists.linux.dev>; Tue, 24 Mar 2026 19:21:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774380060; cv=none; b=KkEjwVsx4ziwvp3Znil8IZzfn0jO6UV3el9kqgg/o+PGSWSZIUlgjkz9r3xb0raFj8mUvC8/G5T+2EqdaHZgd+GQTNZV7m5imq++lGYGz+8laaRjpVjbDaA3dTBcX5GkJrqPgdJr8gjZa9YfTdKYT76smOuv8yyHU3669/Sgc5U=
+	t=1774380062; cv=none; b=lWQIrvYQ4SBDPzCxR24n8sSdgyawGFf5ccykjDGNy0JVjt4oVMjLj2p1YmTl3bvL2iX7Zj59IABXFz2CUw2TV1/DeMpGvX0LjyrZQUXeC8WzM1ir+T278kk0UR6fg5GUmWB39kWFmj3SPFFYsuqT2rv6LDldOtMCwZ3BDKd76FM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774380060; c=relaxed/simple;
-	bh=deNiPkM2affAwlt/TLqptey07RDa4L5QTFfMU8r/qlY=;
+	s=arc-20240116; t=1774380062; c=relaxed/simple;
+	bh=yegxOTNbvkWHPr1/8r51RwojkfCNzbpc1pyp+uDAGa0=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=o2BWfMyj9jEUuhcX3qDnxQG6zhoXxvO9ZCyEUntSRtje8bvGQd0vVcGfAJevhZFh5PtmGBMJ0BVohPZi4DD5G8ah0687BFt54CqQ69J6h8jzaiVtUuZOOErhMZfORSwfbpZdaTPCBM/UJeD75t6d7GIEld+TiG7gq3KfCUCplFA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=padfDWYD; arc=none smtp.client-ip=209.85.215.170
+	 MIME-Version; b=IQO16JGWJfdgECAkAX0DCqHAKGUrkvmUHP8Buwd6gGIyx5lx5+AiBsScoOH7EPcl19GIQcNGAMcsxxZeZtsipN0iKsGevhxhUCG8k1KAiQI/GafF220WOBqT5ydPQ1W+SkFcz/l16GOi2oGKs+MTLx0PaF7eTyvacJ+nF4l3eJI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bMkrJ6Yv; arc=none smtp.client-ip=209.85.210.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="padfDWYD"
-Received: by mail-pg1-f170.google.com with SMTP id 41be03b00d2f7-c70f91776fcso764258a12.0
-        for <iwd@lists.linux.dev>; Tue, 24 Mar 2026 12:20:59 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bMkrJ6Yv"
+Received: by mail-pf1-f182.google.com with SMTP id d2e1a72fcca58-829a27414a3so2645272b3a.3
+        for <iwd@lists.linux.dev>; Tue, 24 Mar 2026 12:21:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1774380059; x=1774984859; darn=lists.linux.dev;
+        d=gmail.com; s=20251104; t=1774380060; x=1774984860; darn=lists.linux.dev;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=/taDBm6ievwdfh1tcdLISpwDGpjrlkH6M1oupmO+yqQ=;
-        b=padfDWYDyexyIb5PCJhRrpHymFEsfxtacUrAryRjaCz516trToLkzGx4QbwYERp5nM
-         nIPimmR43zMw6XsUe64U4brOEelrBzx373N7pyjDNBDg2XA5BOkbBX710kPsuqhPzF2T
-         FFdmA6w+600pL2gUspiAhdbpN+iurQPDXLBSKcK+A+JogzpDHLQNcBPSJPdKRafuKM0z
-         FNB4iGnQHBrHM0cmhhtBT4l+FPmHDRAL1inippBWAkPy4a/aU9hB7t8G/8Nd34q9fFvj
-         ZzzzrVk5m2MxAg714RrrIh9NWyQFjyJAOEtZEoHf2h8dDg4LV+JevqMorfY8aCq6g/dp
-         Jz0w==
+        bh=O25yJO5gBWdk0tAdzi3eWFvU/bu++LQEDuDsCeXK/6o=;
+        b=bMkrJ6YvBwcUfuqvYpP7q8+54n8x4J4Q55coHlkq9hALN7T5rAnYy/tJnDkDcP1ONj
+         9nyP22F0DuL1c/NelaxTWloAqJno9SZjSwaM/HwJf7+znbnLY6LbVyyQZJ2ZkipMa7/+
+         mOGbj8r9zuwQ/K3uxH1IThozUasDJFzCSmc7Xs+fDTcQqUY99FQj2H4FGDWXFvfOZtfs
+         uH7FH6kxRbioEqp81AzLjGQzvggSz2qtWTGyP8VmYm+myPtHYY/EB2MdB5fB+pytalMo
+         r/7MVn/XPRxvGODHEhag3yLFAq62WXEEg4p9mYaRmAPcrnW4eNEMI5FapSSveCovEvJj
+         2D9g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774380059; x=1774984859;
+        d=1e100.net; s=20251104; t=1774380060; x=1774984860;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=/taDBm6ievwdfh1tcdLISpwDGpjrlkH6M1oupmO+yqQ=;
-        b=p9Y4X8bxeBIVmL5/r5Eih+ABrRXr1XhmVUP2BZZL3RUnXn+CZrC6vd+kiKNuL18jvU
-         Uwv0GKGAYZ2olKND43wDNYLVcIMuj5wwLlJNyCeO9tQejsAiyxose8LgeL+AhBhNjzsR
-         ZAbsQ+5B2VzzBPe+zWvVy490thtmhMuHcl6s5pSEHNi4/UqkdAcKVpcqzmJ0JY/awGZh
-         NVfQcKKgn4VfNMiIoje6FKPz7dQ4y7BrvNat5u+gWdxkhpw3rp1w6u+UoIyYLXIoJcRJ
-         bc3o+jDEuUf8BSz4DPt84cCfvteHzOw6StE8Ccikv0XrlACqmsTARWN9hgT8upS5V36p
-         Ko2w==
-X-Gm-Message-State: AOJu0Ywf9LAY0BbzdeFY+lgvJSAJCcKLtE6CAND4aYvAo8xadZ2Mwarg
-	2PpUGanhrli8EMIg33kEuT8Vuey0izXur/jlp9+XeghByuKop5dK5xUAY4wDxg==
-X-Gm-Gg: ATEYQzyJYAt4wIdoXtHsQA4AOeEYMtuTKLRDzbIZFEMjjvNkWKjXuDEvQIBS1kxn9O7
-	s1/Q5TRlleEz7mSZLtvlC1NFkSlMkzBL/LlZ5tqAQuMIM6fglIzt/N1TNbisGtxNUmn5CkEyEVf
-	tc25fZzVdkILHJeC5qhumSH/uAbjPz2o3hpgGz5xAj7Vl0s4eaCdyM/njNCFCVNleKsoT3k8Fki
-	yy9CFgNoAie9dU5VGJA4bvdIyiRcefKWotGc6fiSDfFW8ILZ82bWANaK1kBSyZzgIQhVKUSOamp
-	7UBkMSsSdV8w1zjrfehHgJS9fbKiPQ+6OTW3RvPGRum3louK1jRFewTGoZ1GFvb81GeFGlvp7K4
-	dO5isho4lTEZAyGLbTI3mL7NYfdPHeuLwCv49GqiqPNQQDTkipeCrkQXGH0JJRPCcIBGzFX4teU
-	6hHB6At6MHt1ESBI9AJXQyZyydRd8m6UTjBBxaSQ2XQlYhQiLUpo3mbaPIrlntEIsy+SHACGokj
-	MU=
-X-Received: by 2002:a05:6a20:2583:b0:39b:b35f:2eb4 with SMTP id adf61e73a8af0-39c4ae08048mr905143637.59.1774380058408;
-        Tue, 24 Mar 2026 12:20:58 -0700 (PDT)
+        bh=O25yJO5gBWdk0tAdzi3eWFvU/bu++LQEDuDsCeXK/6o=;
+        b=QG7DwbpCbDw2MaXcNxCCFsPW7XXE7HJHSbBYgdypnJDfnr9Peh0nWjpckHhX86TiYW
+         vxCf1VStzeQDUc061MgvoCf0W5Iqtko2cfs7Nfsu+dKTaoAY+KeqRPaUrg1TRCj2x8GN
+         5o+fFcHFTfc4/TPdaSnR4U8sHBw8aGEx8rap73X87tTcvwooz4ZE4UYwgaK0VdegSMw5
+         k3dX1ZLq9ZzMT90rSHtLWyFyHUBx7bbRWCPKfneYEKvWORgVE9giIWedXC+ivXcBfg1R
+         Rai5FkuiuitzwUvH5wGc3HZAse1rlRORmQQ2hm6l7ucXgH5SgwRa6ImO2V5TOUeMdqdX
+         +rqw==
+X-Gm-Message-State: AOJu0YzLJnnkyej70wJKd4qqghqHx4JmfJjg32Blq/bKPt6LOUcBQUE5
+	7TEaOzDflxemc311Tghl3YbID5Nrc2TBH9oIyGSDOYc9P+/gSbCXA9p2aHN3zw==
+X-Gm-Gg: ATEYQzypOEebc9GsfgPRW1f9vQOLTTSlhCQLnHhSs9EY1x+9eV4rxmq56fWkwJz98ry
+	yPHjCB043DuP4iRYIwjfdGKSClypBjWq2YrPIs4ia9WsyN/0Gsqw9mlbfVajljKu5cwReDywcV3
+	Ty3IWacnB+lDAZpVUbJMcMT69nmL9FslZUyQ7lXrRSahnSfZyeEMtF93/ndc8jqeshwrVxMd3Cr
+	Ln54+dmy6kL4Gjb7l8zUah/0ZrOh+VIKlITJvTh0o1GPQVtka8I6zLIVG6w4/6oYCpolP5XQAee
+	BgXTCDP7FW7u58EA7WunXrxP+QC2AsUqho4NdakeDgbzYWwukB4wURjMt+VCtiXSkQcbdbUztkX
+	L2Pz0i68cnukANP+lGKMkTVKCQQYhFr40kS355frzHKjwKgOlS9lRvb2+6fELWpmg7bzCYaVA/S
+	zGqJojvLeVdRocv1H1FWjYBna1I8GFI8kTkuqhq75NbxrHkIgpteGB1uZ3gdT4g8rH
+X-Received: by 2002:a05:6a20:2448:b0:398:7da3:e4de with SMTP id adf61e73a8af0-39c4aa5708emr887807637.6.1774380060198;
+        Tue, 24 Mar 2026 12:21:00 -0700 (PDT)
 Received: from LOCLAP699.localdomain ([152.193.78.90])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-c743a938743sm10311125a12.19.2026.03.24.12.20.57
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-c743a938743sm10311125a12.19.2026.03.24.12.20.58
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 24 Mar 2026 12:20:57 -0700 (PDT)
+        Tue, 24 Mar 2026 12:20:59 -0700 (PDT)
 From: James Prestwood <prestwoj@gmail.com>
 To: iwd@lists.linux.dev
 Cc: James Prestwood <prestwoj@gmail.com>
-Subject: [PATCH v2 2/4] common: add security_to_akms()
-Date: Tue, 24 Mar 2026 12:20:49 -0700
-Message-Id: <20260324192051.801196-2-prestwoj@gmail.com>
+Subject: [PATCH v2 3/4] network: remove PMKSA entries on known network removal
+Date: Tue, 24 Mar 2026 12:20:50 -0700
+Message-Id: <20260324192051.801196-3-prestwoj@gmail.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20260324192051.801196-1-prestwoj@gmail.com>
 References: <20260324192051.801196-1-prestwoj@gmail.com>
@@ -75,98 +74,37 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This takes a security enum and returns a bitmask of all possible
-AKMs for that security type. The AKM list was refactored to be
-reused by AKM_IS_PSK/AKM_IS_8021X.
+If a known network is removed we should also flush any PMKSA entries
+associated with that network. Without doing this it would permit IWD
+allow connect to that network later which would be confusing to the
+user since they explicitly removed the network.
 ---
- src/common.c | 41 +++++++++++++++++++++++++++++++----------
- src/common.h |  1 +
- 2 files changed, 32 insertions(+), 10 deletions(-)
+ src/network.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-diff --git a/src/common.c b/src/common.c
-index 91979423..1e5b3b7b 100644
---- a/src/common.c
-+++ b/src/common.c
-@@ -28,6 +28,8 @@
- #include <stdbool.h>
- #include <string.h>
+diff --git a/src/network.c b/src/network.c
+index a5a2375a..2d67383f 100644
+--- a/src/network.c
++++ b/src/network.c
+@@ -58,6 +58,7 @@
+ #include "src/handshake.h"
+ #include "src/band.h"
+ #include "src/util.h"
++#include "src/pmksa.h"
  
-+#include <ell/ell.h>
+ #define SAE_PT_SETTING "SAE-PT-Group%u"
+ 
+@@ -2051,6 +2052,10 @@ static void emit_known_network_removed(struct station *station, void *user_data)
+ 
+ 		l_queue_destroy(network->secrets, eap_secret_info_free);
+ 		network->secrets = NULL;
 +
- #include "src/iwd.h"
- #include "src/common.h"
- #include "src/ie.h"
-@@ -64,18 +66,15 @@ bool security_from_str(const char *str, enum security *security)
- 	return true;
- }
++		pmksa_cache_flush_ssid((uint8_t *)info->ssid,
++					sizeof(info->ssid),
++					security_to_akms(network->security));
+ 	}
  
--#define AKM_IS_PSK(akm)							\
--(									\
--	akm & (IE_RSN_AKM_SUITE_PSK |					\
-+#define AKMS_PSK \
-+	(IE_RSN_AKM_SUITE_PSK |						\
- 		IE_RSN_AKM_SUITE_PSK_SHA256 |				\
- 		IE_RSN_AKM_SUITE_FT_USING_PSK |				\
- 		IE_RSN_AKM_SUITE_SAE_SHA256 |				\
--		IE_RSN_AKM_SUITE_FT_OVER_SAE_SHA256)			\
--)
-+		IE_RSN_AKM_SUITE_FT_OVER_SAE_SHA256)
- 
--#define AKM_IS_8021X(akm) \
--(									\
--	akm & (IE_RSN_AKM_SUITE_8021X |					\
-+#define AKMS_8021X \
-+	(IE_RSN_AKM_SUITE_8021X |					\
- 		IE_RSN_AKM_SUITE_8021X_SHA256 |				\
- 		IE_RSN_AKM_SUITE_FT_OVER_8021X |			\
- 		IE_RSN_AKM_SUITE_FT_OVER_8021X_SHA384 |			\
-@@ -83,8 +82,11 @@ bool security_from_str(const char *str, enum security *security)
- 		IE_RSN_AKM_SUITE_FILS_SHA384 |				\
- 		IE_RSN_AKM_SUITE_FT_OVER_FILS_SHA256 |			\
- 		IE_RSN_AKM_SUITE_FT_OVER_FILS_SHA384 |			\
--		IE_RSN_AKM_SUITE_OSEN)					\
--)
-+		IE_RSN_AKM_SUITE_OSEN)
-+
-+#define AKM_IS_PSK(akm) (akm & AKMS_PSK)
-+
-+#define AKM_IS_8021X(akm) (akm & AKMS_8021X)
- 
- enum security security_determine(uint16_t bss_capability,
- 					const struct ie_rsn_info *info)
-@@ -103,3 +105,22 @@ enum security security_determine(uint16_t bss_capability,
- 
- 	return SECURITY_NONE;
- }
-+
-+/* Returns all possible AKMs (as bitmask) for a given security type */
-+uint32_t security_to_akms(enum security security)
-+{
-+	switch (security) {
-+	case SECURITY_WEP:
-+		l_warn("WEP security type not supported");
-+		/* Fall through */
-+	case SECURITY_NONE:
-+		return 0;
-+	case SECURITY_PSK:
-+		return AKMS_PSK;
-+	case SECURITY_8021X:
-+		return AKMS_8021X;
-+	default:
-+		l_warn("Unhandled security type: %u", security);
-+		return 0;
-+	}
-+}
-diff --git a/src/common.h b/src/common.h
-index ca12d813..7e877299 100644
---- a/src/common.h
-+++ b/src/common.h
-@@ -36,3 +36,4 @@ const char *security_to_str(enum security security);
- bool security_from_str(const char *str, enum security *security);
- enum security security_determine(uint16_t bss_capability,
- 					const struct ie_rsn_info *info);
-+uint32_t security_to_akms(enum security security);
-\ No newline at end of file
+ 	connected_network = station_get_connected_network(station);
 -- 
 2.34.1
 
