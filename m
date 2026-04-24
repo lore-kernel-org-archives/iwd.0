@@ -1,173 +1,129 @@
-Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
+Received: from mail-qt1-f177.google.com (mail-qt1-f177.google.com [209.85.160.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 745933368BC
-	for <iwd@lists.linux.dev>; Fri, 24 Apr 2026 08:32:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D327366558
+	for <iwd@lists.linux.dev>; Fri, 24 Apr 2026 13:21:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777019541; cv=none; b=q1iPDRNK3ejQPvRcg5ujytBpgEB7hiWHV8W5MQ9dnWTxJoZzaMiCr8wuaj9vQ9mMTDppmEiySehlr92UXnZ1Mno7sJZTq/jkIaJgb3kG6XYDVpTMJ1IEQwYFqWT/DPsh8hadqIz2zX/Nx62U2xSxTjl0c3QphEnY7ph9XwkyekE=
+	t=1777036904; cv=none; b=kGiwjiude0I53UsTYwBrFrKCOzJ0fsyBr93ssLhpPkifmi1/pYPnCoqqzDGqAZv4h5A+MnrCMuqKzO95e0sLTF03/DLreqMH9fP0aqTIZdX39xs4rzOorLppMzrSR7EQyX7yW3ft2BRoY+IwtbpykkO9R6fVJWMwFl9CCi56/hM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777019541; c=relaxed/simple;
-	bh=29uzo4ls4bpauc0tZN/lexU1DOhcw7ruA1m9q4TmPLQ=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=rpqNFrwKuer4Fg3rBengSGeVtUNcVFnL+Bvzq339y1ltPWjEoasE0HHDhXfTMw7vpvbZ69LXosrlP3S2oc/tgUm/qIAJA76u105i+VRsNbhWHGd6LoQYveU06x9QfFlHd0CrqF8Oen6GU7/zoJAzbvcoyMLvcZ256mcLd0uf+QQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=irregular.at; spf=pass smtp.mailfrom=irregular.at; dkim=pass (1024-bit key) header.d=irregular.at header.i=@irregular.at header.b=kdAUfJWt; arc=none smtp.client-ip=209.85.128.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=irregular.at
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=irregular.at
+	s=arc-20240116; t=1777036904; c=relaxed/simple;
+	bh=T3cJNz3KxBV/3kv0sG80XaBZk2NZ0hkXsGbZ+0XF7tE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=C0OFB97ZbTZ92QvFuCLUnR+/gDjdCP9dtKp3bcfnI0WEH/Mjb52h3k7kYFcLskO37GRSDH3zE/MxqNVVWbF3no0oJdvPxN3nyPjWGB2QylUa9ZcZqJby4p/C6SnCEpqBAVoWVi+ZBPvjPIry20wLsYZuuUMBK8IRclmJgIMl2kc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fono/jCh; arc=none smtp.client-ip=209.85.160.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=irregular.at header.i=@irregular.at header.b="kdAUfJWt"
-Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-4893940bb5eso35036055e9.3
-        for <iwd@lists.linux.dev>; Fri, 24 Apr 2026 01:32:17 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fono/jCh"
+Received: by mail-qt1-f177.google.com with SMTP id d75a77b69052e-50e97863425so53525551cf.0
+        for <iwd@lists.linux.dev>; Fri, 24 Apr 2026 06:21:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=irregular.at; s=google; t=1777019536; x=1777624336; darn=lists.linux.dev;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=111R/Gf0K4x27b/g4+S27DtDMX3TdPZxJES/Dmt+4CU=;
-        b=kdAUfJWt1WozO+UwKKIdCyUXxGLKsnk1d5b4kH4DbxbismI81+3aBM3E4N57eUNtXS
-         xrjRLqIqHvVEuBm3GqT6xc1+hwnAa+vyE/NdftCmEUZktECSZnhRRAGeXIyo+2pfJ+Mk
-         nzS7yC5fP+SxLYJgNGdZMVU7lvoaBJLj9JLKc=
+        d=gmail.com; s=20251104; t=1777036902; x=1777641702; darn=lists.linux.dev;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:to:subject:user-agent:mime-version:date:message-id:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=3jN9TUQfMgogWgN+t4IE7/U1rfcMnvdE/ohFGnbtpkI=;
+        b=fono/jChzjWKYCWk5C9kcO4/A76yIpt4iLQaYH9NYA4bp+otyC2NsGcDLYQrqBUiNb
+         xg4ikOngDmY21eAMeVKctaZfoU0DsqWxguGH9lUPROmsXnOup/dxeIFEDhVM6Wr0L86T
+         564Q9om8Qsnn451sFdeyhFWkQzHWUckOqAn+Klwm/57sPv/ea4eYOPs8xWsjDP+yAr/Q
+         64dBaPCWzDoN0RMSNTy76jgDMYPh0XxQusmslHjH09lQ2W5IYtE+Ges6Xfp4kkJrlhhf
+         QBJmor6kRyo0HhFJNRbNneE0s/J6V6a/gYrC7rfDwFectRmjTUDp6093ncAHanmGaCf1
+         kguQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777019536; x=1777624336;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=111R/Gf0K4x27b/g4+S27DtDMX3TdPZxJES/Dmt+4CU=;
-        b=mzX6dZxpmHVFhYUXHkqLqQKnUqpMY6AaAa1smaf8Aon5emkYTtatpUjrW07841kpQ7
-         G9+g8NIxZeisotb+Hl0kPVav48JiG5QKIexLIIohSMAuCnlQ64tazd0ky+cRErHggZ/n
-         +T31Ux6bqyd8NQirasx8H9zclAXuZ1or2BOAgJIS5X5DUSskAb7w5kQTfpZBcbXr81Y3
-         yIf9x04D8jtq6HhX2fL4tyyGRt7mK1Sk5Z/RuVPgIJocuA6Wnyhl5GOwmv0FYIqZBgKh
-         KP5FZfwioniFiQw8Tli6dGYUnYVEUu3zLnxAA8DM2rFiw3QblTFaTEEgv8xIRxuS46+/
-         qQ8w==
-X-Gm-Message-State: AOJu0YzlhN1eH0VBkRITuW8rP/X3hRkI3MU88sDUyP08QbXU0LEJb/76
-	QOJD69f//XaIuTYBEIW2kYy3buXGizqvii8n9mswFDVv2cI8WMYBs0qcxRtqMxydL7nn8PZ/Xrv
-	2a72P
-X-Gm-Gg: AeBDievbZ/XwwVN4fR9mh9fykNrsUkFgMazaF1xh5hlgiFglaVLdyXYW9fjiZgCuhzn
-	cHs79WwvTimNMYW7ZesbM38oqNFG/5LtC9Ze/On2eRR+beTODyLzxWSlxbeQQ43eI/PGQ8cSJoe
-	T9plgm7sHoxVBU9Y9rdX9+762TvuM3RLCNl07ROOzSVRHMlp6o5JffKUMY54V3Sb0uLE/etJQwk
-	jowgbflMwn2kf+CRyp3xqqu0hNz6zRwErJUra3h7n/aifbNGInMEjeKTt1UUTYoHn9kuYV97590
-	eeLsbW63GY+Hc5hRhEzm3ScyY8TkuW06U0CKDNKMAY5LNvT9xVYKDFA09vY9Q7XFtuA6Ni1QQUO
-	UOwfkivtihGUWi9xT/zhgWruKB9BLFnwI/Hmx03Qmx0AmjNT46xqcR2a6iA5fbIgF1WRW5gNMgl
-	t/v02Q7JfcMNRky6jc0lD5WJyVOsPeHJgmcHudHviU5nx6YzyX4gMqJGxNhGfvCOvTygY9ijs36
-	ADivrfAXCP1+AonLKQ+oi6mspYcAgb9oDGusRFtl0YWCubfh2XJiP1dFOgmOsyUV2VjPGbjKcEb
-	wa2u6wURBkxNdRP3vCYAAkRCYsSTWq4haZj1QAAI0bGbsMv9qYNq364hkQpgWwB46HfjkkrqAgK
-	2EWlfbYEdSm15S4KcYIWk
-X-Received: by 2002:a05:600c:19d3:b0:489:1ae1:4eb9 with SMTP id 5b1f17b1804b1-4891ae14f23mr289396045e9.28.1777019536259;
-        Fri, 24 Apr 2026 01:32:16 -0700 (PDT)
-Received: from mkurz-macbook-pro.fritz.box (2a02-8388-82c0-2a80-8de6-cca3-34a7-690d.cable.dynamic.v6.surfer.at. [2a02:8388:82c0:2a80:8de6:cca3:34a7:690d])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-488fc1c01cfsm601386945e9.10.2026.04.24.01.32.15
-        for <iwd@lists.linux.dev>
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 24 Apr 2026 01:32:15 -0700 (PDT)
-From: Matthias Kurz <m.kurz@irregular.at>
-To: iwd@lists.linux.dev
-Subject: [PATCH 3/3] auto-t: Test transient PSK agent secrets
-Date: Fri, 24 Apr 2026 10:31:59 +0200
-Message-ID: <20260424083209.383093-4-m.kurz@irregular.at>
-X-Mailer: git-send-email 2.54.0
-In-Reply-To: <20260424083209.383093-1-m.kurz@irregular.at>
-References: <20260424083209.383093-1-m.kurz@irregular.at>
+        d=1e100.net; s=20251104; t=1777036902; x=1777641702;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=3jN9TUQfMgogWgN+t4IE7/U1rfcMnvdE/ohFGnbtpkI=;
+        b=Nm0C3LjfiVhqxElf4J9hbq5X8Tjj5QCVwhaoftt2hhOTmEpQ2+qGbw6SQyJ60E3EUe
+         J4nYkVClLDtR/xzPyRgGhnYOYGiX2PNDCDQLWJik2GU+oh4xMSRCLZ8w+Q+lQbU7geyM
+         GJqQbeUnFbmDrnet4sdFXXkHQ+LthTtQthtLBFzLFHBbuSW2+AGwz5wKSLuXENaxerSi
+         8U7JpWavdELz8dsWbxgUMCm+R0Ymk6cGBET+15Zx6XkWZLCJRIdzj6HK5nlJbs+fodnA
+         ckrfs1PBGP8xPZxgm8camf5k2zoxy4vLh44LAfpkU6pblZD3M6GpNTL6bNK6Zjk1Nz1K
+         RaNg==
+X-Forwarded-Encrypted: i=1; AFNElJ+wKhpeoSHmA7dTBEsnDOMbF5VH4SyGRt0BGFPOQRNJI16UhvJJRUkp9/YAVqJcHVyLF8E=@lists.linux.dev
+X-Gm-Message-State: AOJu0YyjQIBseqinGL8IgBoY//Om75j0IJhRz/aDY7tdVQpaxWwy2Q0Z
+	VXVshGCpCEIsMt2gL5P43mlxsPvHvxj13GE1gEpRcJMOqDqL+U5K7SzXAHOT9w==
+X-Gm-Gg: AeBDietDQIhFQkv410b7wu3ggjMPPGmsl7NETphqY6Rdz82WQIVP2wepPXA1JgtxkLE
+	Yf5sDRHorOLWo2kGOF+kyEejkCQwj5tagXnSsd4KC8lrrzmiZpd6ye6tpCt8s6oqu+Z67N8Hgz2
+	zc+f8/AgAXsu3tc1CbRFSMY3mrAam+Qw2Ih2PHYwYMS+wHxmLne4J2t0WAkHXXTewnCApSnf66V
+	9kGyBcmntmkd/zp6o1u3RHi1YiwDocmNUruHOKl6lFWiStDT9VGLS58ve98favjNKNG33sv7d1Q
+	jmq+kxf2u0bR9gvJ9y6PxRSCfW2xZfG8V7Fv0oFEi276vNdRSKNgXqNQldh0+RSx/YvlBE9sWkb
+	inA32pW1JIhFl664rz3wlEuLN8vaXCsAf0dV0lbgCe7eyhrUHQQJm+rS4qrRlDZ/2xYKcqxLxS0
+	0hghC42+udSuNUyYAGcgmx1Rg0KlVY8MfwpB2f/81L26/MwdTgiHNdKlCxZnnEJdpVB1qx
+X-Received: by 2002:ac8:7c55:0:b0:50d:83de:4933 with SMTP id d75a77b69052e-50e36b406a9mr468667671cf.20.1777036902216;
+        Fri, 24 Apr 2026 06:21:42 -0700 (PDT)
+Received: from [10.100.121.202] ([152.193.78.90])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-50e39495192sm192923411cf.27.2026.04.24.06.21.40
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 24 Apr 2026 06:21:41 -0700 (PDT)
+Message-ID: <1b202119-a27b-46b5-8f4c-d8b3fc536b7d@gmail.com>
+Date: Fri, 24 Apr 2026 06:21:39 -0700
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 0/3] agent: add passphrase storage options
+To: Matthias Kurz <m.kurz@irregular.at>, iwd@lists.linux.dev
+References: <20260424083209.383093-1-m.kurz@irregular.at>
+Content-Language: en-US
+From: James Prestwood <prestwoj@gmail.com>
+In-Reply-To: <20260424083209.383093-1-m.kurz@irregular.at>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Extend the PSK agent test helper to implement
-RequestPassphraseWithOptions and add coverage for Store=false. The test
-verifies that IWD can use the agent-provided passphrase without writing
-PSK secrets back to the profile.
----
- .../testEncryptedProfiles/connection_test.py  | 27 +++++++++++++++++++
- autotests/util/iwd.py                         | 14 +++++++++-
- 2 files changed, 40 insertions(+), 1 deletion(-)
+Hi Mattias,
 
-diff --git a/autotests/testEncryptedProfiles/connection_test.py b/autotests/testEncryptedProfiles/connection_test.py
-index eb7fd7c5..17c5ff11 100644
---- a/autotests/testEncryptedProfiles/connection_test.py
-+++ b/autotests/testEncryptedProfiles/connection_test.py
-@@ -21,6 +21,17 @@ class Test(unittest.TestCase):
- 
-         return True
- 
-+    def profile_has_psk_secret(self, profile):
-+        with open('/tmp/iwd/' + profile) as f:
-+            contents = f.read()
-+
-+        return any(secret in contents for secret in [
-+            'Passphrase',
-+            'PreSharedKey',
-+            'SAE-PT-Group19',
-+            'SAE-PT-Group20',
-+        ])
-+
-     def validate(self, wd):
-         devices = wd.list_devices(1)
-         device = devices[0]
-@@ -80,6 +91,22 @@ class Test(unittest.TestCase):
- 
-         wd.unregister_psk_agent(psk_agent)
- 
-+    # Tests that an agent can request one-time use of a passphrase.
-+    def test_agent_transient_profile(self):
-+        wd = IWD(True)
-+
-+        psk_agent = PSKAgent("secret123", store=False)
-+        wd.register_psk_agent(psk_agent)
-+
-+        with self.assertRaises(FileNotFoundError):
-+            self.profile_has_psk_secret('ssidCCMP.psk')
-+
-+        self.validate(wd)
-+
-+        self.assertFalse(self.profile_has_psk_secret('ssidCCMP.psk'))
-+
-+        wd.unregister_psk_agent(psk_agent)
-+
-     # Tests that an invalid profile gets re-written after an agent request
-     def test_invalid_profile_rewritten(self):
-         bad_config = '[Security]\nPassphrase=incorrect\n'
-diff --git a/autotests/util/iwd.py b/autotests/util/iwd.py
-index 37eb4943..54096b01 100755
---- a/autotests/util/iwd.py
-+++ b/autotests/util/iwd.py
-@@ -1153,7 +1153,7 @@ agent_count = 0
- 
- class PSKAgent(dbus.service.Object):
- 
--    def __init__(self, passphrases=[], users=[], namespace=ctx):
-+    def __init__(self, passphrases=[], users=[], namespace=ctx, store=True):
-         global agent_count
- 
-         if type(passphrases) != list:
-@@ -1162,6 +1162,7 @@ class PSKAgent(dbus.service.Object):
-         if type(users) != list:
-             users = [users]
-         self.users = users
-+        self.store = store
-         self._path = '/test/agent/%s' % agent_count
-         self._bus = dbus.bus.BusConnection(address_or_type=namespace.dbus_address)
- 
-@@ -1193,6 +1194,17 @@ class PSKAgent(dbus.service.Object):
- 
-         return self.passphrases.pop(0)
- 
-+    @dbus.service.method(IWD_AGENT_INTERFACE, in_signature='o',
-+                                                        out_signature='sa{sv}')
-+    def RequestPassphraseWithOptions(self, path):
-+        print('Requested PSK with options for ' + path)
-+
-+        if not self.passphrases:
-+            raise CanceledEx("canceled")
-+
-+        return (self.passphrases.pop(0),
-+                {'Store': dbus.Boolean(self.store, variant_level=1)})
-+
-     @dbus.service.method(IWD_AGENT_INTERFACE, in_signature='o',
-                                                               out_signature='s')
-     def RequestPrivateKeyPassphrase(self, path):
--- 
-2.54.0
+On 4/24/26 1:31 AM, Matthias Kurz wrote:
+> Add an agent API variant for PSK passphrase requests that allows the
+> agent to tell IWD whether the passphrase should be persisted in the
+> network profile.
+>
+> This is needed by NetworkManager's IWD backend for profiles where the
+> Wi-Fi PSK is stored as an agent-owned or not-saved secret. In those
+> cases NetworkManager can provide the passphrase for the current
+> connection attempt, but IWD should not save it into /var/lib/iwd/*.psk.
+>
+> The new RequestPassphraseWithOptions method returns the passphrase plus
+> an options dictionary. Currently the only option is Store. If Store is
+> false, IWD uses the passphrase for the current connection attempt but
+> does not write PSK secrets back to the profile.
 
+Do you anticipate additional options needing to be passed? I'm not 
+really liking the idea of adding another agent API. Another option 
+instead of a new DBus API could be that we have a main.conf option, 
+something like:
+
+[General].DisableStorage=true
+
+If NM is always providing the passphrase via the agent API I don't see 
+why we'd need to keep an option within the network profiles right?
+
+Thanks,
+
+James
+
+>
+> The method falls back to RequestPassphrase for older agents.
+>
+> NetworkManager-side draft MR:
+> https://gitlab.freedesktop.org/NetworkManager/NetworkManager/-/merge_requests/2402
+>
+> Matthias Kurz (3):
+>    agent: Add passphrase storage options
+>    doc: Document passphrase storage options
+>    auto-t: Test transient PSK agent secrets
+>
+>   .../testEncryptedProfiles/connection_test.py  |  27 +++++
+>   autotests/util/iwd.py                         |  14 ++-
+>   doc/agent-api.txt                             |  12 ++
+>   src/agent.c                                   | 108 +++++++++++++++---
+>   src/agent.h                                   |   1 +
+>   src/network.c                                 |  12 ++
+>   6 files changed, 159 insertions(+), 15 deletions(-)
+>
