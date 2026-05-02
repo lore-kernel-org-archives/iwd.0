@@ -1,190 +1,90 @@
-Received: from psionic.psi5.com (psionic.psi5.com [185.187.169.70])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88365299927
-	for <iwd@lists.linux.dev>; Sat,  2 May 2026 08:19:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.187.169.70
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3F4C1AA1F4;
+	Sat,  2 May 2026 19:16:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777709974; cv=none; b=tQuQ0I3aWTibVjpf2CH7J3ZGR0X9or+bJjokJ+6GO/SW/GSRTmngNcwR7hjsOEAkLZc1/Wa0Hbr7TECOUwmXPhEIZVxmJ/wpnj9Z59Cl4R2u9EouT50Zfh5XsXG7EqF2uH6L4YwHvT9jVWsthjH/KxjobIdk3GdwHHPmxTNQ+rg=
+	t=1777749380; cv=none; b=dbqLLprISV01MIvu+Sqwd3JSfe40i3s2PzYX1RSCq+I4wv40zmbQBEhkM7IFNKvCr7WkJ2ReaDuoPHKqFe9eLztavXzjQOSmXlpdsusAWKHsXr+KAjVybsTs4Ya8buICxcZld5u9h+DPbHDOxUkkXsrc20nPyme/TmM/zdTjq9Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777709974; c=relaxed/simple;
-	bh=NTsx/M31hlFH1cwqARJbbg0cfBQG+Jn+hgAhTdlKVZk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Y3ZPEbqbmdFWsGq9wwU5ijkPsABzCf6EWHv7S93Pb3OAc0uYXHMV06ZXC8n814HLy8aHBVD9qOQAFUNGyJGS1v/s9V12nDkNYPRbboGw6p2Q9DoR10h96PXqpUSdXFqEx/WE6JevoRLaTyujXUr1RkduuXfIHJrw7eW7lS1FGtA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hogyros.de; spf=pass smtp.mailfrom=hogyros.de; arc=none smtp.client-ip=185.187.169.70
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hogyros.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hogyros.de
-Received: from [IPV6:2400:2410:b120:f200:9e5c:8eff:fec0:ee40] (unknown [IPv6:2400:2410:b120:f200:9e5c:8eff:fec0:ee40])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	by psionic.psi5.com (Postfix) with ESMTPSA id A5F643F51E;
-	Sat,  2 May 2026 10:19:17 +0200 (CEST)
-Message-ID: <9f020da7-97c5-41cc-b0f1-d8aab1bb39ec@hogyros.de>
-Date: Sat, 2 May 2026 17:19:14 +0900
+	s=arc-20240116; t=1777749380; c=relaxed/simple;
+	bh=7uN3jtPk91aiWMgJ4OW3pQf4zAgfesW+pc9AEaFhR7U=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=QLWs3clxm8rVX+4Vk9nTo7wBIzDl/upPFQdl12F3n4SbiDCJZvxDgAjdv86ktJi1HORNYBqawjGxeQLMjXa24LwloCzpBDEi7vucq2uNHQ4yiSJpleh6Kpq1wNOKd/y07bewPshNO1fZcKjVJi04R4SiYQQ4944198dZ1I/N/wo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=spYDCTMw; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="spYDCTMw"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0B98DC19425;
+	Sat,  2 May 2026 19:16:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1777749380;
+	bh=7uN3jtPk91aiWMgJ4OW3pQf4zAgfesW+pc9AEaFhR7U=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=spYDCTMwiWL0uI5Cx79VymlasZX/0jwWul4Yi8AXVZ90zlpg40ewzo6jSIF9Xn6Eq
+	 sZn/w/jMJRsB2krSJ8d84PQy8ivb3lsdGXCUZ6eF90RI6dX/Ye8ic6wCsPsPz9PSJn
+	 i9m+qfQA7+yMcc4ZteiB6pDbMSeJIgxENMUNLUwQGmfrmRrYvnL+PrrLHHyGTDHdPH
+	 kCEKROFHVD19+0eX0eaERxzZQgiknf2xpD24bLx0lwRhTI+ZgNjurNn+cVMz4wB9sk
+	 tZh2uyGj2R1SMGukh7RrRK3epG2a7cfJaZ2/Z6t4sDirXGTyiOqSnX8hQ0+gnQkQF0
+	 nDCPvUkuYvSKg==
+Date: Sat, 2 May 2026 19:16:18 +0000
+From: Eric Biggers <ebiggers@kernel.org>
+To: Demi Marie Obenour <demiobenour@gmail.com>
+Cc: Jan Schaumann <jschauma@netmeister.org>, iwd@lists.linux.dev,
+	Linux kernel mailing list <linux-kernel@vger.kernel.org>,
+	linux-crypto@vger.kernel.org,
+	Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: AF_ALG hardening
+Message-ID: <20260502191618.GA229884@google.com>
+References: <87se8dgicq.fsf@gentoo.org>
+ <afL-QhLfEKqHZqka@eldamar.lan>
+ <20260430071917.GB54208@sol>
+ <177abb5d-8ba9-4bb9-8b23-9fbc868ed3cd@gmail.com>
+ <20260501180028.GA2260@sol>
+ <19837ef5-e5b6-45f4-8336-3ce07423dfb1@gmail.com>
+ <20260501201841.GA2540@quark>
+ <c13dd3c5-ddc1-431e-bc7d-2de39c551f8e@gmail.com>
+ <20260502033556.GA3872267@google.com>
+ <3cc88b2d-fbd6-4e47-b82c-3c685fec0581@gmail.com>
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: AF_ALG hardening
-To: Demi Marie Obenour <demiobenour@gmail.com>,
- Eric Biggers <ebiggers@kernel.org>
-Cc: Jan Schaumann <jschauma@netmeister.org>, iwd@lists.linux.dev,
- Linux kernel mailing list <linux-kernel@vger.kernel.org>,
- linux-crypto@vger.kernel.org, Herbert Xu <herbert@gondor.apana.org.au>
-References: <afJorKIje4O6dXbH@netmeister.org>
- <d6111caa-db61-498a-92cb-ea7a0aa0a5e2@ehuk.net> <87se8dgicq.fsf@gentoo.org>
- <afL-QhLfEKqHZqka@eldamar.lan> <20260430071917.GB54208@sol>
- <177abb5d-8ba9-4bb9-8b23-9fbc868ed3cd@gmail.com> <20260501180028.GA2260@sol>
- <19837ef5-e5b6-45f4-8336-3ce07423dfb1@gmail.com>
- <20260501201841.GA2540@quark>
- <c13dd3c5-ddc1-431e-bc7d-2de39c551f8e@gmail.com>
- <20260502033556.GA3872267@google.com>
- <3cc88b2d-fbd6-4e47-b82c-3c685fec0581@gmail.com>
-Content-Language: en-US
-From: Simon Richter <Simon.Richter@hogyros.de>
-In-Reply-To: <3cc88b2d-fbd6-4e47-b82c-3c685fec0581@gmail.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="------------IAgX6DaXQhDJpK1phOpjNiIQ"
-
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---------------IAgX6DaXQhDJpK1phOpjNiIQ
-Content-Type: multipart/mixed; boundary="------------4KG0OAh5fKrDahONrZhGK9sd";
- protected-headers="v1"
-From: Simon Richter <Simon.Richter@hogyros.de>
-To: Demi Marie Obenour <demiobenour@gmail.com>,
- Eric Biggers <ebiggers@kernel.org>
-Cc: Jan Schaumann <jschauma@netmeister.org>, iwd@lists.linux.dev,
- Linux kernel mailing list <linux-kernel@vger.kernel.org>,
- linux-crypto@vger.kernel.org, Herbert Xu <herbert@gondor.apana.org.au>
-Message-ID: <9f020da7-97c5-41cc-b0f1-d8aab1bb39ec@hogyros.de>
-Subject: Re: AF_ALG hardening
-References: <afJorKIje4O6dXbH@netmeister.org>
- <d6111caa-db61-498a-92cb-ea7a0aa0a5e2@ehuk.net> <87se8dgicq.fsf@gentoo.org>
- <afL-QhLfEKqHZqka@eldamar.lan> <20260430071917.GB54208@sol>
- <177abb5d-8ba9-4bb9-8b23-9fbc868ed3cd@gmail.com> <20260501180028.GA2260@sol>
- <19837ef5-e5b6-45f4-8336-3ce07423dfb1@gmail.com>
- <20260501201841.GA2540@quark>
- <c13dd3c5-ddc1-431e-bc7d-2de39c551f8e@gmail.com>
- <20260502033556.GA3872267@google.com>
- <3cc88b2d-fbd6-4e47-b82c-3c685fec0581@gmail.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 In-Reply-To: <3cc88b2d-fbd6-4e47-b82c-3c685fec0581@gmail.com>
 
---------------4KG0OAh5fKrDahONrZhGK9sd
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: base64
+On Sat, May 02, 2026 at 12:52:57AM -0400, Demi Marie Obenour wrote:
+> > Either way, the first step will be to create the algorithm allowlist,
+> > which should happen anyway, regardless of the other changes.
+> 
+> The simplest changes I can see are:
+> 
+> 1. Get rid of zero-copy support (splice()).
+> 2. Get rid of AIO support.
+> 3. Only allow software implementations.
+> 
+> All of these are really simple.  I can send patches, but be warned
+> that they would only be compile-tested, as I don't know how to test
+> the code.
 
-SGksDQoNCk9uIDUvMi8yNiAxMzo1MiwgRGVtaSBNYXJpZSBPYmVub3VyIHdyb3RlOg0KDQo+
-PiBPZiBjb3Vyc2UsIGl0J2xsIGFsc28gYmUgYSBmYWlyIGEgYml0IG9mIHdvcmssIGFuZCB1
-bmZvcnR1bmF0ZWx5IEkgYWxzbw0KPj4gZXhwZWN0IHB1c2hiYWNrIGZyb20gcGVvcGxlIHdo
-byAoaW5jb3JyZWN0bHkgSU1PKSB0aGluayB0aGF0IEFGX0FMRw0KPj4gcGVyZm9ybWFuY2Ug
-aXMgaW1wb3J0YW50LCBldmVuIG1vcmVzbyB0aGFuIHNlY3VyaXR5Lg0KDQpBRl9BTEcgcGVy
-Zm9ybWFuY2UgKHRpbWUvcG93ZXIpIGlzIGltcG9ydGFudCBpbiB0aGUgd2F5IHRoYXQgaXQn
-cyANCmxpdGVyYWxseSB0aGUgb25seSBwb2ludCB0byBpdHMgZXhpc3RlbmNlLiBJZiBhbGwg
-aXQgcHJvdmlkZXMgaXMgZXh0cmEgDQpvdmVyaGVhZCBvdmVyIGEgc29mdHdhcmUgaW1wbGVt
-ZW50YXRpb24sIHRoZW4gaXQgbWFrZXMgbm8gc2Vuc2UgdG8ga2VlcCBpdC4NCg0KPiBJZiBv
-bmUgY2FyZXMgYWJvdXQgY3J5cHRvIG9mZmxvYWQgcGVyZm9ybWFuY2UsIHRoZXkgd291bGQg
-YmUgYmV0dGVyDQo+IHNlcnZlZCBieSBjcmVhdGluZyBhIGJldHRlciBpbnRlcmZhY2UgdG8g
-aXQgdGhhbiBBRl9BTEcuICBBRl9BTEcgaXMNCj4gYSBob3JyaWJsZSBBUEkgd2l0aCAocHJl
-c3VtYWJseSkgdG9ucyBvZiBvdmVyaGVhZC4gIEkga25vdyB0aGUgUUFUDQo+IGRyaXZlciBh
-bmQgYW4gTnZpZGlhIEJsdWVGaWVsZCBEUFUgYWNjZWxlcmF0b3IgZHJpdmVyIGJvdGggYnlw
-YXNzIGl0Lg0KDQpUaGUgQVBJIGlzIGRlc2lnbmVkIHRvIGJlIHplcm9jb3B5LCB0aGF0J3Mg
-d2h5IGl0J3MgdGhpcyBob3JyaWJsZSANCmNvbWJpbmF0aW9uIG9mIHNvY2tldCBBUEkgYW5k
-IHNwbGljZSgpLiBUaGUgZ2VuZXJhbCBhc3N1bXB0aW9uIGhlcmUgaXMgDQp0aGF0IGl0IGRv
-ZXMgbm90IG1ha2Ugc2Vuc2UgdG8gb2ZmbG9hZCBzbWFsbCByZXF1ZXN0cyBpbiB0aGUgZmly
-c3QgDQpwbGFjZSwgYW5kIGFwcGxpY2F0aW9uIHByb2dyYW1tZXJzIGFyZSBhd2FyZSBvZiB0
-aGF0Lg0KDQpUaGUgdXNlIGNhc2UgaXMgIkkgaGF2ZSBhIGZpbGUgb3IgcGlwZSBmdWxsIG9m
-IGRhdGEgYW5kIGEgZGV2aWNlIHdpdGggYSANCmtlcm5lbCBkcml2ZXIgdGhhdCBzaG91bGQg
-cHJvY2VzcyBpdCwgY2FuIHdlIHNvbWVob3cgYXZvaWQgY29weWluZyB0aGUgDQpkYXRhIHRv
-IHVzZXJzcGFjZSBvbmx5IHRvIGltbWVkaWF0ZWx5IGNvcHkgaXQgYmFjayB0byBrZXJuZWxz
-cGFjZT8iDQoNClRoaXMgY29weWluZyBpcyBldmVuIG1vcmUgc2lsbHkgaWYgdGhlIGFjdHVh
-bCBxdWVzdGlvbiBJIGhhdmUgaW4gDQp1c2Vyc3BhY2UgaXMgIndoYXQgaXMgdGhlIFNIQTI1
-NiBjaGVja3N1bSBvZiB0aGlzIGZpbGU/IiBvciAid2hhdCBpcyB0aGUgDQpTSEEyNTYgY2hl
-Y2tzdW0gb2YgdGhlIHN0cmluZyAnYmxvYiA4Nzk0MzExNTI4XDAnIGZvbGxvd2VkIGJ5IHRo
-aXMgDQpmaWxlPyIgKHdoZXJlIHlvdSBjYW4gc2VlIHdoeSBhbnlvbmUgd291bGQgYXNrIHN1
-Y2ggYSBzaWxseSBxdWVzdGlvbiBhbmQgDQpwcmVmZXIgdG8gdXNlIHRoZSBkZWRpY2F0ZWQg
-aGFyZHdhcmUgdGhhdCBwcm9jZXNzZXMgMjQgR0IvcyBvdmVyIHRoZSBDUFUgDQphdCAxMDAg
-TUIvcykNCg0KPiBGdXJ0aGVybW9yZSwgQUZfQUxHIG9ubHkgc3VwcG9ydHMgc3ltbWV0cmlj
-IGFsZ29yaXRobXMuICBUaGVzZQ0KPiBhbGdvcml0aG1zIGFyZSBpbmV4cGVuc2l2ZSBpbiBz
-b2Z0d2FyZSwgc28gdGhlIGNvc3Qgb2YgZ29pbmcgdG8gYW4NCj4gYWNjZWxlcmF0b3IgYW5k
-IGJhY2sgaXMgZW5vcm1vdXMgY29tcGFyZWQgdG8gdGhlIGNvc3Qgb2YgYSBzaW5nbGUNCj4g
-b3BlcmF0aW9uLg0KDQpZZXMsIGluaXRpYWwgc2V0dXAgY29zdCBpcyBoaWdoLCBzbyB0aGlz
-IG9ubHkgbWFrZXMgc2Vuc2UgZm9yIGxhcmdlIA0KcmVxdWVzdHMgb3IgYmF0Y2hlcyAoc3Vi
-bWl0dGluZyBpbmRpdmlkdWFsIHJlcXVlc3RzIGlzIGdlbmVyYWxseSBjaGVhcCwgDQp0aGUg
-ZGlmZmljdWx0eSBpcyBlbnN1cmluZyB0aGUgZGF0YSBpcyBhY2Nlc3NpYmxlIHRvIHRoZSBo
-YXJkd2FyZSkuDQoNClRoYXQncyBhbHNvIHdoeSB0aGVyZSBhcmUgbm8gYXN5bW1ldHJpYyBh
-bGdvcml0aG1zOiB0aGVzZSBhcmVuJ3QgDQpnZW5lcmFsbHkgdXNlZCBvbiBsYXJnZSBhbW91
-bnRzIG9mIGRhdGEsIHNvIGl0J3MgbmV2ZXIgd29ydGggaXQgdG8gDQpvZmZsb2FkIHRoZXNl
-Lg0KDQpJdCB3b3VsZCBtYWtlIHNlbnNlIHRvIG9mZmxvYWQgYXN5bW1ldHJpYyBhbGdvcml0
-aG1zIGlmIHRoZXJlIHdhcyBhIA0Kc2VjdXJlIGtleSBzdG9yYWdlIGluc2lkZSB0aGUgZGV2
-aWNlLCBidXQgQUZBSUsgdGhlIEFQSSBkb2VzIG5vdCBzdXBwb3J0IA0KdGhhdCwgb3IgZXZl
-biB0aGUgbm90aW9uIG9mIG9uLWRldmljZSBjb250ZXh0cy4NCg0KSXQgaXMgbm90IGEgZ29v
-ZCBBUEksIGFuZCBpdCBzaXRzIG9uIHRvcCBvZiB0aGUgYWhhc2gvYWNvbXAvYWNyeXB0IA0K
-aW50ZXJmYWNlcyB3aGljaCBhcmUgYWxzbyB1bmZyaWVuZGx5IHRvIGFjY2VsZXJhdG9yIGhh
-cmR3YXJlLg0KDQo+IEZvciBvZmZsb2FkIHRvIGV2ZW4gYSB2ZXJ5IGZhc3QgYWNjZWxlcmF0
-b3IgdG8gbWFrZSBzZW5zZSwNCj4gb25lIG11c3QgYmUgYWJsZSB0byBkZWVwbHkgcGlwZWxp
-bmUgcmVxdWVzdHMuICBIb3dldmVyLCB0aGlzIGNyZWF0ZXMNCj4gYSBodWdlIGFtb3VudCBv
-ZiBhZGRpdGlvbmFsIGNvbXBsZXhpdHkgZm9yIHNvZnR3YXJlLg0KDQpTb2Z0d2FyZSB0aGF0
-IGhhcyByZXF1aXJlbWVudHMgbGlrZSB0aGF0IGlzIGFscmVhZHkgY29tcGxleCAtLSBpZiBJ
-IGhhdmUgDQphIGZldyB0aG91c2FuZCB3b3JrbG9hZCBwYWNrZXRzLCBJIG5lZWQgYSB3b3Jr
-ZXIgcG9vbC4NCg0KSWYgSSBkb24ndCBoYXZlIHRoZXNlIHJlcXVpcmVtZW50cywgdGhlbiBp
-bmRlZWQgSSBhbSBiZXR0ZXIgb2ZmIHdpdGggYSANCnNvZnR3YXJlLW9ubHkgc29sdXRpb24g
-aW4gdXNlcnNwYWNlLCBiZWNhdXNlIGl0IGlzIG5vdCByZWxldmFudCBmcm9tIGEgDQpwZXJm
-b3JtYW5jZSBzdGFuZHBvaW50Lg0KDQo+IEFzeW1tZXRyaWMgYWNjZWxlcmF0b3JzIGFsc28g
-ZG9uJ3QgaGF2ZSBhIGJldHRlciBhbHRlcm5hdGl2ZSBpbiB0aGUNCj4gZm9ybSBvZiBpbmxp
-bmUgZW5jcnlwdGlvbiBoYXJkd2FyZS4NCg0KUXVpdGUgYSBudW1iZXIgb2YgYXJjaGl0ZWN0
-dXJlcyBkbyBub3QgaGF2ZSBpbmxpbmUgZW5jcnlwdGlvbiBzdXBwb3J0LCANCmFuZCB0aGVz
-ZSBhcmUgbW9yZSBsaWtlbHkgdG8gdXNlIG9mZmxvYWQgaGFyZHdhcmUgZXZlbiBmb3Igc21h
-bGxlciANCnJlcXVlc3RzIChlLmcuIGZvciBwb3dlciBzYXZpbmcpLg0KDQo+IEkgdGhpbmsg
-YSBoaWdoIHBlcmZvcm1hbmNlIGludGVyZmFjZSB0byBoYXJkd2FyZSBjcnlwdG9ncmFwaHkg
-KGFuZCwNCj4gbW9yZSBpbXBvcnRhbnRseSwgY29tcHJlc3Npb24pIHdvdWxkIGxvb2sgbXVj
-aCBtb3JlIGxpa2UgUkRNQS4NCj4gVGhlcmUgd291bGQgYmUgYSBrZXJuZWwgZHJpdmVyIHRo
-YXQgZGlkIHRoZSBiYXJlIG1pbmltdW0gdG8gcHJvdmlkZQ0KPiBpc29sYXRpb24gYmV0d2Vl
-biB1c2Vyc3BhY2UgcHJvZ3JhbXMsIGFuZCBhIHVzZXJzcGFjZSBkcml2ZXIgdGhhdA0KPiB3
-YXMgcmVzcG9uc2libGUgZm9yIGFic3RyYWN0aW5nIG92ZXIgdGhlIGhhcmR3YXJlLg0KDQpP
-ZmZsb2FkIGhhcmR3YXJlIGNvbWVzIGluIHR3byBmbGF2b3VyczogdGhlIGhpZ2gtdGhyb3Vn
-aHB1dCBraW5kLCBidWlsdCANCmludG8gZGV2aWNlcyB3aGVyZSBubyBvbmUgY2FyZXMgYWJv
-dXQgcG93ZXIsIGFuZCB0aGUgDQpsb3dlci1wb3dlci10aGFuLXRoZS1DUFUtZG9pbmctaXQg
-a2luZC4NCg0KVGhlIGZvcm1lciBjYW4gZWFzaWx5IHByb3ZpZGUgdXNlciBjb250ZXh0cyBl
-dmVuIGluIHZpcnR1YWxpemVkIA0KZW52aXJvbm1lbnRzLCBidXQgdGhlIGxhdHRlciBpcyBn
-ZW5lcmFsbHkgZm91bmQgaW4gc3lzdGVtcyB0aGF0IGRvIG5vdCANCmV2ZW4gaGF2ZSBhbiBJ
-T01NVS4gRWl0aGVyIHdlIGhhdmUgdHdvIGRpc3RpbmN0IGludGVyZmFjZXMgZm9yIHRoZXNl
-LCBvciANCndlIG5lZWQgb25lIHRoYXQgY2FuIGhhbmRsZSBlaXRoZXIuDQoNCk15IGZlZWxp
-bmcgaXMgdGhhdCBubyBvbmUgaXMgaGFwcHkgd2l0aCBlaXRoZXIgQUZfQUxHIG9yIHRoZSAN
-CmFzeW5jaHJvbm91cyBpbnRlcmZhY2VzIGluIGdlbmVyYWwsIHNvIEkgdGhpbmsgdGhleSBz
-aG91bGQgYmUgcmVtb3ZlZCANCmNvbXBsZXRlbHksIGFuZCB0aGVyZSBzaG91bGQgYmUgYSBz
-ZXBhcmF0ZSAib2ZmbG9hZCIgU0lHIHRoYXQgY3JlYXRlcyANCm5ldyBpbnRlcmZhY2VzIHRo
-YXQgYXJlIGFjdHVhbGx5IHVzYWJsZSB3aXRoIGN1cnJlbnQgaGFyZHdhcmUuDQoNCiA+IDEu
-IEdldCByaWQgb2YgemVyby1jb3B5IHN1cHBvcnQgKHNwbGljZSgpKS4NCiA+IDIuIEdldCBy
-aWQgb2YgQUlPIHN1cHBvcnQuDQogPiAzLiBPbmx5IGFsbG93IHNvZnR3YXJlIGltcGxlbWVu
-dGF0aW9ucy4NCg0KVGhhdCBtYWtlcyBzZW5zZSBpZiB3ZSdyZSBmb3JjZWQgdG8ga2VlcCB0
-aGUgaW50ZXJmYWNlIGZvciBub3csIGJ1dCBpdCANCm1lYW5zIHRoYXQgb2ZmbG9hZCBzdXBw
-b3J0IHRocm91Z2ggdGhlIGNyeXB0byBzdWJzeXN0ZW0gaXMgY29tcGxldGVseSANCmRlYWQs
-IGFuZCBhbnlvbmUgd2FudGluZyB0byBzdXBwb3J0IG9mZmxvYWQgaGFyZHdhcmUgbmVlZHMg
-dG8gZ28gDQplbHNld2hlcmUuIENhbiB3ZSBnZXQgYSBkZWZpbml0aXZlIHN0YXRlbWVudCB0
-aGF0IHRoaXMgaXMgaW50ZW5kZWQ/DQoNCiAgICBTaW1vbg0K
+If you're interested, please send patches, and we'll see where things go
+from there.  We need to get more people helping with this stuff.
 
---------------4KG0OAh5fKrDahONrZhGK9sd--
+For (1), it probably should work like the way the zero-copy support was
+disabled in the 6.1 LTS kernel last year, where (I think) the splice()
+syscall still succeeds but it just copies the data.
 
---------------IAgX6DaXQhDJpK1phOpjNiIQ
-Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="OpenPGP_signature.asc"
+For (2) and (3), you can find examples of disabling asynchronous crypto
+API stuff at
+https://lore.kernel.org/linux-fscrypt/20250704070322.20692-1-ebiggers@kernel.org/
+and
+https://lore.kernel.org/linux-fscrypt/20250708181313.66961-1-ebiggers@kernel.org/.
+Note that to request a synchronous algorithm you have to pass
+CRYPTO_ALG_ASYNC (yes, really).
 
------BEGIN PGP SIGNATURE-----
+I think there are a few test scripts for AF_ALG in libkcapi.  Besides
+that AF_ALG is barely tested.  So you're in good company.
 
-iQEzBAEBCgAdFiEEtjuqOJSXmNjSiX3Tfr04e7CZCBEFAmn1s4IACgkQfr04e7CZ
-CBEdjAf/aIEKDJWbLJOV9o8KZ+gGbALiDwqce8bvf2XYzY27fgA56AbOTCnyo5Vn
-m3PG1cTINe5ZT7nYPEBGeYoHQ1fU1LQFm2N+NdJdLCd0UM1WEswHBQtrYcPrZDuz
-Tjgw67SAMsEplS3LaF9h7ve9/WkUwlNqKeHIhRLUCOg4SJD3iVfAq1k3IhleaX18
-W7Tk/Fs+Ve1nnUOUUf+ci08d2Zn7S9Eh1SasgJIYUEjKrRS9kCytyP3X+vntyk+n
-q87U+vVN3Map19L5Ybmqf+s45QO5KTIMzPoohEgm3gY1yt5Tc1RVdQ1XMMgO1o7y
-UNDO9OnH7OQFM2wDS4Y3UzxtEjIPmg==
-=/x7G
------END PGP SIGNATURE-----
-
---------------IAgX6DaXQhDJpK1phOpjNiIQ--
+- Eric
