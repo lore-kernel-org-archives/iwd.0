@@ -1,66 +1,66 @@
-Received: from mail-yw1-f176.google.com (mail-yw1-f176.google.com [209.85.128.176])
+Received: from mail-yw1-f172.google.com (mail-yw1-f172.google.com [209.85.128.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E4EF1C5D44
-	for <iwd@lists.linux.dev>; Sat,  2 May 2026 04:53:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFEDD285CB3
+	for <iwd@lists.linux.dev>; Sat,  2 May 2026 06:39:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777697585; cv=none; b=ucaSqw/zcyU1xh2Le9A0NADeTApAr468ostcFh7YcQUJIEO1PnrP5bpfyZ4HOZmduZC3K0paLqzFHvU0WcNtlmLeVWeJgEndixXVzZGLuFKI3WfQF8dbdId8fDFa3yRZ8b60mWcT524rHdD2c69C29m3Jo2KwbZOhkq8atnvKRU=
+	t=1777703961; cv=none; b=P6lPetZw51dWv7fM4Btc7Z582BwlS+rCKA7eslmMCWgzxAAPUqo6InYqKQ61hmL19stvJIqxtgG+Z3+rZ8k1Ud0pmu7A3nkLu8cSQmz/TgOHMPvgCNb6iam0vk4L2OTjRmZebh1SzwO1T2DnnG5Jn+7AtaNZVUgUDj+P3PsDPd4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777697585; c=relaxed/simple;
-	bh=HiY+v1DKD/WBjm9b5cc9itU66gwuP58YNcVOauImPpI=;
+	s=arc-20240116; t=1777703961; c=relaxed/simple;
+	bh=EL4nyw6IVyJbNDQMYkkze6xuVLcPdmGcqmhAaNR5HQM=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Dm7jvO2az+xCQqmFYSIGhAvuxlsQdAIN8f9m0aAjNQiKlJJkh3nLHlBtnt0nS1SN39REYpHlZx4sy+4UgaR+2GGYDy40u9zVeeQIs91cKD4IvSGRElMONwzBJhrMUkF73Uygf9r1BswsIejiNSSMD/nNRRtyRd8NqZ6uY+DTzMs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VHy5s6Gs; arc=none smtp.client-ip=209.85.128.176
+	 In-Reply-To:Content-Type; b=GthaACZ1lkVtXdY/u1BvDGQl60Z/T3E8sWFuYR2fnnnaTa8Dv6S4j9sTBrz2skDBVJ1FmWFbiFIEpZvClvBUEJi+pNAczezDoQgm3/sryviBua2IKlIenkFKNKwOWZDRCJCgcVSpTwExDJLSVypFcjSxLnU1nIGVo5mQVgkTGAI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fDw7TNj2; arc=none smtp.client-ip=209.85.128.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VHy5s6Gs"
-Received: by mail-yw1-f176.google.com with SMTP id 00721157ae682-7bd5c773ef3so27703497b3.1
-        for <iwd@lists.linux.dev>; Fri, 01 May 2026 21:53:04 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fDw7TNj2"
+Received: by mail-yw1-f172.google.com with SMTP id 00721157ae682-79a7109f568so30166427b3.1
+        for <iwd@lists.linux.dev>; Fri, 01 May 2026 23:39:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1777697583; x=1778302383; darn=lists.linux.dev;
+        d=gmail.com; s=20251104; t=1777703959; x=1778308759; darn=lists.linux.dev;
         h=in-reply-to:autocrypt:from:content-language:references:cc:to
          :subject:user-agent:mime-version:date:message-id:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=N2gVkIfjsknltC0xE8H6x/Xyy8JmuJweFw968jDDmkY=;
-        b=VHy5s6GsYksHoSEN3QdUtfoaNpf+jrklz4/cpbXTRHvorAPZ9kV1845BqFqXQfabz0
-         eSvMcneUbmfpbMCoIVvZ4seNxYXlLM2i6cpMvspeOYPDzxIFnDcvh+8pfIkTP6gU9xaD
-         8Xk8Edm47AeI8sy+Qg3J5KrrNQCS7CakEiNMGgtKOPgmySo5hHgriOgVIlj/S1UAdKC1
-         XBoz6uYDuWPnV1yC1z4TmrEo7NiCKyzMGsreDfmim++ZSKaOqNc7RMdyyEY+F0SwFPW4
-         iRSNHLH/3nFAaObHiWncoXBs/WtTtaJ9BtPMnzCPTxL35AMUMwZ3JGMYox9f6xd5mFAc
-         HIyw==
+        bh=rqhqMnCCBdrPFw7Bwf0aElntKkQIugZJFk9wbkr6K10=;
+        b=fDw7TNj2MOJVs5VT1ZPWx9P94Nj+tf+5gYGdvyu/BS/+MmXQashtPD7ArTURAXK1m5
+         u77/dhXP3xrfz8zLUmOM7ZZlM+65dYmw7FtXy4g0/vjztPFmqFncf3JWaiKCRvE1jpjJ
+         ZutdypuO9ILkaDkp8UMfGoJPafAcGaDleTDfhs0sg6KDtR2dE1j3lvJkwTUgQtCM75it
+         Xyu2k5DkfdKPNRXHy5/4AiDYVpEPLeIUpr3yKszpw7uI+NoT0K+xz4FmGE4Br7kMQoom
+         9lcilH/ZtPikx6EjkjPMLbdakXNeBImt59msC+8/pOYD8XJvXfhaNts7jz0E9pS2/2QR
+         XrYA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777697583; x=1778302383;
+        d=1e100.net; s=20251104; t=1777703959; x=1778308759;
         h=in-reply-to:autocrypt:from:content-language:references:cc:to
          :subject:user-agent:mime-version:date:message-id:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=N2gVkIfjsknltC0xE8H6x/Xyy8JmuJweFw968jDDmkY=;
-        b=seQml3aWbglKDAQgmpj2G1fISqje8YSXM6S81VB2zUonNS3UbS1UA6SrXVMDSTgocA
-         n4g51eZoilUeHclMTubyNOel3xewndXVYmnDnDLw+ZY3YZp+SiHL/9b2Z+gWFc6VS9tj
-         9BK1Er80K4hMCMobzqiwkqd1RYDwB08wDnn+bEV+WWxhXfjHiEziv4RWWQYH4Wr1KIij
-         6yrrXL8viMWHjIdkU0irKWqqJmv3IbKw5YJY2ktyvy1ijUS6QNfvJXMDfXQkervl1mlc
-         HWsE1DCLFaXwsVuu3Rp1nwVR0yiXv4Cv4jmTxyPMeWLDqEwPoxDkYVwd5TlM2/CwPjuI
-         Tx1w==
-X-Forwarded-Encrypted: i=1; AFNElJ9dywxyXgbUMYHbxTQax2SGeD5FGLZB4O8wCDuNIoTkCAacUrGxqMTtkazsYM7XvBoPtzk=@lists.linux.dev
-X-Gm-Message-State: AOJu0Ywg3h6g0t9v+4ZNsQ/DJ3Rme7jv8yk8AKugUQtBZ7eVNTxd2fb+
-	S1ZtM8topRrwerdg92hKJu0/I/1AFmx8fc6mz6Ut+5fRgNqvaePhc9UU
-X-Gm-Gg: AeBDietpJY2QUvDZvl/RgTt5BHEhVJVlpKdUbak0UT0BJaWw3+1BKmm+BGHPum4Q5Yt
-	YXB6Yks2D7ffFsnHllgsThq3NVS+cTJahuMN1P2t18yAY+GvvvqzIYg5k+v4Y5uYOByv08ImqBQ
-	oOeFyYfvNUa/OrqcH8CSYSKQdiGdoAQC44yPHmY+ht3O1bl9XN6ZAgGjzJNcn2joOgpnSkhuppc
-	Nnltv3GxEDdMJkrxDdXcr9MPaDeAk/4UgY12W0kPe8avjFHKcVpLWfiFPMpz7MSrhY8IUbCvAvs
-	NmcQB+8noAG2witgmsr8YHyovP8omQ7+JSF0SQuf8qStGLKmghfryccQf9sCG6/t6bktu+kmOtX
-	YaaHHFXP14CIHzlpTp3woTHZVa7ptwbMe2AgyLmmIUz6AQIE4KS0jm8dGp2cu9j4cRPnfsRw7lC
-	us/INkbod5MzfHPW6/eLwITYdE9kXrXaNvdsBR2irMH6TwyPwIaAy+6G1cUnnjy7UhQ8IRVSn3Q
-	5zcWOLE+y3V2dAWUYohG1qkjdbj3gQzTBc9Vr6c2yBPY5GB39x9MJhqgBd2Z1U=
-X-Received: by 2002:a05:690e:418d:b0:658:509a:754f with SMTP id 956f58d0204a3-65c3da72fcbmr1809203d50.18.1777697583241;
-        Fri, 01 May 2026 21:53:03 -0700 (PDT)
+        bh=rqhqMnCCBdrPFw7Bwf0aElntKkQIugZJFk9wbkr6K10=;
+        b=DEEbMW9DnndUl4r4n10HyfUPN3y4qq1JopzT0abViZlaKHHYEirQDTcpd+XBmkstri
+         2dMXOXYdm636Dzqp/GCR3Gl4ze7YV/NKqK1hqSiZM/wFkHo16ffngi1GeSAxOITj53bJ
+         WV989azmcA2DqxuxoTWoLMV7yUOn9rpVmlMlggu6sbemXPW6nAz1Z1hDBvvTl1estEuB
+         tNYMnPjPW9pTSdhsvH5b6Np9zEmdKgysHM8eLH9i6KkjbVZuueoRyqSm5EUv+g9cGGq8
+         F29d7UrCglRlByq2WDwrtbIQ6YmIKAsYdId+0Diks1F9vcuz7koOWKq2ixXAwzIXHo+E
+         7KKw==
+X-Forwarded-Encrypted: i=1; AFNElJ86s1vQwxSG74cBotgLVtBqsosScKJUTNwA+/h8rnTLm96uhjLs/JONOF+kbFc4TtdGCXA=@lists.linux.dev
+X-Gm-Message-State: AOJu0YxE0uMhgMVtNhYmcBB9DuAxKwACwNCNssOWZU+ts9sB2ca7mr0b
+	jsxQppFi/VCHF4KZRn+Jmf2TINi8dhkTIDdRHO9NpZGbNLrxcFTC95KI
+X-Gm-Gg: AeBDiev4sYC0Un8ZP3mVcLuOARah3862RVr9FbkH5mHBH2EUAeyxh5shCHzzPvaCxTc
+	ShSZEFhr3+gyht8VuMRU+nGja1ryU4dpyTmjNgLY9eTRZHSOLksyWk6akPRyHCXR+5gTdzlc/t2
+	VpVCK77AyvsWTXIe9kvRVGW0HZ2EocVzv8Z+c1BjVODcteWccnsGFVvTp2sZs7gaumNU6ojbCOC
+	1tB6Ed7T2rg2CYDTuB81d5IxrYpIi3Jvm9Hoa6VZAbZMcOMSfwhlWxn8REfIEwoJfdCVIyL8hEA
+	7KO4wo2P0vm49jIr6saihl9j6w1UkX3bAlyEHeFnyOVl6IqqN4Qt5885ZidhAumy4yp2MTxyflG
+	aHDwLVSbzbD1T25yG09S5IKAfXTmNF/QMjBgzNvMOzgYubkDecw26ubmTOd6mTRfUL+BkfoWb6f
+	e/z4svtIC/5WD4ZkSaqE7gOq2vRZ1DUORCnuY7fmwpKjgIEjm9PD1FmHp98S56xOTCLzhTV2xJz
+	ZA+dDuop/HPYJYde1bc2Gm/lYfOb8i9fQ5jO6bvJqoBHgqhRCvBtbNaVHlTHLo=
+X-Received: by 2002:a05:690c:94:b0:79f:3715:1980 with SMTP id 00721157ae682-7bd76f759bcmr24651517b3.12.1777703958603;
+        Fri, 01 May 2026 23:39:18 -0700 (PDT)
 Received: from [10.138.34.110] (h69-131-150-190.cncrtn.broadband.dynamic.tds.net. [69.131.150.190])
-        by smtp.gmail.com with ESMTPSA id 956f58d0204a3-65c2dc81614sm2217169d50.0.2026.05.01.21.53.01
+        by smtp.gmail.com with ESMTPSA id 00721157ae682-7bd66838851sm20893087b3.23.2026.05.01.23.39.16
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 01 May 2026 21:53:02 -0700 (PDT)
-Message-ID: <3cc88b2d-fbd6-4e47-b82c-3c685fec0581@gmail.com>
-Date: Sat, 2 May 2026 00:52:57 -0400
+        Fri, 01 May 2026 23:39:17 -0700 (PDT)
+Message-ID: <378c2ca2-417a-4969-bda5-b7d3f3e8b6fd@gmail.com>
+Date: Sat, 2 May 2026 02:39:12 -0400
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
@@ -68,19 +68,20 @@ List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: AF_ALG hardening
+Subject: Re: [oss-security] CVE-2026-31431: CopyFail: linux local privilege
+ scalation
 To: Eric Biggers <ebiggers@kernel.org>
-Cc: Jan Schaumann <jschauma@netmeister.org>, iwd@lists.linux.dev,
- Linux kernel mailing list <linux-kernel@vger.kernel.org>,
- linux-crypto@vger.kernel.org, Herbert Xu <herbert@gondor.apana.org.au>
-References: <afJorKIje4O6dXbH@netmeister.org>
- <d6111caa-db61-498a-92cb-ea7a0aa0a5e2@ehuk.net> <87se8dgicq.fsf@gentoo.org>
- <afL-QhLfEKqHZqka@eldamar.lan> <20260430071917.GB54208@sol>
- <177abb5d-8ba9-4bb9-8b23-9fbc868ed3cd@gmail.com> <20260501180028.GA2260@sol>
- <19837ef5-e5b6-45f4-8336-3ce07423dfb1@gmail.com>
+Cc: oss-security@lists.openwall.com, Jan Schaumann <jschauma@netmeister.org>,
+ iwd@lists.linux.dev, Linux kernel mailing list
+ <linux-kernel@vger.kernel.org>,
+ Linux kernel mailing list <linux-kernel@vger.kernel.org>
+References: <d6111caa-db61-498a-92cb-ea7a0aa0a5e2@ehuk.net>
+ <87se8dgicq.fsf@gentoo.org> <afL-QhLfEKqHZqka@eldamar.lan>
+ <20260430071917.GB54208@sol> <177abb5d-8ba9-4bb9-8b23-9fbc868ed3cd@gmail.com>
+ <20260501180028.GA2260@sol> <19837ef5-e5b6-45f4-8336-3ce07423dfb1@gmail.com>
  <20260501201841.GA2540@quark>
  <c13dd3c5-ddc1-431e-bc7d-2de39c551f8e@gmail.com>
- <20260502033556.GA3872267@google.com>
+ <20260502033556.GA3872267@google.com> <20260502035402.GB3872267@google.com>
 Content-Language: en-US
 From: Demi Marie Obenour <demiobenour@gmail.com>
 Autocrypt: addr=demiobenour@gmail.com; keydata=
@@ -126,32 +127,33 @@ Autocrypt: addr=demiobenour@gmail.com; keydata=
  vUSQHSrmfOzX3cV4yfmjM5lewgSstoxGyTx2M8enslgdXhPthZlDnTnOT+C+OTsh8+m5tos8
  HQjaPM01MKBiAqdPgksm1wu2DrrwUi6ChRVTUBcj6+/9IJ81H2P2gJk3Ls3AVIxIffLoY34E
  +MYSfkEjBz0E8CLOcAw7JIwAaeBT
-In-Reply-To: <20260502033556.GA3872267@google.com>
+In-Reply-To: <20260502035402.GB3872267@google.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="------------p5k4rdbY20lqpc67cllIPb6S"
+ boundary="------------7PIbKdKeDXQjhm2w42Zf0Tmq"
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---------------p5k4rdbY20lqpc67cllIPb6S
-Content-Type: multipart/mixed; boundary="------------L4s5YiQ9zEwp0Xqdi5txe3o6";
+--------------7PIbKdKeDXQjhm2w42Zf0Tmq
+Content-Type: multipart/mixed; boundary="------------mQ7IR4PhkI00BTbCxQbHmE9P";
  protected-headers="v1"
-Message-ID: <3cc88b2d-fbd6-4e47-b82c-3c685fec0581@gmail.com>
-Date: Sat, 2 May 2026 00:52:57 -0400
+Message-ID: <378c2ca2-417a-4969-bda5-b7d3f3e8b6fd@gmail.com>
+Date: Sat, 2 May 2026 02:39:12 -0400
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: AF_ALG hardening
+Subject: Re: [oss-security] CVE-2026-31431: CopyFail: linux local privilege
+ scalation
 To: Eric Biggers <ebiggers@kernel.org>
-Cc: Jan Schaumann <jschauma@netmeister.org>, iwd@lists.linux.dev,
- Linux kernel mailing list <linux-kernel@vger.kernel.org>,
- linux-crypto@vger.kernel.org, Herbert Xu <herbert@gondor.apana.org.au>
-References: <afJorKIje4O6dXbH@netmeister.org>
- <d6111caa-db61-498a-92cb-ea7a0aa0a5e2@ehuk.net> <87se8dgicq.fsf@gentoo.org>
- <afL-QhLfEKqHZqka@eldamar.lan> <20260430071917.GB54208@sol>
- <177abb5d-8ba9-4bb9-8b23-9fbc868ed3cd@gmail.com> <20260501180028.GA2260@sol>
- <19837ef5-e5b6-45f4-8336-3ce07423dfb1@gmail.com>
+Cc: oss-security@lists.openwall.com, Jan Schaumann <jschauma@netmeister.org>,
+ iwd@lists.linux.dev, Linux kernel mailing list
+ <linux-kernel@vger.kernel.org>,
+ Linux kernel mailing list <linux-kernel@vger.kernel.org>
+References: <d6111caa-db61-498a-92cb-ea7a0aa0a5e2@ehuk.net>
+ <87se8dgicq.fsf@gentoo.org> <afL-QhLfEKqHZqka@eldamar.lan>
+ <20260430071917.GB54208@sol> <177abb5d-8ba9-4bb9-8b23-9fbc868ed3cd@gmail.com>
+ <20260501180028.GA2260@sol> <19837ef5-e5b6-45f4-8336-3ce07423dfb1@gmail.com>
  <20260501201841.GA2540@quark>
  <c13dd3c5-ddc1-431e-bc7d-2de39c551f8e@gmail.com>
- <20260502033556.GA3872267@google.com>
+ <20260502033556.GA3872267@google.com> <20260502035402.GB3872267@google.com>
 Content-Language: en-US
 From: Demi Marie Obenour <demiobenour@gmail.com>
 Autocrypt: addr=demiobenour@gmail.com; keydata=
@@ -197,129 +199,39 @@ Autocrypt: addr=demiobenour@gmail.com; keydata=
  vUSQHSrmfOzX3cV4yfmjM5lewgSstoxGyTx2M8enslgdXhPthZlDnTnOT+C+OTsh8+m5tos8
  HQjaPM01MKBiAqdPgksm1wu2DrrwUi6ChRVTUBcj6+/9IJ81H2P2gJk3Ls3AVIxIffLoY34E
  +MYSfkEjBz0E8CLOcAw7JIwAaeBT
-In-Reply-To: <20260502033556.GA3872267@google.com>
+In-Reply-To: <20260502035402.GB3872267@google.com>
 
---------------L4s5YiQ9zEwp0Xqdi5txe3o6
-Content-Type: multipart/mixed; boundary="------------5386RJHO01h5HUIu4VD0WVke"
+--------------mQ7IR4PhkI00BTbCxQbHmE9P
+Content-Type: multipart/mixed; boundary="------------8OKNP38DwftwKdjRr92LVtl4"
 
---------------5386RJHO01h5HUIu4VD0WVke
+--------------8OKNP38DwftwKdjRr92LVtl4
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 
-On 5/1/26 23:35, Eric Biggers wrote:
-> On Fri, May 01, 2026 at 08:21:27PM -0400, Demi Marie Obenour wrote:
->> I think the single biggest hardening win for AF_ALG would be to move
->> to the crypto library.  The recent CVEs you mentioned mostly seem
->> to relate to the crypto API, and with a hard-coded list of allowed
->> algorithms there's no need to use the crypto API anymore.  I'm not
->> familiar enough with kernel code to do this easily, but for anyone
->> with basic knowledge of the existing code it should (hopefully) be
->> straightforward.
->>
->> In the meantime, only using synchronous algorithms and not using
->> hardware drivers would also be a useful simplification.  The latter
->> would make it especially clear that AF_ALG is deprecated, because
->> its one potential advantage (being able to use hardware acceleration)
->> would no longer be present.
+On 5/1/26 23:54, Eric Biggers wrote:
+> On Sat, May 02, 2026 at 03:35:58AM +0000, Eric Biggers wrote:
+>> So the idea would be something along the lines of:
 >=20
-> The kernel's crypto library
-> (https://docs.kernel.org/crypto/libcrypto.html) does greatly simplify a=
+> And just to make sure no one gets the wrong impression: just because
+> there seem to be ways in which the attack surface of AF_ALG could/shoul=
+d
+> be reduced doesn't mean that userspace should keep using it (or even
+> worse, start to use it).  Fixing programs like iwd needs to proceed
+> concurrently, so that eventually (some years down the line) the problem=
 
-> lot of kernel code that needs to use crypto algorithms.  Yes, AF_ALG
-> doesn't use it directly yet.  Currently AF_ALG puts all the data in
-> (zero-copy) scatterlists, then invokes the "traditional crypto API"
-> which is very complex and has full scatterlist support, asynchronous
-> execution support, an algorithm template system, etc.  In some cases th=
-e
-> crypto library is then used internally, but it's not called directly.
+> can finally be fully solved by removing AF_ALG from the kernel source.
 >=20
-> So the idea would be something along the lines of:
->=20
-> - Add an algorithm allowlist to AF_ALG.  It would include only what the=
+> - Eric
 
->   small set of userspace programs that uses it actually needs.  Bizarre=
-
->   stuff like "authencesn" wouldn't be included.
->=20
-> - Change AF_ALG to make it copy any data written to an AF_ALG file
->   descriptor into an internal kernel buffer.  Put the output in another=
-
->   internal kernel buffer, then copy it to userspace.  No zero-copy, and=
-
->   no scatterlists.  Both restrictions would greatly reduce the chance o=
-f
->   bugs: the actual crypto algorithms would operate only on these
->   internal buffers, not on pagecache data (e.g. the contents of 'su') o=
-r
->   buffers that userspace can concurrently modify.  The use of simple
->   virtual addresses would eliminate all the scatterlist complexity.
->=20
-> - AF_ALG would implement each algorithm by invoking the corresponding
->   the crypto library functions
->   (https://docs.kernel.org/crypto/libcrypto.html#api-documentation).  N=
-o
->   asynchronous execution, no buggy hardware crypto drivers, etc.
-
-Yup!  That's exactly the idea.
-
-> It sounds good to me.  For people who feel like the su binary on their
-> system is a bit too restrictive and would like to fix that, these
-> changes might not be all that great for them.  But for the rest of us,
-> they should work rather well.
->=20
-> Of course, it'll also be a fair a bit of work, and unfortunately I also=
-
-> expect pushback from people who (incorrectly IMO) think that AF_ALG
-> performance is important, even moreso than security.
-
-If one cares about crypto offload performance, they would be better
-served by creating a better interface to it than AF_ALG.  AF_ALG is
-a horrible API with (presumably) tons of overhead.  I know the QAT
-driver and an Nvidia BlueField DPU accelerator driver both bypass it.
-
-Furthermore, AF_ALG only supports symmetric algorithms.  These
-algorithms are inexpensive in software, so the cost of going to an
-accelerator and back is enormous compared to the cost of a single
-operation.  For offload to even a very fast accelerator to make sense,
-one must be able to deeply pipeline requests.  However, this creates
-a huge amount of additional complexity for software.
-
-On the other hand, asymmetric cryptography performs far more work per
-operation.  This might (no benchmarks!) mean that offloading asymmetric
-algorithms makes more sense than offloading symmetric ones.  The cost
-of sending the work to the accelerator and waiting for completion
-is less than the time needed to perform the operation, so even a
-synchronous interface could still be faster than running the algorithm
-on the CPU.  Furthermore, long-term keys are very often asymmetric,
-so DPA and EMA protections are much more likely to be relevant here.
-Asymmetric accelerators also don't have a better alternative in the
-form of inline encryption hardware.
-
-I think a high performance interface to hardware cryptography (and,
-more importantly, compression) would look much more like RDMA.
-There would be a kernel driver that did the bare minimum to provide
-isolation between userspace programs, and a userspace driver that
-was responsible for abstracting over the hardware.
-
-> Either way, the first step will be to create the algorithm allowlist,
-> which should happen anyway, regardless of the other changes.
-
-The simplest changes I can see are:
-
-1. Get rid of zero-copy support (splice()).
-2. Get rid of AIO support.
-3. Only allow software implementations.
-
-All of these are really simple.  I can send patches, but be warned
-that they would only be compile-tested, as I don't know how to test
-the code.
-
-I removed oss-security from CC as this is now a Linux kernel development
-discussion.
+Can AF_ALG be emulated using LD_PRELOAD?  That would allow it to be
+eliminated from the kernel much more quickly, as one would not need
+to get rid of all of its existing users.  It would even work for those
+who need AF_ALG because of closed source binaries, who otherwise will
+have no alternative other than running an old kernel in a VM.
 --=20
 Sincerely,
 Demi Marie Obenour (she/her/hers)
---------------5386RJHO01h5HUIu4VD0WVke
+--------------8OKNP38DwftwKdjRr92LVtl4
 Content-Type: application/pgp-keys; name="OpenPGP_0xB288B55FFF9C22C1.asc"
 Content-Disposition: attachment; filename="OpenPGP_0xB288B55FFF9C22C1.asc"
 Content-Description: OpenPGP public key
@@ -439,30 +351,30 @@ EtJuZYM5blWncBOJCoWMnBEcTEo/viU3GgcVRw=3D=3D
 =3Dx94R
 -----END PGP PUBLIC KEY BLOCK-----
 
---------------5386RJHO01h5HUIu4VD0WVke--
+--------------8OKNP38DwftwKdjRr92LVtl4--
 
---------------L4s5YiQ9zEwp0Xqdi5txe3o6--
+--------------mQ7IR4PhkI00BTbCxQbHmE9P--
 
---------------p5k4rdbY20lqpc67cllIPb6S
+--------------7PIbKdKeDXQjhm2w42Zf0Tmq
 Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="OpenPGP_signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCgAdFiEEopQtqVJW1aeuo9/sszaHOrMp8lMFAmn1gyoACgkQszaHOrMp
-8lOb8RAAk2MwBn60oQE6fVHII5srIVEVJWOjtHl6mpxfnl3sh/AfiirP4Xh60kRX
-qwxhym2E29EzrbAqJ8Xudr7Lr/TTlipTSFDi6hJVOVwM8IF/ycakBvSelW3y6qsA
-Y2+3x+K3h3cbd9cMRPzPmEUmCfwBgRQuIkV6TMnAMPTQ28LMwrZNm5rkwl+szV9a
-4BpcvKAQ1yFZdvl8/YRKT4iyQk6t1pxyvvYQ7/eqR9lTnoNVeYYWdzQfB4WwiqnY
-CIKh/mJCkK+cD6rgcQXNYPjLD5+OB8uLeDKoq4+J6wYTAsSxhUFJQI18pQSi1n6i
-sOs5mDlGec79Ac8kzlArVJnbC27oOonw3yjDuwTz8pysB5CdjIFE2MpNrlfhRVB8
-hd9Grd8GnZR4rwPLdVfQTy1FhgDEwhVGsQVaoZWtExcjzkIWMPTgr6TbHqcHWVcO
-SGBr8K0sTXXYteNhVObf5nv+JlAhHA5yVPFHX6yFNBaqLxUILa6LW71uvRRs3JSp
-SLUOeHyUk9tAHwFTBSFBjkoz6HuDwGSB3FkA76mMBTtsTQJGGO7HFCFhZDPJr1VC
-3uzlWc2dOxepIVnSXgGr2OqdFyHG3pbFN5+ANE1qPubPO7S5A9xvoVrnJkZOOpxh
-3U04ooQhmDCMsWBmJOVDIGNvcY6k1A/tiPbxG5hSN8y9SdOpsVM=
-=0ns9
+iQIzBAEBCgAdFiEEopQtqVJW1aeuo9/sszaHOrMp8lMFAmn1nBEACgkQszaHOrMp
+8lMYsxAAjEnPo+Z3ljaM0alUlZAxdZ2cSHbSJW+u9JrzoIooK6D2E55MTLtu7yB0
+v1ychFYfU5/khgXe9L6bYdd7Tfdsz+fmtMh7QLODfGekYhD+x+dPtLKNZdT9FRh4
+PePN7SA+uDChEBQ4QXj+MgEAWehQ8jKQP2cjYT98rC2AcPhBZpS/T2oeBKTLS8dj
+QCQIz+kPFaLTSI3gvc4uqAi2lMIEV2JXA3HE5/rdIF55ZJ9Yg2eyHOv4+51GBwYa
+MZVliUhgLCaknAejSYm99gLvkEvIAQKBzH3KyRsTIGqpQ04Wv0+QkSZR5ZFLKuWw
+mPA18q8hdYcLahg6jxpF2USuQKYR5d917BOrx4LGpNKFBcEH7AGgysYXPBisFRR5
+Lqx3mGDiKE688jyKsG6Hq/OZQKNu8YxRl4cxFciBCZj1wp3wv9EIqo0dDIuoKuer
+L2gxKpvGpUq8ilr6BGe/MjlXjA+m443cBkuzBc5J7vrMhcH6wuja23qyhR20k+/t
+jgDGubgNzah8QTEx6GbUqBmKfGQm87wKGM5PQHzXTRnVpoLnSeFSk0Idlq3c148C
+0CvaC7UWSzvud08/w04S/KtXtSPkC5NJjOAL+NCqT2EleuFCDFPWhLerEBtFWuc0
+u460km788d5IYuZ6Tt76cXYvTfe0P13JlWw+R1hcJR5k9S8gVs4=
+=l8sM
 -----END PGP SIGNATURE-----
 
---------------p5k4rdbY20lqpc67cllIPb6S--
+--------------7PIbKdKeDXQjhm2w42Zf0Tmq--
