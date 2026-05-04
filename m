@@ -1,67 +1,27 @@
-Received: from mail-qk1-f182.google.com (mail-qk1-f182.google.com [209.85.222.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from psionic.psi5.com (psionic.psi5.com [185.187.169.70])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A70EA3D7D8D
-	for <iwd@lists.linux.dev>; Mon,  4 May 2026 12:58:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 902182701CF
+	for <iwd@lists.linux.dev>; Mon,  4 May 2026 19:02:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.187.169.70
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777899525; cv=none; b=b9A0pMD5Ak1omUCNDrCLLGYXdlSuoab8g6UbaaA8fDa9YZS1HZ6IFmGw3ThjlaOp4S+4pQljc0UrDapFjzKMKVo6x5g2HBE/VmR3bcmZy+ZT9xqjYPRRfcZxeVsI8iSzy/+BonjMHeWUGygDW6e3dDiUN/nLzwq0AJJsIi0284s=
+	t=1777921326; cv=none; b=hDFWT9fmdw8JXE5/CCasz1uJeOmmM0qlZDqZxnHAa4nxAqrn9K47FnRZR3LrtgH7P0canvwfLTZ5v5AL90ySX5v2lKt26ApGeXl7X+64UtdQKN5fwFqA28aNxf+7QnSacoDmoWtyukA0UrwzcoRSOKoFmA3FMMVfrKCRbn4oh0c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777899525; c=relaxed/simple;
-	bh=NmoK00K18ee0KWR0BRNW6Sy1q35LGoXy6wYg8Lac6Ro=;
+	s=arc-20240116; t=1777921326; c=relaxed/simple;
+	bh=iWe6Y+xyF45vq/FxdmErkqhFwGiMJTev/y2U1X58V5g=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=PddRpRWJGlXTYI+t0Q2eXXJhDql1aQn1636QojDNnSQuOT04QCbyS7EGqB4fkY8uaWO/AG7WMPTZrRpl/i8BPkSB2kdXWLFcnj6bLllvxH/QFCiY7MjFB4a1EQhAp6hwDhPT8NuFCtEl+X2JwcedZIR054NH73VYiK4pEmjSjGw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=pKyhnEh6; arc=none smtp.client-ip=209.85.222.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="pKyhnEh6"
-Received: by mail-qk1-f182.google.com with SMTP id af79cd13be357-8f231f3b130so277904585a.3
-        for <iwd@lists.linux.dev>; Mon, 04 May 2026 05:58:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1777899523; x=1778504323; darn=lists.linux.dev;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Ypd1QBD8IL5nEI5wKW5JxIvcEM/x3rJY8yhwAEDZ758=;
-        b=pKyhnEh6j6UDUX/l18jSMyzHoE799u3+YCMlAYC5TF6EUna5yORk4Cp8eztM0aC8V/
-         IdeMYCslt6wHDGdrySUom+d/cAZxMlXmJgzCLfEavV3YlIVnhpAoicxookSGhRIrncIM
-         v3hBFQmAgfhd8W1oKfleTzum4b/AmTDlOdUcPq+hfjswBLnZznn6aFhMRiQF2lQ4R74L
-         OK1b3GMaMABKva3Nizv9jriaXDgCUlsHO5+wPRMaFmSa/6gxtufATnjhJEq9VlHUn6gk
-         gO+Z1cfXrvwsBR4wNX02PnCV8On1qpK6Me8ONQs4yDhM6n3LfHYCMXMEiRKxZ3AD/HQ0
-         GjPw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777899523; x=1778504323;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Ypd1QBD8IL5nEI5wKW5JxIvcEM/x3rJY8yhwAEDZ758=;
-        b=FvHrEg6Fkrh93AtTEhxqd7lvmOh+pQV/wwgdCO6lZUi9szxOHj7UceokR9ExJZxlaS
-         jPZO2XMuMlUcDj/2ojawFGQY2aFx4/5GZXGvfHcpSVd7oRZQ6CDz7SAjSE1pbJIpCtmq
-         iq+UXqU2QZ1xEdPFUvoir/fIxwIr148w9jcpJ84iM5e/Uu/iIb8ktIQ8VMA99BN8JNG9
-         SWGa0lr2uAQZ3Ynom2NfNCNvk2I0FzHUDyvexulJadfoz2pl3Z7uJXT3j+DNpRRo62nb
-         olaKfxqOnz+WpSVVsPGb4l0bEN5hdWQWxDFEyYjrdXLb+us8mF1Oh6opxTiz/4j5xDOY
-         hpzA==
-X-Forwarded-Encrypted: i=1; AFNElJ+tQP9P+D4kWdLlQGcgRXo+KOAxz8t2KrPTH0k9sZt1kgmqPrtmW5MrxS2h67zzygCT9S4=@lists.linux.dev
-X-Gm-Message-State: AOJu0YzjiX9J+5hrJ7iSzdsn95LfgqzirO/QCFDNrxHSURis/9tyiCHL
-	c9snf3fCVjKvwoCaka5Ph2hp3yAIoGvcnmI2fY+jXTGehVScc4hUUBlW
-X-Gm-Gg: AeBDievtm8QoxdCprBdAmeYCEhrfui3mOqCfUJB+rYMzkq+Fzd8bq6vd0c20LSiB78i
-	zPKazS0m1KH1svDNP1pdJMskomkRDnvMLuJItb/uf/+oBWVphYbP8q50zTJGE9J+xD/1T/hBdxJ
-	6TKId18fA7bPA9/GWpPLTOvD70kXNxBJL9+48uFeLtCxxbRvPv47FBpke428uS9+A8Q+TuaapUO
-	BqeRf3J3xFPVCpyP+k1G1UqAGQpxwMZL0XXXP2eQyIyKYtb/pAoJRbG8piErc2wSZaEL1UT4oXW
-	YDjCbh3SovQ4mrawK2SC2Zpl7A7Z2mSyYbVooBXab3tRScPmWToqQwO5mu8EZx+8Xul7GvyA7Ci
-	jUl6T3eaStzg2dQSGQ5QghuJgKejik/vH72dLlgetofBj0VhzMBX9G0we4svh83wxyCQ6lnCDVf
-	uquEvKQWW2qz1wMKTOVqMSxEaw9ZbapZfIU7EOgThpY4oL6s75mOrcnfy/DjeBW9GXxlpDeUObc
-	A31pZc=
-X-Received: by 2002:a05:620a:4010:b0:8ed:c0bf:2c24 with SMTP id af79cd13be357-8fd19122e53mr1413514585a.62.1777899522542;
-        Mon, 04 May 2026 05:58:42 -0700 (PDT)
-Received: from [10.100.121.202] ([152.193.78.90])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-8fc2c91cd7dsm1031615585a.37.2026.05.04.05.58.40
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 04 May 2026 05:58:42 -0700 (PDT)
-Message-ID: <bcbbef00-5881-421b-8892-7be6c04b832d@gmail.com>
-Date: Mon, 4 May 2026 05:58:39 -0700
+	 In-Reply-To:Content-Type; b=fdwGML9rikC14X5Uc5H1xcMHLsnxFDi0t9pPtkgRxZC8ymMeuxHaMaAV90EO5jFR008+DE6a0++5XYszntjB9p7AZ5avcrLRGYeLYMrsDCbQynyGWXbfjnr5jxkHxXL9SbKnraRWuw37Xwaigq+hEzdwcq2VhNEFPEtpAeX6aFw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hogyros.de; spf=pass smtp.mailfrom=hogyros.de; arc=none smtp.client-ip=185.187.169.70
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hogyros.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hogyros.de
+Received: from [IPV6:2400:2410:b120:f200:9e5c:8eff:fec0:ee40] (unknown [IPv6:2400:2410:b120:f200:9e5c:8eff:fec0:ee40])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	by psionic.psi5.com (Postfix) with ESMTPSA id 821B53F209;
+	Mon,  4 May 2026 21:01:51 +0200 (CEST)
+Message-ID: <f3203014-9e0b-45a6-b031-5b7487e82ff2@hogyros.de>
+Date: Tue, 5 May 2026 04:01:47 +0900
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
@@ -69,79 +29,148 @@ List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: Complete list of AF_ALG algorithms used by iwd
-To: Eric Biggers <ebiggers@kernel.org>, iwd@lists.linux.dev,
- Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-crypto@vger.kernel.org, linux-wireless@vger.kernel.org,
- linux-kernel@vger.kernel.org, Demi Marie Obenour <demiobenour@gmail.com>
-References: <20260504045007.GA2289@sol>
+Subject: Re: AF_ALG hardening
+To: Eric Biggers <ebiggers@kernel.org>,
+ Demi Marie Obenour <demiobenour@gmail.com>
+Cc: Jan Schaumann <jschauma@netmeister.org>, iwd@lists.linux.dev,
+ Linux kernel mailing list <linux-kernel@vger.kernel.org>,
+ linux-crypto@vger.kernel.org, Herbert Xu <herbert@gondor.apana.org.au>
+References: <87se8dgicq.fsf@gentoo.org> <afL-QhLfEKqHZqka@eldamar.lan>
+ <20260430071917.GB54208@sol> <177abb5d-8ba9-4bb9-8b23-9fbc868ed3cd@gmail.com>
+ <20260501180028.GA2260@sol> <19837ef5-e5b6-45f4-8336-3ce07423dfb1@gmail.com>
+ <20260501201841.GA2540@quark>
+ <c13dd3c5-ddc1-431e-bc7d-2de39c551f8e@gmail.com>
+ <20260502033556.GA3872267@google.com>
+ <3cc88b2d-fbd6-4e47-b82c-3c685fec0581@gmail.com>
+ <20260502191618.GA229884@google.com>
 Content-Language: en-US
-From: James Prestwood <prestwoj@gmail.com>
-In-Reply-To: <20260504045007.GA2289@sol>
+From: Simon Richter <Simon.Richter@hogyros.de>
+In-Reply-To: <20260502191618.GA229884@google.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="------------q1oQOYyvhcOSm25Vdun1tSMD"
+
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--------------q1oQOYyvhcOSm25Vdun1tSMD
+Content-Type: multipart/mixed; boundary="------------NvQBh5VzbAkqfAvF1Z143Y0b";
+ protected-headers="v1"
+From: Simon Richter <Simon.Richter@hogyros.de>
+To: Eric Biggers <ebiggers@kernel.org>,
+ Demi Marie Obenour <demiobenour@gmail.com>
+Cc: Jan Schaumann <jschauma@netmeister.org>, iwd@lists.linux.dev,
+ Linux kernel mailing list <linux-kernel@vger.kernel.org>,
+ linux-crypto@vger.kernel.org, Herbert Xu <herbert@gondor.apana.org.au>
+Message-ID: <f3203014-9e0b-45a6-b031-5b7487e82ff2@hogyros.de>
+Subject: Re: AF_ALG hardening
+References: <87se8dgicq.fsf@gentoo.org> <afL-QhLfEKqHZqka@eldamar.lan>
+ <20260430071917.GB54208@sol> <177abb5d-8ba9-4bb9-8b23-9fbc868ed3cd@gmail.com>
+ <20260501180028.GA2260@sol> <19837ef5-e5b6-45f4-8336-3ce07423dfb1@gmail.com>
+ <20260501201841.GA2540@quark>
+ <c13dd3c5-ddc1-431e-bc7d-2de39c551f8e@gmail.com>
+ <20260502033556.GA3872267@google.com>
+ <3cc88b2d-fbd6-4e47-b82c-3c685fec0581@gmail.com>
+ <20260502191618.GA229884@google.com>
+In-Reply-To: <20260502191618.GA229884@google.com>
+Autocrypt-Gossip: addr=demiobenour@gmail.com; keydata=
+ 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
+ +MYSfkEjBz0E8CLOcAw7JIwAaeBT
+
+--------------NvQBh5VzbAkqfAvF1Z143Y0b
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: base64
 
-Hi Eric,
+SGksDQoNCk9uIDUvMy8yNiAwNDoxNiwgRXJpYyBCaWdnZXJzIHdyb3RlOg0KDQo+IE9uIFNh
+dCwgTWF5IDAyLCAyMDI2IGF0IDEyOjUyOjU3QU0gLTA0MDAsIERlbWkgTWFyaWUgT2Jlbm91
+ciB3cm90ZToNCg0KPj4gVGhlIHNpbXBsZXN0IGNoYW5nZXMgSSBjYW4gc2VlIGFyZToNCg0K
+Pj4gMS4gR2V0IHJpZCBvZiB6ZXJvLWNvcHkgc3VwcG9ydCAoc3BsaWNlKCkpLg0KPj4gMi4g
+R2V0IHJpZCBvZiBBSU8gc3VwcG9ydC4NCj4+IDMuIE9ubHkgYWxsb3cgc29mdHdhcmUgaW1w
+bGVtZW50YXRpb25zLg0KDQo+IEZvciAoMikgYW5kICgzKSwgeW91IGNhbiBmaW5kIGV4YW1w
+bGVzIG9mIGRpc2FibGluZyBhc3luY2hyb25vdXMgY3J5cHRvDQoNCkkgdGhpbmsgd2UgbmVl
+ZCB0byBtYWtlIHVwIG91ciBtaW5kcyBoZXJlLg0KDQpUaGlzIHRocmVhZCBpcyBhYm91dCBy
+ZW1vdmluZyBhc3luY2hyb25vdXMgaW1wbGVtZW50YXRpb25zIGFuZCANCmFjY2VsZXJhdG9y
+IHN1cHBvcnQgZnJvbSBBRl9BTEcsIHNvIGl0IGNhbiBzdXBwb3J0IGxlZ2FjeSBhcHBsaWNh
+dGlvbnMgDQp3aXRoIGtub3duLWdvb2QgaW1wbGVtZW50YXRpb25zLCB3aGlsZSB0aGUgb3Ro
+ZXIgdGhyZWFkWzFdIGlzIGFib3V0IA0KcmVtb3ZpbmcgZXZlcnl0aGluZyAqYnV0KiBhY2Nl
+bGVyYXRvciBzdXBwb3J0IGZyb20gQUZfQUxHIC0tIGFuZCBhcyANCmFjY2VsZXJhdG9ycyBh
+cmUgdHlwaWNhbGx5IGFzeW5jaHJvbm91cywgdGhpcyBhc3BlY3QgaGFzIHRvIHN0YXkgYXMg
+d2VsbC4NCg0KQXQgbGVhc3Qgd2l0aCB0aGUgb3Bwb3NpdGUgcHJvcG9zYWxzLCBpdCB3b3Vs
+ZCBiZSBnb29kIHRvIGtub3cgd2hpY2ggb25lIA0KaXMgb2ZmaWNpYWwgcG9saWN5Lg0KDQpB
+dCB0aGUgc2FtZSB0aW1lLCB0aGUgdGhpcmQgdGhyZWFkWzJdIGRlcHJlY2F0ZXMgQUZfQUxH
+IGJlY2F1c2Ugb2YgaXRzIA0Kd29ua3kgc2VjdXJpdHkgcG9zdHVyZSwgd2hpbGUgbmV3ZXIg
+YWNjZWxlcmF0b3JzIGFyZSBpbXBsZW1lbnRpbmcgdGhlaXIgDQpvd24gdXNlcnNwYWNlIGlu
+dGVyZmFjZXMgYmVjYXVzZSBBRl9BTEcgaXMgdG9vIGxpbWl0ZWQsIHNvIHdlJ3JlIGFscmVh
+ZHkgDQpyZXBsYWNpbmcgb25lIENWRSBtYWduZXQgd2l0aCBzZXZlcmFsIGluZGVwZW5kZW50
+IG9uZXMsIGFuZCBkZXByZWNhdGluZyANCkFGX0FMRyBtZWFucyB0aGF0IGZ1dHVyZSBkcml2
+ZXJzIHdpbGwgYWRkIGV2ZW4gbW9yZSBvZiB0aG9zZSBiZWNhdXNlIA0KdGhlcmUgaXMgbm8g
+bG9uZ2VyIGEgY29tbW9uIGZyYW1ld29yayB0byBhdHRhY2ggdG8uDQoNCkFsc28sIGlmIEFG
+X0FMRyBpcyBkZXByZWNhdGVkIGFuZCB0aGUga2VybmVsIG5vIGxvbmdlciB1c2VzIA0KYWhh
+c2gvYWNyeXB0L2Fjb21wIGludGVybmFsbHksIHRoZXJlIGlzIG5vIHBvaW50IGluIGFjY2Vs
+ZXJhdG9yIGNhcmRzIA0KZXZlbiByZWdpc3RlcmluZyB3aXRoIHRoZSBjcnlwdG8gc3Vic3lz
+dGVtLiBTaG91bGQgdGhhdCBiZSBhbiBleHBsaWNpdCANCnBvbGljeSAiYWNjZWxlcmF0b3Ig
+Y2FyZHMgYXJlIG91dHNpZGUgdGhlIHNjb3BlIG9mIHRoZSBjcnlwdG8gc3Vic3lzdGVtLCAN
+CmV2ZW4gaWYgdGhleSBpbXBsZW1lbnQgYSBjcnlwdG9ncmFwaGljIGFsZ29yaXRobSI/DQoN
+CiAgICBTaW1vbg0KDQpbMV0gDQpodHRwczovL2xvcmUua2VybmVsLm9yZy9saW51eC1jcnlw
+dG8vMTEyYmYwYWYtMTU1MS00ZDNlLWFiMTUtZTVkZWEzZmMyNDM1QGFwcC5mYXN0bWFpbC5j
+b20vDQoNClsyXSANCmh0dHBzOi8vbG9yZS5rZXJuZWwub3JnL2xpbnV4LWNyeXB0by8yMDI2
+MDQzMDAxMTU0NC4zMTgyMy0xLWViaWdnZXJzQGtlcm5lbC5vcmcvDQo=
 
-On 5/3/26 9:50 PM, Eric Biggers wrote:
-> With AF_ALG being on its way out due to its frequent vulnerabilities,
-> iwd will need to be fixed to follow the standard practice of using
-> userspace crypto code (for example, libcrypto) instead.  In the mean
-> time, AF_ALG is at least going to need to be hardened by removing
-> unnecessary functionality, for example unnecessary algorithms.
->
-> Based on the iwd and libell source code, it appears iwd is relying on
-> the following algorithm names from AF_ALG.  Please confirm that this
-> list is correct and that these are the ones we need to keep for iwd:
->
->      cmac(aes)
->      hmac(md5)
->      hmac(sha1)
->      hmac(sha224)
->      hmac(sha256)
->      hmac(sha384)
->      hmac(sha512)
->      md4
->      md5
->      sha1
->      sha224
->      sha256
->      sha384
->      sha512
->      ecb(aes)
->      cbc(aes)
->      ctr(aes)
->      ecb(des)
->      cbc(des)
->      cbc(des3_ede)
+--------------NvQBh5VzbAkqfAvF1Z143Y0b--
 
-This looks correct from IWD's standpoint, but ELL does support 
-additional checksums:
+--------------q1oQOYyvhcOSm25Vdun1tSMD
+Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="OpenPGP_signature.asc"
 
-- sha3-224
-- sha3-256
-- sha3-384
-- sha3-512
-- hmac(sha3-224)
-- hmac(sha3-256)
-- hmac(sha3-384)
-- hmac(sha3-512)
+-----BEGIN PGP SIGNATURE-----
 
-Marcel may be able to comment on what projects are using these, if any.
+iQEzBAEBCgAdFiEEtjuqOJSXmNjSiX3Tfr04e7CZCBEFAmn47RsACgkQfr04e7CZ
+CBHSVwf/aL2WHGsvH9sOST1P6VR0/MneU9AhhRktbL1+1Um2wCPQrORk1wAxQu9d
+I269sjtcpOe2d3WbrVKtgMLiUkLD230ZnMEs0n6ykBCQN3fK8yPcygJhARXLtJMq
+fsGCuvOOl/8LX68SsXjMEpfb1uAWP/0Lgw6coc64K91cZ+VBVHSQKDnrAwrt98VD
+ys2vtScyX2qj+6wH9E2oT+p/5IcwvdEHyk3Lsn8Lhaa0Tu8aLk2sMcaIr8c79oPp
+YPvok7YQ1D9HzcEnYenJpLQgJ4QXS+7vCGkJ60XAJN6sAbn4KNPqzNmFLeGG3egF
+F6mbKwpSmUWG9TBPTnBGOV0lvLzZXg==
+=4bcj
+-----END PGP SIGNATURE-----
 
->
-> Also, does iwd always hold CAP_NET_ADMIN?  We're also considering adding
-> a privilege check to AF_ALG.  (It's TBD whether it would be
-> unconditional or controlled by a sysctl.)
-
-Yes we require CAP_NET_ADMIN:
-
-https://git.kernel.org/pub/scm/network/wireless/iwd.git/tree/src/iwd.service.in#n15
-
-
-Thanks,
-
-James
-
->
-> - Eric
+--------------q1oQOYyvhcOSm25Vdun1tSMD--
