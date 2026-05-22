@@ -1,138 +1,298 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f47.google.com (mail-qv1-f47.google.com [209.85.219.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A5AA3E2756;
-	Mon,  4 May 2026 19:56:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C98F93624A5
+	for <iwd@lists.linux.dev>; Fri, 22 May 2026 18:40:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777924563; cv=none; b=ZAWzHw/VFYghb6slBFDY62G9Xxxzx4dMNqTZ/xbajTmc5uJ6xL1WG8p9qM5d3Tsj5wmmv5G+ASw2gAxjUVHLd8ZFBQftAT7381flxhSnN9NbpaQVDwDcc+53v/FapDcRtQNg9UbrdNdLbkdOmpwvMcj0DoUu619KHYlTUwRCMkU=
+	t=1779475239; cv=none; b=ekTwZRpYbofxaojUuiKzpz56/xU64I4viFOj3AO9CGBCWVYuCEErxyM5JNTif8QrGXqTwPyROyavxyTxkKhRO9oY9PkCoSrrvXqlr1XQ7MGgSgeAeuEYyTf3iOmGqwk+azDvUv8x/lTO5JA5WolUru3FxgxARRTyWwrOV1pMHfE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777924563; c=relaxed/simple;
-	bh=KAIc5EEE66Y5PElW0pgVZFHgaNMi3+FHADgvWMfKdWU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=So0x1H2UrIxAcdm3LAOvTsMzVKzY5EYyrVEKNbZjl9RuijsP5gD4QOQxWBTHN6g+sKiUQlzZYzabgry/Ozb/LS1eDjKrK7IzLwk78AvffzgW/TLiShgVW0Bnbjj7/BuZz9jmtLvCb83HwZdS/GlH+6QRBLfDZFk7bA7WHiqrMwY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OcgTRtRl; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1779475239; c=relaxed/simple;
+	bh=N+ayA25I1xWxo+sHC3+m7Sog6AHnhM/YXdSt74MHDfg=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=pUHPzfO3yt5VbsheMgfEri6M2rSnmt699Pno+ZEutAtj89vud6r8vIiJidj9v7k3CYxyowy8wzWEdhzFro9Jh7W+wnB4dpEjLBletgh7isYTA95LYWZk+NrnmDB9aZNiPrvAD/5eRWT7ODzXC4Zxmiou3cx8PSCj5DmsTSFyYWY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=T7fq/LV2; arc=none smtp.client-ip=209.85.219.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OcgTRtRl"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C85ABC2BCB9;
-	Mon,  4 May 2026 19:56:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1777924563;
-	bh=KAIc5EEE66Y5PElW0pgVZFHgaNMi3+FHADgvWMfKdWU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=OcgTRtRlZZDEspyTg1Onu12LgbBDru4rV+9ZJ1s7aIFypiqMCjMUxrvuYOJBRs0zq
-	 wDyKe0kQQotJY8S0F6cubNA8ESfzFqpxRFCygz9UIUMzvIxNskzqo/wKShdeaBsTX1
-	 UCERCF9XIhqxG07/WGYM+A0nGm2WSekP3wXDtTmu+wZH9D3eNwr8yvJps9Y70mhmky
-	 33U2c9EXqRcoZF7a5GZL6S7/oE5vsAQSN+ko+1eOe3iAEKlr60q/xSSgRil0PYFVDd
-	 LdXciDPZcKMiLoxfIQIh0uyUN6IqH/KVt28RTLwFtGt3nqHTi/lVireNamWSUfInr+
-	 QCAcPdaXRNWsg==
-Date: Mon, 4 May 2026 12:54:43 -0700
-From: Eric Biggers <ebiggers@kernel.org>
-To: Simon Richter <Simon.Richter@hogyros.de>
-Cc: Demi Marie Obenour <demiobenour@gmail.com>,
-	Jan Schaumann <jschauma@netmeister.org>, iwd@lists.linux.dev,
-	Linux kernel mailing list <linux-kernel@vger.kernel.org>,
-	linux-crypto@vger.kernel.org,
-	Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: AF_ALG hardening
-Message-ID: <20260504195443.GA12424@sol>
-References: <20260430071917.GB54208@sol>
- <177abb5d-8ba9-4bb9-8b23-9fbc868ed3cd@gmail.com>
- <20260501180028.GA2260@sol>
- <19837ef5-e5b6-45f4-8336-3ce07423dfb1@gmail.com>
- <20260501201841.GA2540@quark>
- <c13dd3c5-ddc1-431e-bc7d-2de39c551f8e@gmail.com>
- <20260502033556.GA3872267@google.com>
- <3cc88b2d-fbd6-4e47-b82c-3c685fec0581@gmail.com>
- <20260502191618.GA229884@google.com>
- <f3203014-9e0b-45a6-b031-5b7487e82ff2@hogyros.de>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="T7fq/LV2"
+Received: by mail-qv1-f47.google.com with SMTP id 6a1803df08f44-8b8e98fd885so97699386d6.0
+        for <iwd@lists.linux.dev>; Fri, 22 May 2026 11:40:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1779475237; x=1780080037; darn=lists.linux.dev;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=0QBZsazxGqml3Qjpbv42nS9l38WM6vCL4Z20WEknet0=;
+        b=T7fq/LV2vFhf5Z/+2wwh2b4zg+X8zy/zDSO+eADAwrC0P+ZWeBdoiyV9417xaiolY6
+         VOR3ZRGj8WFuax7JLq534q44QMPvd93cNP1RywBKTx13rY9gewbCFAzbA2rj5M9rIMPC
+         s4daLRRPNGbwgguFpqkBMvTRGkVsQlaLB+ubiyvl9+ieQ1y7iyGN588UKTGRXWilXMRc
+         KEDQQmugJkwQjTR6Kh3zifSiP0i2GDX9Werc8ofYXrb0MKi+PePZBidoye0CcPY6CwYW
+         +cjAijTrIwUl3pVRJ9Loh16OIVkCBWMawN1k7ysotDyUPSbx0A+GNVxaR+3OaZWKBbpw
+         XmKw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1779475237; x=1780080037;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=0QBZsazxGqml3Qjpbv42nS9l38WM6vCL4Z20WEknet0=;
+        b=b8n/y4R8/RW/szDhN9zQ/3vlW6Il3zca5RMelLq4Sm7gaBSHmYUC8XThsojoFMW1Jy
+         6yqA0wXkS57YrdobaFIiDjbqVOYFsGMObsfZsuDCPYVlIdb1Z12ehUNONrEG5yyAbsCJ
+         o6wRHRvBpRN8JpNlsrnnAjRWeUX565t/zqv4afurDt6pWXyCwXCSQZOFuihHThx+Lfkk
+         OgQHS8mBdiLi1hJpM+aJ6VsiTOcOmu8T7Pp7RCeTql0BXNnxWTaFiFo10/mHS+Tds2zk
+         8mnlZmeH8Ts8zqwrRaGnI7CtEt+VLWnPKw5rS0IBm3xEsK1dhb+sMK3HfUzfFm7YRdT6
+         UxPA==
+X-Gm-Message-State: AOJu0YxNZ59HI667qAM0PXyC8aIAxcyTovWuJLmowgNPHvuH8DdCk5sy
+	UlTMVXoB9raPsLDWEBrufzik9zE94FnWVV2oCapEGUSvAY1CyYjnaK72gF0A7A==
+X-Gm-Gg: Acq92OFC8TcDcHcIUUbkwAvB2UPT+rnd1uVqoFQyKB8Jj8oPBcd2antqxsiLhm3FZFl
+	I3X6oQOUoickwJs4Nd6XQ0KbXM2gHDIV/edcTBdcCh6fRKaFpW14FBCOR/S3c1IyMV7RD7weiKS
+	cGebstPRa4VDDPFdDSGeUsamfei7GNOcv2inKcV1m1KhFS/bB7s273En3pPlFFCpZN1eHZc82rc
+	k8JuatetynWSFzHhFnZXFowSE8l1HRzbqFjzgWnfNJFMAC78E8ygcdc0Pi96C/TMiYC1q+fx12v
+	FEBjC+OY6/cx/jgWTY2t/xOetWr3AWby6aJZftHNar7gZUbqtJJllpwj6LG4WGAUZMze9+djccr
+	bpw2f0Wksgy06ViN+cCedmK+X9nnEokuEbF9uTriusur8O9FNiiOcPG45kD41w2xnCp2sP0Yo5X
+	oKx7VyQ2EmRtrVE67UR3xOjbhpx+quuLO0DC7pWex63NABGuIGKKDpOyWvHowq2kARSXBFL3KPV
+	vE=
+X-Received: by 2002:ad4:5b82:0:b0:8cc:3546:2616 with SMTP id 6a1803df08f44-8cc7b558562mr84358436d6.21.1779475236738;
+        Fri, 22 May 2026 11:40:36 -0700 (PDT)
+Received: from LOCLAP699.localdomain ([152.193.78.90])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-8cc80ffca70sm26041616d6.22.2026.05.22.11.40.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 22 May 2026 11:40:35 -0700 (PDT)
+From: James Prestwood <prestwoj@gmail.com>
+To: iwd@lists.linux.dev
+Cc: James Prestwood <prestwoj@gmail.com>
+Subject: [PATCH] main: make developer mode more configurable
+Date: Fri, 22 May 2026 11:40:25 -0700
+Message-Id: <20260522184025.96758-1-prestwoj@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <f3203014-9e0b-45a6-b031-5b7487e82ff2@hogyros.de>
+Content-Transfer-Encoding: 8bit
 
-On Tue, May 05, 2026 at 04:01:47AM +0900, Simon Richter wrote:
-> Hi,
-> 
-> On 5/3/26 04:16, Eric Biggers wrote:
-> 
-> > On Sat, May 02, 2026 at 12:52:57AM -0400, Demi Marie Obenour wrote:
-> 
-> > > The simplest changes I can see are:
-> 
-> > > 1. Get rid of zero-copy support (splice()).
-> > > 2. Get rid of AIO support.
-> > > 3. Only allow software implementations.
-> 
-> > For (2) and (3), you can find examples of disabling asynchronous crypto
-> 
-> I think we need to make up our minds here.
-> 
-> This thread is about removing asynchronous implementations and accelerator
-> support from AF_ALG, so it can support legacy applications with known-good
-> implementations, while the other thread[1] is about removing everything
-> *but* accelerator support from AF_ALG -- and as accelerators are typically
-> asynchronous, this aspect has to stay as well.
-> 
+The developer mode (-E) option is used only for the autotest
+framework to start up IWD in a state where:
+ - Autoconnect is disabled
+ - The station debug interface is available
 
-Thread [1] is a patch that removes the kernel's last
-architecture-optimized implementation of MD5, which is a broken and
-deprecated algorithm anyway.  So it's not just AF_ALG that's motivating
-that particular patch, but also a desire to focus effort on modern
-algorithms and keep the different Linux architectures consistent.  So I
-think the scope of that thread is more narrow than what you're claiming.
+For testing and development on real systems the debug interface
+is convenient to have available, the trouble is starting IWD in
+this mode loses the autoconnect functionality (unless you manually
+enable after starting).
 
-Also, it's already been established that for now AF_ALG will have to
-keep the software code used by a small set of userspace programs such as
-iwd.  So no, it cannot be completely removed yet (except on systems that
-don't use any of these programs, where it can be already).  However,
-that doesn't mean that we shouldn't be nudging people towards better
-solutions, with an eye towards future attack surface reductions.
+This patch aims to allow developer mode + autoconnect but making
+allowing the -E flag to take several options:
 
-> At least with the opposite proposals, it would be good to know which one is
-> official policy.
-> 
-> At the same time, the third thread[2] deprecates AF_ALG because of its wonky
-> security posture, while newer accelerators are implementing their own
-> userspace interfaces because AF_ALG is too limited, so we're already
-> replacing one CVE magnet with several independent ones, and deprecating
-> AF_ALG means that future drivers will add even more of those because there
-> is no longer a common framework to attach to.
+-E (no args) - same behavior, debug interface + no autoconnect
+-Etest	     - same as -E with no args
+-Edebug      - debug interface with autoconnect enabled
+---
+ src/iwd.h     |  7 ++++++-
+ src/main.c    | 48 ++++++++++++++++++++++++++++++++++++++++++------
+ src/station.c | 16 +++++++++-------
+ 3 files changed, 57 insertions(+), 14 deletions(-)
 
-It's long been clear that by far the best way to accelerate symmetric
-crypto is to just put it in the CPU, or in-line in the storage or
-network controller.  Indeed, that's what almost everyone does now.
+diff --git a/src/iwd.h b/src/iwd.h
+index a8e2c5db..ee7c8544 100644
+--- a/src/iwd.h
++++ b/src/iwd.h
+@@ -30,6 +30,11 @@
+ struct l_genl;
+ struct l_genl_family;
+ 
++enum iwd_mode {
++	IWD_MODE_NO_AUTOCONNECT = 1 << 0,
++	IWD_MODE_DEBUG_INTERFACE = 1 << 1,
++};
++
+ const struct l_settings *iwd_get_config(void);
+ struct l_genl *iwd_get_genl(void);
+ struct l_netlink *iwd_get_rtnl(void);
+@@ -41,7 +46,7 @@ const char *iwd_get_iface_blacklist(void);
+ 
+ const char *iwd_get_phy_whitelist(void);
+ const char *iwd_get_phy_blacklist(void);
+-bool iwd_is_developer_mode(void);
++uint32_t iwd_get_developer_modes(void);
+ 
+ #define IWD_NOTICE_STATE		"state"
+ #define IWD_NOTICE_CONNECT_INFO		"connect-info"
+diff --git a/src/main.c b/src/main.c
+index 27b2ced2..babfd1ea 100644
+--- a/src/main.c
++++ b/src/main.c
+@@ -35,6 +35,7 @@
+ #include <sys/mman.h>
+ #include <linux/rtnetlink.h>
+ #include <ell/ell.h>
++#include <linux/limits.h>
+ 
+ #include <ell/useful.h>
+ 
+@@ -64,7 +65,7 @@ static const char *phys;
+ static const char *nophys;
+ static const char *debugopt;
+ static const char *logger;
+-static bool developeropt;
++static uint32_t iwd_developer_mode;
+ static bool terminating;
+ static bool nl80211_complete;
+ 
+@@ -137,9 +138,23 @@ const char *iwd_get_phy_blacklist(void)
+ 	return nophys;
+ }
+ 
+-bool iwd_is_developer_mode(void)
++uint32_t iwd_get_developer_modes(void)
+ {
+-	return developeropt;
++	return iwd_developer_mode;
++}
++
++static const char *iwd_mode_to_string(uint32_t mode)
++{
++	static char str[PATH_MAX];
++	int idx = 0;
++
++	if (mode & IWD_MODE_NO_AUTOCONNECT)
++		idx = sprintf(str, "no-autoconnect ");
++
++	if (mode & IWD_MODE_DEBUG_INTERFACE)
++		idx += sprintf(str + idx, "debug-interface ");
++
++	return str;
+ }
+ 
+ static void usage(void)
+@@ -160,7 +175,7 @@ static void usage(void)
+ }
+ 
+ static const struct option main_options[] = {
+-	{ "developer",    no_argument,       NULL, 'E' },
++	{ "developer",    optional_argument, NULL, 'E' },
+ 	{ "version",      no_argument,       NULL, 'v' },
+ 	{ "interfaces",   required_argument, NULL, 'i' },
+ 	{ "nointerfaces", required_argument, NULL, 'I' },
+@@ -473,14 +488,31 @@ int main(int argc, char *argv[])
+ 	for (;;) {
+ 		int opt;
+ 
+-		opt = getopt_long(argc, argv, "Ei:I:p:P:d::vhl:",
++		opt = getopt_long(argc, argv, "E::i:I:p:P:d::vhl:",
+ 							main_options, NULL);
+ 		if (opt < 0)
+ 			break;
+ 
+ 		switch (opt) {
+ 		case 'E':
+-			developeropt = true;
++			if (optarg)
++				if (!strcmp(optarg, "test"))
++					iwd_developer_mode =
++						IWD_MODE_DEBUG_INTERFACE |
++						IWD_MODE_NO_AUTOCONNECT;
++				else if (!strcmp(optarg, "debug"))
++					iwd_developer_mode =
++						IWD_MODE_DEBUG_INTERFACE;
++				else {
++					fprintf(stderr,
++						"Invalid developer mode '%s'\n",
++						optarg);
++					return EXIT_FAILURE;
++				}
++			else
++				iwd_developer_mode = IWD_MODE_DEBUG_INTERFACE |
++							IWD_MODE_NO_AUTOCONNECT;
++
+ 			break;
+ 		case 'i':
+ 			interfaces = optarg;
+@@ -539,6 +571,10 @@ int main(int argc, char *argv[])
+ 	if (debugopt)
+ 		l_debug_enable(debugopt);
+ 
++	if (iwd_developer_mode)
++		l_debug("Developer mode enabled: %s",
++				iwd_mode_to_string(iwd_developer_mode));
++
+ #ifdef HAVE_BACKTRACE
+ 	__iwd_backtrace_init();
+ #endif
+diff --git a/src/station.c b/src/station.c
+index 8fcf8c70..fc1ce040 100644
+--- a/src/station.c
++++ b/src/station.c
+@@ -279,7 +279,7 @@ static bool station_debug_event(struct station *station, const char *name)
+ {
+ 	struct l_dbus_message *signal;
+ 
+-	if (!iwd_is_developer_mode())
++	if (!(iwd_get_developer_modes() & IWD_MODE_DEBUG_INTERFACE))
+ 		return true;
+ 
+ 	l_debug("StationDebug.Event(%s)", name);
+@@ -1921,7 +1921,7 @@ bool station_set_autoconnect(struct station *station, bool autoconnect)
+ 	if (station_is_autoconnecting(station) && !autoconnect)
+ 		station_enter_state(station, STATION_STATE_DISCONNECTED);
+ 
+-	if (iwd_is_developer_mode())
++	if (iwd_get_developer_modes() & IWD_MODE_DEBUG_INTERFACE)
+ 		l_dbus_property_changed(dbus_get_bus(),
+ 				netdev_get_path(station->netdev),
+ 				IWD_STATION_DEBUG_INTERFACE, "AutoConnect");
+@@ -5144,6 +5144,7 @@ static struct station *station_create(struct netdev *netdev)
+ 	struct station *station;
+ 	struct l_dbus *dbus = dbus_get_bus();
+ 	bool autoconnect = true;
++	uint32_t iwd_mode = iwd_get_developer_modes();
+ 
+ 	station = l_new(struct station, 1);
+ 	watchlist_init(&station->state_watches, NULL);
+@@ -5175,13 +5176,14 @@ static struct station *station_create(struct netdev *netdev)
+ 
+ 	station_fill_scan_freq_subsets(station);
+ 
+-	if (iwd_is_developer_mode()) {
++	if (iwd_mode & IWD_MODE_DEBUG_INTERFACE)
+ 		l_dbus_object_add_interface(dbus,
+ 					netdev_get_path(station->netdev),
+ 					IWD_STATION_DEBUG_INTERFACE,
+ 					station);
++
++	if (iwd_mode & IWD_MODE_NO_AUTOCONNECT)
+ 		autoconnect = false;
+-	}
+ 
+ 	station_set_autoconnect(station, autoconnect);
+ 
+@@ -5201,7 +5203,7 @@ static void station_free(struct station *station)
+ 	l_dbus_object_remove_interface(dbus_get_bus(),
+ 					netdev_get_path(station->netdev),
+ 					IWD_STATION_DIAGNOSTIC_INTERFACE);
+-	if (iwd_is_developer_mode())
++	if (iwd_get_developer_modes() & IWD_MODE_DEBUG_INTERFACE)
+ 		l_dbus_object_remove_interface(dbus_get_bus(),
+ 					netdev_get_path(station->netdev),
+ 					IWD_STATION_DEBUG_INTERFACE);
+@@ -5995,7 +5997,7 @@ static int station_init(void)
+ 					station_setup_diagnostic_interface,
+ 					station_destroy_diagnostic_interface,
+ 					false);
+-	if (iwd_is_developer_mode())
++	if (iwd_get_developer_modes() & IWD_MODE_DEBUG_INTERFACE)
+ 		l_dbus_register_interface(dbus_get_bus(),
+ 					IWD_STATION_DEBUG_INTERFACE,
+ 					station_setup_debug_interface,
+@@ -6062,7 +6064,7 @@ static void station_exit(void)
+ {
+ 	l_dbus_unregister_interface(dbus_get_bus(),
+ 					IWD_STATION_DIAGNOSTIC_INTERFACE);
+-	if (iwd_is_developer_mode())
++	if (iwd_get_developer_modes() & IWD_MODE_DEBUG_INTERFACE)
+ 		l_dbus_unregister_interface(dbus_get_bus(),
+ 					IWD_STATION_DEBUG_INTERFACE);
+ 	l_dbus_unregister_interface(dbus_get_bus(), IWD_STATION_INTERFACE);
+-- 
+2.34.1
 
-So I would expect the demand for this kind of interface to symmetric
-crypto to continue to decline, as it already has been for a long time.
-And as you pointed out, AF_ALG doesn't work well for it anyway, which
-makes AF_ALG increasingly kind of besides the point.
-
-> Also, if AF_ALG is deprecated and the kernel no longer uses
-> ahash/acrypt/acomp internally, there is no point in accelerator cards even
-> registering with the crypto subsystem. Should that be an explicit policy
-> "accelerator cards are outside the scope of the crypto subsystem, even if
-> they implement a cryptographic algorithm"?
-
-There are still some in-kernel users of the asynchronous crypto APIs,
-for example IPsec and dm-crypt.  So I think your prediction of the
-demise of these APIs is a bit premature as well.  But yes, at least for
-the symmetric crypto, kernel subsystems have been been repeatedly seeing
-that the async support just isn't worth it.  We'll see more kernel
-subsystems switching to sync-only.  But in practice this is a gradual
-transition.
-
-Anyway, I don't think I'm proposing conflicting things.  We can and
-should document a general deprecation of AF_ALG, while also helping
-update userspace programs to no longer use it, while also applying
-various hardening measures to reduce AF_ALG's attack surface as best we
-can in the meantime.  There are multiple independent hardening measures
-that could be applied, and they will be up for discussion on the
-individual patches that implement them.
-
-- Eric
