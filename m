@@ -1,93 +1,91 @@
-Received: from mail-yx1-f48.google.com (mail-yx1-f48.google.com [74.125.224.48])
+Received: from mail-lf1-f47.google.com (mail-lf1-f47.google.com [209.85.167.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 772DB348C42
-	for <iwd@lists.linux.dev>; Tue, 23 Jun 2026 18:51:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0958F37F8AF
+	for <iwd@lists.linux.dev>; Tue, 23 Jun 2026 19:12:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.167.47
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782240690; cv=pass; b=GNvHKmgjyWw8RSgBlAFiIZh+rsbw24B5Okol4IWpGsueV/yi2dKexb8gDZsWJZK2Jtx/Smiqta+i4pBbl5nlF7FpFm8vsa/dgB/GF6cYN1PCdEIQjI6ysYBPfhPth91vJuONPTTIz2IKbtSwUgs8XJ9AwXfSxuq9tB0c7tWdNqI=
+	t=1782241960; cv=pass; b=NQ12BGY2NVBscOPH/axWgGnu1lYLYFprRbYWAjRRK9VxNd0L93qUzK6FHnCekhcFFSBqc6fkcQWs5mrkMboN3BvBaKBhyunmrGaw4/LaH3fZnrISuAh1n1A7yY9kZmC3DHDBUGH77iK7v8iW9z2wgXxktoFIiVo5XgsrOeCUEdM=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782240690; c=relaxed/simple;
-	bh=Efr1OooVVeTRTisiJfG3vsg/+MXEtgRrVmeiLqYtGck=;
+	s=arc-20240116; t=1782241960; c=relaxed/simple;
+	bh=ii6MvtTjLi70cljzH6vlCK19qdEyYEgO4Rik7cd/sMQ=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=JiqfBY0DFWIPOFwrvcZ+MntQmNIUAZQ2jGHyTM/db8XQYZNTdBYHXBhSn9kMs2losdztaC+aS0BvKNB85l/qJHjLQm8OR/BSX+13fCINANwnQvCL8EtxI2mvCCe8wHKbmosoic3HpZARcnoHTMHbTxUItgaf4bf6CEVTiVj9p+Y=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nfOCk0Ye; arc=pass smtp.client-ip=74.125.224.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	 To:Cc:Content-Type; b=dBpfWXp00AZ7NTBbW1tp/dEHdrA0HN8XpkFtlXZ/KB42GEW6E9V/rq0g32PctXQ1BzGVkZ+9DoYwiyZJudt+cpbd9tQ4IVpiEV8Nqiysd9jn59iZ5it5L4VwrIf8ZqPERUSVwsZA9AedDNcGVI9L6cCg20KaVfRA9zeVQvzA89E=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=amacapital.net; spf=pass smtp.mailfrom=amacapital.net; dkim=pass (2048-bit key) header.d=amacapital-net.20251104.gappssmtp.com header.i=@amacapital-net.20251104.gappssmtp.com header.b=BvL9MZWd; arc=pass smtp.client-ip=209.85.167.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=amacapital.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amacapital.net
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nfOCk0Ye"
-Received: by mail-yx1-f48.google.com with SMTP id 956f58d0204a3-662e7fed068so102641d50.0
-        for <iwd@lists.linux.dev>; Tue, 23 Jun 2026 11:51:27 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1782240686; cv=none;
+	dkim=pass (2048-bit key) header.d=amacapital-net.20251104.gappssmtp.com header.i=@amacapital-net.20251104.gappssmtp.com header.b="BvL9MZWd"
+Received: by mail-lf1-f47.google.com with SMTP id 2adb3069b0e04-5ad68b30252so213564e87.2
+        for <iwd@lists.linux.dev>; Tue, 23 Jun 2026 12:12:38 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1782241957; cv=none;
         d=google.com; s=arc-20240605;
-        b=d0eqEneJxLyyLx2uhuq4Mf/4jCVznjTlgj82UBavsIkFEekIOFMOD78Wz2hcJb6cdc
-         MVPXRpscG1cKVS5MD0iB2kMjXFmkYDbdjrAa8BOPHFlujFzTzotI1CeKFEqocsJoeVgi
-         dFlNtt8zn0KrtmnCtRcKBiy8+hu/cnhIYPpTEy4Ezxj8S8dEINGey+duKnsvkxmE4VkV
-         V0HhU5nNYFlGVr2H/jLmVIly/wkoPrI1mv/vL7WpS55uOr1oSuUx2BJ7Sd8zaNFnyU66
-         JMsYK12f5apI1WHNysrxgrtig4hHQCS9rXJDhlwcQG0NGbX5rSp5YBU9kqvtERExgVqu
-         uEAQ==
+        b=GYKvPaBOOkKw1EEIO5CNT5qLcCrDVVokowHYrFmlF6mfeQEkWSqG1K25Yejpw6Tk0y
+         lDbMEKCm60Z/1LKFj8IN28Og0kEKT+XAWCU5fka2IpMwy4zrUepQSCkYWUjqvshTnoB5
+         WgNm3K8pGPQcjpBTjv80pbS8exijipyUdNEvaEkv+Z5JGALNoqFeRVFH2AL1Dzw39nkW
+         /7o3iDvzrAPCRE5OHtEt7/toFOgU+jvMd0KagpGbVP2SYr7OivkmEvHaVsmj9S+Xjx5t
+         U8/tYT5ie84eOyt6TXaM80tVIQbBfdZNsPyZ05qnLAZUJGWjCoIqaBdJTZ6cEXE3mACp
+         jmTw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:dkim-signature;
-        bh=QGHdQke52quudoElH5DIY+sbZKk9j5FB05lJCBdajHM=;
-        fh=MgsJmFFBMAB1VJKcJrb4/TG5qBxN+sUENH8fGiFR5VM=;
-        b=JxrOzHe5DyPhTXeFfR3KUnagsHYHr2vGKdymmGAdUQRlN57qU3e+QZVcsGw4zB8XT+
-         KLwgopB4uOGSt/1YN9A2IbevNIZ43k0oXSdznHRZVb4Q/EXFGVGCB248vS/tGFk+d39U
-         WQLMFwnB8yCuPRgWo/z4T2z1ThmQTHlmhFQamVmCbeiueNWt4HG9jBzz786yVN3Z8TvE
-         G+a6C4ggHT++Mqs/8KLxGXLf5zCIpIxGxFoOU8zjE9zMFWAMMAAaXMhqcSULVD+XUqyd
-         iNNNP6ocBXngaF/iC2YqUzWffqEKp3wd8qXw+xwxp++qzEhk1ya8jXlmbdm7CKynkgIM
-         pBjw==;
+        bh=/vvDwAJenwF6coS01e9xCYrLEyTAVwYfnUT70JedLS0=;
+        fh=4SVNv0zs0lTNre91FiqKKmxW9BB213JxEl0ifCga+Yc=;
+        b=Xz81Ydbj4pSfkP851j9R/htp0/6pHqmij8W+sI1xSne0UrV4mwg0HEtZy0ViEKTYg2
+         DNEskbtrBDOMIDYhRtnUS74IFypuarDF2JHPRdYtfNdjzSywBtmmlCATBclNEZhVO7Cl
+         La/yfgFedHzQsUnC1UMrivB5IJyid0DFGBON5129rSX2F13xl8MYoXUVM4Wkv9bl4fIO
+         q7sCgpqc7qZwLQOBXMfwIsnwVowAXzjQxaihsJOqaFldPq0v6jjj+yhMtrD8lnVWqvI+
+         tdR2R5oboXP+9lfusqIlGf0f3FqsR3sHutOJWgdL2UDrgR6I2bTqO51MCpbuq/I7cKD5
+         PhFg==;
         darn=lists.linux.dev
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1782240686; x=1782845486; darn=lists.linux.dev;
+        d=amacapital-net.20251104.gappssmtp.com; s=20251104; t=1782241957; x=1782846757; darn=lists.linux.dev;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=QGHdQke52quudoElH5DIY+sbZKk9j5FB05lJCBdajHM=;
-        b=nfOCk0Ye4PwzugqmAYU4BAW+c1E3WLQK+7J5GIlQJFBTE4kxO4V+FqfgRajsGhDunJ
-         rcM1wwohmLiJN1Z7TPXRqbAgE+TyHLz1yVp8OqMTjbb+nq6NeI7ECepD48TLH8DjAp3b
-         r/auzdoaaOaeobRBJyjxwy79zv2whq7y7r2AnQTYqyEiUhBiLPvJKwzsWjMuVYhD/J0e
-         RbfebjuVwc97RcGzTsuOi6L4oOn1rcCDqSuMh0Pr78zJscTMrdrYZ1+kPEuk/RvCx8VX
-         pfR6tbdlwHCAo7cN5sjhQMdPdXiK3XzSbyj95hqKr1PAy/C6MfxvIgldWagKD2tC2OzY
-         v8pA==
+        bh=/vvDwAJenwF6coS01e9xCYrLEyTAVwYfnUT70JedLS0=;
+        b=BvL9MZWdS9HDH1oSluq/2vg6KaFox8npkP8xthUmOPlhkLlUqvhzgxEsAevgu6w9kE
+         yB2Tt0rxaeuVwG6DMSlGXO+lnIjsC0ZC5w6j654dCCPrRNymPuGn1YCYsa/F+F8jtjTG
+         nDWHX31DQ8l/zTFOhWFVoATX8TyDtyDY20rwSWfs35PhgkVbXPtbMr4k2o+YHl44bvoc
+         MUaVNFBzNSbXpuDgbRq+VLOCrh4dE6QVSRbQ2UhtVYMbyLO7q+VXePkcIlaOu5GWA31Q
+         MBo4RAvaldseamC2wNBD//JLRAmmZfP1RTiOYNk4gUGdDUWE46Vzdqf10jD29df2eZmr
+         fJ0A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782240686; x=1782845486;
+        d=1e100.net; s=20251104; t=1782241957; x=1782846757;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=QGHdQke52quudoElH5DIY+sbZKk9j5FB05lJCBdajHM=;
-        b=XtPDxZ9tBePriCevqOxR0zY9IkqKxULubCiYdPof/t8pi+SfNhlay5cHba9COYjJvC
-         HIpZ3VEY60YTRFAtbv7Tg6IF7vz3V2W+C0Ggkf0cLI+V3oxY/T+uDyAPC5sMlLcL/N75
-         hMwgNbnGQIq3Bz0TKby4bhlgVpjTygM9AV7a/GtaZ687dbhOvvszmk3c0ZBQXBNTJU1L
-         t/n3tM+2cFV03C6TDIRcTBFz0hgzUS5WdFKVcsvEr0FoT6ADBT7Mh3wSF2MLsyt8EgIY
-         uHJ/iSco495dHi7+XSfHWbrHwW/tAVb0AYrDTAURy5ts6AXkr0ZUQTM8omjYPSxwAydj
-         kKvg==
-X-Forwarded-Encrypted: i=1; AHgh+RrolmoAAoYAhrNcn3m4RSmrAIsufSMEt6SjhJBm+JXKUl7Z9aSIGpVd5ufR8sXRBSrfeps=@lists.linux.dev
-X-Gm-Message-State: AOJu0YyDXMmkiT8hc6ddibQ/MI8QOS1PEMPw8ckmx2uEPjWaO2ydQKWi
-	8sV3azKqdCAmIvbNMj3znXP9k3zQUffRpUV/VkBRalTtO6WThoumPqMMEyS56irIX54qzPEiSAs
-	Jze7WgMQaqhqgk95J8HSLr83Cc+OnOoQ=
-X-Gm-Gg: AfdE7cmVkjrYvq+4bye4C94YZg0kcITDwVr/hmEDWpecaAK1W+ID5f+35TSESmEfFWl
-	pipcEYhKsnSndohJ460GuBxJgbSAddg/7AUf+IZ+pMfVY7Cm+pzfaAvNR+YbMquccdm+p6MHmhr
-	mnTmk2Gr3WGOL193WLGHEIwqxAvETNGMg7RsXe5LH2SMIaUWtZhk9IeAe9XeUDp+L37G40886EA
-	q0uNvXYbUzwtyOos7ZKnz8OBGcQVj35DngGa+JqIr81Pdma9Mt+F6nVqpjyVeu5/szU/Po5U/c7
-	srSjy+PVmIFBqCQ7F/TTMeHBoXg6D4/lfc2TlkjuR+DveEqmNsRo1hgfo5k=
-X-Received: by 2002:a05:690e:e87:b0:662:f2d1:f27 with SMTP id
- 956f58d0204a3-66359ece524mr3827196d50.27.1782240686326; Tue, 23 Jun 2026
- 11:51:26 -0700 (PDT)
+        bh=/vvDwAJenwF6coS01e9xCYrLEyTAVwYfnUT70JedLS0=;
+        b=SYcBoqZlk7rb3/UpbttxAFgTRy0DWAvwaiMrueaLrwvL8LLWkaZ5zwhBKmhye4rt3A
+         DOC/uGUo4aioZWUX736likMvv4+lUUu3YyYJPpZ7AqXC1Ap09Q5oOdDoObIWRDmggYdN
+         d6qvM8TC2d/QcWf1nOSDfEj2B4qSIps7mCedJgRWw0X3z9FIp11crCK7zySyWtFRjcPI
+         haBfZBtMjf79FsH/ct/RBgjVX60aqoh/Uyx2MuJdyKc/EwYaTK/RLpAYgx86nEFlljB8
+         3Qx97936+PM9qKnMOGrkzWRaVpT9ACycyU4vl95rmE4yZrAMxh4qeiSTwekEn1Qejx7m
+         q8Pg==
+X-Forwarded-Encrypted: i=1; AFNElJ8o62YZba5w7WdiayxHnx32RAe+033xn9HbYeQBbNrFXKIhq1Iidhccb2MzOPlrgdbTA6s=@lists.linux.dev
+X-Gm-Message-State: AOJu0YzZiSi5FuOh0SV4nmMBrqVuD5siXi2ezSsuB5HaRfQdsdzWYxac
+	cmzAYdFFCJ3mHl27G/+AFwY3+HKQSSTvanQ5fT5ILXJw5L4+D7WMNPwIanLpIHUy7H/rDcU6OyQ
+	EICNon/DdCFANzuTiMY7KGYi5Y/KHWvoz/Q/n8ADf
+X-Gm-Gg: AfdE7cmelcEYo0ek0OjifzUbsafh92PgKWN3IT6fGwBfSyC0p/RAo5WtrnBd18STiYK
+	PQ8swENyo3AXquNAL64IDbBAQDa9F5k3lYxb7hW4OrC3If0CUpxgGPSxy6S+v2/RBdExh6ZKm+E
+	BqV8mtzjy8qs4ULx1N7kCFNhDgRHp+2eJ6A2Ly8Dla/gjRvhJx8g47bi0VgmYLhGm105dTjWyBH
+	Wg9rHMATWcPtWoHHJTEVSaS8PKlxEog5GfHSN4uUQZAYYTFzbhM8Dqtvk725IrqIcCaGuW+
+X-Received: by 2002:ac2:44d4:0:b0:5aa:8822:b874 with SMTP id
+ 2adb3069b0e04-5ad5771ec41mr4233175e87.46.1782241957214; Tue, 23 Jun 2026
+ 12:12:37 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20260622234803.6982-1-ebiggers@kernel.org> <CABBYNZ+QLvkYkn_EcBZ4+GopyhKqJLcfCoABYcw1VamavbSvhg@mail.gmail.com>
- <20260623165208.GB1793@sol> <20260623180502.GC1850517@google.com>
-In-Reply-To: <20260623180502.GC1850517@google.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Tue, 23 Jun 2026 14:51:13 -0400
-X-Gm-Features: AVVi8CfbI5Vx_0h2Ev3jl-1KL9OujVxy8AaPvUK9sScHwsY8ABVyPNIyPnDwcl8
-Message-ID: <CABBYNZKdd2-S9C1z0vtUB5yMVTWxLHi+Ta0_aUrahDYAq5rpxg@mail.gmail.com>
+References: <20260622234803.6982-1-ebiggers@kernel.org>
+In-Reply-To: <20260622234803.6982-1-ebiggers@kernel.org>
+From: Andy Lutomirski <luto@amacapital.net>
+Date: Tue, 23 Jun 2026 12:12:24 -0700
+X-Gm-Features: AVVi8CdurCE0Z4nmJzTanxEgxUT-VwvR4nCHq2kkCJY0BXv2CrDitgelAGd8YoA
+Message-ID: <CALCETrXPj0u=FZ=aFcZAHk3fFZa7rCuPEjx6cOMXmT3sdkC7SA@mail.gmail.com>
 Subject: Re: [PATCH] crypto: af_alg - Add af_alg_restrict sysctl, defaulting
  to 1
 To: Eric Biggers <ebiggers@kernel.org>
@@ -95,57 +93,49 @@ Cc: linux-crypto@vger.kernel.org, Herbert Xu <herbert@gondor.apana.org.au>,
 	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, 
 	linux-bluetooth@vger.kernel.org, iwd@lists.linux.dev, 
 	linux-hardening@vger.kernel.org, Milan Broz <gmazyland@gmail.com>, 
-	Demi Marie Obenour <demiobenour@gmail.com>, Andy Lutomirski <luto@amacapital.net>
+	Demi Marie Obenour <demiobenour@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Hi Eric,
-
-On Tue, Jun 23, 2026 at 2:05=E2=80=AFPM Eric Biggers <ebiggers@kernel.org> =
+On Mon, Jun 22, 2026 at 4:49=E2=80=AFPM Eric Biggers <ebiggers@kernel.org> =
 wrote:
 >
-> On Tue, Jun 23, 2026 at 09:52:08AM -0700, Eric Biggers wrote:
-> > On Tue, Jun 23, 2026 at 11:04:14AM -0400, Luiz Augusto von Dentz wrote:
-> > > > +=3D=3D=3D  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> > > > +0    AF_ALG is unrestricted.
-> > > > +
-> > > > +1    AF_ALG is supported with a limited list of algorithms. The li=
-st
-> > > > +     is designed for compatibility with known users such as iwd an=
-d
-> > > > +     bluez that haven't yet been fixed to use userspace crypto cod=
-e.
-> > >
-> > > Is the expectation that we go shopping for userspace crypto here?
-> >
-> > Yes, same as what 99% of userspace already does.  Probably you'll just
-> > want to link to OpenSSL, but it could be something else if you want.
-> >
-> > - Eric
+> AF_ALG is a frequent source of vulnerabilities and a maintenance
+> nightmare.  It exposes far more functionality to userspace than ever
+> should have been exposed, especially to unprivileged processes.  Recent
+> exploits have targeted kernel internal implementation details like
+> "authencesn" that have zero use case for userspace access.
 >
-> By the way you do know that bluez already has a local implementation of
-> ECDH, right?  See src/shared/ecc.c.
+> Fortunately, AF_ALG is rarely used in practice, as userspace crypto
+> libraries exist.  And when it is used, only some functionality is known
+> to be used, and many users are known to hold capabilities already.
+> iwd for example requires CAP_NET_ADMIN and has a known algorithm list
+> (https://lore.kernel.org/linux-crypto/bcbbef00-5881-421b-8892-7be6c04b832=
+d@gmail.com/).
+>
+> Thus, let's restrict the set of allowed algorithms by default, depending
+> on the capabilities held.
+>
+> Add a sysctl /proc/sys/crypto/af_alg_restrict with meaning:
+>
+>     0: unrestricted
+>     1: limited functionality
+>     2: completely disabled
+>
+> Set the default value to 1, which enables an algorithm allowlist for
+> unprivileged processes and a slightly longer allowlist for privileged
+> processes.
 
-It's never been audited; it's only used for hardware emulation, I
-didn't even remember we had that thingy. What we really use is
-src/shared/crypto.c, and I'm not looking forward to having it changed.
-With something like Zephyr, changing crypto libraries every so often
-just because one didn't fit on a platform wasn't a great experience,
-and that is a much bigger project. In the end it seems they are using
-a forked mbedtls:
+In our brave new world of containers, this is a bit awkward.  The
+admin is sort of asking two separate questions:
 
-https://github.com/zephyrproject-rtos/mbedtls
+1. Is the actual running distro and its privileged components capable
+of working without AF_ALG or with only the parts marked as being
+unprivileged?
 
-I'm quite sure whatever choice we make will be the wrong choice for
-someone. Then someone will have the brilliant idea to add some sort of
-backend support to let everyone plug in their preferred crypto
-library, possibly adding even more code to audit.
+2. Is the system running contains that need the unprivileged parts?
+(Which is maybe just sha1 for ip?  I really don't know.)
 
-> - Eric
-
-
-
---=20
-Luiz Augusto von Dentz
+Should there maybe be two separate options so that all options are
+available?  Or maybe something between 2 and 3 that means "limited
+functionality and privileged modes are completely disabled"?
