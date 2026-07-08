@@ -1,162 +1,97 @@
-Received: from mx1.sew-eurodrive.com (mx1.sew-eurodrive.com [194.180.1.34])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D25DC32ED3A
-	for <iwd@lists.linux.dev>; Wed,  8 Jul 2026 15:41:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=194.180.1.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 376063E1CE1
+	for <iwd@lists.linux.dev>; Wed,  8 Jul 2026 19:56:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783525295; cv=none; b=h38HkLmn0Gp6sbLaAp6hlhgp9V9GJif0RTHLyB/SG0LFwKRZg5WP7ahZcFn3f5RCy+cTQGif7pCDeNYQw/nJ3kg+LJJ0Ei6sGf4oYgOc5E4h4SrTva9nJhH0bqawynSmH5OghP4CEtiNE3E0/EV5juSwNCwuug/NmBTTt/lmwhU=
+	t=1783540570; cv=none; b=S3RTSLaKqd7GvvpGoP66q1ajurlEXWXfVX4M8AG3zkBpTsPlTnmvLK4MOlMUW2wZ1IA7Gnsa/phcGvUmMI+6JefRw5vnU5XNWd0oO3KAEIvI+3ftCv1cuLjjVKrGTOjOFm/8dnUUKYNSebuFk5CbMFsHeQN+dRBJIH+FF9Vg0ns=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783525295; c=relaxed/simple;
-	bh=m0jG5zmosHi1PNkuNXkVD2hl/snbo2ytIt1jbdi348k=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 MIME-Version:Content-Type; b=ujDejVJMzA7PpMv2fvKpKQeX3qPEnFeE4pgRLUumRvWTSW+QApOT1PWFbYB3wNIRR8+zYi1iSrAM5JOOiAiBUPqFI+vfaDpC0YG0mXp531tJpOYyzqNSU8vvdpcEPdY4MmTVdJRQbAXuA1qvYik5jrnxxArDnH3Fid8n3idhv40=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=sew-eurodrive.de; spf=pass smtp.mailfrom=sew-eurodrive.de; dkim=pass (2048-bit key) header.d=sew-eurodrive.de header.i=@sew-eurodrive.de header.b=uSznGE5k; arc=none smtp.client-ip=194.180.1.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=sew-eurodrive.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sew-eurodrive.de
+	s=arc-20240116; t=1783540570; c=relaxed/simple;
+	bh=b95JPjlKmHqfrkuojA6VS9CcYtqexPLFFbrYe6uGA7g=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Uvuc9kxf1nqDrDvEIylELGg7l8/p+X2Efc5kjJ6ov8W7kq+BnsBFYq2tE/qWO/y3rm6lYX80I3RaNZ60HctzyweK6OqSd3rztjlJAmQZQRZ4v5yyLCcudZSLxv49FPxbziDWteyFu9XJth3QnHPe4QzCadtSjLIiG933orwjIjw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=P2YKIVhV; arc=none smtp.client-ip=209.85.128.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sew-eurodrive.de header.i=@sew-eurodrive.de header.b="uSznGE5k"
-Received: from pps.filterd (mx1.sew-eurodrive.com [127.0.0.1])
-	by mx1.sew-eurodrive.com (8.18.1.7/8.18.1.7) with ESMTP id 668FXM3h025169;
-	Wed, 8 Jul 2026 17:41:31 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	sew-eurodrive.de; h=cc:content-transfer-encoding:content-type
-	:date:from:in-reply-to:message-id:mime-version:references
-	:subject:to; s=sew1; bh=m0jG5zmosHi1PNkuNXkVD2hl/snbo2ytIt1jbdi3
-	48k=; b=uSznGE5ktPTBNuwpUb8RUXF9FQYAJfR1TtOBYeghxOZzshA3iIah9j6I
-	5vm4GlmbjBo7dZdCZbQeAAATx0Vo4WFb86Y4j9ZD/wgEPKHyJVQJD5hpkGtM/b9B
-	37+9BjqG3CkN9sIdB4SLrKhVG3EOLR4AnZDQpZWMUjMhI7aweIZpSef9eq94n4jd
-	UFYCPM5qco1cUS+0+gajhMPArO5rzt2a5tVxG/RnzyZYy70cTr9Sgtg6Rk3PgFqY
-	yRItizR1kMuwtGGOu56gieDpel7v0L/iAy/w6CSSjMizvOZP8p/H3NWq6RG1UGIS
-	ap9FK6fW2AkqxmKQA2R3jXzh8duyRA==
-X-PGP-Universal: processed;
-	by brudepgp1.de.eu.sew on Wed, 08 Jul 2026 17:41:31 +0200
-From: <Dierk.Modrow@sew-eurodrive.de>
-To: <pmenzel@molgen.mpg.de>
-CC: <iwd@lists.linux.dev>
-Subject: AW: [PATCH] Three bugfixes for iwd SEGVs at receipt of EAPOL M1 msg
- with legacy roaming and repeated roam scan after ft_auth-/ft_reassoc-timeout
- occurred:
-Thread-Topic: [PATCH] Three bugfixes for iwd SEGVs at receipt of EAPOL M1 msg
- with legacy roaming and repeated roam scan after ft_auth-/ft_reassoc-timeout
- occurred:
-Thread-Index: AQHdDqF+DTbh0NWhc06C/72mY0mb2rZjJCeAgACOdyCAAA+nIA==
-Date: Wed, 8 Jul 2026 15:41:30 +0000
-Message-ID: <3851101f50a740c4b67f5c3a5f546ee8@sew-eurodrive.de>
-References: <20260708061651.299-1-dierk.modrow.opensource@gmail.com>
- <d2b4a6d8-9ca4-4865-befa-8f28168a2473@molgen.mpg.de>
- <686f8b3498e645d89bc538456bb847e9@sew-eurodrive.de>
-In-Reply-To: <686f8b3498e645d89bc538456bb847e9@sew-eurodrive.de>
-Accept-Language: de-DE, en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="P2YKIVhV"
+Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-493c00f74baso7681165e9.0
+        for <iwd@lists.linux.dev>; Wed, 08 Jul 2026 12:56:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1783540567; x=1784145367; darn=lists.linux.dev;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=mMge/CPrcPVkz/U5A/MA4aPYzvUMjj1gRalE9p/wZu8=;
+        b=P2YKIVhV4dUWoJ9jqxZrjnnwn3bIVLtBeNJXVs9MW+7AhQcUxSzxWycKiKnPh1KZZD
+         Er7DXEIndkH7edSur2Jje65accyv+pkLrnVvB9qL5h6T5Udn2T+QsYyVGpUSO4BaHOdr
+         kfTWg+w/hRq1Y9pu9/9bbKZzdo4uXOb8q9xJdZS4KkxbmI8QjaZRF0Lb2RtUIN0KlPgE
+         f6M8GaJW7ljJhfJQxuyp/dUg6v+oyWaWfRcIPGa/a1OKvDTDbMHAvPovEkS/VIUFjFCV
+         oeE3e7fC9ef0O+61WNAYdFm8vn+vzqc9tQ4zgRTKTUqUaNEWMz/+7JQrMJMDXo480h26
+         bs5w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1783540567; x=1784145367;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=mMge/CPrcPVkz/U5A/MA4aPYzvUMjj1gRalE9p/wZu8=;
+        b=tS34usFC+2ACC2tQUfVKh6dNnjRiFrmi/xRqLXKdBQzoSBRYe6EEY6FcCir4BPZBl/
+         mEqLv4wwDTFkt3/cEkOwRGRorHE/Yf26dsdF9gS6iQ7x58GZKFwvl8Ew5hk5P4/e0IMM
+         6ibbl7ck+g+NuKaDAxUNqwkZWxM45srgTXobiaK7Znmq0M89AGxH/19ExvtzZnuEt8Me
+         T4qshaNDKVHrJoOb8v5Xs1OmabXa1yK2k/RXuChwtpPKF++nyvfHuYplmuW0m5hIAkna
+         uciceVqBEOawqLoV45TDubsxlzIJhx8Jx/+rKx6lwTjhInfDjuNFAl8pZUaaCjY+X+Ys
+         ydAg==
+X-Gm-Message-State: AOJu0YwMSMD9ok6OT7EJDaKLxkjgmSVOoGTH4eToUUfB24ni/cc+r39a
+	BoCIHeZICtIeJ1psDMnmpP5ByoanokN0Rnv0Ht1PRJRsyrEW9XGsiYGi5ZiV0Q==
+X-Gm-Gg: AfdE7cnRoanRKSHVz1ypgoq9c+apcjgL0INIiHHN+bIlTceafxWxln5wCBEZJSIJaEK
+	2NSWZWaXmak6GiUlZAGn/12kPCEO4qnFK0jY3FzAB5NvZ/OAYMdJjso/gWr6gb4gnarrDFsZapy
+	eSi1bDfg51WF6HmYDY2PP38XUaa/oAPEh2fPWGmI3n6JkNlEueVlPBMm25cGrT63c2BALOrDW1T
+	AhITRgRbdRelueOiNwKePwzVwRGG/GxmiGMPsz/v9ibUHL1T1ZLMpowdrIIqELJBkloHYerxDPs
+	JXoFkPump83e3lYiAKRLKmFEt3Wubb6LRnwmmmJUj/4mhPq2VSxeaCHerAb/npXQCMbapYPbhop
+	Y43ImV7ut8VoGV8PNzKTvz+wzXNiEfIevVUiC2tTPBhRG1qB7Vq2T4yOJWkANPKUfSm3Myp4Cki
+	5hNil0NL0U9wUaac4ox0i9qK8DkyZa7UN2lxLIAQ==
+X-Received: by 2002:a05:600c:4753:b0:493:b84f:9c28 with SMTP id 5b1f17b1804b1-493e6892e6dmr38318435e9.4.1783540567182;
+        Wed, 08 Jul 2026 12:56:07 -0700 (PDT)
+Received: from localhost.localdomain ([2a10:4440:fff:d1a0:d438:d408:8c5e:d0ed])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-493eb6f3b85sm5485835e9.2.2026.07.08.12.56.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 08 Jul 2026 12:56:06 -0700 (PDT)
+From: Dierk Modrow <dierk.modrow@gmail.com>
+To: iwd@lists.linux.dev
+Cc: pmenzel@molgen.mpg.de,
+	Dierk Modrow <dierk.modrow@sew-eurodrive.de>
+Subject: [PATCH v2 1/2] It fixes a SEGV in eapol_rx_packets at receipt of EAPOL M1 msg at legacy roaming following a failed FT-handover due to a preceding ft_auth-/ft_reassoc-timeout. The issue only arises when using mwifiex / NXP 88W9098 driver for the client's WLAN module. We have seen the issue with SIEMENS SCALANCE W700 AX APs, but it may also occur with other AP brands supporting FT-handover.
+Date: Wed,  8 Jul 2026 21:55:49 +0200
+Message-ID: <20260708195550.165-1-dierk.modrow@gmail.com>
+X-Mailer: git-send-email 2.49.0.windows.1
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Language: de-DE
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.134,FMLib:17.12.100.49
- definitions=2026-07-08_02,2026-07-08_01,2025-10-01_01
+Content-Transfer-Encoding: 8bit
 
-RGVhciBQYXVsLA0KDQpJIHNwbGl0IHRoZSBwYXRjaCBpbiB0d28gZGlmZmVyZW50IHBhdGNoZXMg
-YW5kIGNvcnJlY3RlZCBnaXQgY29uZmlnIHVzZXIubmFtZSAvIGF1dGhvci4gSSB3aWxsIGRvIGdp
-dCBzZW5kLWVtYWlsIGZvciB0aGUgcGF0Y2hlcyB3aXRoIGFub3RoZXIgbWFpbC1hY2NvdW50ICYg
-UEMgZHVlIHRvIGZpcmV3YWxsIGlzc3VlcyBpbiB0aGUgY29tcGFueSBuZXR3b3JrLg0KDQpUaGFu
-ayB5b3UhDQoNCi9CUiBEaWVyaw0KDQpWb246IFBhdWwgTWVuemVsIDxtYWlsdG86cG1lbnplbEBt
-b2xnZW4ubXBnLmRlPg0KR2VzZW5kZXQ6IE1pdHR3b2NoLCA4LiBKdWxpIDIwMjYgMTA6MTINCkFu
-OiBtYWlsdG86ZGllcmsubW9kcm93Lm9wZW5zb3VyY2VAZ21haWwuY29tDQpDYzogbWFpbHRvOml3
-ZEBsaXN0cy5saW51eC5kZXY7IE1vZHJvdywgRGllcmsgPG1haWx0bzpEaWVyay5Nb2Ryb3dAc2V3
-LWV1cm9kcml2ZS5kZT4NCkJldHJlZmY6IFJlOiBbUEFUQ0hdIFRocmVlIGJ1Z2ZpeGVzIGZvciBp
-d2QgU0VHVnMgYXQgcmVjZWlwdCBvZiBFQVBPTCBNMSBtc2cgd2l0aCBsZWdhY3kgcm9hbWluZyBh
-bmQgcmVwZWF0ZWQgcm9hbSBzY2FuIGFmdGVyIGZ0X2F1dGgtL2Z0X3JlYXNzb2MtdGltZW91dCBv
-Y2N1cnJlZDoNCg0KRGVhciBEaWVyaywNCg0KVGhhbmsgeW91IGZvciB5b3VyIHBhdGNoLg0KDQpB
-bSAwOC4wNy4yNiB1bSAwODoxNiBzY2hyaWViIG1haWx0bzpkaWVyay5tb2Ryb3cub3BlbnNvdXJj
-ZUBnbWFpbC5jb206DQo+IEZyb206IERFTU9ERElFIDxtYWlsdG86ZGllcmsubW9kcm93QHNldy1l
-dXJvZHJpdmUuZGU+DQoNCkRFTU9ERElFIGRvZXNu4oCZdCBsb29rIHJpZ2h0LiBgZ2l0IGNvbmZp
-ZyAtLWdsb2JhbCB1c2VyLm5hbWUgIkRpZXJrDQpNb2Ryb3ciYCBhbmQgYGdpdCBjb21taXQgLS1h
-bWVuZCAtLWF1dGhvcj0iRGllcmsgTW9kcm93DQo8bWFpbHRvOmRpZXJrLm1vZHJvd0BzZXctZXVy
-b2RyaXZlLmRlPiIgc2hvdWxkIGhlbHAuDQoNCj4gICAgc3JjL2VhcG9sLmM6IG5leHQgdHJ5IGZv
-ciBhIGZpeCBvZiBTRUdWIGZhdWx0IGF0IGVhcG9sX3J4X3BhY2tldHMgd2hlbiB1c2luZyBtd2lm
-aWV4IC8gTlhQIDg4VzkwOTggZHJpdmVyDQo+ICAgIHNyYy9zdGF0aW9uLmM6IHBvdGVudGlhbCBi
-dWdmaXggaW4gc3RhdGlvbl9yb2FtX3NjYW5fbm90aWZ5IHRvIGF2b2lkIE5VTEwtUHRyIGFjY2Vz
-cyB0byB2YXIgaHMNCj4gICAgc3JjL3N0YXRpb24uYzogbmV4dCB0cnkgdG8gZml4IGEgU0VHViBh
-ZnRlciBhdXRoIHRpbWVvdXQgYXQgRlQgcm9hbWluZw0KDQpJdOKAmWQgYmUgZ3JlYXQgaWYgeW91
-IGNvdWxkIG1ha2Ugb25lIGNvbW1pdCBmb3IgZWFjaCBidWcuDQoNCj4gLS0tDQo+ICAgc3JjL2Vh
-cG9sLmMgICB8ICA0ICsrKysNCj4gICBzcmMvc3RhdGlvbi5jIHwgMTIgKysrKysrLS0tLS0tDQo+
-ICAgMiBmaWxlcyBjaGFuZ2VkLCAxMCBpbnNlcnRpb25zKCspLCA2IGRlbGV0aW9ucygtKQ0KPg0K
-PiBkaWZmIC0tZ2l0IGEvc3JjL2VhcG9sLmMgYi9zcmMvZWFwb2wuYw0KPiBpbmRleCAzNzI1NDlj
-Ni4uYzJkYzRlNGMgMTAwNjQ0DQo+IC0tLSBhL3NyYy9lYXBvbC5jDQo+ICsrKyBiL3NyYy9lYXBv
-bC5jDQo+IEBAIC0yODI0LDYgKzI4MjQsMTAgQEAgdm9pZCBlYXBvbF9yZWdpc3RlcihzdHJ1Y3Qg
-ZWFwb2xfc20gKnNtKQ0KPg0KPiAgICAgICAgICAgICBsX3F1ZXVlX3B1c2hfaGVhZChzdGF0ZV9t
-YWNoaW5lcywgc20pOw0KPg0KPiArICAgICAgICAgIC8qIHdvcmthcm91bmQgYWdhaW5zdCBTRUdW
-IG9uIGZjdC4gZWFwb2xfcnhfcGFja2V0IGJ5IGF2b2lkaW5nIGZvciB0d28gZGlmZmVyZW50IGVh
-cG9sX2ZyYW1lX3dhdGNoZXMgd2l0aCBkaWZmZXJlbnQgaWRzLCBidXQgc2FtZSBlYXBvbF9zbSBw
-dHIgKi8NCj4gKyAgICAgICAgICBpZiAoKHNtLT53YXRjaF9pZCA+IDApICYmIGVhcG9sX2ZyYW1l
-X3dhdGNoX3JlbW92ZShzbS0+d2F0Y2hfaWQpKSB7DQo+ICsgICAgICAgICAgICAgICAgICAgICAg
-ICAgbF9kZWJ1ZygiZXhpc3RpbmcgZnJhbWVfd2F0Y2ggZm9yIHNtPSVwIHdpdGggaWQ9JXUgc3Vj
-Y2Vzc2Z1bGx5IHJlbW92ZWQiLCBzbSwgc20tPndhdGNoX2lkKTsNCj4gKyAgICAgICAgICB9DQo+
-ICAgICAgICAgICAgIHNtLT53YXRjaF9pZCA9IGVhcG9sX2ZyYW1lX3dhdGNoX2FkZChzbS0+aGFu
-ZHNoYWtlLT5pZmluZGV4LA0KPiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgcnhfaGFu
-ZGxlciwgc20pOw0KPiAgICAgICAgICAgICBzbS0+cHJvdG9jb2xfdmVyc2lvbiA9IHNtLT5oYW5k
-c2hha2UtPnByb3RvX3ZlcnNpb247DQo+IGRpZmYgLS1naXQgYS9zcmMvc3RhdGlvbi5jIGIvc3Jj
-L3N0YXRpb24uYw0KPiBpbmRleCA4ZmNmOGM3MC4uMDc3ZTUxMGUgMTAwNjQ0DQo+IC0tLSBhL3Ny
-Yy9zdGF0aW9uLmMNCj4gKysrIGIvc3JjL3N0YXRpb24uYw0KPiBAQCAtMjI1Myw3ICsyMjUzLDcg
-QEAgc3RhdGljIGJvb2wgc3RhdGlvbl9jYW5fZmFzdF90cmFuc2l0aW9uKHN0cnVjdCBzdGF0aW9u
-ICpzdGF0aW9uLA0KPiAgIHsNCj4gICAgICAgICAgICAgdWludDE2X3QgbWRpZDsNCj4NCj4gLSAg
-ICAgICAgICAgaWYgKCFocy0+bWRlKQ0KPiArICAgICAgICAgIGlmICghaHMgfHwgIWhzLT5tZGUp
-DQo+ICAgICAgICAgICAgICAgICAgICAgICAgICAgIHJldHVybiBmYWxzZTsNCj4NCj4gICAgICAg
-ICAgICAgaWYgKGllX3BhcnNlX21vYmlsaXR5X2RvbWFpbl9mcm9tX2RhdGEoaHMtPm1kZSwgaHMt
-Pm1kZVsxXSArIDIsDQo+IEBAIC0yOTE3LDcgKzI5MTcsNyBAQCBzdGF0aWMgYm9vbCBzdGF0aW9u
-X3JvYW1fc2Nhbl9ub3RpZnkoaW50IGVyciwgc3RydWN0IGxfcXVldWUgKmJzc19saXN0LA0KPg0K
-PiAgICAgICAgICAgICBvcmlnX3NlY3VyaXR5ID0gbmV0d29ya19nZXRfc2VjdXJpdHkobmV0d29y
-ayk7DQo+DQo+IC0gICAgICAgICAgIGlmIChocy0+bWRlKQ0KPiArICAgICAgICAgIGlmIChocyAm
-JiBocy0+bWRlKQ0KPiAgICAgICAgICAgICAgICAgICAgICAgICAgICBpZV9wYXJzZV9tb2JpbGl0
-eV9kb21haW5fZnJvbV9kYXRhKGhzLT5tZGUsIGhzLT5tZGVbMV0gKyAyLA0KPiAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgJm1kaWQsIE5VTEwsIE5VTEwpOw0K
-Pg0KPiBAQCAtMjkzMCw3ICsyOTMwLDcgQEAgc3RhdGljIGJvb2wgc3RhdGlvbl9yb2FtX3NjYW5f
-bm90aWZ5KGludCBlcnIsIHN0cnVjdCBsX3F1ZXVlICpic3NfbGlzdCwNCj4gICAgICAgICAgICAg
-aWYgKGJzcyAmJiAhc3RhdGlvbi0+YXBfZGlyZWN0ZWRfcm9hbWluZykgew0KPiAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICBkb3VibGUgY3VyX2Jzc19yYW5rID0gYnNzLT5yYW5rOw0KPg0KPiAt
-ICAgICAgICAgICAgICAgICAgICAgICAgICBpZiAoaHMtPm1kZSAmJiBic3MtPm1kZV9wcmVzZW50
-ICYmIGxfZ2V0X2xlMTYoYnNzLT5tZGUpID09IG1kaWQpDQo+ICsgICAgICAgICAgICAgICAgICAg
-ICAgICAgaWYgKGhzICYmIGhzLT5tZGUgJiYgYnNzLT5tZGVfcHJlc2VudCAmJiBsX2dldF9sZTE2
-KGJzcy0+bWRlKSA9PSBtZGlkKQ0KPiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICBjdXJfYnNzX3JhbmsgKj0gUkFOS19GVF9GQUNUT1I7DQo+DQo+ICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgIGN1cl9ic3NfZ3JvdXBfcmFuayA9IGV2YWx1YXRlX2Jzc19ncm91cF9y
-YW5rKGJzcy0+YWRkciwNCj4gQEAgLTI5NjcsOCArMjk2Nyw4IEBAIHN0YXRpYyBib29sIHN0YXRp
-b25fcm9hbV9zY2FuX25vdGlmeShpbnQgZXJyLCBzdHJ1Y3QgbF9xdWV1ZSAqYnNzX2xpc3QsDQo+
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGdvdG8gbmV4dDsNCj4N
-Cj4gICAgICAgICAgICAgICAgICAgICAgICAgICAgLyogU2tpcCByZXN1bHQgaWYgaXQgaXMgbm90
-IHBhcnQgb2YgdGhlIEVTUyAqLw0KPiAtICAgICAgICAgICAgICAgICAgICAgICAgICBpZiAoYnNz
-LT5zc2lkX2xlbiAhPSBocy0+c3NpZF9sZW4gfHwNCj4gLSAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgbWVtY21wKGJzcy0+c3NpZCwgaHMtPnNz
-aWQsIGhzLT5zc2lkX2xlbikpDQo+ICsgICAgICAgICAgICAgICAgICAgICAgICAgaWYgKGhzICYm
-IChic3MtPnNzaWRfbGVuICE9IGhzLT5zc2lkX2xlbiB8fA0KPiArICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIG1lbWNtcChic3MtPnNzaWQsIGhz
-LT5zc2lkLCBocy0+c3NpZF9sZW4pKSkNCj4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgZ290byBuZXh0Ow0KPg0KPiAgICAgICAgICAgICAgICAgICAgICAgICAgICBp
-ZiAoc2Nhbl9ic3NfZ2V0X3NlY3VyaXR5KGJzcywgJnNlY3VyaXR5KSA8IDApDQo+IEBAIC0yOTg2
-LDcgKzI5ODYsNyBAQCBzdGF0aWMgYm9vbCBzdGF0aW9uX3JvYW1fc2Nhbl9ub3RpZnkoaW50IGVy
-ciwgc3RydWN0IGxfcXVldWUgKmJzc19saXN0LA0KPg0KPiAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICByYW5rID0gYnNzLT5yYW5rOw0KPg0KPiAtICAgICAgICAgICAgICAgICAgICAgICAgICBp
-ZiAoaHMtPm1kZSAmJiBic3MtPm1kZV9wcmVzZW50ICYmIGxfZ2V0X2xlMTYoYnNzLT5tZGUpID09
-IG1kaWQpDQo+ICsgICAgICAgICAgICAgICAgICAgICAgICAgaWYgKGhzICYmIGhzLT5tZGUgJiYg
-YnNzLT5tZGVfcHJlc2VudCAmJiBsX2dldF9sZTE2KGJzcy0+bWRlKSA9PSBtZGlkKQ0KPiAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICByYW5rICo9IFJBTktfRlRfRkFD
-VE9SOw0KPg0KPiAgICAgICAgICAgICAgICAgICAgICAgICAgICBncm91cF9yYW5rID0gZXZhbHVh
-dGVfYnNzX2dyb3VwX3JhbmsoYnNzLT5hZGRyLCBic3MtPmZyZXF1ZW5jeSwNCg0KDQpLaW5kIHJl
-Z2FyZHMsDQoNClBhdWwNCg0KX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18NCg0KDQpT
-RVctRVVST0RSSVZFIEdtYkggJiBDbyBLRw0KS29tbWFuZGl0Z2VzZWxsc2NoYWZ0LCBTaXR6OiBC
-cnVjaHNhbCwgUkcgTWFubmhlaW0gSFJBIDIzMDk3MA0KS29tcGxlbWVudMOkcmluOiBTRVctRVVS
-T0RSSVZFIFZlcndhbHR1bmdzLUdtYkgsIFNpdHo6IEJydWNoc2FsLCBSRyBNYW5uaGVpbSBIUkIg
-MjMwMjA3DQoNCkdlc2Now6RmdHNmw7xocmVuZGVyIEdlc2VsbHNjaGFmdGVyOiBKw7xyZ2VuIEJs
-aWNrbGUNCkdlc2Now6RmdHNmw7xocnVuZzogSsO8cmdlbiBCbGlja2xlIChWb3JzaXR6ZW5kZXIp
-LCBEci4gSsO2cmcgSGVybWVzLCBEci4gSGFucyBLcmF0dGVubWFjaGVyLCBNaWNoYWVsIEx1eiwg
-Q2hyaXN0aWFuIE1heWVyLCBEci4gTWFya3VzIFfDtnBwZXJtYW5uDQo=
+From: Dierk Modrow <dierk.modrow@sew-eurodrive.de>
+
+---
+ src/eapol.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/src/eapol.c b/src/eapol.c
+index 372549c6..c2dc4e4c 100644
+--- a/src/eapol.c
++++ b/src/eapol.c
+@@ -2824,6 +2824,10 @@ void eapol_register(struct eapol_sm *sm)
+ 
+ 	l_queue_push_head(state_machines, sm);
+ 
++	/* workaround against SEGV on fct. eapol_rx_packet by avoiding for two different eapol_frame_watches with different ids, but same eapol_sm ptr */
++	if ((sm->watch_id > 0) && eapol_frame_watch_remove(sm->watch_id)) {
++		l_debug("existing frame_watch for sm=%p with id=%u successfully removed", sm, sm->watch_id);
++	}
+ 	sm->watch_id = eapol_frame_watch_add(sm->handshake->ifindex,
+ 						rx_handler, sm);
+ 	sm->protocol_version = sm->handshake->proto_version;
+-- 
+2.49.0.windows.1
+
