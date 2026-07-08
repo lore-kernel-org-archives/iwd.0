@@ -1,68 +1,72 @@
-Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
+Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C13C3451AF
-	for <iwd@lists.linux.dev>; Wed,  8 Jul 2026 15:23:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4019E3F12C6
+	for <iwd@lists.linux.dev>; Wed,  8 Jul 2026 15:23:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783524194; cv=none; b=DDJ4NYk1E6qtPKn/RYwsDx8GY6Q1aA7hCEzxBs7f3XVeH/fVttFny3owE1QNRKMlHigZunGASt6u/YFWfsN+mvJ4z+IxU+yYKOKUCthOTo0e4uCz7WKFuaK1EECB95h7U4eUz5szcMRStN0M/D7GNdQLL3hCtLVlJ7IW4P2h1HM=
+	t=1783524195; cv=none; b=VOVkdZkBsRRh9Xsw/aqrIMY+YxEYkmmgvcRUUuOE0oDMhunXS9vChxjPlJaMVFi/q4DqAL7CldK4CG1H2mdn+bfLVB9Ielsle0CC+/N3gVFdRqT1QzzmIDK58bd4O0A9iGub1huRJdhZE+PiIlk4YQa3LpumJhrKBkQ2wCsnqFA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783524194; c=relaxed/simple;
-	bh=i6CB0RGySQ4tEKc+FtRRWf4TIwEBkdRMVwdut9O9dtc=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=jQ6yBO+yxmvYumr57Vw4jcVGdgHC9RlNrvavu24BgKy/IzH+xc2nwrAvxN/7U6ZKyic6W9N5GiDlFJVhov8YyeyY/pxmCNH7DMVZyDuxzJJF1ixMKrCmq+4lqQzpLzWtWdsxu2uq8i6esjrXc+kyuh6mEYWtpMpXkYJJE0nBwAE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=S98H0P6H; arc=none smtp.client-ip=209.85.128.41
+	s=arc-20240116; t=1783524195; c=relaxed/simple;
+	bh=0F2OW2XL/TofmzNHZSSET/+m39sVdc4dBNx2/8ooz9Q=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=ghXRpgbTNdWA+WsNePbQzKlYoNsfufmvCXNyPc07QeSWQrQAzKATNfLTjN9TP099Fr2nx/xjsAdziC4min9AsQQ2KdneCrhBdFtF6mAFKzygs/o9lxU7xSVxluKyaueFdkK2iecT3AQZL93XFGBvOCwFwvPVmQtgDiC7epuqmvo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Jjjiu7rH; arc=none smtp.client-ip=209.85.128.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="S98H0P6H"
-Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-493e4cccd8dso3614085e9.2
-        for <iwd@lists.linux.dev>; Wed, 08 Jul 2026 08:23:12 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Jjjiu7rH"
+Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-493b6f1b14bso3711285e9.0
+        for <iwd@lists.linux.dev>; Wed, 08 Jul 2026 08:23:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1783524191; x=1784128991; darn=lists.linux.dev;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=ji+74JjtsCf46eEciwJLMgSMMYyY6/3ISbbxDBKYoL0=;
-        b=S98H0P6Hp202UeFs+GTo4dpg1eUYkn+8jGB660YLwHPy0gt3zLwB/CQ2GO/GVri2EE
-         1RfP/ea8OWEpWNKChr6/tz/1JfpZu+I1vbigGLechIpFfYtKrl+Fmi7vbYZtGEAC7ASF
-         98FyJgHN2ywnDv9FexabK3SEVzItbpuoIGvlZy7MLbxvbH93NvkvGcZcNp8e8yL5iOjV
-         VZHIziBp716b02DrYE2IR5YsiYQfAm/Ktwv8rXe3ali9I1EtV2qrWZRKQ+2RkY45ioOO
-         npNxH+9XwdeC6I5NAerUkvRui5QxVXuTAyGlPRCcWkX9Hhf4Wb80tpN6tJrUn9TSj7Sf
-         Yjpg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783524191; x=1784128991;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20251104; t=1783524193; x=1784128993; darn=lists.linux.dev;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=ji+74JjtsCf46eEciwJLMgSMMYyY6/3ISbbxDBKYoL0=;
-        b=QUWgqiraTe2tycPmp491HQ+iMnbLT+HLSXRBzGP1/kFbOw5QiYGaK7K3v9VPOSHzN+
-         vL4oC3yUjMggKCzIRR4/ahwzNYucNfjNMMisHygCCzFEbpsEFRAQpUSoLczbj9GK55we
-         1eKoeMIPH6oc3L5rocpkUWv3KikVCzTBru94O2dxIzHXCpERhAhifIn7YsrKNqyrDN3H
-         V5m0D3kOs5SDif/wDct613gFeg1OJoZReojApSn5f/aTmZAyv74zzVGosYfqJb5T9M1F
-         b8cMRxhNPPLwlfsopVDfVBIQ0rqWpWOjeuJyCTWahMjdW7IpxCNkOypq1+hu5paVn0Yn
-         wvgA==
-X-Gm-Message-State: AOJu0YyeI2I3PjKSuYTKGknFXAYcqhglYPN5arTGthdYdJbrpLlIB72s
-	KtIwg41GX/Qnu2XYQZrzpJ4n/jSyG+c7euLMGZkk5QfGEWrI+hlY5ey2tOoxmA==
-X-Gm-Gg: AfdE7cm3crUFS/i6v2m4ngAPL5XY54WIeo1wR64XHSkSAFa8zFmghDQ5nyCg8vElRe2
-	VYRL4MVPEzaWomZCuFvQVuE6Z5S0/0uMy4EBmrv4FjASDeF7l/mGSVPTApo46o9HypbKr9OX2p9
-	W29dvNzQ4ZD/HqpN84WeiFCC55NQTY1qAYk8sjt/KxPpbm8paa/C+Op1egiL2hBUNAKnbpqzRVg
-	m83Ly71lKaKgvMqVdBhEI1KKisRdxcQc6rheyyyKjvYbtMlSFqpFzjkZqNw84q3tn6cS1DBI2Uj
-	wa/VcTGllvgzjy+ocnu7nN/H8CLcCbvvIxFPEseGIkuG4VIy0BkjIbUJBCQOPiNn8YN0S3y7gSQ
-	Eqp/dmH9ZpjxQMq6gAL26GhFjFgQb6FN8AAOyBe/Kqiql+aM7v49T6g39STPGRHnYAet144eEZi
-	HWgVpuBxNcE8Qd2hdJUpn7h8VwT2QM39jyv23Y5w==
-X-Received: by 2002:a05:600c:a00f:b0:493:bc4b:b8c with SMTP id 5b1f17b1804b1-493e69e9902mr31486995e9.38.1783524190696;
-        Wed, 08 Jul 2026 08:23:10 -0700 (PDT)
+        bh=xTYyHLv+JFcTBWT9WahDmWAeXG05epmCD+11TXuczQs=;
+        b=Jjjiu7rHQcykgZaRNE7c9X+CnDga2+owKbAZHrmpMIm46qFNY7G7NfI2OvcUMPndh/
+         wn2SurP+x6EJVzyOiVmCfwreqA2SxmdS17THYZENDOE9OqY4E/UPEJxYMXVnOiEWCz3g
+         uA1XgxCGeO22hM8gXhx7lJ3qb3YoZB887cpTrFAWsZH+P7LWMCJHNLRyWum7M3JY/tyX
+         A7I/yZC1NYafqnycoIrEuLKX3FjTxArDIpRPu9HF3iFntHnWdTX6qH1EiubprQonwYF4
+         MEFCixJ7+cA2fpdYrcPOh7oSG26RbxGpG7MTzeoI59c15gQos7hMSX+uiivEUvUBi8rw
+         inWg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1783524193; x=1784128993;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to:content-type;
+        bh=xTYyHLv+JFcTBWT9WahDmWAeXG05epmCD+11TXuczQs=;
+        b=ITqs/VRyuOBUd1RgNMJwYfhdGEPwGX8XeaS61G72zHJQMAK7eHLl3Ufu26NWQRe+dg
+         Eo74U7R6YC0mTcSOr8dTVvxLHMhSESOo/msKXk/8HBUqwZut9NMZD3vtgag0ZHu5JA6o
+         LYCGyNh/+tLYArekh+ovSf0SYvDjt+PcXr3XabdxYS7MorBXDLm4HTLEcy96/kU2qCaW
+         70cPtb4bvQLAeLOfmSlItH6dPbfZv18E0GKQ6yOZ7PGAFrrQS6SSmECW5zPuAaDUsita
+         7/qUeE/zH07pI+jGFu4OvPJwRHWbksnT2pWcXZMmhPVXZoyehUxI117W+8ANTzO2JRxn
+         9MHA==
+X-Gm-Message-State: AOJu0YxdY/pC8D6sHKZq7/aMUt8i4lU0R5nylT0e/zO5vDBD7ZZonYVk
+	xRc0Cp8iJmjHlSHe7FLuO5oN6CIG56ldCnjrCX/DUUfzKqgVbAUFAHPgFRaSFg==
+X-Gm-Gg: AfdE7cmhdCWzYoBnLE50DrElX9oaT1m54JhBI+wkT72cYzYtmw153MnGp+td4/S6uPv
+	l6A/zUyksX+UzoyHkemZtxldZG/9wxDS6fDeDOfEA+i0UY5y8zSg4IEsUmeMDbm8pI4Tbxi6XZy
+	7Kgs6IpcoHtc9uBaq9kwi3uz1JOHHoEwW1U900/vWHL3ky5Gr7x7B4espjJOnwQEYvVIeK1wimd
+	EnfAMr4L/CuO4cBAjsO/rUp7zWD/zyDEVsU1GHghR49IhmDv98YjpwfKnYym0ZZsdpRCs59Ew5F
+	wE8NimoI7EKfUjvq0lWl+RTsXN4wpFPF1EHNlQobHxTEnjCdL6aJQ/qOnfA7vCOfnTHC4EufrwY
+	jag/cFIHT6uEEBZfVzNugP4VBqzhjO+aHxOuPvxi9+hu02o3VJ4GsECznj0g/rrybrbv+qe5KCM
+	Ypw4LB0xo3r02anirK4mLMocESxR5todl2VyCgAQ==
+X-Received: by 2002:a05:600c:528c:b0:493:aa28:38ad with SMTP id 5b1f17b1804b1-493e6844228mr31995895e9.10.1783524192359;
+        Wed, 08 Jul 2026 08:23:12 -0700 (PDT)
 Received: from localhost.localdomain ([2a10:4440:fff:d1a0:c58e:91f1:416f:77dd])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-493e5a61135sm42412065e9.1.2026.07.08.08.23.09
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-493e5a61135sm42412065e9.1.2026.07.08.08.23.10
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 08 Jul 2026 08:23:10 -0700 (PDT)
+        Wed, 08 Jul 2026 08:23:11 -0700 (PDT)
 From: Dierk Modrow <dierk.modrow@gmail.com>
 To: iwd@lists.linux.dev
 Cc: pmenzel@molgen.mpg.de,
 	Dierk Modrow <dierk.modrow@sew-eurodrive.de>
-Subject: [PATCH] src/eapol.c: fix of SEGV in eapol_rx_packets at receipt of EAPOL M1 msg at legacy roaming after ft_auth-/ft_reassoc-timeout when using mwifiex / NXP 88W9098 driver
-Date: Wed,  8 Jul 2026 17:22:27 +0200
-Message-ID: <20260708152228.1191-1-dierk.modrow@gmail.com>
+Subject: [PATCH 2/2] src/station.c: fix of SEGV in station_roam_scan_notify when performing repeated roam scan at legacy roaming after ft_auth-/ft_reassoc-timeout when using mwifiex / NXP 88W9098 driver
+Date: Wed,  8 Jul 2026 17:22:28 +0200
+Message-ID: <20260708152228.1191-2-dierk.modrow@gmail.com>
 X-Mailer: git-send-email 2.49.0.windows.1
+In-Reply-To: <20260708152228.1191-1-dierk.modrow@gmail.com>
+References: <20260708152228.1191-1-dierk.modrow@gmail.com>
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
@@ -74,24 +78,60 @@ Content-Transfer-Encoding: 8bit
 From: Dierk Modrow <dierk.modrow@sew-eurodrive.de>
 
 ---
- src/eapol.c | 4 ++++
- 1 file changed, 4 insertions(+)
+ src/station.c | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
 
-diff --git a/src/eapol.c b/src/eapol.c
-index 372549c6..c2dc4e4c 100644
---- a/src/eapol.c
-+++ b/src/eapol.c
-@@ -2824,6 +2824,10 @@ void eapol_register(struct eapol_sm *sm)
+diff --git a/src/station.c b/src/station.c
+index 8fcf8c70..077e510e 100644
+--- a/src/station.c
++++ b/src/station.c
+@@ -2253,7 +2253,7 @@ static bool station_can_fast_transition(struct station *station,
+ {
+ 	uint16_t mdid;
  
- 	l_queue_push_head(state_machines, sm);
+-	if (!hs->mde)
++	if (!hs || !hs->mde)
+ 		return false;
  
-+	/* workaround against SEGV on fct. eapol_rx_packet by avoiding for two different eapol_frame_watches with different ids, but same eapol_sm ptr */
-+	if ((sm->watch_id > 0) && eapol_frame_watch_remove(sm->watch_id)) {
-+		l_debug("existing frame_watch for sm=%p with id=%u successfully removed", sm, sm->watch_id);
-+	}
- 	sm->watch_id = eapol_frame_watch_add(sm->handshake->ifindex,
- 						rx_handler, sm);
- 	sm->protocol_version = sm->handshake->proto_version;
+ 	if (ie_parse_mobility_domain_from_data(hs->mde, hs->mde[1] + 2,
+@@ -2917,7 +2917,7 @@ static bool station_roam_scan_notify(int err, struct l_queue *bss_list,
+ 
+ 	orig_security = network_get_security(network);
+ 
+-	if (hs->mde)
++	if (hs && hs->mde)
+ 		ie_parse_mobility_domain_from_data(hs->mde, hs->mde[1] + 2,
+ 							&mdid, NULL, NULL);
+ 
+@@ -2930,7 +2930,7 @@ static bool station_roam_scan_notify(int err, struct l_queue *bss_list,
+ 	if (bss && !station->ap_directed_roaming) {
+ 		double cur_bss_rank = bss->rank;
+ 
+-		if (hs->mde && bss->mde_present && l_get_le16(bss->mde) == mdid)
++		if (hs && hs->mde && bss->mde_present && l_get_le16(bss->mde) == mdid)
+ 			cur_bss_rank *= RANK_FT_FACTOR;
+ 
+ 		cur_bss_group_rank = evaluate_bss_group_rank(bss->addr,
+@@ -2967,8 +2967,8 @@ static bool station_roam_scan_notify(int err, struct l_queue *bss_list,
+ 			goto next;
+ 
+ 		/* Skip result if it is not part of the ESS */
+-		if (bss->ssid_len != hs->ssid_len ||
+-				memcmp(bss->ssid, hs->ssid, hs->ssid_len))
++		if (hs && (bss->ssid_len != hs->ssid_len ||
++				memcmp(bss->ssid, hs->ssid, hs->ssid_len)))
+ 			goto next;
+ 
+ 		if (scan_bss_get_security(bss, &security) < 0)
+@@ -2986,7 +2986,7 @@ static bool station_roam_scan_notify(int err, struct l_queue *bss_list,
+ 
+ 		rank = bss->rank;
+ 
+-		if (hs->mde && bss->mde_present && l_get_le16(bss->mde) == mdid)
++		if (hs && hs->mde && bss->mde_present && l_get_le16(bss->mde) == mdid)
+ 			rank *= RANK_FT_FACTOR;
+ 
+ 		group_rank = evaluate_bss_group_rank(bss->addr, bss->frequency,
 -- 
 2.53.0.windows.2
 
