@@ -1,72 +1,68 @@
-Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
+Received: from mail-qt1-f175.google.com (mail-qt1-f175.google.com [209.85.160.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2130D2ED872
-	for <iwd@lists.linux.dev>; Wed,  8 Jul 2026 22:21:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDF8F314D37
+	for <iwd@lists.linux.dev>; Thu,  9 Jul 2026 21:45:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783549282; cv=none; b=K1C2+BbKcICimoOti+2q95sApOR13BbtsvKaim3YJdSsxDXh7lIAEmi5w6kwJPZW6C2GmS9x60WnV940uMCWCkHrg4khzzKxgseG8F6qsvCLkkLGTEwxLPRr6dg7Y98En6uy1kKk6w/ApO9+95eTspuWV+zpDk7ok63SNRCC1uM=
+	t=1783633555; cv=none; b=IlEEUSy+xrH/8KIBpA2jXGFljmQ3lcc/iSuhzrPhue+j5lSAjaQ23xu/Vi1eDcMCYT3MG8HB4n591vjzgPvmoHzlijFAGJW/svBjX1tghAiF7f6sjAd4YBmJc4/DJIB/3E5/U8M5fRV4vavbIG+DO+VdbBlnR2Ljfp+aLyyrRwo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783549282; c=relaxed/simple;
-	bh=NizH098wFjanZOsBRUroseDBKjUwmj//jJtNlvi9JaY=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=WisFJrD5tRM1Y4aum2vL1KjAhwZxR7Il71uueDOINtpLukxJ1ak+oDBjMQdwrJi8V9Uw+DKMBJB3KvxRLJPjF2W2uClS70HAG4svaAzq4QQpMhNOGsg/x//EzZcOKe4EwG/In+D606740+kzIlrEA9dCEBR3iPazJAGI4L1F4o8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nnUvzk2a; arc=none smtp.client-ip=209.85.128.41
+	s=arc-20240116; t=1783633555; c=relaxed/simple;
+	bh=ua338y3NmzGI+L0+Je1Ee+QjrzUrkRNK+vao+qO7cLQ=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=stzFJV2dx6iNrFQ4IfBBSNWyYgLerFFstJLx929W6NSF4io/ZtEAW5kfTqOGzGf5b0q4diwWijYAzkxRyD6teHd04DkZC5RSYYfvSTFn4ByxVm//wbVcm79UgC5Lb+N6bQDZRG0ZOZTJfYApZkGJ/WwZ7uON8mOWTfLTlQt7jMw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=sE1wfm+V; arc=none smtp.client-ip=209.85.160.175
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nnUvzk2a"
-Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-4938d5f86f3so2261855e9.1
-        for <iwd@lists.linux.dev>; Wed, 08 Jul 2026 15:21:20 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="sE1wfm+V"
+Received: by mail-qt1-f175.google.com with SMTP id d75a77b69052e-51c2c8f43aaso2056731cf.1
+        for <iwd@lists.linux.dev>; Thu, 09 Jul 2026 14:45:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1783549279; x=1784154079; darn=lists.linux.dev;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=HcGFAfrURYIlfuZaBHWi3CkVLkW9ZfxUhTBFntox6+I=;
-        b=nnUvzk2aVhQXv6ioNOcy4HQEbdCyIthUmzhw0gwn9x6gBgmILaxqw+SeuhjbtLa6yT
-         apbaR8wGWU8Wse+fLdaNRi2x0VaeN2DqAxzpYf5UyyADyH5Wn27MhTugUPdIniAA4b+2
-         if6gRP2g0UndzQWZG/s1XGGgExH9lAJs4/vmANqmhVQoetnpLvsxZBxF1Mz4v6PDXCEL
-         rTQicwz8f9TJIMBfj+tpRDJ1dIJoRTp+XROGLiG195WPAq+huvGiIay0kkRJ6vIYsCwE
-         rVx6PUfLR6bs+dCvkX9GsK2YDuH8uFgsPUpFa2j6Nhc/YUB4MAaOy5GbIykYdHuEodN/
-         Z2Og==
+        d=gmail.com; s=20251104; t=1783633553; x=1784238353; darn=lists.linux.dev;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=0I6Z4G5g6B2NEPOYHFwFJ1WQcKWrdL+W7lri2taE22Y=;
+        b=sE1wfm+VIfQfWs9BNyY43+Fdui+5Pm+TSywrJ8nHwOxx633BsBDvvr8PYCC+xZ9Nsk
+         Xa7HKYOioeTbNOXZvW6C47U+wt/iiRuSG7Dq+mSKIK0ADoH8giXUmJOepuxc9niycjpx
+         +bZhjWXgVv5pcVX4376YL0mLWOcvUqzXQfyE/WEjLRs0d4uEFQzJvHBBQdQNtB6cocR7
+         v+LscpgPAuSmuDrILRbSL5jLwyt7bxWG4bdaYC8kuU+4yWGdM2z8TNFI96OfTie2l4WX
+         Sul015a8I1USRtMzRWSw3phT6DNlt1/Usq/aD4pRUt8F3N5x7TNuoVxi004v19S2/jFJ
+         a0Mg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783549279; x=1784154079;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=HcGFAfrURYIlfuZaBHWi3CkVLkW9ZfxUhTBFntox6+I=;
-        b=CUAZejeA0/nDhByI+Pm+g0trxxicP81lICXn2UFfaJg3aGlrZcYcWBdLovDExiwrea
-         pRo1wUQuHA1ZZvB8li12/GqO+WqNx9MMkEmdNLMImmN+2WUE01xQwJVwWK5dMSkYjFtT
-         7Kp9TYuRKvGfJ4/ZfrXSFL9Clb+qEQGKV3OsvgrifuoLAWTSvQc2jrUkOOedE/vGImP4
-         OQWXyv4p2FO0j3aQ8wRdLfE7GuWrNAYeab8EYFzn9SACPNFfgXbhNsKMPEli3+S4yXY1
-         Kfo75t1e/OXyQbmU4Wq0t3sYC5o9Ev08kFMO8pNYg+PJ90N1l7j4iZ2DMGGpluW2lOP5
-         oqug==
-X-Gm-Message-State: AOJu0YwTXh+2eaySnz/Ik6mI8fuIPKYkmtmH35OTpt4Ztcf/l9pjlj+h
-	6ioyZirM3+t81/VbK7fnUduaMNyl0tSgnwf1abxKIOloqMjsNpxbtRVIYG2S9A==
-X-Gm-Gg: AfdE7ckjgy8A52dpZIKAj43wmlpPtCp46DT0mxN7wx+r4znUVqlFpzzlJZCazHpBVK9
-	2pcT3Q3vuTgNT0wM4s1kjGUKABcB8lAZhM2QNOuCWcLlJWbX/jKubEXTtrkz11wBbxDx9Yuxiuy
-	14Pex+C1RL1aW49uwFgUyuXzsGocqKpwXoOI2A6+W9H305nLj86E6+Kf2iMMVKNdtXM04mfzIMQ
-	ShCERnkxlagIE9OCVC9uA0qqwNoW4tALpLyjBoA8yMk9uHkHQPLKk7yjIdzUV9VMe5GGLurx9uF
-	cbsQ893Sehps7VcjyxbaGvMiTrhQhiEsp1sX39kv4sadULkE4qZ+rVqcFhM+pw9OtjPwo8+2Yp1
-	62fr30hef4XRgatSN73VxJAGfMtvBWLVm97f00QP0qOxe/vHT4t2IXG6vDJaTWNnOxs+0JojGpN
-	jo4Oy4SVl2THc45AnkvrpwNnIAewurahag+G0CFA==
-X-Received: by 2002:a05:600c:8a0a:20b0:493:c2ac:58f with SMTP id 5b1f17b1804b1-493ec665a0bmr933365e9.8.1783549279300;
-        Wed, 08 Jul 2026 15:21:19 -0700 (PDT)
-Received: from localhost.localdomain ([2a10:4440:fff:d1a0:d438:d408:8c5e:d0ed])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-493eb6f373csm19920295e9.14.2026.07.08.15.21.17
+        d=1e100.net; s=20251104; t=1783633553; x=1784238353;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=0I6Z4G5g6B2NEPOYHFwFJ1WQcKWrdL+W7lri2taE22Y=;
+        b=ZvqCtpW5le+PHv6vIJXM2eVAFRMb5UKCcp+P9MJsOmyu/TUOLCPAXkX0y7CM5jxF+a
+         8ybAiPU0+5K4zJmHtatPd9gjjdo0oeITWOl/enFAqix2pD5wVDW81o7lQG5wUoBeNhUi
+         18yt9cniwrjIgskMHgIwuR/UVGyo6//XEdWZSLlFtFBP4Fo6cTm7kEALD7+6rSO8dFDd
+         wgkZOJO1wmYYCjlA9kYCSQZehguCrWDQjSD8Fbtf2/GHC31cgpoO9tYXxyAguiHkbwYd
+         r0tumM8BB6aC+tOQWcinZCgG21jbmQCcjFDcRp89NTH9wovVP6AtpSc4jt6v7by3RPc7
+         MJtQ==
+X-Gm-Message-State: AOJu0YxzPmyZSQwbLWpegKwX1TUdXWJSFAgqFxvYvOZU8w0slcUaQVyx
+	NFSmZs+toKYkJYvLwUzfAcK/6csKPOk2Jq+5lMulokUZst2zf8P1a9H6hm29BA==
+X-Gm-Gg: AfdE7cmlg4+UiQ3N0IgTnjjFkBnupENxzJJKM6efbCsrriD40H0yTR1KvOWGO0+0D67
+	7gtuNdJHTAAhli/yvG8m2nDAruzGax188jn6bCNeommA12Eu0NFZ4I+dOP/Pc2iCMVqgCBZcNbE
+	EImkr1rgNK28aPovlzDacWFZJmsM+BJejSzMpZztK3/HsrfW8jlXKPPNC1aHEEWl4i/AxIj6uJb
+	0gW6bfrYFmbXvZqLaOKYZt4VGU5cf1q1GLZt07mxUVNbsjMRm1SisQ22mUUm9EYm5sQ3RgnDMzO
+	F41V908GOxoQ3JSh3OjbCg2jCfjcSqN/iga433L+5tLsMHnFYIY6S3K9AN5Hn9Febn3znYHvsuw
+	EOwyguEROwEQGZEK6ZGwGFcFU4PUNgwVRdti11vje3ibx2Sz3IlA1GinHycrgxGiAPdRvqrY8Hi
+	z7tIPdsRHmumjWZqhAMf6iZV+pLKiXnNabue/GMsg8fGeFLyBoZ8mkCWdXai25wzLpiZ62je4+1
+	fburWg=
+X-Received: by 2002:a05:622a:54b:b0:516:e062:1a83 with SMTP id d75a77b69052e-51c8b549a0cmr94947921cf.51.1783633552734;
+        Thu, 09 Jul 2026 14:45:52 -0700 (PDT)
+Received: from LOCLAP699.locus-rst-dev-locuspark.locus ([152.193.78.90])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-51caab6d574sm3857641cf.3.2026.07.09.14.45.50
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 08 Jul 2026 15:21:18 -0700 (PDT)
-From: Dierk Modrow <dierk.modrow@gmail.com>
+        Thu, 09 Jul 2026 14:45:51 -0700 (PDT)
+From: James Prestwood <prestwoj@gmail.com>
 To: iwd@lists.linux.dev
-Cc: pmenzel@molgen.mpg.de,
-	Dierk Modrow <dierk.modrow@sew-eurodrive.de>
-Subject: [PATCH v3 2/2] station.c: Fix SEGV in station_roam_scan_notify on roam scans
-Date: Thu,  9 Jul 2026 00:20:56 +0200
-Message-ID: <20260708222056.273-2-dierk.modrow@gmail.com>
-X-Mailer: git-send-email 2.49.0.windows.1
-In-Reply-To: <20260708222056.273-1-dierk.modrow@gmail.com>
-References: <20260708222056.273-1-dierk.modrow@gmail.com>
+Cc: James Prestwood <prestwoj@gmail.com>
+Subject: [PATCH 1/3] station: Add Utilization/SNR/LastSeen to station diagnostics
+Date: Thu,  9 Jul 2026 14:45:44 -0700
+Message-Id: <20260709214546.659971-1-prestwoj@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
@@ -75,68 +71,69 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Dierk Modrow <dierk.modrow@sew-eurodrive.de>
-
-It fixes SEGV in station_roam_scan_notify when performing repeated roam scans
-at legacy roaming after a failed FT-handover due to a
-ft_auth-/ft_reassoc-timeout. The issue occurs with all WLAN drivers.
-We have seen the issue with SIEMENS SCALANCE W700 AX APs, but it may also
-occur with other AP brands supporting FT-handover.
+For metric gathering and general debugging its convenient to query
+the last known utilization and/or SNR from the currently connected
+BSS. In addition another property was added, "BssLastSeen" which is
+the seconds since the last scan returned the BSS. Since the
+BSS's beacon info (like utilization/SNR) are only updated upon
+getting scan results we need to also advertise the "age" of the
+data so any consumers can decide whether or not to ignore these
+values if they are too old.
 ---
- src/station.c | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
+ src/station.c | 26 ++++++++++++++++++++++++++
+ 1 file changed, 26 insertions(+)
 
 diff --git a/src/station.c b/src/station.c
-index 8fcf8c70..077e510e 100644
+index 8fcf8c70..05ed043e 100644
 --- a/src/station.c
 +++ b/src/station.c
-@@ -2253,7 +2253,7 @@ static bool station_can_fast_transition(struct station *station,
- {
- 	uint16_t mdid;
+@@ -5337,6 +5337,14 @@ static void station_destroy_interface(void *user_data)
+ 	station_free(station);
+ }
  
--	if (!hs->mde)
-+	if (!hs || !hs->mde)
- 		return false;
++/* Gets the time in seconds since the BSS was last seen */
++static uint32_t bss_last_seen_time(const struct scan_bss *bss)
++{
++	uint64_t diff = l_time_diff(bss->time_stamp, l_time_now());
++
++	return (uint32_t)l_time_to_secs(diff);
++}
++
+ static void station_get_diagnostic_cb(
+ 				const struct diagnostic_station_info *info,
+ 				void *user_data)
+@@ -5346,6 +5354,7 @@ static void station_get_diagnostic_cb(
+ 	struct l_dbus_message_builder *builder;
+ 	struct handshake_state *hs = netdev_get_handshake(station->netdev);
+ 	uint16_t channel_num;
++	uint32_t last_seen;
  
- 	if (ie_parse_mobility_domain_from_data(hs->mde, hs->mde[1] + 2,
-@@ -2917,7 +2917,7 @@ static bool station_roam_scan_notify(int err, struct l_queue *bss_list,
+ 	if (!info) {
+ 		reply = dbus_error_aborted(station->get_station_pending);
+@@ -5388,6 +5397,23 @@ static void station_get_diagnostic_cb(
+ 						's', str);
+ 	}
  
- 	orig_security = network_get_security(network);
++	if (station->connected_bss->have_utilization) {
++		uint8_t percent =
++			(station->connected_bss->utilization * 100) / 255;
++		dbus_append_dict_basic(builder, "ChannelUtilization", 'y',
++			&percent);
++	}
++
++	if (station->connected_bss->have_snr) {
++		uint8_t snr = (uint8_t)station->connected_bss->snr;
++		dbus_append_dict_basic(builder, "SignalNoiseRatio", 'y', &snr);
++	}
++
++	last_seen = bss_last_seen_time(station->connected_bss);
++
++	dbus_append_dict_basic(builder, "BssLastSeen", 'u',
++			&last_seen);
++
+ 	diagnostic_info_to_dict(info, builder);
  
--	if (hs->mde)
-+	if (hs && hs->mde)
- 		ie_parse_mobility_domain_from_data(hs->mde, hs->mde[1] + 2,
- 							&mdid, NULL, NULL);
- 
-@@ -2930,7 +2930,7 @@ static bool station_roam_scan_notify(int err, struct l_queue *bss_list,
- 	if (bss && !station->ap_directed_roaming) {
- 		double cur_bss_rank = bss->rank;
- 
--		if (hs->mde && bss->mde_present && l_get_le16(bss->mde) == mdid)
-+		if (hs && hs->mde && bss->mde_present && l_get_le16(bss->mde) == mdid)
- 			cur_bss_rank *= RANK_FT_FACTOR;
- 
- 		cur_bss_group_rank = evaluate_bss_group_rank(bss->addr,
-@@ -2967,8 +2967,8 @@ static bool station_roam_scan_notify(int err, struct l_queue *bss_list,
- 			goto next;
- 
- 		/* Skip result if it is not part of the ESS */
--		if (bss->ssid_len != hs->ssid_len ||
--				memcmp(bss->ssid, hs->ssid, hs->ssid_len))
-+		if (hs && (bss->ssid_len != hs->ssid_len ||
-+				memcmp(bss->ssid, hs->ssid, hs->ssid_len)))
- 			goto next;
- 
- 		if (scan_bss_get_security(bss, &security) < 0)
-@@ -2986,7 +2986,7 @@ static bool station_roam_scan_notify(int err, struct l_queue *bss_list,
- 
- 		rank = bss->rank;
- 
--		if (hs->mde && bss->mde_present && l_get_le16(bss->mde) == mdid)
-+		if (hs && hs->mde && bss->mde_present && l_get_le16(bss->mde) == mdid)
- 			rank *= RANK_FT_FACTOR;
- 
- 		group_rank = evaluate_bss_group_rank(bss->addr, bss->frequency,
+ 	l_dbus_message_builder_leave_array(builder);
 -- 
-2.49.0.windows.1
+2.34.1
 
