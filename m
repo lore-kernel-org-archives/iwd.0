@@ -1,45 +1,45 @@
-Received: from mx1.sew-eurodrive.com (mx1.sew-eurodrive.com [194.180.1.34])
+Received: from sewfire.sew-eurodrive.com (sewfire.sew-eurodrive.com [194.180.1.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3729323EAB4
-	for <iwd@lists.linux.dev>; Mon, 13 Jul 2026 11:29:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=194.180.1.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86B4738B7C3
+	for <iwd@lists.linux.dev>; Mon, 13 Jul 2026 11:35:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=194.180.1.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783942181; cv=none; b=Os+NsFBo0lw+40Hocsvf+MUVbnPNHSeupaGJ62xJYkpCsI/weXqVE9Gsk/9kMjv7i6mZQRG2VKMvlq2HjUqmej8I58HL7//8+BJO7cD2XfSTPSV69+3iHVqB/LGl8E/Vh2Z+HGO1HV4G3OoHax2bz5DSLXKDP9lJdVwy9vcxxvg=
+	t=1783942542; cv=none; b=TydOyOFLCwaGSMFQDc5dL+LskoXM+GDsDkdpRKQAr4j3f2nmPXsMvA+Vk0WgExMk1dARgjWyO8FIXzu7Cp8bi1iC4W9bgaqL4R24Tlo/kbftVKR4JlYX2CfXfXzBRn43LRdMi0gducDDZWmll65fDykL0Fhgfkd/qoliOQ1r6+I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783942181; c=relaxed/simple;
+	s=arc-20240116; t=1783942542; c=relaxed/simple;
 	bh=YQcuuXPkb4IpfHRLM5o5gdQhSHDj3rsVapv2ol5nnSs=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Cw86utOP6N4yaVXV0YjZM/K1RzoV2N8e4HOr8nyMZajZAEraxt+vYhZTU3jjd5GKzMx44+yT3P9JAcURyQcZKIDaY3Fl7HcCLewo6+3j+tHMd20GD2yeNuDfdIkV4BpL97aaS0FNJ7OrBuVJKdZ5kdFNXarzxLygas0bEVd4yMw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=sew-eurodrive.de; spf=pass smtp.mailfrom=sew-eurodrive.de; dkim=pass (2048-bit key) header.d=sew-eurodrive.de header.i=@sew-eurodrive.de header.b=JrDDLJHp; arc=none smtp.client-ip=194.180.1.34
+	 MIME-Version:Content-Type; b=X0u3eEKlGvXfjPB6xShsOjBxSBg4z45uk9ujZ0F3/skl63cPQ+3zO8Bphq7Suu3WnCZDdd1zS77pi6itSqb7eD9PYW4sEhh/K3QeX5WEuWDKqvqUdcUUSgbUEZ+I9EYwUn7FCtZF4/DUIpS3M3heH/Kl5i2Pr5G+XvFz3Si+tRk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=sew-eurodrive.de; spf=pass smtp.mailfrom=sew-eurodrive.de; dkim=pass (2048-bit key) header.d=sew-eurodrive.de header.i=@sew-eurodrive.de header.b=RO3wO1Pr; arc=none smtp.client-ip=194.180.1.53
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=sew-eurodrive.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sew-eurodrive.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sew-eurodrive.de header.i=@sew-eurodrive.de header.b="JrDDLJHp"
-Received: from pps.filterd (mx1.sew-eurodrive.com [127.0.0.1])
-	by mx1.sew-eurodrive.com (8.18.1.7/8.18.1.7) with ESMTP id 66DBSMYk010243
-	for <iwd@lists.linux.dev>; Mon, 13 Jul 2026 13:29:37 +0200
+	dkim=pass (2048-bit key) header.d=sew-eurodrive.de header.i=@sew-eurodrive.de header.b="RO3wO1Pr"
+Received: from pps.filterd (sewfire.sew-eurodrive.com [127.0.0.1])
+	by sewfire.sew-eurodrive.com (8.18.1.7/8.18.1.7) with ESMTP id 66DBXM8w004722
+	for <iwd@lists.linux.dev>; Mon, 13 Jul 2026 13:35:38 +0200
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
 	sew-eurodrive.de; h=cc:content-transfer-encoding:content-type
 	:date:from:in-reply-to:message-id:mime-version:references
 	:subject:to; s=sew1; bh=/Hyz+S8EP1g87aHsczanp+kHwgWcpeZMXz5bFOfy
-	CAc=; b=JrDDLJHpcTGCwwW9qRm5qI/0X66Shz+u+0ahg4jbSZMR9ft/Wrt9iH4W
-	xNi1fJQXMaL26gvS9uP6H4mYn9j6Z0Qt4NK3RlAo+62702FMNkUSTu1EPc5fb8zf
-	ILcVmBTCk+NDF0BLA0/efYJjdEzWAYPXFipaOHxqCyRGzLXy54Ldv287ZATKkadF
-	vzhdGz/IVXmq6sicGP6HyocW8nmZETW+EGfMxFvOYGfWcLkeoVreKJWzMFJRDljv
-	0NS5xs2iT6EcrezrcN3aLRoxZbwsBQi+Uf+kBshtU9zy0QvEKmFgtQsxqLa/epZb
-	fL4LB0suibu7ldpOqzxQKd+7AckpSA==
+	CAc=; b=RO3wO1PrnGYVYEcGfbYwFIE6tHWdS50WXCfWlcnBN22X520dUxo//ZIk
+	ZoniXsM4wpy+up6MEy5Ct9T+kGUCULs6Qg/yVblBFp/nrTUPUnmfWKJz6YV6cXlQ
+	dLE6wIlF+pObBZHz95Hriq3ai77zO8hkEAZ4f7aP/45EKfrpUd555pZWZBbuX8Fj
+	NLXtD5nyzms5Q0tmfffeYpZc+8xo5NoxNlZzDvXKZlUxu5R0TcmyZNQz/42eAegF
+	Wlsd2wMzbEgApwxjs4q0eCCLxlSXUksZPDtS2+K6xEfwXHEpXLcgXjt8WKF3xe//
+	zgFIyUINByXIXc7mBXh7XLcSvixAFg==
 X-PGP-Universal: processed;
-	by brudepgp2.de.eu.sew on Mon, 13 Jul 2026 13:29:37 +0200
+	by brudepgp1.de.eu.sew on Mon, 13 Jul 2026 13:35:38 +0200
 From: Dierk Modrow <dierk.modrow@sew-eurodrive.de>
 To: <iwd@lists.linux.dev>
 CC: DEMODDIE <dierk.modrow@sew-eurodrive.de>
 Subject: [PATCH 2/2] src/station.c: fix of SEGV in station_roam_scan_notify when performing repeated roam scan at legacy roaming after ft_auth-/ft_reassoc-timeout when using mwifiex / NXP 88W9098 driver
-Date: Mon, 13 Jul 2026 13:29:25 +0200
-Message-ID: <20260713112926.1030-2-dierk.modrow@sew-eurodrive.de>
+Date: Mon, 13 Jul 2026 13:35:06 +0200
+Message-ID: <20260713113506.1081-2-dierk.modrow@sew-eurodrive.de>
 X-Mailer: git-send-email 2.53.0.windows.2
-In-Reply-To: <20260713112926.1030-1-dierk.modrow@sew-eurodrive.de>
-References: <20260713112926.1030-1-dierk.modrow@sew-eurodrive.de>
+In-Reply-To: <20260713113506.1081-1-dierk.modrow@sew-eurodrive.de>
+References: <20260713113506.1081-1-dierk.modrow@sew-eurodrive.de>
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
