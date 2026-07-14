@@ -1,78 +1,78 @@
-Received: from mail-qt1-f179.google.com (mail-qt1-f179.google.com [209.85.160.179])
+Received: from mail-qt1-f170.google.com (mail-qt1-f170.google.com [209.85.160.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80C413168E6
-	for <iwd@lists.linux.dev>; Tue, 14 Jul 2026 20:38:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF28D32ABCD
+	for <iwd@lists.linux.dev>; Tue, 14 Jul 2026 20:39:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.170
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784061526; cv=pass; b=T/hD9EtpsluLFDMPcXpOhXEU3raqsoFISGvNNYsr4u1TSJsjwHh0VOPmdL4dzrMvEf2DuNi0cJZMuS3alLIPpadhqUScB/mMd5GL1PyUodveDwOwk1nVkhes469vTn/q08V6h/ximxBBe3iwON/E1F4AxB/byNN2Jd0dUOx2kZM=
+	t=1784061576; cv=pass; b=LFPR2DSAcYWrO53VsYMExbDQBvdrL3xVTTRHjIkWJ/FuBfQMehmXJ4IfTKcdOMv+FeMracKKRE8ukX8LQqAr/SAYHDm5kvDmEIpnqGcpSdneJVQGeVQYBPNOQMwiljFhcL/sOYc0cL0zXkHwxCYbSjRhNDMdLzqR9gGAfZECKbE=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784061526; c=relaxed/simple;
-	bh=Cezo/4qUBvO3CBkh4VqIaujafDJywl+S99UExg81jyo=;
+	s=arc-20240116; t=1784061576; c=relaxed/simple;
+	bh=W+F+u5+clgF6ULYf6ydhTCAgsTogDMIexlFBh6m1LGw=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Id8Eq350GzqmEoJ6b77AfquJhaRSY+rQ0uVf+Q/+b49GEwjGIUSSlH3fxfN5hZJGs6J6juUo58lwg/3LfhT7ogTKai3OpjBLrmE3i9D7JV6IfINx00zb9GwLNfeGHfPqjAn2uuegX+ukHBr/MLpV+H9NaE3441Pc2sr0orPQqyw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FOJXzww2; arc=pass smtp.client-ip=209.85.160.179
+	 To:Cc:Content-Type; b=NEGeKggLRStaEjpPbmmAkPYPpEhPgfOwQuLkUJY44N8PLDQjvIWOI7xc9esF5NZHw92E/Y20nSgMcyjHQTdyWf6DHPz87kdtwE6Nt+GUaSHK+N6cDGzvdHSeifQ7pilfdkm9tp3YVfrXXeII71RHacFBsxupSzk2tsiyiXy0Yxo=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=INLXilZk; arc=pass smtp.client-ip=209.85.160.170
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FOJXzww2"
-Received: by mail-qt1-f179.google.com with SMTP id d75a77b69052e-51c2cce930cso12982591cf.0
-        for <iwd@lists.linux.dev>; Tue, 14 Jul 2026 13:38:45 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1784061524; cv=none;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="INLXilZk"
+Received: by mail-qt1-f170.google.com with SMTP id d75a77b69052e-51c4436d02cso7858241cf.1
+        for <iwd@lists.linux.dev>; Tue, 14 Jul 2026 13:39:34 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1784061574; cv=none;
         d=google.com; s=arc-20260327;
-        b=EtIgItOuskvfe44aHUH90GmR734U+/otUgGhbj/dwK+GIm2wxZ8SVKZmceJNl+tyNr
-         TGvxIZv/qNuw9xhGJAI1qcr5htlyTdSENC4o0a+0RiL1OX7e6seIYWDq6WLo52fVB9DP
-         UWxzzQjMHGoAuZxAfAvsMXt+tGXC5nQ9A4hPbw62yi+kpJGWn1Nf3XzG+1SrgMt9TLMY
-         b6sMtdecqbsSTKW9XyEM9WmowH1IjJDlSdMspTXYUkrsxqQn9ym03Vlk1W7jm53ZEzZp
-         nrub3VCpuf8+L0tSNGwsEwNU/Nht/R82kLD90N7RtVyEipl7Eo4tVUUOmdkQoDJhp4Bj
-         t8QA==
+        b=eCm6b/jOxjvOfDth/RN8jYl/L5igKNyCHHx+UG+dAnxIQCGryaH5Q0yFeGVIgAu5uK
+         Udsp5G3MZE/4jiv/ntROoMMFaQbDChZw3bIPMfqFkNWz3joNEwEc/7tcs/5IWqD47Ih+
+         cFrG1vOh3gVlVwicrpjmuo3JaFmVdVY73yqerzGoX3nR24+7O269OPTt6Aykvo4sicqJ
+         zaIplQPDj8OjsyLi3aMGjbN1qYOuYJhBb5eJAzvhmdr4t+4cHMpCEYecsyVQTE//k9AY
+         1IO1u//6fWoSz3f9xo/8t+/toHfmUp9ofS0q7bhUl2tIwPmzQoNio2A5thqoEzxAbPsH
+         o/nw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:dkim-signature;
-        bh=xabRNS2BQJEG5BD6WSGNjR56n5s9fuV1/G3DJ/GNMyA=;
+        bh=5952Ku/c3CrBMP/n5nyyA7lgzw9ThRLWtc2xcPHwCcY=;
         fh=lOB+NE21i+DlK11xqGcqr6uTCV2U6X/qbNGHyNqUyZk=;
-        b=YmSUeopTGdvjTW658fUn+Ct91tomw/M7HZX5ey7KHZp37Po61OkeZyemqC5lh/uQnl
-         of7mJazXi7vpahJWQOf6wKpwjTghlUYm9cVJ9yRUk632k8K6dAap9k1NdcrCr6Qla7R8
-         ZG7NhYtF7VdnicBC8tSjw1H75Qr5GMR9oQaWgQ8mUQFOShJoNH8AikzoB9O8SMSInM+M
-         3HbrxT6nTAhlz6mqXIhycgOABorvyewLDgSo3nOHfuZZKSiw285jqvXTJ2RPc0Y9PS2h
-         hj9gglZvb53WUyj+aHU4hH2qfRky19sRmtIskFjitypZAK9cmr7irgzWG2k8lO7gN0TH
-         HCpA==;
+        b=HpLbU7y+h2VVj2UD/YRSAOK5kjazNHWPAD3mSX0uq4K8iJiVx/7A91NAKAXaVDW+pP
+         Bvrl3TWTLiTZ5iQN1ghu3+qGejdqn2cDBYHoG6VFHpKItzN7EfiFXwM4ods3j/TpYpJ6
+         Tc/3TgUE8DMcUKE3RTto4GKPOLD4i/oBisEaYUgTF3CJ+ci5aYBzYB3zySqe4eS9ueHK
+         z67/J/wfSV5yrc5R83vWTED76gmKFrcgeMhppJoLicwinT2ChlTsNxpnZzKvst7lBHG1
+         3A7N1qL3Bv56sXHXssY/GZuGT5BLjwUazk9f1CDnrhA5mrRRFyDs0sGLoQem3YdEjNuk
+         O0dQ==;
         darn=lists.linux.dev
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1784061524; x=1784666324; darn=lists.linux.dev;
+        d=gmail.com; s=20251104; t=1784061574; x=1784666374; darn=lists.linux.dev;
         h=content-type:cc:to:subject:message-id:date:from:in-reply-to
          :references:mime-version:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=xabRNS2BQJEG5BD6WSGNjR56n5s9fuV1/G3DJ/GNMyA=;
-        b=FOJXzww2FWxTRoqsKx71QMTQuCJIV84nucXm3exi9Lgr88QCOKC3Jkp02hYvCu9W6q
-         e7Zw3vmt53lwDTjtnGtD03M0BSTp804/cX91xO+vjFaKhrYU7QwQrmzfJJ8EEIvSjwv0
-         d8MDeORnUVjSHm+Mlx3AGn/yXXMLZDBU+8CN9/SmCWsVBy8Q2zU8YbFB9qp+65FPe0jt
-         7UC5rktJDAqjcbkhOYz8tZoB97U9+tdoXkB0YWxt6VDymlJVqYW2OcHKmllsun6QHoOd
-         oMianXcnyFnEPZWib8u1qoVmhFenBFw0Dv2UyWOf63hmgkZXAhPg7XU8Hoq9ioGGsW6b
-         uiGg==
+        bh=5952Ku/c3CrBMP/n5nyyA7lgzw9ThRLWtc2xcPHwCcY=;
+        b=INLXilZk+mPeqn6NraSM5Lldrk6tizyzuDEpZAgpcWXB3+pUGmRMb1aEFcfULk94ji
+         nKeWudB70iOeahvfrby4ziGOnTov8b89E67Plnem8jkcBQzUUfAMsgskcUAylrrZwHKE
+         Ikj14rBgmHPm6s9KXsexYhx+Y9zh+auyM+mUqXU2J74o+6mHhGD+g8sxZv8L94HB2ytj
+         18C0bc48WaXw+QVsAFmg7TieLxgbq/SdKt3dI8fM57KN5lsmp1uBhlS5pFqTzG0+GQjA
+         mbUC+NtnnciB1JotHKAUIAmQllZiJ3+3iLCmQ5VclNO5gbU1TEpWHkDAaXTtBJcH81Rm
+         J84Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1784061524; x=1784666324;
+        d=1e100.net; s=20251104; t=1784061574; x=1784666374;
         h=content-type:cc:to:subject:message-id:date:from:in-reply-to
          :references:mime-version:x-gm-gg:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to:content-type;
-        bh=xabRNS2BQJEG5BD6WSGNjR56n5s9fuV1/G3DJ/GNMyA=;
-        b=lpa0ukt/XJtJPrznwzfzkq2IFXE8wB5Ni+ptFypvjY7Qyaw+ycDVZeyLZGbkLLthZy
-         O9fahn+gV1DMV3BFj4krUfaI82BOo8AzUKishzTZZX0IF9cI5NcrR8UYuVjSOI9p7bms
-         fWmiwd9wh5GnClbB38hblAJgg+65IFLS/zS98RFyzsivJ13y0ys1R1t5Ni/xQnKH5xoW
-         63awkxD2Z7LsnlLLTsah6QLzjt8wEMP6BeL8ymNfJ7vG8jn+YwL1j4eXjz9bEtGhZ9bW
-         hLestRECpUwR/yfZtbR1nxSh7Y2Cu6i1ZssySbCDKSqZdZVYU/7ASkTf1bx7BqZfdPBD
-         MDFg==
-X-Gm-Message-State: AOJu0Yw88Xl7L1PrFehw5sOgoYP9eYZS8FrJyD5+wa5hPpuCbNvGzy6q
-	29RZfExRKyNic28UkjGEZ85zzOX5/B6S3lddXyidFCGI2iZ6AWc3TGRz32bnnE1AOj+R0wHK11o
-	r5WG88sxa9IGBv0eeXYGAgVloJHuemNelpBtpTufxCA==
-X-Gm-Gg: AfdE7cm22hhuEhXgOSgscx0nXw98TDEx9oLg8/uP8I6TUd+Jt/iErx9E6geZjmcmBWb
-	4EuJUuMmBnAf/iZ4CHG/34wPOpMJHC4UwA91A+G9sZj9ILW1mZ6woz/QkcCdfVkC9KuoFp2CuDt
-	QzGDQho5iXaE7aUCgfC0zDw74d7s/cFG/erZFTp0bdCVcBIxexI2tm9B8n+Gvlt1fl5Id2kiuzi
-	ObU3kojHIiATroCv76g5kNED6KdsNWvid9F7s46SoNXTxOLVQGnFqKLmPUZ+OD5cwdq/JwFoQ==
-X-Received: by 2002:a05:622a:8c3:b0:51c:1ec5:d11 with SMTP id
- d75a77b69052e-51cbf130085mr155321621cf.19.1784061524281; Tue, 14 Jul 2026
- 13:38:44 -0700 (PDT)
+        bh=5952Ku/c3CrBMP/n5nyyA7lgzw9ThRLWtc2xcPHwCcY=;
+        b=innSOPEw8eZfXCw3PneNiu1DxI7by4Dh8H4hQW8qt2QZT5agqKIN5RQ3YS+BZTz2up
+         Y1JOzvCWc93stPSLzmqqP775UfTbelKXo43fet0Vw0YxODpYmRXyVLFdMpO6lorNyV/K
+         AHmeDVJzEaDHWOxdLg7QUWE+SNEA5+KQ5YjRy6OXHiRgyDywbV6hPrnwRxXxJMB3P84R
+         XWZSfXn57CwOLMh6cNgSf0m2m2VcdKB8M82YEpNSdkIDTdTIFbxYQOD4jNM6amI979rW
+         FlTh25+aazDtMzAtqCdU++DYrTKTN0WNWicrUq7R7AI0gVSX2rBQ0Te2tz+1BHjjOWmw
+         R7+Q==
+X-Gm-Message-State: AOJu0Yw5S80aB93ZNUeuTY8RWTuA59OA3ak8QPiS4o5g0Br6gmKhe+0R
+	r+5jaGSnm16smFcmUl1SBptvzKiGlYKioGyIk8z0/4n5jkOqExq8j5PxeUVcWX1fb3XhMTK2ksS
+	awLzP+pC+Wcax0dZ0YI3v9AMk0VGqzWTvL6ZJ73ih6w==
+X-Gm-Gg: AfdE7clZRx1F+NlmVwhKSsez/ea2Sw8Oaz5pKvbf14IFEwyzsKhZvOn4aQZHtYLb2Ez
+	LSybXjO8ue3c+GyNITRlC4uMQT6AZO9eTZDrStjLl5w6Jc/ro95yrTPZAvC5gjHNxFpX5m79TB4
+	RrstX10f1Hr1v8AsSZV6SphUQcqm/3jl2o/YuzjCST5vHr5d8ian37ACrwNzgkWLEv5lV2fjpkN
+	RNlMz+7N8NgQioSVUgxvZkMcfqP/XUz9UTSAF3+ymxLQnKys0FJkSfA3iH4oJmgFMGisOzoRA==
+X-Received: by 2002:a05:622a:411:b0:51c:1daf:196f with SMTP id
+ d75a77b69052e-51cbf261911mr145706121cf.58.1784061573610; Tue, 14 Jul 2026
+ 13:39:33 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
@@ -83,50 +83,174 @@ References: <CAMq8zouhDMRW4Q7qSpMCFftp21wCzuC+RaJKsKz0sUivGAQHXA@mail.gmail.com>
  <c684823d-4be1-48ba-94ac-f2c01551f832@gmail.com> <CAMq8zou2PAgGRp4xZsEQ0TBz7ScANnVxUJ8t-qrJ4pMe86zyQw@mail.gmail.com>
 In-Reply-To: <CAMq8zou2PAgGRp4xZsEQ0TBz7ScANnVxUJ8t-qrJ4pMe86zyQw@mail.gmail.com>
 From: =?UTF-8?B?0JDQu9C10LrRgdC10Lk=?= <aleksman4o@gmail.com>
-Date: Tue, 14 Jul 2026 23:38:33 +0300
-X-Gm-Features: AUfX_mw8Ckvrb-N9bWEjWfdosMlPPb_kkMAdEz2ieq3KFMRndF4taZ20BizE2lM
-Message-ID: <CAMq8zovjF6zZfdB6UFzedEUNA6Yc_-0EhmmRjOYgVoLMFUG4-w@mail.gmail.com>
-Subject: [PATCH 2/3] doc: document BasicServiceSet RSN property
+Date: Tue, 14 Jul 2026 23:39:22 +0300
+X-Gm-Features: AUfX_mztuXE46UDAOy8R5XY4qDH6u7ejzAwgX_dM3h2Tgwaj2iQ86muLceu8oEk
+Message-ID: <CAMq8zosKH22wMSpTR1tHBMroZjjV8FMxtLNAZBJ+KYS36jCQFw@mail.gmail.com>
+Subject: [PATCH 3/3] auto-t: test BasicServiceSet RSN property
 To: James Prestwood <prestwoj@gmail.com>
 Cc: iwd@lists.linux.dev
 Content-Type: text/plain; charset="UTF-8"
 
-Describe the optional RSN dictionary and its KeyMgmt, Pairwise, and
-Group entries.
+Verify the exact D-Bus key management and cipher capabilities for
+WPA2-PSK, SAE, and transition BSSes.
 ---
- doc/basic-service-set.txt | 23 +++++++++++++++++++++++
- 1 file changed, 23 insertions(+)
+ .../basic_service_set_rsn_test.py             | 70 +++++++++++++++++++
+ autotests/testBasicServiceSetRSN/hw.conf      |  9 +++
+ autotests/testBasicServiceSetRSN/ssidSAE.conf | 11 +++
+ .../ssidTransition.conf                       | 12 ++++
+ .../testBasicServiceSetRSN/ssidWPA2.conf      |  8 +++
+ 5 files changed, 110 insertions(+)
+ create mode 100644
+autotests/testBasicServiceSetRSN/basic_service_set_rsn_test.py
+ create mode 100644 autotests/testBasicServiceSetRSN/hw.conf
+ create mode 100644 autotests/testBasicServiceSetRSN/ssidSAE.conf
+ create mode 100644 autotests/testBasicServiceSetRSN/ssidTransition.conf
+ create mode 100644 autotests/testBasicServiceSetRSN/ssidWPA2.conf
 
-diff --git a/doc/basic-service-set.txt b/doc/basic-service-set.txt
-index f827ca02..b4f2486f 100644
---- a/doc/basic-service-set.txt
-+++ b/doc/basic-service-set.txt
-@@ -8,3 +8,26 @@ Object path /net/connman/iwd/{phy0,phy1,...}/{1,2,...}/Xxx
- Properties string Address [readonly]
-
-  MAC address of BSS
+diff --git a/autotests/testBasicServiceSetRSN/basic_service_set_rsn_test.py
+b/autotests/testBasicServiceSetRSN/basic_service_set_rsn_test.py
+new file mode 100644
+index 00000000..20e0b62c
+--- /dev/null
++++ b/autotests/testBasicServiceSetRSN/basic_service_set_rsn_test.py
+@@ -0,0 +1,70 @@
++#! /usr/bin/python3
 +
-+ dict RSN [readonly, optional]
++import unittest
++import sys
 +
-+ Security capabilities advertised in the RSN information
-+ element. The dictionary contains the following entries:
++import dbus
 +
-+ array(string) KeyMgmt
++sys.path.append('../util')
++import iwd
++from iwd import IWD
++from hwsim import Hwsim
++from hostapd import HostapdCLI
 +
-+ Key management suites. Values use the same names as
-+ the wpa_supplicant D-Bus BSS.RSN property, such as
-+ "wpa-psk", "wpa-ft-psk", "sae", "ft-sae",
-+ "wpa-eap", and "owe".
++BSS_INTERFACE = 'net.connman.iwd.BasicServiceSet'
 +
-+ array(string) Pairwise
 +
-+ Pairwise ciphers. Possible values are "tkip",
-+ "ccmp", "gcmp", "ccmp-256", and "gcmp-256".
++class Test(unittest.TestCase):
++    def _get_rsn(self, device, ssid):
++        ordered_network = device.get_ordered_network(ssid, full_scan=True)
++        network = ordered_network.network_object
++        self.assertEqual(len(network.extended_service_set), 1)
 +
-+ string Group
++        path = network.extended_service_set[0]
++        proxy = self.wd._bus.get_object(iwd.IWD_SERVICE, path)
++        properties = dbus.Interface(proxy, iwd.DBUS_PROPERTIES)
 +
-+ Group cipher. Possible values are "wep40", "wep104",
-+ "tkip", "ccmp", "gcmp", "ccmp-256", and
-+ "gcmp-256".
++        return properties.GetAll(BSS_INTERFACE)['RSN']
++
++    def test_rsn(self):
++        device = self.wd.list_devices(1)[0]
++
++        rsn = self._get_rsn(device, 'ssidWPA2')
++        self.assertEqual(set(map(str, rsn['KeyMgmt'])), {'wpa-psk'})
++        self.assertEqual(set(map(str, rsn['Pairwise'])), {'ccmp'})
++        self.assertEqual(str(rsn['Group']), 'ccmp')
++
++        rsn = self._get_rsn(device, 'ssidSAE')
++        self.assertEqual(set(map(str, rsn['KeyMgmt'])), {'sae'})
++        self.assertEqual(set(map(str, rsn['Pairwise'])), {'ccmp'})
++        self.assertEqual(str(rsn['Group']), 'ccmp')
++
++        rsn = self._get_rsn(device, 'ssidTransition')
++        self.assertEqual(set(map(str, rsn['KeyMgmt'])),
++                         {'wpa-psk', 'sae'})
++        self.assertEqual(set(map(str, rsn['Pairwise'])), {'ccmp'})
++        self.assertEqual(str(rsn['Group']), 'ccmp')
++
++    def setUp(self):
++        self.wd = IWD(True)
++
++    def tearDown(self):
++        self.wd.stop()
++        self.wd = None
++
++    @classmethod
++    def setUpClass(cls):
++        Hwsim()
++        cls.hostapd = [
++            HostapdCLI(config='ssidWPA2.conf'),
++            HostapdCLI(config='ssidSAE.conf'),
++            HostapdCLI(config='ssidTransition.conf'),
++        ]
++
++    @classmethod
++    def tearDownClass(cls):
++        cls.hostapd = None
++
++
++if __name__ == '__main__':
++    unittest.main(exit=True)
+diff --git a/autotests/testBasicServiceSetRSN/hw.conf
+b/autotests/testBasicServiceSetRSN/hw.conf
+new file mode 100644
+index 00000000..a43062d9
+--- /dev/null
++++ b/autotests/testBasicServiceSetRSN/hw.conf
+@@ -0,0 +1,9 @@
++[SETUP]
++num_radios=4
++hwsim_medium=yes
++start_iwd=no
++
++[HOSTAPD]
++rad0=ssidWPA2.conf
++rad1=ssidSAE.conf
++rad2=ssidTransition.conf
+diff --git a/autotests/testBasicServiceSetRSN/ssidSAE.conf
+b/autotests/testBasicServiceSetRSN/ssidSAE.conf
+new file mode 100644
+index 00000000..2ec9ae61
+--- /dev/null
++++ b/autotests/testBasicServiceSetRSN/ssidSAE.conf
+@@ -0,0 +1,11 @@
++hw_mode=g
++channel=2
++ssid=ssidSAE
++
++wpa=2
++wpa_key_mgmt=SAE
++wpa_pairwise=CCMP
++sae_password=secret123
++sae_groups=19
++ieee80211w=2
++sae_pwe=0
+diff --git a/autotests/testBasicServiceSetRSN/ssidTransition.conf
+b/autotests/testBasicServiceSetRSN/ssidTransition.conf
+new file mode 100644
+index 00000000..00170772
+--- /dev/null
++++ b/autotests/testBasicServiceSetRSN/ssidTransition.conf
+@@ -0,0 +1,12 @@
++hw_mode=g
++channel=3
++ssid=ssidTransition
++
++wpa=2
++wpa_key_mgmt=WPA-PSK SAE
++wpa_pairwise=CCMP
++wpa_passphrase=secret123
++sae_password=secret123
++sae_groups=19
++ieee80211w=1
++sae_pwe=0
+diff --git a/autotests/testBasicServiceSetRSN/ssidWPA2.conf
+b/autotests/testBasicServiceSetRSN/ssidWPA2.conf
+new file mode 100644
+index 00000000..d706142b
+--- /dev/null
++++ b/autotests/testBasicServiceSetRSN/ssidWPA2.conf
+@@ -0,0 +1,8 @@
++hw_mode=g
++channel=1
++ssid=ssidWPA2
++
++wpa=2
++wpa_key_mgmt=WPA-PSK
++wpa_pairwise=CCMP
++wpa_passphrase=secret123
 -- 
 2.55.0
