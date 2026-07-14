@@ -1,72 +1,72 @@
-Received: from mail-lf1-f47.google.com (mail-lf1-f47.google.com [209.85.167.47])
+Received: from mail-lf1-f50.google.com (mail-lf1-f50.google.com [209.85.167.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1CD73F23DB
-	for <iwd@lists.linux.dev>; Tue, 14 Jul 2026 21:13:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 447E925CC57
+	for <iwd@lists.linux.dev>; Tue, 14 Jul 2026 22:50:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784063595; cv=none; b=Z5NK6w9QoTOKg54HG7EzyUTzJ5jdDF0eyAHOwloA/gNCiWF2o1d86moYfAlAjh/o7pYNlV/tWPeLdrPXHfYAtAV92fJHnbz76IRhbsQ1zeGfTUpJ7tTt7CHIsJMeWSCYxuvon5A9G3eYcxbP2i074rUVATAXmY9CI79BsyyWHmk=
+	t=1784069454; cv=none; b=SHbP0daJZIOiEUHCLvU462w4/CwnTJR242kQtw8IbnIFETPaQjNvgr5XA6jeLw8/Paf6GGfsZhdLlTourD4+ukhI1wGZKAyyZ94QzcLoqhY4V0zKBMyWSHq5UzZoog4Em9FCMdM6Ne7voxH/VwqC9msWJc5uxH2MSIoeaa9dkrc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784063595; c=relaxed/simple;
-	bh=+avDLYl02jg16QfUQ/9d9V4t4Lsh6glkImD0QCEf72w=;
+	s=arc-20240116; t=1784069454; c=relaxed/simple;
+	bh=M2FfY5nWfNnWuMDJFIOzlc3fo+mUFOOGOU07kEfUXXc=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ah4BdfO7Zp6p61l5k/rB2AXQBJ8jLovAywgKOapfL1UiYr/9cov4KFwdDo5r3Dd3cmK0SpVts//+9e4mYvGEX+juOLkjyqjtcOmcMVE3HLbtoAnN9K+FFO0fAFZGgWCWp3hE5Ep8aNdFohwe1ZFn7ZSfHKQODV74NXrn6dZ8GBc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RRzTESiN; arc=none smtp.client-ip=209.85.167.47
+	 MIME-Version; b=Xgx0YR0YgsoaNVNrK/aD5oF3s15WmefXH8ToXrmEkRPrF+MpKlPyT+h2O+QAQI41RkR/r55iRWAlfjENQybh+qe6pQBCvh/Qri1GIIVqv6S29ygIJcb8s3bo8p2n1rlwND8XjMQmBj+uid4s5Ci8toRwlpnkB7a8jaw2UChOoD0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mm3VN7/C; arc=none smtp.client-ip=209.85.167.50
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RRzTESiN"
-Received: by mail-lf1-f47.google.com with SMTP id 2adb3069b0e04-5aeb98460c6so1469277e87.2
-        for <iwd@lists.linux.dev>; Tue, 14 Jul 2026 14:13:13 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mm3VN7/C"
+Received: by mail-lf1-f50.google.com with SMTP id 2adb3069b0e04-5b0117d49dcso4447868e87.3
+        for <iwd@lists.linux.dev>; Tue, 14 Jul 2026 15:50:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1784063592; x=1784668392; darn=lists.linux.dev;
+        d=gmail.com; s=20251104; t=1784069451; x=1784674251; darn=lists.linux.dev;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=recLJqc0K/zdffeYtklSqGwwX2m1C+5yHGwdbNT1TZw=;
-        b=RRzTESiNDzyk1eOHOkdSHO60uPqHBRiGCuyNICZamo8OAocwmM8jbGyqeVzQ5uuCOh
-         MvfdXQ6DL6pUOVwob4p6MrkrhPvUb0RIvqX7YpRXMYS7hn2pqpAYAlzidCPlQVsTyoLJ
-         BRiXNX02K/AvpXEl/qxI+Cbft5PneZPkmtpkms1WdKIX6Msdw4pczIO88KFwvxttvEJQ
-         ph1ah1ZHv3E/ftehoa8eH8XTQ9Dzqijoy+QkQ3Ivh2oiqlbw5U6qNKOsLsVvggn9aXbo
-         xza1/AXKxaKOJ+9m8tPbgQnoXVe80xwlMLOL/3ruYr3qWiVQtM/Dx5hFxtG/POG1ixNM
-         bL0Q==
+        bh=4JRpeJyN1+2FJe4KumW2C0bvIhWKXqKAoqpwddebiKk=;
+        b=mm3VN7/CCISfSqrBnwWksjAyhO7T/V9Daa6RgwMXXRQrIv7OOBJRxRMaA8mIq9yoet
+         tQM6TsUKkPNvosSAEJVyQ9cAlDgzQRfPQ0PAzSAXZrJfW/hKdsqTGYCUHNcxWWGZzX8j
+         P/6wYrOW3/ZZNHLF6oLWt8f0s3eIbz14EdTHXFy5mSEN/pL2G1sa6cWVzBh4BHBLhwEI
+         Wit2mfs4C8zSkCPG0mY3QngPEDcaBMMbjggm91j1jb330BjVIVyVSZskrhiq3Pkrkagl
+         4uPz1/FSmmL+PFTugSkavOPzEG3gS7wtQRDe6Ar74UbAOzVYpa+0DV6RJqU1k2gSXyme
+         EIKg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1784063592; x=1784668392;
+        d=1e100.net; s=20251104; t=1784069451; x=1784674251;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=recLJqc0K/zdffeYtklSqGwwX2m1C+5yHGwdbNT1TZw=;
-        b=WCBOcpc6laGDn4z7+ju3SRUShyzEZkCsD9PPcr25czRxS2Sk5GTwb1ciKXRkiKGowB
-         ngMGt2IbmMKvc23CXpXRmBghr+wUoC/BvZISpCWEveqsAsGZPtifyhPlJ7f/JF9M/M3Z
-         3VNeMz0nhF96wTZiiUUyXrcytwN6SkOJIK/q2al+VWW930n9/zcPf1WnZkbl4lOoC+qX
-         XOeeSZCKX/kQPA8POpL6DpoiTqEmZ51pV+ADI9ZWbbRQKdA+1VHIKBtyTp2aQZnF5m18
-         rKgQYGxQrEFd3ji9Lf+9pZiE1KbG+gjZpYulgmDyy3ayOATOivGW4WSIUEVlsmIpYteF
-         rVNg==
-X-Gm-Message-State: AOJu0Yw6W6tVcxtcdP59zAkYz9i8wL9MoaaZMDPNZbzIcrNFhwJ4sywp
-	St9PLHW02hp/6s/vTbf8tI8LEO0g/ly6dFrhaZneII0OFH34klIxh4HW6UpYut7BmYg=
-X-Gm-Gg: AfdE7ckJuby1FbbwJM0GTS/SmyG3IIyjePfs/pQ0hi/5NBL0C/yqJV4SnL/fAqrLcQc
-	qiEevjfKUWyEmLJrFfxr8v4d127bEbRw/fYqfHD1tDFhGLOypelwtFuuwTmWOV74xBDCNTF6q0G
-	i9OU8qulEjwlu8yUca8KLeTvKw0ThoEIXRNZUR9ANL7WDSvG3kQcN468oDAmWQUqnq1eePaeaHJ
-	SmwQLGbEFXjahf1A2Sb08hwrqRMmLYTTe971sGvZiJWZD80Bn9gDmpSgjWpc+Sy1BtOrGISgOLU
-	0PgDkxjbgeG769NS4pN1UBmZcaZNDJ+XX1dDj1fdBIRV8y0A0OQ8JkYGDHr95X0EWavpBgSmK+j
-	vtCHhUkrGzz3GwB00HNkCnAKKiTNyT3QofdlboFHSDSWgftCS/ajFxVqWUXT5GN3KMg6bqToIP4
-	sbJimL/oNZKCf3mA1LJA==
-X-Received: by 2002:ac2:5684:0:b0:5ae:ba8f:f9fa with SMTP id 2adb3069b0e04-5b02366465amr3486155e87.18.1784063591732;
-        Tue, 14 Jul 2026 14:13:11 -0700 (PDT)
+        bh=4JRpeJyN1+2FJe4KumW2C0bvIhWKXqKAoqpwddebiKk=;
+        b=alWM3wF1YTIDg+Ndg8OSfva9e9soetGN5C3+CC2bHerZ+X1A/4/2d4Qy9yTuTx7VVt
+         pnlkUaRL8t0yJqHbXDDScnM2B/o4o08v8Xsc9sjiWECl6W5rNCUp9rJmPJXDqMLRa/o9
+         nP7T0kYOv9IDtnn/LybBJKE5KWhcQLX9TUtM+ktYPyzQU7hUs0x8hhoA4ex5e2WHVv+w
+         icKwy3yuf4MT9paLBShUPYc39taUrAvEFr5nczyXsVr5P9ZOhj3McE6TvdrLDT1xLONF
+         wPP/C5dsV6sX4olWarizR/+ThBynwXd9sDY6AuZAM2oeSLgvkBOP/HB66LG+ZgikRUaR
+         YxEA==
+X-Gm-Message-State: AOJu0YxrCGIlkoJ/D3jsz8W3Gq6v2q5jmyc94f5lQkbK/4RXz8rvpUk+
+	eK6odomyKjuJeyCoL8Q0RCN87aDnkocToPVOM+9TtImAJ2fY5ZZtk6yIAKYeeTTqmto=
+X-Gm-Gg: AfdE7ck9oEZY6tZC/lkEZ1oquMC/K/05ndex1wgTr1qH4Wn/uP6dqfdesh+lKKKuMUB
+	faLgwP+Qo/tuvaaO5kZQVibAYeHH+C8g51pidL+kCa7femmNaJHUdL9JuA9PmKexfjUaTLf4o3I
+	+qJjTTd7c31fHK4R+KjTAoIz//ulgJg5WribebAHWZr2R9ZtvmVqwKmREyK1B/cjc0ylW2YZCqq
+	L+hweP7hO0kKYTNjvfTa0ZJByWxN2CNl8sqFtFQwdXuyppaHrhrCEOsbeSMXQgxazD9XLn+c6CF
+	Y5Jyxslk6Ejs/R6tphtGGenSG5rRmkguEwDufTOzWW56qF5gvL+pPAXi+2ee8PQ6FNwiFWRX5Py
+	msEdrvfLnNkMbSyCK4IskCvbbtcTpnmVtN/vypUZSRM1nMLqViB6yZoLOblThzcgdVHcxmo3h7v
+	iNpLDnDP8WVEUxA65mChA=
+X-Received: by 2002:a05:6512:6185:b0:5b1:4fab:fbd4 with SMTP id 2adb3069b0e04-5b159b8bbf7mr790191e87.59.1784069451156;
+        Tue, 14 Jul 2026 15:50:51 -0700 (PDT)
 Received: from ultra-pc (s3.2dsites.ru. [188.187.190.12])
-        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-5b01ca4f919sm3770435e87.20.2026.07.14.14.13.11
+        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-5b01ca9ddf0sm3791060e87.50.2026.07.14.15.50.50
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 14 Jul 2026 14:13:11 -0700 (PDT)
+        Tue, 14 Jul 2026 15:50:50 -0700 (PDT)
 From: Aleksman4o <aleksman4o@gmail.com>
 To: iwd@lists.linux.dev
 Cc: Aleks Man <aleksman4o@gmail.com>,
 	prestwoj@gmail.com
-Subject: [PATCH v2 3/3] auto-t: test BasicServiceSet RSN property
-Date: Wed, 15 Jul 2026 00:12:26 +0300
-Message-ID: <b6c265063dd8c5f74d63d902a170482ae1d9272b.1784062939.git.aleksman4o@gmail.com>
+Subject: [PATCH v3 0/3] dbus: expose per-BSS RSN capabilities
+Date: Wed, 15 Jul 2026 01:48:46 +0300
+Message-ID: <cover.1784069194.git.aleksman4o@gmail.com>
 X-Mailer: git-send-email 2.55.0
 In-Reply-To: <cover.1784062938.git.aleksman4o@gmail.com>
-References: <c684823d-4be1-48ba-94ac-f2c01551f832@gmail.com> <cover.1784062938.git.aleksman4o@gmail.com>
+References: <cover.1784062938.git.aleksman4o@gmail.com>
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
@@ -77,161 +77,69 @@ Content-Transfer-Encoding: 8bit
 
 From: Aleks Man <aleksman4o@gmail.com>
 
-Verify the exact D-Bus key management and cipher capabilities for
-WPA2-PSK, SAE, and transition BSSes.
----
- .../basic_service_set_rsn_test.py             | 70 +++++++++++++++++++
- autotests/testBasicServiceSetRSN/hw.conf      |  9 +++
- autotests/testBasicServiceSetRSN/ssidSAE.conf | 11 +++
- .../ssidTransition.conf                       | 12 ++++
- .../testBasicServiceSetRSN/ssidWPA2.conf      |  8 +++
- 5 files changed, 110 insertions(+)
- create mode 100644 autotests/testBasicServiceSetRSN/basic_service_set_rsn_test.py
+James, thanks for confirming that extending BasicServiceSet is a
+reasonable approach.
+
+Network.Type intentionally represents WPA2-Personal, WPA3-Personal, and
+transition networks as "psk".  This series exposes the RSN information
+that iwd already retains for each BSS so consumers can distinguish those
+networks without changing the existing Network API.
+
+The optional BasicServiceSet.RSN dictionary uses the same KeyMgmt,
+Pairwise, and Group fields and values as wpa_supplicant's BSS.RSN
+property.  NetworkManager can therefore reuse its existing parser rather
+than add another translation layer.  Older consumers ignore the optional
+property, and consumers can retain their Network.Type fallback for older
+iwd versions.
+
+A corresponding NetworkManager series reads and combines the per-BSS
+capabilities for its synthetic ESS access point.  It will be submitted
+separately after this API series.
+
+Validation:
+
+  - iwd builds successfully with make -j4.
+  - On a physical WPA2/WPA3 transition network, an initial PSK connection
+    was reported as WPA2.  After changing the saved profile to SAE, a
+    disconnect/reconnect through the stock Plasma applet completed without
+    a password prompt and was reported as WPA3-SAE.
+  - Cycling Wi-Fi subsequently auto-connected the SAE profile and kept it
+    visible as connected in the applet.
+  - The upstream CI auto-t runner passed the v2 series.
+
+Changes in v3:
+  - Shorten the auto-t filename so the generated patch metadata complies
+    with GitLint's 80-column limit.  There are no code changes.
+
+Changes in v2:
+  - Resend with git-send-email after the Gmail web client corrupted the
+    inline v1 patches.  There are no code changes.
+
+RFC:
+https://lore.kernel.org/iwd/CAMq8zouhDMRW4Q7qSpMCFftp21wCzuC%2BRaJKsKz0sUivGAQHXA@mail.gmail.com/
+
+Related NetworkManager issues:
+https://gitlab.freedesktop.org/NetworkManager/NetworkManager/-/issues/1489
+https://gitlab.freedesktop.org/NetworkManager/NetworkManager/-/issues/1693
+
+Aleks Man (3):
+  network: expose RSN capabilities on BSS
+  doc: document BasicServiceSet RSN property
+  auto-t: test BasicServiceSet RSN property
+
+ .../testBasicServiceSetRSN/bss_rsn_test.py    |  70 +++++++++++
+ autotests/testBasicServiceSetRSN/hw.conf      |   9 ++
+ autotests/testBasicServiceSetRSN/ssidSAE.conf |  11 ++
+ .../ssidTransition.conf                       |  12 ++
+ .../testBasicServiceSetRSN/ssidWPA2.conf      |   8 ++
+ doc/basic-service-set.txt                     |  23 ++++
+ src/network.c                                 | 110 ++++++++++++++++++
+ 7 files changed, 243 insertions(+)
+ create mode 100644 autotests/testBasicServiceSetRSN/bss_rsn_test.py
  create mode 100644 autotests/testBasicServiceSetRSN/hw.conf
  create mode 100644 autotests/testBasicServiceSetRSN/ssidSAE.conf
  create mode 100644 autotests/testBasicServiceSetRSN/ssidTransition.conf
  create mode 100644 autotests/testBasicServiceSetRSN/ssidWPA2.conf
 
-diff --git a/autotests/testBasicServiceSetRSN/basic_service_set_rsn_test.py b/autotests/testBasicServiceSetRSN/basic_service_set_rsn_test.py
-new file mode 100644
-index 00000000..20e0b62c
---- /dev/null
-+++ b/autotests/testBasicServiceSetRSN/basic_service_set_rsn_test.py
-@@ -0,0 +1,70 @@
-+#! /usr/bin/python3
-+
-+import unittest
-+import sys
-+
-+import dbus
-+
-+sys.path.append('../util')
-+import iwd
-+from iwd import IWD
-+from hwsim import Hwsim
-+from hostapd import HostapdCLI
-+
-+BSS_INTERFACE = 'net.connman.iwd.BasicServiceSet'
-+
-+
-+class Test(unittest.TestCase):
-+    def _get_rsn(self, device, ssid):
-+        ordered_network = device.get_ordered_network(ssid, full_scan=True)
-+        network = ordered_network.network_object
-+        self.assertEqual(len(network.extended_service_set), 1)
-+
-+        path = network.extended_service_set[0]
-+        proxy = self.wd._bus.get_object(iwd.IWD_SERVICE, path)
-+        properties = dbus.Interface(proxy, iwd.DBUS_PROPERTIES)
-+
-+        return properties.GetAll(BSS_INTERFACE)['RSN']
-+
-+    def test_rsn(self):
-+        device = self.wd.list_devices(1)[0]
-+
-+        rsn = self._get_rsn(device, 'ssidWPA2')
-+        self.assertEqual(set(map(str, rsn['KeyMgmt'])), {'wpa-psk'})
-+        self.assertEqual(set(map(str, rsn['Pairwise'])), {'ccmp'})
-+        self.assertEqual(str(rsn['Group']), 'ccmp')
-+
-+        rsn = self._get_rsn(device, 'ssidSAE')
-+        self.assertEqual(set(map(str, rsn['KeyMgmt'])), {'sae'})
-+        self.assertEqual(set(map(str, rsn['Pairwise'])), {'ccmp'})
-+        self.assertEqual(str(rsn['Group']), 'ccmp')
-+
-+        rsn = self._get_rsn(device, 'ssidTransition')
-+        self.assertEqual(set(map(str, rsn['KeyMgmt'])),
-+                         {'wpa-psk', 'sae'})
-+        self.assertEqual(set(map(str, rsn['Pairwise'])), {'ccmp'})
-+        self.assertEqual(str(rsn['Group']), 'ccmp')
-+
-+    def setUp(self):
-+        self.wd = IWD(True)
-+
-+    def tearDown(self):
-+        self.wd.stop()
-+        self.wd = None
-+
-+    @classmethod
-+    def setUpClass(cls):
-+        Hwsim()
-+        cls.hostapd = [
-+            HostapdCLI(config='ssidWPA2.conf'),
-+            HostapdCLI(config='ssidSAE.conf'),
-+            HostapdCLI(config='ssidTransition.conf'),
-+        ]
-+
-+    @classmethod
-+    def tearDownClass(cls):
-+        cls.hostapd = None
-+
-+
-+if __name__ == '__main__':
-+    unittest.main(exit=True)
-diff --git a/autotests/testBasicServiceSetRSN/hw.conf b/autotests/testBasicServiceSetRSN/hw.conf
-new file mode 100644
-index 00000000..a43062d9
---- /dev/null
-+++ b/autotests/testBasicServiceSetRSN/hw.conf
-@@ -0,0 +1,9 @@
-+[SETUP]
-+num_radios=4
-+hwsim_medium=yes
-+start_iwd=no
-+
-+[HOSTAPD]
-+rad0=ssidWPA2.conf
-+rad1=ssidSAE.conf
-+rad2=ssidTransition.conf
-diff --git a/autotests/testBasicServiceSetRSN/ssidSAE.conf b/autotests/testBasicServiceSetRSN/ssidSAE.conf
-new file mode 100644
-index 00000000..2ec9ae61
---- /dev/null
-+++ b/autotests/testBasicServiceSetRSN/ssidSAE.conf
-@@ -0,0 +1,11 @@
-+hw_mode=g
-+channel=2
-+ssid=ssidSAE
-+
-+wpa=2
-+wpa_key_mgmt=SAE
-+wpa_pairwise=CCMP
-+sae_password=secret123
-+sae_groups=19
-+ieee80211w=2
-+sae_pwe=0
-diff --git a/autotests/testBasicServiceSetRSN/ssidTransition.conf b/autotests/testBasicServiceSetRSN/ssidTransition.conf
-new file mode 100644
-index 00000000..00170772
---- /dev/null
-+++ b/autotests/testBasicServiceSetRSN/ssidTransition.conf
-@@ -0,0 +1,12 @@
-+hw_mode=g
-+channel=3
-+ssid=ssidTransition
-+
-+wpa=2
-+wpa_key_mgmt=WPA-PSK SAE
-+wpa_pairwise=CCMP
-+wpa_passphrase=secret123
-+sae_password=secret123
-+sae_groups=19
-+ieee80211w=1
-+sae_pwe=0
-diff --git a/autotests/testBasicServiceSetRSN/ssidWPA2.conf b/autotests/testBasicServiceSetRSN/ssidWPA2.conf
-new file mode 100644
-index 00000000..d706142b
---- /dev/null
-+++ b/autotests/testBasicServiceSetRSN/ssidWPA2.conf
-@@ -0,0 +1,8 @@
-+hw_mode=g
-+channel=1
-+ssid=ssidWPA2
-+
-+wpa=2
-+wpa_key_mgmt=WPA-PSK
-+wpa_pairwise=CCMP
-+wpa_passphrase=secret123
 -- 
 2.55.0
-
