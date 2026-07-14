@@ -1,93 +1,172 @@
-Received: from mx2.sew-eurodrive.com (mx2.sew-eurodrive.com [194.180.1.35])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f169.google.com (mail-pf1-f169.google.com [209.85.210.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 497B338D40D
-	for <iwd@lists.linux.dev>; Mon, 13 Jul 2026 11:42:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=194.180.1.35
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B4C4339B41
+	for <iwd@lists.linux.dev>; Tue, 14 Jul 2026 13:27:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783942977; cv=none; b=iMn4ELbav+YKYgqZaC4GZtw1tm/tmtu/LNhqtNfspJzTZCwPKFBlcI/L7Eo3tUJEFJz6zNuPlr0MeDCv3XFuVYhjxW3v126IUOfPx+V00EnBqfNMfZDdqUaDXEHtWvH/cizSZi50uAufgv2bbLx30EqMniTzEYbTj2Qup4KQ+h8=
+	t=1784035634; cv=none; b=FITHpU9ejxMIasu+fYlEGLCXaOIycE63YfXY64Eg7QKYk1C7yLTMLSUAop0X1ZzncnJYo91fjz+4/GzUqvxlicvBcTjPxIJLahDNcu+rRaRfINauJinMPMDbuTL1h1hiIJXaSySemv7LsOzFRvwiSQ5+fDBW3R5l1KbWvb9wnrs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783942977; c=relaxed/simple;
-	bh=qyNKS2N0Hu7j/HBpn54I8RAww4dgqgKiKF+WVZMH0ag=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=cpyfLz1UUoNHNFOKxO9QaekXt7a7lTJX5VF4Po2tbzqIrpoKQF84IfidCbRgnhNK1nN/nyxWwLvsIwrRsgToLWwy7i3XZe7rt36VWrcEgzXTcD7IE1vRiP/pfivrOozmKdKripuidJec+zTqU2nFI222kbUJ2ydTUGu1EYHckJM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=sew-eurodrive.de; spf=pass smtp.mailfrom=sew-eurodrive.de; dkim=pass (2048-bit key) header.d=sew-eurodrive.de header.i=@sew-eurodrive.de header.b=pT0Ae4Zz; arc=none smtp.client-ip=194.180.1.35
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=sew-eurodrive.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sew-eurodrive.de
+	s=arc-20240116; t=1784035634; c=relaxed/simple;
+	bh=Do0Cw45EJ8pQuk9GYRe9G6s0cXxasSx7M0v5AJ9yC/k=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=NJ9tt1B+3USWGin2bNBlGO+urUpK+xWNuRLENkRy15H4mCws6ItUW5FbLxIihmumjLM+q4A2Fq5XPU97UkcqV1w0cURgym01ki+TFw0hM1XmKb6jtc5LFG4zRAj0jQjByOJ7jEP8Pi+TcN9sCGLM6658/Ev1p9gjJ3T6Fbewpe4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jTFpDFxa; arc=none smtp.client-ip=209.85.210.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sew-eurodrive.de header.i=@sew-eurodrive.de header.b="pT0Ae4Zz"
-Received: from pps.filterd (mx2.sew-eurodrive.com [127.0.0.1])
-	by mx2.sew-eurodrive.com (8.18.1.7/8.18.1.7) with ESMTP id 66DBSSgI001746
-	for <iwd@lists.linux.dev>; Mon, 13 Jul 2026 13:29:37 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	sew-eurodrive.de; h=cc:content-transfer-encoding:content-type
-	:date:from:message-id:mime-version:subject:to; s=sew1; bh=vorn1K
-	nj7OrIOCx6s0/FqqEf4tBNqHXJnk44jNUi2Vs=; b=pT0Ae4ZzLdNYMLvMK76CEh
-	kK1OIXDUDZpHqsnmk7F5bWgQtoYPfSzGTFeprcSV/ySZMtMSyDNcQoaYDJQLO2BD
-	7nVAz6fMJT7G5pQxzKgX3tDAVxtUvyB+m+BMXHKv/bUKkE2FSsnP7k7PDGznTntm
-	FRGcWefaxpwPyzs5L+jMSIZsLC3C3O9NOPnXGXpQGmy4B8NFTK1QMr7WdYEg/qb8
-	LG/FashvgdorIatvOYHQlQwmNhnfqLBA/8Ley2S35kqTErZXBIMb5raQIc/8HaNO
-	BpSpx2a3PVLssDo9oI7U5GqARwvB4T7JZdDb1brcDW0NXxoYlQ05wGAvCt16/UWA
-	==
-X-PGP-Universal: processed;
-	by brudepgp1.de.eu.sew on Mon, 13 Jul 2026 13:29:37 +0200
-From: Dierk Modrow <dierk.modrow@sew-eurodrive.de>
-To: <iwd@lists.linux.dev>
-CC: DEMODDIE <dierk.modrow@sew-eurodrive.de>
-Subject: [PATCH 1/2] src/eapol.c: fix of SEGV in eapol_rx_packets at receipt of EAPOL M1 msg at legacy roaming after ft_auth-/ft_reassoc-timeout when using mwifiex / NXP 88W9098 driver
-Date: Mon, 13 Jul 2026 13:29:24 +0200
-Message-ID: <20260713112926.1030-1-dierk.modrow@sew-eurodrive.de>
-X-Mailer: git-send-email 2.53.0.windows.2
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jTFpDFxa"
+Received: by mail-pf1-f169.google.com with SMTP id d2e1a72fcca58-8486672f03cso3891748b3a.0
+        for <iwd@lists.linux.dev>; Tue, 14 Jul 2026 06:27:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1784035632; x=1784640432; darn=lists.linux.dev;
+        h=content-transfer-encoding:content-type:in-reply-to:from
+         :content-language:references:to:subject:user-agent:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=kxxJLb9RcHbHYOJ4/9fLKAxiabkWDLD3hpBRhYjAuWE=;
+        b=jTFpDFxasWxHckRvcMCAtBEZ7q+fZm5F5c00RUhNf5P94uq87DCOTKE76cOxQ/SrQ0
+         FX3ritVxEJmDXlx7jXvYOYnP3ojGXWbScuZqiUrFXzUF2O0MwZNdJ7FUj727awE6EpN+
+         nCNdn0nkhWV3Ey9GbLWo7A0IX1D9NeEGP/YnneCxO/5TugBpvTX5dLrpiuwMGad8g+J1
+         9D05xsXGHhplRaLQcAu070W1cNzeMiZq/Vjetn3xCCJK3xYSnpnJ1sZ4M/fmaOISTdcj
+         CSz9MZwR4owGgYFq+EYp2QqNBiKOU8I3TUPY3Rri0pZ0kx+zx9jkLfwB/4Jhvqo4ryre
+         Tp5A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1784035632; x=1784640432;
+        h=content-transfer-encoding:content-type:in-reply-to:from
+         :content-language:references:to:subject:user-agent:mime-version:date
+         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=kxxJLb9RcHbHYOJ4/9fLKAxiabkWDLD3hpBRhYjAuWE=;
+        b=VgWgX3rSH/aNx4ue4Z+1LxnhwVN8nWGkSf/AXvi8kPsH7ULNPCREikdT8K26bkzyUR
+         +NWHUMiuGrX5xgAjdypfYZ9exl4TYRD0clRasCBH07z3Smc3jefLjGxRzyz4wRqDq8rf
+         EWAYoq1Kiy9FEC2NCDCTt0et0uc6zksld3nxCYDJzfKhr7nHsZFvqVnbi+GxYGluKTt3
+         jMh+wjTU1rZgopm8v91+gmw5NEz6hvLo6a8m+wq6Ym6DJq3EHuQhFBI1Q20oPYLVfvPt
+         cgf2l4j9s3tSvDK6MofbBM92VMRrd2uHFLWioq4M7lU3G9345+csMaKXuXnsnFO9XUbR
+         4sTA==
+X-Forwarded-Encrypted: i=1; AHgh+Rq0DCpK+SAoqE5nEJgM/7PyMdPaIMWcbUfwDSxJsXttaEWgwqtoVQapY1Ua+36Jy9jI+4Y=@lists.linux.dev
+X-Gm-Message-State: AOJu0YxGW0k8SEZsP9FGDF91U7ilY5EzvPpTDH/h3AqKnk3UaP0/XtOR
+	T5f3EPGrtjl/Af2a6aZ7dA/D7/eVQbqk+05/wULc+759ME4rSnkkzmpGRjMmEQ==
+X-Gm-Gg: AfdE7ckJSJjh2tc3eij5/Z1bxJu3i8gMqCLxqDXEg+JurPkkIMLkLAf5Oq+2SUPTODu
+	pE6Hv47XBbdFQhvOR538dGmreS6KeqZAo9XFU0al8T6WP21q98PQKE53bfQnNiTIM1qmSSuIvTJ
+	oZoU8L2Jz0GtsjMUxvg3Bga2H8VX4d7nPyMtT9q3v4nMGqoIjR57KH3Ciue7dHH/eFrrydUsNhR
+	F5VjGDXLjRL0PMpBpBq2Dhh5MueOlm5qIg7++8r+i2hxlCeSKpIm9h/mCcOTgjTXEg61VDoH7LX
+	3mY/VJv1gmtmir4tIyXcYRRity5l4048TTqBJlksHJbeDyKYfvH5LoVW6f+GGUx3smNAtkho6FI
+	UYUNEtcD8y33GzWXggjlLY7Dd2BUQQ+nbWKlzeeP6xXlIAXeh5ckGA8uetCR/AkxXQFKxgNugKM
+	7YU43RW8VinVW4IE+gK0ZQhZ8crBpbYJCaZ4LUF6lW75bb3UPgdDB46E23Xux0y+Gnvj+Gs+Njh
+	3hH3fZ9jNRHGrBu/mOVYK8hX7w=
+X-Received: by 2002:a05:6a00:c210:b0:84a:2c46:3fe2 with SMTP id d2e1a72fcca58-84a2c464352mr5975390b3a.48.1784035632300;
+        Tue, 14 Jul 2026 06:27:12 -0700 (PDT)
+Received: from [192.168.1.164] (h69-130-12-20.bendor.broadband.dynamic.tds.net. [69.130.12.20])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-84a4f241d60sm1628416b3a.11.2026.07.14.06.27.11
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 14 Jul 2026 06:27:11 -0700 (PDT)
+Message-ID: <c684823d-4be1-48ba-94ac-f2c01551f832@gmail.com>
+Date: Tue, 14 Jul 2026 06:27:10 -0700
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-X-ClientProxiedBy: debrumsx21.de.eu.sew (10.2.251.140) To debrumsx07.de.eu.sew
- (10.2.251.157)
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.134,FMLib:17.12.100.49
- definitions=2026-07-13_02,2026-07-10_01,2025-10-01_01
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC] dbus: expose per-BSS security capabilities
+To: =?UTF-8?B?0JDQu9C10LrRgdC10Lk=?= <aleksman4o@gmail.com>,
+ iwd@lists.linux.dev
+References: <CAMq8zouhDMRW4Q7qSpMCFftp21wCzuC+RaJKsKz0sUivGAQHXA@mail.gmail.com>
+Content-Language: en-US
+From: James Prestwood <prestwoj@gmail.com>
+In-Reply-To: <CAMq8zouhDMRW4Q7qSpMCFftp21wCzuC+RaJKsKz0sUivGAQHXA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-From: DEMODDIE <dierk.modrow@sew-eurodrive.de>
+Hi,
 
----
- src/eapol.c | 4 ++++
- 1 file changed, 4 insertions(+)
+On 7/11/26 1:07 PM, Алексей wrote:
+> Hi,
+>
+> NetworkManager cannot currently distinguish WPA2-Personal, WPA3-Personal,
+> and WPA2/WPA3 transition networks when using its iwd backend.
+>
+> iwd has the required information internally.  scan_bss stores the WPA and
+> RSN information elements, and scan_bss_get_rsn_info() exposes the parsed AKM
+> and cipher information.  However, the stable D-Bus API reduces all of these
+> personal network variants to Network.Type="psk".  BasicServiceSet currently
+> exports only Address.
+>
+> This causes a concrete integration failure.  NetworkManager maps an iwd
+> Network with Type="psk" to NM_802_11_AP_SEC_KEY_MGMT_PSK.  A saved NM profile
+> with 802-11-wireless-security.key-mgmt="sae" then fails the normal AP/profile
+> compatibility check and is removed from Device.AvailableConnections, even
+> while iwd is successfully connected to the same network using SAE.
+>
+> Observed with NetworkManager 1.56.1 and iwd 3.12 on a WPA2/WPA3 transition
+> network:
+>
+>    NM profile key-mgmt:       sae
+>    iwd negotiated security:  WPA3-Personal + FT
+>    NM AP RsnFlags:           0x188 (CCMP + PSK, no SAE)
+>    NM AvailableConnections:  empty
+>
+> Would it be acceptable to extend net.connman.iwd.BasicServiceSet with stable
+> WPA/RSN security capability information?
+>
+> The information needs to include at least:
+>
+>    - advertised AKM suites (PSK, FT-PSK, SAE, FT-SAE, and so on)
+>    - pairwise and group ciphers
+>    - management frame protection capability and requirement
+>
+> Per-BSS properties seem preferable to a Network-level value because BSSs in
+> the same ESS may advertise different capabilities.  A consumer such as
+> NetworkManager can aggregate the capabilities when presenting the iwd
+> Network as one logical AP while leaving BSS selection and roaming to iwd.
+>
+> One possible API shape would be an extensible read-only RSN dictionary on
+> BasicServiceSet, similar to:
+>
+>    RSN = {
+>        "KeyManagement": ["psk", "sae", "ft-sae"],
+>        "Pairwise": ["ccmp"],
+>        "Group": "ccmp",
+>        "ManagementFrameProtection": "optional"
+>    }
 
-diff --git a/src/eapol.c b/src/eapol.c
-index 372549c6..c2dc4e4c 100644
---- a/src/eapol.c
-+++ b/src/eapol.c
-@@ -2824,6 +2824,10 @@ void eapol_register(struct eapol_sm *sm)
+Extending the BasicServiceSet interface to include these properties 
+seems perfectly reasonable to me.
 
-        l_queue_push_head(state_machines, sm);
+>
+> The exact representation is the main subject of this RFC.  Raw suite
+> selectors, separate properties, or an aggregate Network property may fit
+> iwd's API conventions better.
+>
+> A corresponding NetworkManager change would consume these capabilities
+> instead of synthesizing PSK-only RsnFlags from Network.Type.  Separately, NM
+> should preserve an SAE-only profile policy in the generated iwd profile by
+> using:
+>
+>    [Settings]
+>    TransitionDisable=true
+>    DisabledTransitionModes=personal
+>
+> Related reports and downstream investigation:
+>
+>    https://gitlab.freedesktop.org/NetworkManager/NetworkManager/-/issues/1489
+>    https://gitlab.freedesktop.org/NetworkManager/NetworkManager/-/issues/1693
+>    https://invent.kde.org/plasma/plasma-nm/-/merge_requests/571
+>
+> There was prior discussion indicating that additional BasicServiceSet
+> properties are welcome when the data already exists in scan_bss:
+>
+>    https://lore.kernel.org/iwd/97112988-3681-4192-abb2-9a9ee6d9552d@gmail.com/
+>
+> If this direction is acceptable, I can follow up with the D-Bus
+> documentation, implementation, and tests after agreeing on the property
+> format.
+>
+> Regards,
+> Aleks
+>
+Thanks,
 
-+       /* workaround against SEGV on fct. eapol_rx_packet by avoiding for =
-two different eapol_frame_watches with different ids, but same eapol_sm ptr=
- */
-+       if ((sm->watch_id > 0) && eapol_frame_watch_remove(sm->watch_id)) {
-+               l_debug("existing frame_watch for sm=3D%p with id=3D%u succ=
-essfully removed", sm, sm->watch_id);
-+       }
-        sm->watch_id =3D eapol_frame_watch_add(sm->handshake->ifindex,
-                                                rx_handler, sm);
-        sm->protocol_version =3D sm->handshake->proto_version;
---
-2.53.0.windows.2
+James
 
-
-________________________________
-
-
-SEW-EURODRIVE GmbH & Co KG
-Kommanditgesellschaft, Sitz: Bruchsal, RG Mannheim HRA 230970
-Komplement=E4rin: SEW-EURODRIVE Verwaltungs-GmbH, Sitz: Bruchsal, RG Mannhe=
-im HRB 230207
-
-Gesch=E4ftsf=FChrender Gesellschafter: J=FCrgen Blickle
-Gesch=E4ftsf=FChrung: J=FCrgen Blickle (Vorsitzender), Dr. J=F6rg Hermes, D=
-r. Hans Krattenmacher, Michael Luz, Christian Mayer, Dr. Markus W=F6pperman=
-n
