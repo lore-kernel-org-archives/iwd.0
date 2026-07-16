@@ -1,68 +1,68 @@
-Received: from mail-pj1-f41.google.com (mail-pj1-f41.google.com [209.85.216.41])
+Received: from mail-pg1-f179.google.com (mail-pg1-f179.google.com [209.85.215.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAE4B2E739A
-	for <iwd@lists.linux.dev>; Thu, 16 Jul 2026 02:36:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C36E32D63E5
+	for <iwd@lists.linux.dev>; Thu, 16 Jul 2026 02:36:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784169386; cv=none; b=jExNhExV4eOx6vdWWFw+/jmAYFTPMptOCJSqno0kpOjtvRdQnPnkxYPyUFjuxxK38Ts9lJ+J/awrvSkbpF7S9AsoIqvaej342QGAAQNb4GDi1ZJWw6Glvtiklwf1mHVnI3ryvSD0Tmld3q6H++eBTK2wexR5N2Csy6j0vS8o8Ko=
+	t=1784169387; cv=none; b=Lt+WOHRtJHeBgbTr9ww8eec36Fz9SMtTNB1PowZHEoLlGPMqezDUglR7LT8N9CyYr1+miKInHNojvKc2r+HlhzZaLVcgn/KUZ0AT0xgSOLtnvtT9MKWVxAYRAzP/KqMelMYVPIuYRp67iSBnOqR5EnEXIrKyQbVjoz1jxbcHkzE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784169386; c=relaxed/simple;
-	bh=rEjGrjqjKfKvT0qh+WkosETg/1I//qN6ua/mjyFibhw=;
+	s=arc-20240116; t=1784169387; c=relaxed/simple;
+	bh=WwQa8aDgtWFCgmE2TeXqH+lNiekZKa9PwBzBMqPqWhM=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=uVs/vrlur1xJ34WXlLY9Oi2BlNpL8lBZIIwAY3OLDz+ekgOqr33psPOfLrPAJonTf8l64qJ8g+1n2jUCC0kbbHqbgvTnLweCAXhskY2E/B89dBBOHyd2dWfypKo/8/+2zidh48rhG6QSZ8CPF5R0YZSzEEdYytgBlFEMySnekYM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OykRsO64; arc=none smtp.client-ip=209.85.216.41
+	 MIME-Version; b=iB8+0vfkvcbuj9+S7WJ/yIVJNl8aLe7j+dxR+nsA/nP1WpmmKIb2dfT6fkanoUvZPa0o+pjA8XcddPsCvKCX7we5272abxaN1igms4hh3j4NFBEeO2mUNYIKXrFm4AVqBuzAIJWANrAmFzKmx37wd/DGf0zQp5wjxMZIyOlmNBs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HtjLDT5q; arc=none smtp.client-ip=209.85.215.179
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OykRsO64"
-Received: by mail-pj1-f41.google.com with SMTP id 98e67ed59e1d1-382ef647e20so5729233a91.1
-        for <iwd@lists.linux.dev>; Wed, 15 Jul 2026 19:36:24 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HtjLDT5q"
+Received: by mail-pg1-f179.google.com with SMTP id 41be03b00d2f7-ca965de53baso1606658a12.0
+        for <iwd@lists.linux.dev>; Wed, 15 Jul 2026 19:36:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1784169384; x=1784774184; darn=lists.linux.dev;
+        d=gmail.com; s=20251104; t=1784169386; x=1784774186; darn=lists.linux.dev;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to:content-type;
-        bh=333KuQCJ9HyiqfbixGLZUQ6FukrmhkNYIUhy60dAABA=;
-        b=OykRsO64blHNhZELaAGrEkSc3WRyBYvMD8by650trgwttw5AN78IX/4dvfQVRFmR2O
-         OsFon5l7xDmjCRXaXK+KLF0UlBJRZWSnU0HHewR77lgmmhb0VR+RqjhwIprap7bkfQa8
-         8nZPqd/Q98gE7aejZowlXwjT32hMAZnCgk8vFZnjZ8hpDA+IIW7EHKkjIzKYdDTmXczq
-         /4TJG5Dl058BIl2Lq8BPhszQW3RkVpOtpFmm0HRbJmYm50LFqyFfUIQXy8EPgTZqczBK
-         qgji8Zvg4Tnx4dBhbT0DfFYwVDGt7iZw+OpPX4glBri+Osp2iWZxz3gNYn7jDv6IRQe5
-         bnxA==
+        bh=YBS6EQoynlZzpDfc+IrAfz3jUXRnQAz3dlw8jkkg38k=;
+        b=HtjLDT5q8Yx6pW96hKmqCs1G7MKJsNoR2kVzzCSZOX8MgOJplxJ/S0JQI6snd6C3uK
+         VyVYUW8wYYcm0ArllZUjUpHNA3/CIHpbMxJayKGYTN2bxznbc672/8dqgWF666pfaJZC
+         INQpZqe4/kFZeLCjb0TDTwN6xVQgD6MC9Z7lQ9SS44PNmBQo7qAlyi8V1t1sL5jcqkp9
+         PZRMGNFK9+gUNR2sqo2TptJPE6P4K+0mgZ7D1yb+kBA0Y0PxjGl7uFCUMjDXk5n/oi1u
+         pwVM2PHiG48hrDjvuApuBbL/P+4UqLqhzQVtBXt0feYhA4xmkS7hgchVTNo+HD5LicWN
+         9ShQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1784169384; x=1784774184;
+        d=1e100.net; s=20251104; t=1784169386; x=1784774186;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to:content-type;
-        bh=333KuQCJ9HyiqfbixGLZUQ6FukrmhkNYIUhy60dAABA=;
-        b=nT5llEAhaJFhCSaZ0TNaiCVA/+Vlz/vPN1eVpGL+wUTtUzDQFVtQQkgI5siAr4LnlH
-         ELKvc5X+1vWWZlCBAv4uERoYlRAIniYiv4HyMLVRO1l0d36XCnUigtlLoGIuJrCLRPVS
-         1BQnWiLjA+DWIEG+c1F9f3BQiUXgyFyd5R8+GHfnFHjMkvZ3E0Wroo0QMG+Iy8CwOvLH
-         yuA504C6MHOzhwItrGa9WUCjhp6qI3ki64JH0cikISShP1Pw+KTEhsnCEOEWm+XsIX2M
-         rtyNkS4zkr7Evua0m/BKrsSGVE7zqTEGDNia0b+j+hi0E0K8y2qH0Uj5/4gs/scNsF9u
-         9RMQ==
-X-Gm-Message-State: AOJu0YxpfyRdNpg5YHIC/Ifq7gBpyX7dfeShq+pwcejVkYjQAFVsVUqi
-	FX4LZ08vWbF3ca6Av+Y+ym8r7M5+T8ziIraIC3mkkfAub9d9zHt/cHwXuj6rWiQ=
-X-Gm-Gg: AfdE7cmR/aQ4chHcBo+bs2aG47VWiD3LFFXv0/vk6cXIq+xbHeiADJD1Qw3EkaSVSzt
-	BQVg10e5CTgHiwVUOhiJjf6sRMMhOygA30ubWFG+GIJTPrGRQkdqXPxpLoG08QjLc5clSj3O0+R
-	nRISHrHrL1lQzbmoZWNOKTOsSYKSi4SZ7oPiYVg00XeIOstSDLuXwn24tN9qYr3QxAJ4PiZ9qac
-	InlMn/YgqHowA0O1G2GChs0DsMyLzwR6d5vKC5Jt0DsooWN0lMFSnmlggpvl3Fw0WSoY1W2sZ0t
-	JgMf5Q7hu8Bsk9hq5nTabxlDup8OpuXWau2jwzeScQNVn7slNaWRMEZhj5a0jaU6iHQeDWzrODB
-	7ffE8Js41Y1s3BGubvH5Dk7tLT2fPKE9/9N0/IELdOhNzJPS1RSRagvGUDE6sCD+Xb20pVqdRq0
-	4mG3MX5M4+lIRltGYf1l7MNYL6c1zeBQ3CIuToSg==
-X-Received: by 2002:a17:90b:2fc4:b0:36a:8240:2477 with SMTP id 98e67ed59e1d1-38e29fb6132mr4702136a91.19.1784169384201;
-        Wed, 15 Jul 2026 19:36:24 -0700 (PDT)
+        bh=YBS6EQoynlZzpDfc+IrAfz3jUXRnQAz3dlw8jkkg38k=;
+        b=BYTPzh9xeKgKQStmPt/ZPfHJopKm+xVW0MMvziA28wU4PC2FZ4pXTzx6FjDUvpzOLV
+         k9OHNgMG+WoLbvRS8dZ5gttVK5WvRs9LCXwIkWOWEgDUVxp3Sf/ofCmftrSEEXmnvsWN
+         FXd+kAaG6j/9QkuoF5cCwii5WC11av1M5kBagiXx5W22yT0A2lCaELc0W02yQW2ao29X
+         N+h2ptciZS7Nt2PMxo5abQEE6ztXYTEHWC7OM6s/7c+cal+F5wXZejFoxLa41fmSL936
+         AjbbetY5acDXLvoLA1u0iwhNzhFccTz014k7WIv38KyJgN3rYOjgzFbf78FxPvO1pr1F
+         Wubw==
+X-Gm-Message-State: AOJu0Yy8EGiO9f3yxvRNNsGOH6QSbrPXVILMgpIoQwQP5X5+nN2xJ/fg
+	ke1Xj/Xu0Bf9rgTni4RXvMxCH7oBPdguCEfLzoSzmxC6+GU4Tn6IDijkqcUXTVc=
+X-Gm-Gg: AfdE7cls2tRXgZ2gvwxU2u63sYkkacT75clzjdGn2HbkHtwsSlwre/wb4FWXVqmMU35
+	nzdDcniyqyuuXgJLV+YS3+GZ8kx9EReeUtY1bIFra+rxXa67QDPpFQNUqGxm2/uh+S0staK47oy
+	yfpg6tmbOVJR1HG0Hss5dBJyb95ReSWo07Ja7EoX0r3X2J4ZZSgA5R+MEsrGjabP3UDGBiBIqsn
+	XnklDRbDpPLH56OCGkO2btmyswVzVXH2pO1A1pm4JrjJNm0KssQxtpgBjX3S09/hrfckn7m1fU3
+	EdVrEPZPFbCycI7Zv1HRUpE0WAjtl4xI9/4Jq4wfHVweRxMYtfsi+MQ/oXQCpDz1HpdahLS5w0z
+	Yo1pAru9GH82+EuUrrSpeoPYPv4PY+TVM6IyPW9pSFQgUFoNQzUztFj0xAmWUieCc8YcAcxlTyG
+	CWgqiqN6o4oaJ4Pg1F6YuvwY7NKnGWQA/yObN71g==
+X-Received: by 2002:a05:6a21:9216:b0:3bf:bde7:d66f with SMTP id adf61e73a8af0-3c11076c6ecmr22617403637.2.1784169386082;
+        Wed, 15 Jul 2026 19:36:26 -0700 (PDT)
 Received: from matic1.1020marsh.offices.matician.com ([2600:1700:471:807f:aff0:107f:e34:fd6e])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-3140e5306afsm6060595eec.9.2026.07.15.19.36.23
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-3140e5306afsm6060595eec.9.2026.07.15.19.36.25
         for <iwd@lists.linux.dev>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 15 Jul 2026 19:36:23 -0700 (PDT)
+        Wed, 15 Jul 2026 19:36:25 -0700 (PDT)
 From: Suchir Kavi <suchirkavi@gmail.com>
 To: iwd@lists.linux.dev
-Subject: [PATCH 2/3] netdev: reject reassociation while connect pending
-Date: Wed, 15 Jul 2026 19:34:43 -0700
-Message-ID: <20260716023444.3512595-3-suchirkavi@gmail.com>
+Subject: [PATCH 3/3] station: fix NULL deref in ap_directed_roam
+Date: Wed, 15 Jul 2026 19:34:44 -0700
+Message-ID: <20260716023444.3512595-4-suchirkavi@gmail.com>
 X-Mailer: git-send-email 2.54.0
 In-Reply-To: <20260716023444.3512595-1-suchirkavi@gmail.com>
 References: <20260716023444.3512595-1-suchirkavi@gmail.com>
@@ -74,49 +74,45 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-netdev_reassociate() replaces netdev->handshake and unrefs the old
-handshake without freeing netdev->ap or dequeuing a pending connection
-work item. If a reassociation begins while an earlier attempt's radio
-work is still queued (reachable since station_cannot_roam() does not
-cover the connecting states), the stale auth proto keeps a raw pointer
-to the freed handshake. On the PMKSA-cache path netdev_connect_common()
-does not replace netdev->ap, and it re-inserts the already-queued
-embedded work item; when the work finally runs,
-netdev_begin_connection() starts the stale auth proto and sae_start()
-dereferences the freed handshake:
+station_ap_directed_roam() initialized ignore_candidates from
+station->connected_bss->vendor_quirks before the state != CONNECTED
+guard. station_disconnect() clears connected_bss before entering
+DISCONNECTING and the WNM frame watch outlives the connection, so a BSS
+Transition Management frame arriving in that window crashes on the
+dereference the guard was meant to prevent.
 
-  #0  sae_choose_next_group   <- reads handshake->ecc_sae_pts == NULL
-  #1  sae_start
-  #2  netdev_begin_connection
-  #3  netdev_connection_work_ready
-  #4  wiphy_radio_work_next
-  #5  get_scan_done
-
-Mirror netdev_connect(), which already refuses to start while
-netdev->connect_cmd_id or netdev->work.id is set. Both are zero at any
-legitimate roam start since netdev_connect_ok() completes the work item,
-and the station roam paths handle a negative return by failing the roam
-cleanly.
+Assign it after the state check, which guarantees connected_bss is set
+(the frame-sanitize memcmp below already relies on the same invariant).
 
 Assisted-by: Claude:claude-fable-5
 ---
- src/netdev.c | 3 +++
- 1 file changed, 3 insertions(+)
+ src/station.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
-diff --git a/src/netdev.c b/src/netdev.c
-index e639a1f8..dadd90da 100644
---- a/src/netdev.c
-+++ b/src/netdev.c
-@@ -4394,6 +4394,9 @@ int netdev_reassociate(struct netdev *netdev, const struct scan_bss *target_bss,
- 	struct handshake_state *old_hs;
- 	struct eapol_sm *old_sm;
+diff --git a/src/station.c b/src/station.c
+index 0b2d7dc6..e3aeb3fd 100644
+--- a/src/station.c
++++ b/src/station.c
+@@ -3273,8 +3273,7 @@ static void station_ap_directed_roam(struct station *station,
+ 	uint16_t dtimer;
+ 	uint8_t valid_interval;
+ 	bool can_roam = !station_cannot_roam(station);
+-	bool ignore_candidates =
+-		station->connected_bss->vendor_quirks.ignore_bss_tm_candidates;
++	bool ignore_candidates;
  
-+	if (netdev->connect_cmd_id || netdev->work.id)
-+		return -EBUSY;
+ 	l_debug("ifindex: %u", netdev_get_ifindex(station->netdev));
+ 
+@@ -3283,6 +3282,9 @@ static void station_ap_directed_roam(struct station *station,
+ 		return;
+ 	}
+ 
++	ignore_candidates =
++		station->connected_bss->vendor_quirks.ignore_bss_tm_candidates;
 +
- 	old_sm = netdev->sm;
- 	old_hs = netdev->handshake;
- 
+ 	/*
+ 	 * Sanitize the frame to check that it is from our current AP.
+ 	 *
 -- 
 2.54.0
 
