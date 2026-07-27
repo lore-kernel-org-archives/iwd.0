@@ -1,118 +1,167 @@
-Received: from mail-pg1-f179.google.com (mail-pg1-f179.google.com [209.85.215.179])
+Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C36E32D63E5
-	for <iwd@lists.linux.dev>; Thu, 16 Jul 2026 02:36:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7444B4252A7
+	for <iwd@lists.linux.dev>; Mon, 27 Jul 2026 20:03:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784169387; cv=none; b=Lt+WOHRtJHeBgbTr9ww8eec36Fz9SMtTNB1PowZHEoLlGPMqezDUglR7LT8N9CyYr1+miKInHNojvKc2r+HlhzZaLVcgn/KUZ0AT0xgSOLtnvtT9MKWVxAYRAzP/KqMelMYVPIuYRp67iSBnOqR5EnEXIrKyQbVjoz1jxbcHkzE=
+	t=1785182633; cv=none; b=rzfLz2RhPATLmnIRNKuOLi377xgR3/aMDyhbqhT2xUo4hUURwCLUc1jr0goZpCiMqvkL80kd4hLZkRe6u9vWZar6AZ741sqQYtCE47p3IIaAJ/g8kSUU8HbzA//rSVr6XW9b2VTpIf5AXJdrW69yTwsLVvWOgQq42VWhfKMsxKQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784169387; c=relaxed/simple;
-	bh=WwQa8aDgtWFCgmE2TeXqH+lNiekZKa9PwBzBMqPqWhM=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=iB8+0vfkvcbuj9+S7WJ/yIVJNl8aLe7j+dxR+nsA/nP1WpmmKIb2dfT6fkanoUvZPa0o+pjA8XcddPsCvKCX7we5272abxaN1igms4hh3j4NFBEeO2mUNYIKXrFm4AVqBuzAIJWANrAmFzKmx37wd/DGf0zQp5wjxMZIyOlmNBs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HtjLDT5q; arc=none smtp.client-ip=209.85.215.179
+	s=arc-20240116; t=1785182633; c=relaxed/simple;
+	bh=m7lAk0IbbIIJ8aZYcF8CQ8BzbBvJVZSOyNGJwLoumx4=;
+	h=Date:Message-ID:From:To:Subject; b=VTrxfW/rikkbGeAfXuEABXOVc770AN98X0n98JmweXzEZUG/J0cQoA+Yxu8JBsyTYPRLh7P6K1L7eLpcCqoWwgzL1ENkJCOFxlAx0Rhxunvy3v5g20uoAlgkLIg04y0UO798IhLASfIq4bX57rQfuZaxoi566zno8wkFjeUp0EE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=R8Tt5f60; arc=none smtp.client-ip=209.85.221.54
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HtjLDT5q"
-Received: by mail-pg1-f179.google.com with SMTP id 41be03b00d2f7-ca965de53baso1606658a12.0
-        for <iwd@lists.linux.dev>; Wed, 15 Jul 2026 19:36:26 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="R8Tt5f60"
+Received: by mail-wr1-f54.google.com with SMTP id ffacd0b85a97d-47f96c5b722so1783652f8f.0
+        for <iwd@lists.linux.dev>; Mon, 27 Jul 2026 13:03:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1784169386; x=1784774186; darn=lists.linux.dev;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
+        d=gmail.com; s=20251104; t=1785182630; x=1785787430; darn=lists.linux.dev;
+        h=subject:to:from:message-id:date:from:to:cc:subject:date:message-id
          :reply-to:content-type;
-        bh=YBS6EQoynlZzpDfc+IrAfz3jUXRnQAz3dlw8jkkg38k=;
-        b=HtjLDT5q8Yx6pW96hKmqCs1G7MKJsNoR2kVzzCSZOX8MgOJplxJ/S0JQI6snd6C3uK
-         VyVYUW8wYYcm0ArllZUjUpHNA3/CIHpbMxJayKGYTN2bxznbc672/8dqgWF666pfaJZC
-         INQpZqe4/kFZeLCjb0TDTwN6xVQgD6MC9Z7lQ9SS44PNmBQo7qAlyi8V1t1sL5jcqkp9
-         PZRMGNFK9+gUNR2sqo2TptJPE6P4K+0mgZ7D1yb+kBA0Y0PxjGl7uFCUMjDXk5n/oi1u
-         pwVM2PHiG48hrDjvuApuBbL/P+4UqLqhzQVtBXt0feYhA4xmkS7hgchVTNo+HD5LicWN
-         9ShQ==
+        bh=m63SL4ZA0auHGFgOBoVT7Vwt+H9LrDmemSQiP4N89ws=;
+        b=R8Tt5f60vRJDGbf5yrfKHi4FPBNKNNjSGHLeueVp5/YokM15OvZoXmFU6foFves9Mk
+         i554+aEvJzBcuTv4yq0hedNv4dHOLDQoL5XD+ob5YqPD57I8dhZiGszuBMY9hIYoq4+d
+         m85xs1m0jDVjgjZu0/BHrI8SCfxo8NRQQMChilnQcAVEwE9tE/N59aMlw8TrlYIwHjB7
+         8Id6BbjR5tgkEDnA0iFukcyRqcau3uVOkjmGLWP8GN9YSfqPjgkYcaUYa0bOSxt6TN1+
+         Jw+ZfdFabN06xBXjmCD8KlRKb2A+AUppVvACQ2Ls+jOpRzRW9f9zCpoldnsjhNz5PaNW
+         YGSA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1784169386; x=1784774186;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
+        d=1e100.net; s=20251104; t=1785182630; x=1785787430;
+        h=subject:to:from:message-id:date:x-gm-gg:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to:content-type;
-        bh=YBS6EQoynlZzpDfc+IrAfz3jUXRnQAz3dlw8jkkg38k=;
-        b=BYTPzh9xeKgKQStmPt/ZPfHJopKm+xVW0MMvziA28wU4PC2FZ4pXTzx6FjDUvpzOLV
-         k9OHNgMG+WoLbvRS8dZ5gttVK5WvRs9LCXwIkWOWEgDUVxp3Sf/ofCmftrSEEXmnvsWN
-         FXd+kAaG6j/9QkuoF5cCwii5WC11av1M5kBagiXx5W22yT0A2lCaELc0W02yQW2ao29X
-         N+h2ptciZS7Nt2PMxo5abQEE6ztXYTEHWC7OM6s/7c+cal+F5wXZejFoxLa41fmSL936
-         AjbbetY5acDXLvoLA1u0iwhNzhFccTz014k7WIv38KyJgN3rYOjgzFbf78FxPvO1pr1F
-         Wubw==
-X-Gm-Message-State: AOJu0Yy8EGiO9f3yxvRNNsGOH6QSbrPXVILMgpIoQwQP5X5+nN2xJ/fg
-	ke1Xj/Xu0Bf9rgTni4RXvMxCH7oBPdguCEfLzoSzmxC6+GU4Tn6IDijkqcUXTVc=
-X-Gm-Gg: AfdE7cls2tRXgZ2gvwxU2u63sYkkacT75clzjdGn2HbkHtwsSlwre/wb4FWXVqmMU35
-	nzdDcniyqyuuXgJLV+YS3+GZ8kx9EReeUtY1bIFra+rxXa67QDPpFQNUqGxm2/uh+S0staK47oy
-	yfpg6tmbOVJR1HG0Hss5dBJyb95ReSWo07Ja7EoX0r3X2J4ZZSgA5R+MEsrGjabP3UDGBiBIqsn
-	XnklDRbDpPLH56OCGkO2btmyswVzVXH2pO1A1pm4JrjJNm0KssQxtpgBjX3S09/hrfckn7m1fU3
-	EdVrEPZPFbCycI7Zv1HRUpE0WAjtl4xI9/4Jq4wfHVweRxMYtfsi+MQ/oXQCpDz1HpdahLS5w0z
-	Yo1pAru9GH82+EuUrrSpeoPYPv4PY+TVM6IyPW9pSFQgUFoNQzUztFj0xAmWUieCc8YcAcxlTyG
-	CWgqiqN6o4oaJ4Pg1F6YuvwY7NKnGWQA/yObN71g==
-X-Received: by 2002:a05:6a21:9216:b0:3bf:bde7:d66f with SMTP id adf61e73a8af0-3c11076c6ecmr22617403637.2.1784169386082;
-        Wed, 15 Jul 2026 19:36:26 -0700 (PDT)
-Received: from matic1.1020marsh.offices.matician.com ([2600:1700:471:807f:aff0:107f:e34:fd6e])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-3140e5306afsm6060595eec.9.2026.07.15.19.36.25
+        bh=m63SL4ZA0auHGFgOBoVT7Vwt+H9LrDmemSQiP4N89ws=;
+        b=sFNBgGgv5LWaGCk7JBKYR3hQQFHzSksEongQla2eTLjr7GVLBFtwwRwxzzYtyl1ilR
+         vkfjrJT0BI7SCsRm3vw46n2qpQE+hCawl5tKdGvMcMUXRkHdECN67xd691xJhDD31k4k
+         W2YnVERwC0p9VhXQR8nju2//M+/6aUeLs79qPIqTbr73dTzQVI046Rb8YMggghtY+5zb
+         aFM6ZQSc7D3M78/c8V+7uLsQs5dQK0/EQtMHdmi58RGgRyod17F5rz5K9GEy1yeMhUlu
+         KXeRzoNbGpKdAPIwwcxLRc29cGU6E5c3syvpTfc71jgi4J2HBq6KVEgod2kCkRIsUSCV
+         GqCw==
+X-Gm-Message-State: AOJu0YzcxiGwbnBfnBBhSJAeExf6tYFpXO1LqhZyVGpqrspxSb2LTieT
+	pGVjg3reCYHWyjjkeX5KSXYGPOvIdEzj5SM/keq8QJ9YWEMaTpPsiMK5vQNlAiC3+J4=
+X-Gm-Gg: AR+sD10UAWy68v5byzeAmynioq9UjPgpvidhrpgac3gNsCiKXpgSzqVrBeYTdj4EFhx
+	+zBtNB+fHDD7M06Z78kGETpGezp3Pu46OIFwW+5ll3velcp3GhgsRSe45nX4WopXVoQcmHzJLIJ
+	GR2N94rVZIdmE5qqCWQuMQrJ/E8Pu45f705/VgXwGPqufkOjd5q+3z7QhsmNu1g57dSPZGgYu/v
+	WLkMHVnLirVoKkzm/R/Ip0zc8KtT2uNvN8JflVoLCsdBj8zDsQlfdadPRFuhCC0u14wCmnctZfn
+	8tdxyJgRT7CHqC1ababPQE976L9glgc9tlK9rOwe5Bt7l5Gs43JFXcGc0RVfJ9Nh39R8bdsS7SK
+	i78ivlpiTKRxQdiiikizPepxjS+1NpJakZk7nvL7+Yz3VNkY0Cu+eo1b2Z0MVv4KjdtAbJW3Heq
+	uBag==
+X-Received: by 2002:a5d:5f54:0:b0:47f:697b:de65 with SMTP id ffacd0b85a97d-47fafa9ed94mr543929f8f.60.1785182629672;
+        Mon, 27 Jul 2026 13:03:49 -0700 (PDT)
+Received: from localhost ([31.223.9.108])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-47f85c63678sm48139966f8f.29.2026.07.27.13.03.48
         for <iwd@lists.linux.dev>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 15 Jul 2026 19:36:25 -0700 (PDT)
-From: Suchir Kavi <suchirkavi@gmail.com>
+        Mon, 27 Jul 2026 13:03:49 -0700 (PDT)
+Date: Mon, 27 Jul 2026 23:03:48 +0300
+Message-ID: <889ea449fac3377cf73b35cd8dfe8de1@gmail.com>
+From: Muhammed Izzet Saglam <m.izzetsaglam@gmail.com>
 To: iwd@lists.linux.dev
-Subject: [PATCH 3/3] station: fix NULL deref in ap_directed_roam
-Date: Wed, 15 Jul 2026 19:34:44 -0700
-Message-ID: <20260716023444.3512595-4-suchirkavi@gmail.com>
-X-Mailer: git-send-email 2.54.0
-In-Reply-To: <20260716023444.3512595-1-suchirkavi@gmail.com>
-References: <20260716023444.3512595-1-suchirkavi@gmail.com>
+Subject: [BUG] Crash in network_info_get_roam_frequencies() when a neighbor
+ report completes with -ENOTCONN during disconnect teardown
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 
-station_ap_directed_roam() initialized ignore_candidates from
-station->connected_bss->vendor_quirks before the state != CONNECTED
-guard. station_disconnect() clears connected_bss before entering
-DISCONNECTING and the WNM frame watch outlives the connection, so a BSS
-Transition Management frame arriving in that window crashes on the
-dereference the guard was meant to prevent.
+Hi,
 
-Assign it after the state check, which guarantees connected_bss is set
-(the frame-sanitize memcmp below already relies on the same invariant).
+iwd 3.12 crashes with SIGSEGV while roaming, when a pending 802.11k
+neighbor report request completes during connection teardown. The
+neighbor report callback only bails out on -ENODEV, so an -ENOTCONN
+completion falls through to a roam scan that dereferences the connection
+state netdev_connect_free() has just torn down.
 
-Assisted-by: Claude:claude-fable-5
----
- src/station.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+I hit this twice within one minute on 2026-07-25 and captured both core
+dumps. The backtraces are identical, so this looks deterministic rather
+than memory corruption.
 
-diff --git a/src/station.c b/src/station.c
-index 0b2d7dc6..e3aeb3fd 100644
---- a/src/station.c
-+++ b/src/station.c
-@@ -3273,8 +3273,7 @@ static void station_ap_directed_roam(struct station *station,
- 	uint16_t dtimer;
- 	uint8_t valid_interval;
- 	bool can_roam = !station_cannot_roam(station);
--	bool ignore_candidates =
--		station->connected_bss->vendor_quirks.ignore_bss_tm_candidates;
-+	bool ignore_candidates;
- 
- 	l_debug("ifindex: %u", netdev_get_ifindex(station->netdev));
- 
-@@ -3283,6 +3282,9 @@ static void station_ap_directed_roam(struct station *station,
- 		return;
- 	}
- 
-+	ignore_candidates =
-+		station->connected_bss->vendor_quirks.ignore_bss_tm_candidates;
-+
- 	/*
- 	 * Sanitize the frame to check that it is from our current AP.
- 	 *
--- 
-2.54.0
+Backtrace (both dumps, identical):
 
+  #0  network_info_get_roam_frequencies (info=0x0, current_freq=2462,
+          max=max@entry=5 '\005') at src/knownnetworks.c:391
+  #1  station_roam_scan_known_freqs (station=station@entry=0x564903a82b50)
+          at src/station.c:3088
+  #2  station_neighbor_report_cb (netdev=<optimized out>, err=-107,
+          reports=<optimized out>, reports_len=0,
+          user_data=0x564903a82b50) at src/station.c:3129
+  #3  netdev_connect_free (netdev=netdev@entry=0x564903a77c40)
+          at src/netdev.c:867
+  #4  netdev_connect_failed (netdev=0x564903a77c40, result=<optimized out>,
+          status_or_reason=<optimized out>) at src/netdev.c:937
+  #5  netdev_disconnected (netdev=0x564903a77c40, result=<optimized out>,
+          event=NETDEV_EVENT_DISCONNECT_BY_SME,
+          status_or_reason=<optimized out>) at src/netdev.c:1004
+  #6  netdev_disconnect_by_sme_cb (msg=<optimized out>,
+          user_data=0x564903a77c40) at src/netdev.c:1019
+  #7  process_unicast (genl=<optimized out>, nlmsg=0x7ffffcf571d0)
+          at ell/genl.c:860
+  #8  received_data (io=<optimized out>, user_data=0x564903a69bb0)
+          at ell/genl.c:972
+  #9  io_callback (fd=<optimized out>, events=1, user_data=0x564903a69b00)
+          at ell/io.c:105
+  #10 l_main_iterate (timeout=<optimized out>) at ell/main.c:463
+  #11 l_main_run () at ell/main.c:511
+  #12 l_main_run () at ell/main.c:492
+  #13 l_main_run_with_signal (callback=0x5648f3df5bc0 <signal_handler>,
+          user_data=0x0) at ell/main.c:633
+  #14 main (argc=<optimized out>, argv=<optimized out>) at src/main.c:610
+
+The faulting line is knownnetworks.c:391, with info == NULL:
+
+  for (entry = l_queue_get_entries(info->known_frequencies); entry && max;
+
+Sequence, as I read it:
+
+  1. The AP disconnects us, so netdev_disconnect_by_sme_cb() runs
+     (NETDEV_EVENT_DISCONNECT_BY_SME).
+  2. netdev_connect_failed() -> netdev_connect_free() tears the
+     connection down and completes the outstanding neighbor report
+     request with an error.
+  3. station_neighbor_report_cb() is invoked with err = -107
+     (-ENOTCONN).
+  4. The guard at the top of that callback only returns early for
+     -ENODEV:
+
+        if (!station->preparing_roam || err == -ENODEV)
+                return;
+
+     so -ENOTCONN continues to:
+
+        if (!reports || err) {
+                r = station_roam_scan_known_freqs(station);
+
+  5. station_roam_scan_known_freqs() then reaches
+     network_info_get_roam_frequencies() with the network info already
+     gone, and dereferences NULL.
+
+Commit 155c266 ("station: add checks to prevent multiple roam scans",
+Jan 2023) fixed a different path to the same crash signature and is of
+course already in 3.12. This one arrives through the disconnect teardown
+rather than the roam rearm timer, and the code in master still looks
+affected: station_neighbor_report_cb() special-cases -ENODEV only, and
+station_roam_scan_known_freqs() has no NULL check on the connected
+network.
+
+I have not written a patch because I do not know which fix you would
+prefer -- treating any err as terminal in the callback, checking
+station->connected_network before the fallback scan, or cancelling the
+neighbor report request earlier in netdev_connect_free(). Happy to test
+a patch on this hardware.
+
+System:
+
+  iwd            3.12 (Arch Linux, iwd 3.12-1)
+  kernel         7.1.5-zen1-1-zen (x86_64)
+  device         Intel Wi-Fi 6E AX210/AX1675 2x2 [Typhoon Peak]
+                 [8086:2725] rev 1a, iwlwifi
+  firmware       89.735b75a4.0 ty-a0-gf-a0-89.ucode, op_mode iwlmvm
+  band at crash  2462 MHz (2.4 GHz, channel 11), roaming on a weak link
+
+Both core dumps are still on disk if anything else would help.
+
+Thanks,
+Muhammed Izzet Saglam
