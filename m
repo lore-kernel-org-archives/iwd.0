@@ -1,143 +1,133 @@
-Received: from sewfire.sew-eurodrive.com (sewfire.sew-eurodrive.com [194.180.1.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B97DD477E55
-	for <iwd@lists.linux.dev>; Wed, 29 Jul 2026 11:48:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=194.180.1.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 814233CB56D
+	for <iwd@lists.linux.dev>; Wed, 29 Jul 2026 20:13:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785325708; cv=none; b=ZiN1kDraHKLcq2/hBDVO/JjnjjndVgcLYK+lRFP04xPYMDjqiYTaIXnmo3pQkABnBtBik0b9nYWfixWQkxH4jsNwdRDKi/IZjrJBxtrH+h4ZkPh05Yg5Imv/+p41BjkGLanpaPM1i2NCeSvbFBPc2sCAvnBBqq/QJxBDYM7k+wA=
+	t=1785356026; cv=none; b=OY9TU/Wjt+rfuH4hTX4/7iASvgXFsDoxLCM1FYSNrqsX2jvpHOLIWulfJR3P2EEQOLI9fWiF6a5aZlKcSWpv4AHSLddHDBxq0SQIUmdQpGXMfVSdaOGXa34fhIUsr5Y45GurfiPQwyvuRP3yl7daMoNFxGPmWiS5qlGoJv3uMOM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785325708; c=relaxed/simple;
-	bh=4Vupk6si3pYTKLYIL7RF3VUW0UVS7daRN5Dk2DuxdKk=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=T/vmjZr8b8HEcV0eU/S4I5cBTSES170BI/hrNC2/Q6v1tQwLlW2wDGxAbmzaVhh9Md7RBOdkIxIYHGJD2Kn3IR8Qks3/8mzaL0pDifPuqi/qXcBzp1iGBxtOX9SJg9pWpbLdmZn8jdVl6st4jyi7uuIeo+AJoh1mD5/6gEUz5JU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=sew-eurodrive.de; spf=pass smtp.mailfrom=sew-eurodrive.de; dkim=pass (2048-bit key) header.d=sew-eurodrive.de header.i=@sew-eurodrive.de header.b=ZPNlYOxL; arc=none smtp.client-ip=194.180.1.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=sew-eurodrive.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sew-eurodrive.de
+	s=arc-20240116; t=1785356026; c=relaxed/simple;
+	bh=SPfw7nrU+nLXgZNuuwrxj4kRoXQ9dK962E/WP0YZLyc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=P6K+rWhkArjUbPfwkgQStyKVO1AM9DjPDbTQCw+v/SkGkgMmw5BT301D5auFilwyRH8WXeAnY7ByRwZV54+opBzo7Q5vypOY3DCK5DvTNNOl5UaxwKn7XZkadE+7sQbMBC0yCL59a6dmBLsBUXuw4atUaxuo1OYEgHhr/Jnal8g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YIL75YEs; arc=none smtp.client-ip=209.85.214.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sew-eurodrive.de header.i=@sew-eurodrive.de header.b="ZPNlYOxL"
-Received: from pps.filterd (sewfire.sew-eurodrive.com [127.0.0.1])
-	by sewfire.sew-eurodrive.com (8.18.1.7/8.18.1.7) with ESMTP id 66TBYIxI005225
-	for <iwd@lists.linux.dev>; Wed, 29 Jul 2026 13:42:26 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	sew-eurodrive.de; h=cc:content-transfer-encoding:content-type
-	:date:from:message-id:mime-version:subject:to; s=sew1; bh=DEYVj0
-	FBmclhqgFj6p5h0/oTaIsrU2N2ymR2s/p5IRw=; b=ZPNlYOxLQloqHbJEHvRS7l
-	p6/SSaaYf02Ua/H6SpLR9QwhVQCob107JKX35El2FGdSlk0xcy+V9AB6bTS6abGw
-	6GgTq20hz5r37ddOQM6dCUyWJre++GUAAzMThn7aM3pbgTx3Eqs/VSWSLVaU6n7k
-	kwlWyUjwVNcgY7xX+R1p0FPHK+dfZ4VoysPslAkU2C7FKewzxlLaVJjqDJ71Hrne
-	FaOBPWrtfDQmc6dLcl0CCM6Fo1hHmZ6x2LarD2IEh29HEPiNp2iXp3PgThMfAMmM
-	CvFRKwVSZvvQMuBGjLxx45k2JBMgXvyyc71BOZGnG8SbOonYpkUlblYfkwOO3XPA
-	==
-X-PGP-Universal: processed;
-	by brudepgp2.de.eu.sew on Wed, 29 Jul 2026 13:42:26 +0200
-From: Dierk Modrow <dierk.modrow@sew-eurodrive.de>
-To: <prestwoj@gmail.com>
-CC: <iwd@lists.linux.dev>, Dierk Modrow <dierk.modrow@sew-eurodrive.de>
-Subject: [PATCH v4] src/station.c: fix of segv in station_roam_scan_notify when performing repeated roam scan at legacy roaming after FT-TO
-Date: Wed, 29 Jul 2026 13:42:15 +0200
-Message-ID: <20260729114215.1883-1-dierk.modrow@sew-eurodrive.de>
-X-Mailer: git-send-email 2.53.0.windows.2
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YIL75YEs"
+Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-2ce87c7e3bbso15984925ad.1
+        for <iwd@lists.linux.dev>; Wed, 29 Jul 2026 13:13:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1785356025; x=1785960825; darn=lists.linux.dev;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=dfQanY//vYFcvfP/Xq5qzeVhdKaJUoFaA/dfl3/bX08=;
+        b=YIL75YEstiGyjj1ZwZ09yV9heQoM7P/kZu7G1lKJHISKvF0hSkF29hoBl7WJHX9OhB
+         2ssi91SGNR0sjBYzm7eZ20Z3jp5Akg/IqC37QgZ4uQHEfyPUH+mPXThxkqSvar+sriqT
+         rb7GhRSfleJ1yRE8L6QTWvEt4at1/pPVyu96CgzwHE1lYj2zwVZkltL4QKIrCueXFrMd
+         PC9gxuTzxFyHcbnwKN2FHcpPc3mIq3bVPs3rMkA+bS7wANQDWibQIwOoWlkiJUmZMJJc
+         cS7SuGGl6+Z+Z53B24oAJmdV09cYj1tgpMSbjnGz3LsJkLGrUwgCDR9ghM1DIYa0JpfI
+         D03A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1785356025; x=1785960825;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=dfQanY//vYFcvfP/Xq5qzeVhdKaJUoFaA/dfl3/bX08=;
+        b=QrqKUeOnC/tjh/asIETYqXqXAMEcNUIiAf7P7Zv8p08OzsOlv/9eSbqcrAJYlQSNnk
+         v4ZLHsPUdUX2W+2xdU7SVbfLbHuULgcz0icaPKken2dffhqABBfqjo0n19KmHph9UIS/
+         WypBCGcQGb9g0tBBDSE+3mNoyzgpRGIHLn+N8tuz+CfmYTSDrHAjpzmoxZR3jkibICM7
+         PTrWkEO+hdnTysaXKsNQmmTzEZqasvy8gA54vNKdbViEUWznJFwxlau8LvNPw2KYZt5r
+         aW+TnNwpIwk3fLIJVgCaaSupT43MsHrKQV7B/nY3ojKjgW50bhmR0BJDIrtLVM3eGXyQ
+         LBgw==
+X-Gm-Message-State: AOJu0Yx/HSbf41/7N6a0OcYe2fa6I+2TyCFsOeiZv18ot201BKgPLnAK
+	rHxQ2xal2rNDUK9VHulvcD5rGQ5H6QKeyBIKQaRkBC1kt5MrVqBCtFpL5Td39JlEgRo=
+X-Gm-Gg: AR+sD13OY65ds3+r2gMH0MSvL/Gi5MUUrZiSzyCEAoGPeFdoALzGiPmTeMDJ9BQOX9M
+	OE8bnEvwHy3caiD/h5hWOv9W5RQ4Yo4Qv85dGt9ZN0USp3YapPfqFBDVH9c0CxT0kWB8iOBVjFO
+	9uBum5hFrcvR6WwV4JZwOnhcKTW0M5hX5n5POEstefYXIsLGxwAzk0fHI0ZRm+HKPio6RKRZTX6
+	nn7yzRScrCsNSSnAIlcDzwCIovBpRvfpezW2AZQqpE8zPmyEuA2sBkJJRoh//IKcXq/UkvX88mH
+	646SYSkmV6HfwcjSspXwOxatIxg66eceXBrK3DOFwofJ+kVxRdjd/MWlYogC7Iim0/+GSM/yc3u
+	szaeDnl+mqFsuonLg0GO0hbn25WwqScptGNf+NGzwtlupmDIrh0eZPRI90fOBVAG8/IXIPHVkbw
+	bpKJq0qDFxv9uPS777UasDHscq+OESqtvQBNSBNwNu+3YzYD9Chr7kx7emjo8=
+X-Received: by 2002:a17:903:1786:b0:2cf:4339:aaa with SMTP id d9443c01a7336-2d033b11ce4mr2991955ad.12.1785356024637;
+        Wed, 29 Jul 2026 13:13:44 -0700 (PDT)
+Received: from arch ([49.204.97.234])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-31504d37368sm23550885eec.22.2026.07.29.13.13.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 29 Jul 2026 13:13:43 -0700 (PDT)
+From: arpan <arpanpramanik015@gmail.com>
+To: iwd@lists.linux.dev
+Cc: arpan <arpanpramanik015@gmail.com>
+Subject: [PATCH] netdev: Fix premature ECSA channel switch timeout for mt7925
+Date: Thu, 30 Jul 2026 01:43:16 +0530
+Message-ID: <20260729201316.85499-1-arpanpramanik015@gmail.com>
+X-Mailer: git-send-email 2.55.0
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-X-ClientProxiedBy: debrumsx22.de.eu.sew (10.2.251.141) To debrumsx07.de.eu.sew
- (10.2.251.157)
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.134,FMLib:17.12.100.49
- definitions=2026-07-29_04,2026-07-28_02,2025-10-01_01
+Content-Transfer-Encoding: 8bit
 
+The mt7925 cards get stuck and disconnect during Extended Channel Switch
+Announcement (ECSA) events because the kernel considers them stuck.
+
+This occurs because the kernel sends an imminent channel switch
+notification (NL80211_CMD_CH_SWITCH_NOTIFY with the
+NL80211_ATTR_CH_SWITCH_COUNT attribute present) prior to the physical
+switch. iwd was previously ignoring the countdown attribute and
+immediately initiating an active scan to re-query the AP. Sending a
+scan command while the firmware is trying to tune the radio causes the
+mt7925 firmware to time out.
+
+This patch adds a check to see if the countdown attribute is present for
+mt7925 interfaces. If it is, we wait for the second notification (which
+omits the count) that confirms the switch is physically completed before
+proceeding with the internal state updates.
+
+Signed-off-by: Arpan <arpanpramanik015@gmail.com>
 ---
-Hello James,
+ src/netdev.c | 20 ++++++++++++++++++++
+ 1 file changed, 20 insertions(+)
 
-here is my modified patch for the topic 'fix of SEGV in station_roam_scan_n=
-otify
- when performing repeated roam scan at legacy roaming after ft_auth-/ft_rea=
-ssoc-timeout
- when using mwifiex / NXP 88W9098 driver'
- As suggested I added only one "L_WARN_ON(!hs)"-query on method station_roa=
-m_scan and two
- debug traces at methods station_try_next_transition & station_roam_scan_no=
-tify. So we
- could detect if handshake might be reset to NULL unexpectedly in meantime.
- I will do tests with this variant and come back to you later with results.
-
- Best regards!
-
- src/station.c | 15 +++++++++++++++
- 1 file changed, 15 insertions(+)
-
-diff --git a/src/station.c b/src/station.c
-index 8fcf8c70..8d6ebb0b 100644
---- a/src/station.c
-+++ b/src/station.c
-@@ -2764,6 +2764,10 @@ static bool station_try_next_transition(struct stati=
-on *station,
-        /* Reset AP roam flag, at this point the roaming behaves the same *=
-/
-        station->ap_directed_roaming =3D false;
-
-+       /* ### START: check if hs is unexpectedly set to NULL here ### */
-+       l_debug("handshake pointer: %p", hs);
-+       /* ### END ### */
-+
-        /* Can we use Fast Transition? */
-        if (station_can_fast_transition(station, hs, bss) && !no_ft)
-                return station_fast_transition(station, bss);
-@@ -2909,6 +2913,10 @@ static bool station_roam_scan_notify(int err, struct=
- l_queue *bss_list,
-                return false;
-        }
-
-+       /* ### START: check if hs is unexpectedly set to NULL here ### */
-+       l_debug("handshake pointer: %p", hs);
-+       /* ### END ### */
-+
-        /*
-         * Do not call station_set_scan_results because this may have been
-         * a partial scan.  We could at most update the current networks' B=
-SS
-@@ -3041,6 +3049,7 @@ static void station_roam_scan_destroy(void *userdata)
- static int station_roam_scan(struct station *station,
-                                struct scan_freq_set *freq_set)
+diff --git a/src/netdev.c b/src/netdev.c
+index e639a1f8..96b48ac3 100644
+--- a/src/netdev.c
++++ b/src/netdev.c
+@@ -5428,12 +5428,32 @@ static void netdev_channel_switch_event(struct l_genl_msg *msg,
  {
-+       struct handshake_state *hs;
-        struct scan_parameters params =3D { .freqs =3D freq_set, .flush =3D=
- true };
-        _auto_(scan_freq_set_free) struct scan_freq_set *allowed =3D
-                                        station_get_allowed_freqs(station);
-@@ -3049,6 +3058,12 @@ static int station_roam_scan(struct station *station=
-,
-                return -ENOTSUP;
-
-        l_debug("ifindex: %u", netdev_get_ifindex(station->netdev));
+ 	_auto_(l_free) struct band_chandef *chandef = NULL;
+ 
++	uint32_t count;
++	const char *driver;
 +
-+       /* ### START: check if hs is unexpectedly set to NULL here ### */
-+       hs =3D netdev_get_handshake(station->netdev);
-+       if (L_WARN_ON(!hs))
-+               return -ENOTSUP;
-+       /* ### END ### */
+ 	if (netdev->type != NL80211_IFTYPE_STATION)
+ 		return;
+ 
+ 	if (L_WARN_ON(!netdev->connected))
+ 		return;
+ 
++	driver = wiphy_get_driver(netdev_get_wiphy(netdev));
++
++	/*
++	 * If the channel switch countdown is present, the switch is imminent
++	 * but has not happened yet. Wait for the second CH_SWITCH_NOTIFY
++	 * event (which omits the count) to avoid interrupting the firmware
++	 * by prematurely starting a scan.
++	 *
++	 * Restrict this workaround to mt7925 cards as requested.
++	 */
++	if (driver && !strncmp(driver, "mt7925", 6) &&
++			nl80211_parse_attrs(msg, NL80211_ATTR_CH_SWITCH_COUNT, &count,
++				NL80211_ATTR_UNSPEC) == 0) {
++		l_debug("Channel switch imminent in %u TBTTs, waiting...", count);
++		return;
++	}
++
+ 	chandef = l_new(struct band_chandef, 1);
+ 
+ 	if (nl80211_parse_chandef(msg, chandef) < 0) {
+-- 
+2.55.0
 
-        if (station->connected_network) {
-                const char *ssid =3D network_get_ssid(station->connected_ne=
-twork);
---
-2.53.0.windows.2
-
-
-________________________________
-
-
-SEW-EURODRIVE GmbH & Co KG
-Kommanditgesellschaft, Sitz: Bruchsal, RG Mannheim HRA 230970
-Komplement=E4rin: SEW-EURODRIVE Verwaltungs-GmbH, Sitz: Bruchsal, RG Mannhe=
-im HRB 230207
-
-Gesch=E4ftsf=FChrender Gesellschafter: J=FCrgen Blickle
-Gesch=E4ftsf=FChrung: J=FCrgen Blickle (Vorsitzender), Dr. J=F6rg Hermes, D=
-r. Hans Krattenmacher, Michael Luz, Christian Mayer, Dr. Markus W=F6pperman=
-n
