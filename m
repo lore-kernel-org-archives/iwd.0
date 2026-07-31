@@ -1,41 +1,41 @@
-Received: from mailer.sew-eurodrive.com (mailer.sew-eurodrive.com [194.180.1.3])
+Received: from mx1.sew-eurodrive.com (mx1.sew-eurodrive.com [194.180.1.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9A0B1A239A
-	for <iwd@lists.linux.dev>; Thu, 30 Jul 2026 09:29:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=194.180.1.3
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E1E0429CFA
+	for <iwd@lists.linux.dev>; Fri, 31 Jul 2026 14:05:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=194.180.1.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785403793; cv=none; b=WKJzpwML3m+T5ntIyH3BQEBKpqS4VXW+NyqrbxpkaFhPNGGBtOAYmbxwRzAgb1gYOYC5yZNUMWJtBhVes8oU+IMgPQXlxM/kRPZ6uT5vvOadOKNBRKg3q8Ns/6UBgRp710SadQSYYo+gdYt96yLsTPo46FWvb/M9kPf3ROmA3ic=
+	t=1785506754; cv=none; b=QKVarJnuHfNsnOY1gtR4HyHbAUAyniFstj1T08jggoCj/Jbd+xYshPOgfH9suF0uv09m9U4SfwCx3EgwAcv9XxrDyl4xB5mTGjLSwYohscyMmjYoMigjBPPfI9Ncp8IDp1N8SYBIb8xNAq9j7xDwMoW/qKSuz8pcGXUTLwJZGew=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785403793; c=relaxed/simple;
-	bh=CDzlcsLRID5wmWBjpdPyYroPONiItopk/N4DEqfR9Ag=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=gwYfhWiagdF/HuYurX1S/kuxCSM96XF4Y74DOH5/EU2jmT4sdsxLdgqyW9kK3LBTuXdCkHHVxM3mB7CRsuYa0DJJhLGp1vt90LK/sUz+29QvoDmtf7UCjJAsNbBXV64TeZ8IXlOObUFmN2qspptxS8SMt+S2SkcFASaa70kExyQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=sew-eurodrive.de; spf=pass smtp.mailfrom=sew-eurodrive.de; dkim=pass (2048-bit key) header.d=sew-eurodrive.de header.i=@sew-eurodrive.de header.b=DFP+3smK; arc=none smtp.client-ip=194.180.1.3
+	s=arc-20240116; t=1785506754; c=relaxed/simple;
+	bh=woTdC44N0yK0SQJYBfCoyvGqxcbiq3B5OBy/flJAhhg=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=ICRwVhzCkyves+c8WAWgoVATCpytPfS43vAOUXrc+VEIerj66e/NDhrvL4hxbf3pyKkwf+LYTwWPrCoiQPCpwJyjAFrbCNN2Q4LGLA/RDfONNW8LZmzU4pdrX7fpdxoG4M3KwQNLuy/g+oJe3FYnBfzvjITVhYsuTkkg3bRMJC0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=sew-eurodrive.de; spf=pass smtp.mailfrom=sew-eurodrive.de; dkim=pass (2048-bit key) header.d=sew-eurodrive.de header.i=@sew-eurodrive.de header.b=lG2P9Oa9; arc=none smtp.client-ip=194.180.1.34
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=sew-eurodrive.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sew-eurodrive.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sew-eurodrive.de header.i=@sew-eurodrive.de header.b="DFP+3smK"
-Received: from pps.filterd (mailer.sew-eurodrive.com [127.0.0.1])
-	by mailer.sew-eurodrive.com (8.18.1.7/8.18.1.7) with ESMTP id 66U9J7dQ026792
-	for <iwd@lists.linux.dev>; Thu, 30 Jul 2026 11:20:13 +0200
+	dkim=pass (2048-bit key) header.d=sew-eurodrive.de header.i=@sew-eurodrive.de header.b="lG2P9Oa9"
+Received: from pps.filterd (mx1.sew-eurodrive.com [127.0.0.1])
+	by mx1.sew-eurodrive.com (8.18.1.7/8.18.1.7) with ESMTP id 66VE4Dip011265
+	for <iwd@lists.linux.dev>; Fri, 31 Jul 2026 16:04:26 +0200
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
 	sew-eurodrive.de; h=cc:content-transfer-encoding:content-type
-	:date:from:message-id:mime-version:subject:to; s=sew1; bh=j2uu4z
-	JDpEjKb9EBHInEudlpFCErn2fhfaQR1FujVZ4=; b=DFP+3smKsnco9OXMfITJ53
-	8WEZBATbXlnej0wNX7owUO2K/93oYkHHiRKRv6YRZvdyGFvyEMbi4B6PAORS79zV
-	1UuDg9fIcwrIpdZSFxpGqB/xE3Kk48WJ+s3GKlk4iYM/z6sYYiKel6zSA47wgn/l
-	vkgR90AthK6j+Qt+pOmUv4DAnOdfUj4jV5x+Jiq506ASEl6O2+ZdELLn82ICuAMt
-	p35Y+WYCms7yQG9ENKL82QTy3R5Wg7i3AF7qCoIkyqi6p4NYWnwzhkr1YxYs4UmC
-	WTP2bOldp3ZaWZVe+I3eSG2n8Vf/CRx+aNJSQr/fhI/B33A8gI6VZ28HmuV1Gxhg
+	:date:from:message-id:mime-version:subject:to; s=sew1; bh=lzEb7o
+	EPk/kqQDgmbf+h4+fEs8lEX4MLgZQzKJCswJM=; b=lG2P9Oa98YNAQlAnxrCbgf
+	Vxoqid5szG3W8WJ/sD06iUAQ0U7D+gUEJYLVTBOMP04uohlX4kgNoVHVJ4s+ElEC
+	pS6hAxRaO3izoTLj3eQe3Z8uLCog0yijxNsha44zOR6KQ5ZI0LdoY2cyqPAtDYXQ
+	UKftQ6e8c/sPzJn5kyI2Yh57tAQgAHdeQjSGFsbMJBUXFaJNXyXJYEMryJURz8zG
+	rxGqltkv+C08QQzFih+RCC7+7g+ImTxelLtNDbM3BgFp2TC+J/HjEFF4qhhwtK54
+	tT/hYJXoj+pbtCLztc+bvGfkuFCqi6yskptlGcvZa7gyK/bnhL9zMErVsrl8kIXQ
 	==
 X-PGP-Universal: processed;
-	by brudepgp2.de.eu.sew on Thu, 30 Jul 2026 11:20:12 +0200
+	by brudepgp1.de.eu.sew on Fri, 31 Jul 2026 16:04:26 +0200
 From: Dierk Modrow <dierk.modrow@sew-eurodrive.de>
-To: <prestwoj@gmail.com>
-CC: <iwd@lists.linux.dev>, Dierk Modrow <dierk.modrow@sew-eurodrive.de>
-Subject: [PATCH v4] src/station.c: fix of segv in station_roam_scan_notify when performing repeated roam scan at legacy roaming after FT-TO
-Date: Thu, 30 Jul 2026 11:20:00 +0200
-Message-ID: <20260730092001.2145-1-dierk.modrow@sew-eurodrive.de>
+To: <iwd@lists.linux.dev>
+CC: <denkenz@gmail.com>, Dierk Modrow <dierk.modrow@sew-eurodrive.de>
+Subject: [PATCH v4] src/eapol.c: fix of SEGV in eapol_rx_packets at receipt of EAPOL M1 msg at legacy roaming after ft_auth-/ft_reassoc-timeout when using mwifiex / NXP 88W9098 driver
+Date: Fri, 31 Jul 2026 16:03:22 +0200
+Message-ID: <20260731140322.1823-1-dierk.modrow@sew-eurodrive.de>
 X-Mailer: git-send-email 2.53.0.windows.2
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
@@ -43,83 +43,38 @@ List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-X-ClientProxiedBy: debrumsx22.de.eu.sew (10.2.251.141) To debrumsx07.de.eu.sew
+X-ClientProxiedBy: debrumsx23.de.eu.sew (10.2.251.142) To debrumsx07.de.eu.sew
  (10.2.251.157)
 Content-Transfer-Encoding: quoted-printable
 Content-Type: text/plain
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.134,FMLib:17.12.100.49
- definitions=2026-07-30_02,2026-07-29_01,2025-10-01_01
+ definitions=2026-07-31_04,2026-07-30_01,2025-10-01_01
 
 ---
-Hello James,
+ src/eapol.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-here is my modified patch for the topic 'fix of SEGV in station_roam_scan_n=
-otify  when performing
-repeated roam scan at legacy roaming after ft_auth-/ft_reassoc-timeout  whe=
-n using mwifiex / NXP
-88W9098 driver'
- As suggested I added only one "L_WARN_ON(!hs)"-query on method station_roa=
-m_scan and two  debug
-traces at methods station_try_next_transition & station_roam_scan_notify. S=
-o we  could detect if
-handshake might be reset to NULL unexpectedly in meantime.
- I will do tests with this variant and come back to you later with results.
+diff --git a/src/eapol.c b/src/eapol.c
+index 372549c6..c2dc4e4c 100644
+--- a/src/eapol.c
++++ b/src/eapol.c
+@@ -2824,6 +2824,10 @@ void eapol_register(struct eapol_sm *sm)
 
- Best regards!
- src/station.c | 9 +++++++++
- 1 file changed, 9 insertions(+)
+        l_queue_push_head(state_machines, sm);
 
-diff --git a/src/station.c b/src/station.c
-index 8fcf8c70..b5a680e6 100644
---- a/src/station.c
-+++ b/src/station.c
-@@ -2764,6 +2764,8 @@ static bool station_try_next_transition(struct statio=
-n *station,
-        /* Reset AP roam flag, at this point the roaming behaves the same *=
-/
-        station->ap_directed_roaming =3D false;
-
-+       l_debug("handshake pointer: %p", hs);
-+
-        /* Can we use Fast Transition? */
-        if (station_can_fast_transition(station, hs, bss) && !no_ft)
-                return station_fast_transition(station, bss);
-@@ -2909,6 +2911,8 @@ static bool station_roam_scan_notify(int err, struct =
-l_queue *bss_list,
-                return false;
-        }
-
-+       l_debug("handshake pointer: %p", hs);
-+
-        /*
-         * Do not call station_set_scan_results because this may have been
-         * a partial scan.  We could at most update the current networks' B=
-SS
-@@ -3041,6 +3045,7 @@ static void station_roam_scan_destroy(void *userdata)
- static int station_roam_scan(struct station *station,
-                                struct scan_freq_set *freq_set)
- {
-+       struct handshake_state *hs;
-        struct scan_parameters params =3D { .freqs =3D freq_set, .flush =3D=
- true };
-        _auto_(scan_freq_set_free) struct scan_freq_set *allowed =3D
-                                        station_get_allowed_freqs(station);
-@@ -3048,6 +3053,10 @@ static int station_roam_scan(struct station *station=
-,
-        if (L_WARN_ON(!allowed))
-                return -ENOTSUP;
-
-+       hs =3D netdev_get_handshake(station->netdev);
-+       if (L_WARN_ON(!hs))
-+               return -ENOTSUP;
-+
-        l_debug("ifindex: %u", netdev_get_ifindex(station->netdev));
-
-        if (station->connected_network) {
++       /* workaround against SEGV on fct. eapol_rx_packet by avoiding for =
+two different eapol_frame_watches with different ids, but same eapol_sm ptr=
+ */
++       if ((sm->watch_id > 0) && eapol_frame_watch_remove(sm->watch_id)) {
++               l_debug("existing frame_watch for sm=3D%p with id=3D%u succ=
+essfully removed", sm, sm->watch_id);
++       }
+        sm->watch_id =3D eapol_frame_watch_add(sm->handshake->ifindex,
+                                                rx_handler, sm);
+        sm->protocol_version =3D sm->handshake->proto_version;
 --
 2.53.0.windows.2
-
 
 
 ________________________________
