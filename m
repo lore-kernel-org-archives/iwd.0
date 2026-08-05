@@ -1,91 +1,78 @@
-Received: from mx1.sew-eurodrive.com (mx1.sew-eurodrive.com [194.180.1.34])
+Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAFF93DDB11
-	for <iwd@lists.linux.dev>; Tue,  4 Aug 2026 12:55:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=194.180.1.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9680E3D8133
+	for <iwd@lists.linux.dev>; Wed,  5 Aug 2026 13:51:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785848135; cv=none; b=GEejkryHJcWLY7Ki66pyyjNE2FNdhfK44RvIm5ZwZMi2F4rqtCV6QIX3+NzyVsJfZHRW09TVdHQgFdLL3Zj4NX/vfjR1oaiJykpwBYV7N1IzGjpu1MuPap3pkIDu9AblttRxCQvD60FNtWxv0r74xR+g/kfEjdkOhxMd3x0B7t4=
+	t=1785937910; cv=none; b=BSqqVJJaBmENuISF4VfTpj9aaYuSmYdGxVVmrNVYg83YTEtkqZ0UiV+jrHxflbcu+BZRz40kj2TGSQ3ZyvO5ij7T2n94olL7SGEtKxfLJuS707/dCYxLRGLrPtdHFOR0WVfSvVfbB69ONn04ygEhvvyFD4wKXKjXcYUS+kAs9Y8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785848135; c=relaxed/simple;
-	bh=woTdC44N0yK0SQJYBfCoyvGqxcbiq3B5OBy/flJAhhg=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=LFe/ZTjr2u5hEGT+br5+3D/QXU+onC6+P5W0M5J5TywtgwvaW3Bj7jfK816mIsNhFGfoEXJZfvsnhWPFykdKuo2QQRmeXn0OGs02bjVPxiMtzaYWlznVmhdaIJgbF8dIThbNyHKPFgOk/z8DaV6+qJ6oKyNWsGIO4noDS2xGBy8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=sew-eurodrive.de; spf=pass smtp.mailfrom=sew-eurodrive.de; dkim=pass (2048-bit key) header.d=sew-eurodrive.de header.i=@sew-eurodrive.de header.b=WdLvkE5h; arc=none smtp.client-ip=194.180.1.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=sew-eurodrive.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sew-eurodrive.de
+	s=arc-20240116; t=1785937910; c=relaxed/simple;
+	bh=BWXARvP518Yu3MB1DFFyRk1NDalxkXv7LVUmOFcrTcU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=m0dbVvcTaE8qyt8o9b+NmMv8IVes2omzVFHSFS4q/MkHOKeOoCyZr4wn9K8P6brj827tQdkZ3Slpula5FOcsQp1sQrsf64M+drODI7W1tV9JsDouKrW7O52Ogkr14ncAjvXKPymR9c2DixINomFxQAlRHC7qcjX7OK1nbGS98Jw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=BJAd4euF; arc=none smtp.client-ip=148.251.105.195
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sew-eurodrive.de header.i=@sew-eurodrive.de header.b="WdLvkE5h"
-Received: from pps.filterd (mx1.sew-eurodrive.com [127.0.0.1])
-	by mx1.sew-eurodrive.com (8.18.1.7/8.18.1.7) with ESMTP id 674CnCeZ030637
-	for <iwd@lists.linux.dev>; Tue, 4 Aug 2026 14:55:23 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	sew-eurodrive.de; h=cc:content-transfer-encoding:content-type
-	:date:from:message-id:mime-version:subject:to; s=sew1; bh=lzEb7o
-	EPk/kqQDgmbf+h4+fEs8lEX4MLgZQzKJCswJM=; b=WdLvkE5h03PtfcFGYLwUUX
-	QWSo7H/sG9HAzfRIiRlg6Z2vxTGt5g3LNkzXUEmJABPTIZo0vXj/GEgzw9tLIXC2
-	L7l63hhXd7EEzgYTZH/blHWeZzRk1OKIquiyWjylSwETvkP/vvv7gfSavLmEjZyt
-	/QcRffbLFnJLPzEJW8GhqIv7klFmO9q0JT+uMNAe8iXAQf/SN7aNP+jYoebfuMVJ
-	KoTLIwj5ddH+8uhw7HpSTln3VgiVNutAH5PsfnxvsJcJySVBAcN0y7r7RXPIIlXD
-	36xUaDHnHhQtpfRfN/hkpSpHc+kekLfYIgjmtNxo7X8QaGaLMXYA7tvudio1/AUg
-	==
-X-PGP-Universal: processed;
-	by brudepgp2.de.eu.sew on Tue, 04 Aug 2026 14:55:23 +0200
-From: Dierk Modrow <dierk.modrow@sew-eurodrive.de>
-To: <iwd@lists.linux.dev>
-CC: <prestwoj@gmail.com>, Dierk Modrow <dierk.modrow@sew-eurodrive.de>
-Subject: [PATCH v5] src/eapol.c: fix of SEGV in eapol_rx_packets at receipt of EAPOL M1 msg at legacy roaming after ft_auth-/ft_reassoc-timeout when using mwifiex / NXP 88W9098 driver
-Date: Tue, 4 Aug 2026 14:55:05 +0200
-Message-ID: <20260804125505.2126-1-dierk.modrow@sew-eurodrive.de>
-X-Mailer: git-send-email 2.53.0.windows.2
+	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="BJAd4euF"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
+	s=mail; t=1785937906;
+	bh=BWXARvP518Yu3MB1DFFyRk1NDalxkXv7LVUmOFcrTcU=;
+	h=From:To:Cc:Subject:Date:From;
+	b=BJAd4euFOSe5Ta3rjElJqeMw85LR968KF7Ff3Ii6k5RHQDbHkzc2hmphShnkwp2lx
+	 2KjMKgJtY8JFxat7W+gFVCkDFlwNFKdIluD95Nqa7PHOmqOKoFaWnxLVfq3tJyvimg
+	 oI5AvkrhWn05yN0AvwHNhvRwpNut8HC/H+2Mrom1Mjg7uHiNH5IB9gnrMDstIvJd0O
+	 rf+Iggyj5mCNhMSRg2+88esZlWtg08l+FH+bxU5M46IH8aY8tY4awR6M5cj2aEEjN9
+	 xv9m9v4uwHUzm+pCL/FX5avJoWtO95DLgI4Cwlawd9Kos8Svrh331z9uWffH2NiBWB
+	 9m99970oH0P7Q==
+Received: from vignesh-thinkpad.. (unknown [100.64.0.157])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange x25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: vignesh)
+	by bali.collaboradmins.com (Postfix) with ESMTPSA id AEE7517E025E;
+	Wed, 05 Aug 2026 15:51:45 +0200 (CEST)
+From: Vignesh Raman <vignesh.raman@collabora.com>
+To: iwd@lists.linux.dev
+Cc: andrew.zaborowski@intel.com,
+	bgalvani@redhat.com,
+	ludovico.denittis@collabora.com
+Subject: [PATCH] station: register BSS before adding to ESS
+Date: Wed,  5 Aug 2026 19:21:37 +0530
+Message-ID: <20260805135139.2957946-1-vignesh.raman@collabora.com>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-X-ClientProxiedBy: debrumsx22.de.eu.sew (10.2.251.141) To debrumsx07.de.eu.sew
- (10.2.251.157)
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.134,FMLib:17.12.100.49
- definitions=2026-08-04_03,2026-08-03_02,2025-10-01_01
+Content-Transfer-Encoding: 8bit
 
+The network points to its BSSes through ExtendedServiceSet, but a
+BSS does not point back to the network. So the BSS object should be
+published on D-Bus first, then added to the network's list. Doing it
+the other way round briefly exposes a BSS path on D-Bus before the
+object it points to exists.
 ---
- src/eapol.c | 4 ++++
- 1 file changed, 4 insertions(+)
+ src/station.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/src/eapol.c b/src/eapol.c
-index 372549c6..c2dc4e4c 100644
---- a/src/eapol.c
-+++ b/src/eapol.c
-@@ -2824,6 +2824,10 @@ void eapol_register(struct eapol_sm *sm)
+diff --git a/src/station.c b/src/station.c
+index 8fcf8c70..8b9ca565 100644
+--- a/src/station.c
++++ b/src/station.c
+@@ -646,8 +646,9 @@ static struct network *station_add_seen_bss(struct station *station,
+ 			network_get_ssid(network), security_to_str(security));
+ 	}
+ 
++	/* Publish the BasicServiceSet object before it's referenced in ExtendedServiceSet. */
++	station_register_bss(network, bss);
+ 	network_bss_add(network, bss);
+-	station_register_bss(network, bss);
+ 
+ 	return network;
+ }
+-- 
+2.47.3
 
-        l_queue_push_head(state_machines, sm);
-
-+       /* workaround against SEGV on fct. eapol_rx_packet by avoiding for =
-two different eapol_frame_watches with different ids, but same eapol_sm ptr=
- */
-+       if ((sm->watch_id > 0) && eapol_frame_watch_remove(sm->watch_id)) {
-+               l_debug("existing frame_watch for sm=3D%p with id=3D%u succ=
-essfully removed", sm, sm->watch_id);
-+       }
-        sm->watch_id =3D eapol_frame_watch_add(sm->handshake->ifindex,
-                                                rx_handler, sm);
-        sm->protocol_version =3D sm->handshake->proto_version;
---
-2.53.0.windows.2
-
-
-________________________________
-
-
-SEW-EURODRIVE GmbH & Co KG
-Kommanditgesellschaft, Sitz: Bruchsal, RG Mannheim HRA 230970
-Komplement=E4rin: SEW-EURODRIVE Verwaltungs-GmbH, Sitz: Bruchsal, RG Mannhe=
-im HRB 230207
-
-Gesch=E4ftsf=FChrender Gesellschafter: J=FCrgen Blickle
-Gesch=E4ftsf=FChrung: J=FCrgen Blickle (Vorsitzender), Dr. J=F6rg Hermes, D=
-r. Hans Krattenmacher, Michael Luz, Christian Mayer, Dr. Markus W=F6pperman=
-n
