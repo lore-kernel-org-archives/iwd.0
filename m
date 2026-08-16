@@ -1,189 +1,248 @@
-Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
+Received: from mail-pj1-f45.google.com (mail-pj1-f45.google.com [209.85.216.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5572D37EFE7
-	for <iwd@lists.linux.dev>; Sun, 16 Aug 2026 00:13:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7EF378F4A
+	for <iwd@lists.linux.dev>; Sun, 16 Aug 2026 14:45:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786839238; cv=none; b=uuhvtlL1FxWm6inXa6vRviL+212CgICYv15AjeDt9YF36wm/E+8kv899kgUGS/tPocskq1JKbwogmOR4dxCxGJHyLrTFyLQlCLpWcKzEkucHS+gyb+ECTqrUPEC0ee7tT5oXp5zaemOhbkytruca579IKJDKTVZbuSvRHf6ATzo=
+	t=1786891540; cv=none; b=EVPWusXeySvoL3qvsdtxxsRgC6u4msKqtRaKNGDpswKA+fbs+anRalgAmpLXVm/oXGZOlfr4B0chmNO8eRG9z06gtubDGO6FsHLPf4B2gIjpd7N+b81Uf3o6G0KRnYCafQqtaUQ5PSiG5tJyXf3qHBvO3iDwmUgsoNiKAgCFL6I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786839238; c=relaxed/simple;
-	bh=y1XkHJIfBOVGA+VVJe2COeQS/aJGYtVD+5KGI+pao+s=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=tLQ4SGLZcb9FhoGvU/kkAf7yLRn/UQUOsFaD9rVfu4YnBA+JKN9b7mM5+imvGrnmhTWXlSi56iitNEFOGkMy9QYLK6B+TvG+/SlwYNxs3Kulf0h31bDi4mhtLg3IUKazispJSKMiGaYO13HfZqRGXPRO/EUssTYmZqyGvVVtRfU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=intelfx.name; spf=pass smtp.mailfrom=intelfx.name; dkim=pass (1024-bit key) header.d=intelfx.name header.i=@intelfx.name header.b=HYzTF6nQ; arc=none smtp.client-ip=209.85.128.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=intelfx.name
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intelfx.name
+	s=arc-20240116; t=1786891540; c=relaxed/simple;
+	bh=DvuDKF7mFd1OYloMDFgLa4gHhyTqxUPD0nnaFAutsEw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ruMh358vA/DrLT5hiKN94sU+EfEQ8El4536VTEmc2yeO+x76IfFa+6I9b4nKVKO7gVsdoGZTxc+aTKQ4iBYMkwmd05lAkZ6S9eIMPDeHqrUWzFVs+mKyrxVevfskpcfAD4pakjtlaxz2GEarquuPp9guS13MapI+Q7Ju9NigbII=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AvnRXT0M; arc=none smtp.client-ip=209.85.216.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=intelfx.name header.i=@intelfx.name header.b="HYzTF6nQ"
-Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-4980dc26022so22598905e9.1
-        for <iwd@lists.linux.dev>; Sat, 15 Aug 2026 17:13:54 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AvnRXT0M"
+Received: by mail-pj1-f45.google.com with SMTP id 98e67ed59e1d1-38ea87caafeso1945543a91.3
+        for <iwd@lists.linux.dev>; Sun, 16 Aug 2026 07:45:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=intelfx.name; s=google; t=1786839232; x=1787444032; darn=lists.linux.dev;
-        h=cc:to:message-id:content-transfer-encoding:content-type
-         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=Swu5QdUkrrKXwrAFsBoUnTgKdipzzWtjz8TKQO49fxk=;
-        b=HYzTF6nQ0BXdlMfHoFdyAFkT2KUC2hjUyxZsuDzZMBMcW6KoUue580QOZLj1kgtvX4
-         nZoyW2RMUF+RdoIN9BEul8IVe63ZMWSideusiT5sCtE6Y0sWsDWYoHy+w1RuTOsTDXRL
-         wrn4y4iEGBgspU1h39INmrTAT3Gi9gkuIK6rk=
+        d=gmail.com; s=20251104; t=1786891538; x=1787496338; darn=lists.linux.dev;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=3+JRTnCxsfH1XNNRpepF+cvrOcm9I4TyrVPOAF1gEYM=;
+        b=AvnRXT0MAcMGu3a+qYim91sc6MFTSGmYYGA9mQ6f0pN1vTpm9v6Y1o3iuSxr1r5k4V
+         WDXhUE6erOGKDrk09Q33DRcYLdtTmeoHPr/K8lgHISgiKRW2j5nNMI1gbBxl7ghVT7VW
+         YxpMhq8paKN0UHyBupXVETHGGdDGHlSxvBNg7WoeHvTqOmQeVtgD05JzJD8QrCcaJykP
+         BD/6EHTQxWSm/L4fmyYW7rz1/mGCmzBovxx0w62LThIkg2eS5ICnLy8AP7ENX8U9K9RS
+         aIhGXe9zqbUrF5OfqQXLBVQjVDBQILkqJHEJX2ULdZubFlfSfWpZyn/VqXng15S+1raw
+         /z1Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1786839232; x=1787444032;
-        h=cc:to:message-id:content-transfer-encoding:content-type
-         :mime-version:subject:date:from:x-gm-gg:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to:content-type;
-        bh=Swu5QdUkrrKXwrAFsBoUnTgKdipzzWtjz8TKQO49fxk=;
-        b=KcDKEEJlnXLVLFPdcsznEisX7jeZ+Bz0Xo5oj4w+68As3ZWKnf7khL2dpOLS9lFzuN
-         kqHZ8qBXAevh+GhOJTagxVOVXWvFnaJlJQnNs2DZ57pWSwohNbOgohXAeXKr4Zx5dsbM
-         b0TI85ASVVcYFIiZ0aaCSKYmaRoGHwA7Hg4d3GYu9BA7ksCFooQE5fmMCs3hGD5vQWxO
-         Kt8IG6GVd0UPdncU8DyaG/274WJZRhwp6syNflbBvqrivqjnfLTVfrs/yU9EV0EL7WOO
-         f7oicI0cQxgl3Z5kbcB4ssWrtQx7HnUSqqPYhBsTF8vlVW+ejmJ0I20+//m4++jVF4wN
-         D0Cg==
-X-Gm-Message-State: AOJu0YxK3QvaB2qEBAkhWNP5m7YZrXb6CK5PsMcfWM2IJcnlyqATx/3t
-	pmUe1lgIOUev6ZFlH5A6AAtI6Wy62H6T97EzODSZBH9XONzZ2sIaYoozc0/0z8SE/OLc15aVQT0
-	szIzsDGU=
-X-Gm-Gg: AR+sD13d3pUtdsTrPdMG8s1mLfW93h4Z07e1ODk7npFc6Cq6LrQe3/RiB6ajh/KM/TW
-	vtWdCAjts1k203X4oc0aki4ttk1THZcy+NLL2/pakBZIyk/k5t7aRBUxmy/hepy0elvYFtiS/3J
-	j/jvc+rVoiAU/d1NTnkwJW8jo8DWJSGC2gV3AnmVG3vt9Xk8LTutQungkJ5Cd3BM+8A5GpfrRHo
-	wEhL2P+Kpo2NMs61+umsp3w1mzKdTGOp+iPvxQUpQE2kZR5VN55jOyrfGh2CstZJoBpTARTjbYf
-	eN1FuwDC2q/uPHppbLlUpCBCsVD31ayNcniv07j8v2uB00Eyf78yC7M5ySzJBRRhmpgRQyUGjuc
-	TzWcOnejDZ3Jqrlb6NwAgDq960mCHXu6BsMJuyipeXEJMBlq7Kb1W3U6z4Vl2fTXdoJB+Ca613u
-	/m94egLHUaXVca0iItDUvslUBPW6rxeaU8+fnSc64Ov36YhLI=
-X-Received: by 2002:a05:600c:1395:b0:499:872b:abd4 with SMTP id 5b1f17b1804b1-4998797684cmr207086525e9.6.1786839232497;
-        Sat, 15 Aug 2026 17:13:52 -0700 (PDT)
-Received: from localhost ([2a00:1358:e0ce:6800::3db])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4998777d428sm104904495e9.0.2026.08.15.17.13.51
+        d=1e100.net; s=20251104; t=1786891538; x=1787496338;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=3+JRTnCxsfH1XNNRpepF+cvrOcm9I4TyrVPOAF1gEYM=;
+        b=PA+qbsSJkrp1LMJJvqI0JNNyh2AJPaLockK059CARo1006ryw6Cu9rWaXe/EmEDOKb
+         nZHMC7VLMHlfCmm39vFf4ySQIotsd2e0lKXLR1OJp3Sap3XHObcM7i/DtYzdwR2tWK3a
+         w9XkkfysODz7P+8uDiVaGXEZcRbKtYxOTJFs7K2Jar5gqP9TwoGnZ9EhQT+wLOomCqQU
+         dXZUwSKtmF+V4LJKbGQEvnFgbdJPYUP4ZG1+JUKr2GJZmSPpOTFRoVbaRATH6d0M+aBz
+         KEkIuqPRvuTx9B0U6fdOSzZcaU3T1+Cw8zIWJ7jVVqina1kPx9AO+9a0J1P8vy9nxy2z
+         yuFA==
+X-Gm-Message-State: AOJu0YxgkD3A7WAMzvIq3ll+vUTL00Vq8wapGSc8nRghZXL+020wStag
+	CQiLZOy2EpOYarAZWi3eevoH8cDRMPQ+dAIia0vsoJ83p1Yx19ihcLtguliCYg==
+X-Gm-Gg: AR+sD130HMrgx0NirJ6EFJGRKUMyZxyrlhO3+BPjYr9m7ceN3HOwSwiePTorTlNyfnz
+	KrXZq1C5AQnDEcX/OHTnKi0knJ7JhwrbAn3odxxbIkqADfi4kRpmtK4Tz9V/w6VKZzoRWAPcWSJ
+	HwW4ZxXLq0V89lSHOrWLwUPmtiingHmQrUDzHP1X3S/9bd7wWQ65JYP2ZIiowPa2awEouiAC0ZQ
+	NSw3BrI86h/SfHYzYpQcLU7evp1fA8HkL4OCvefDWyPUos9+0YSPTq6lSjz6Q4WOprTiMCq6gDy
+	JjzrC75JLd+CxOyFBbHgtxPrqHEKP/zBHhW7h4dRUP787MYoAShThZGFA4i8lIrpLFu7g/wKKyf
+	eNL2KJFM/PKy8W4frPv2mj1PlxjdP85lcfYD3SVQsmdCOENRn4hxNYc7t1YXdTd2OS+pHwGNIoc
+	3zp0cUW0AbQEiDW38FzYAisBKQKjEWs1pJAGIwp9WDxtFPuz7H6eY=
+X-Received: by 2002:a17:90b:3d48:b0:381:528a:808c with SMTP id 98e67ed59e1d1-3933b8939dfmr20671051a91.12.1786891537823;
+        Sun, 16 Aug 2026 07:45:37 -0700 (PDT)
+Received: from toolbx ([2401:dc20:2817:0:bd7a:2eef:1251:5659])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-320d66e52d2sm27523029eec.13.2026.08.16.07.45.36
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 15 Aug 2026 17:13:51 -0700 (PDT)
-From: Ivan Shapovalov <intelfx@intelfx.name>
-Date: Sun, 16 Aug 2026 03:13:45 +0300
-Subject: [PATCH] wiphy: do not select FT AKMs if we are going to reject
- them later
+        Sun, 16 Aug 2026 07:45:37 -0700 (PDT)
+From: Christopher Fraser <cfraz89@gmail.com>
+To: iwd@lists.linux.dev
+Cc: Christopher Fraser <cfraz89@gmail.com>
+Subject: [PATCH] network: add DisableHT/VHT/HE/EHT settings
+Date: Mon, 17 Aug 2026 00:45:24 +1000
+Message-ID: <20260816144524.1594795-1-cfraz89@gmail.com>
+X-Mailer: git-send-email 2.55.0
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260816-brcmfmac-ft-v1-1-6a87b3453173@intelfx.name>
-X-B4-Tracking: v=1; b=H4sIAAAAAAAC/yXMzQpAQBSG4VvRWZsyoyS3IgszvsNRfppBSu7dY
- Pks3veiAC8IVCUXeRwSZJkjdJqQG9q5h5IumkxmiqzUhbLeTTy1TvGmtGGYjmFzMMVi9WA5v1v
- d/A67HeG2d0H3/QDajE4DbwAAAA==
-X-Change-ID: 20260816-brcmfmac-ft-12fe2dfeb3ef
-To: iwd@lists.linux.dev
-Cc: Ivan Shapovalov <intelfx@intelfx.name>
-X-Mailer: b4 0.15.2
-X-Developer-Signature: v=1; a=openpgp-sha256; l=4189; i=intelfx@intelfx.name;
- h=from:subject:message-id; bh=y1XkHJIfBOVGA+VVJe2COeQS/aJGYtVD+5KGI+pao+s=;
- b=LS0tLS1CRUdJTiBQR1AgTUVTU0FHRS0tLS0tCgpvd0did012TXdDVVdHM2x2aGVTbFF6Mk1wO
- VdTR0xJYUdmWVdUQTdNSzAwV2ZSbDcvbkhJdml2eHU2ZDdiSjNnCmR2REJTcjI4M2pzenBsejcx
- RkhLd2lER3hTQXJwc2l5Ky82MHNFZHpKeWdkOHR5UUN6T0hsUWxrQ0FNWHB3Qk0KUkdVanczLy8
- 4cVJXNmNlUG1CWmMzMXQ5dlhySmR4ZUpueHpkWDgrZVY5NVc4T3ZFNG9XWEdmNnBQWG5rN2lPZA
- oyV0pzRzlHNVZ0VENtZTJheXpISDROb3JSbTgveVZ6NmY1d2RBQT09Cj0zdHN0Ci0tLS0tRU5EI
- FBHUCBNRVNTQUdFLS0tLS0K
-X-Developer-Key: i=intelfx@intelfx.name; a=openpgp;
- fpr=04DEA27EEF682F17083D892295D5D5F5A5A5E5E5
+Content-Transfer-Encoding: 8bit
 
-The condition for choosing a FT AKM for SAE does not match the condition
-used further down the line to validate the permissibility of an FT AKM.
+Add per-network [Settings] options (DisableHT, DisableVHT, DisableHE,
+DisableEHT) that let a network's config force a specific PHY
+generation off when associating with that network, by setting the
+matching NL80211_ATTR_DISABLE_* flag on the connect/associate
+netlink command, similar to flags that exist in wpa_supplicant.
 
-Make a minimal change to bring the two in line, just to prevent choosing
-a FT AKM that we are going to reject anyway.
-
-Tested on a BCM43455 (brcmfmac) device, firmware 7.45.265 (28bca26 CY),
-where this change [among others] allows to associate with a network that
-advertises WPA3-Personal+FT (w/o FT actually being used). Without this
-change, the FT AKM is selected, subsequently triggering an assertion
-and failing the association.
-
-See: f5c5efa0 ("wiphy: allow FT AKM to be used if Auth/Assoc is not supported")
-Signed-off-by: Ivan Shapovalov <intelfx@intelfx.name>
+This is useful for APs where negotiating a particular mode causes
+instability.
 ---
-Note that the resulting condition (which I wrote to mirror condition in
-netdev_handshake_state_setup_connection_type()) differs from the similar
-condition for WPA2-FT just below, which also checks for 4-way handshake
-offload in the !softmac arm:
+ src/handshake.h     |  4 ++++
+ src/iwd.network.rst | 16 ++++++++++++++++
+ src/knownnetworks.c | 20 ++++++++++++++++++++
+ src/knownnetworks.h |  8 ++++++++
+ src/netdev.c        | 24 ++++++++++++++++++++++++
+ src/network.c       |  4 ++++
+ 6 files changed, 76 insertions(+)
 
-WPA3-FT: (IE_AKM_IS_FT() && (softmac || roam_offload))
-WPA2-FT: (IE_AKM_IS_FT() && (softmac || (psk_offload && roam_offload))
-
-I do not have enough knowledge to tell if this is an omission or a
-deliberate asymmetry between WPA2 and WPA3 implementations.
----
- src/netdev.c |  7 +++++++
- src/wiphy.c  | 20 ++++++++++++++++----
- 2 files changed, 23 insertions(+), 4 deletions(-)
-
+diff --git a/src/handshake.h b/src/handshake.h
+index 9ddeecd6..de86ee86 100644
+--- a/src/handshake.h
++++ b/src/handshake.h
+@@ -145,6 +145,10 @@ struct handshake_state {
+ 	bool supplicant_ocvc : 1;
+ 	bool ext_key_id_capable : 1;
+ 	bool force_default_ecc_group : 1;
++	bool disable_ht : 1;
++	bool disable_vht : 1;
++	bool disable_he : 1;
++	bool disable_eht : 1;
+ 	bool have_pmksa : 1;
+ 	union {
+ 		struct pmksa *pmksa;
+diff --git a/src/iwd.network.rst b/src/iwd.network.rst
+index 892c6eb8..a031d50b 100644
+--- a/src/iwd.network.rst
++++ b/src/iwd.network.rst
+@@ -181,6 +181,22 @@ The group ``[Settings]`` contains general settings.
+        (WPA3 and OWE) if set true. If unset IWD will learn the capabilities of
+        the network based on its initial association and retain that setting for
+        the duration of its process lifetime.
++   * - DisableHT
++     - Values: true, **false**
++
++       If enabled, forces HT (802.11n) off when associating with this network.
++   * - DisableVHT
++     - Values: true, **false**
++
++       If enabled, forces VHT (802.11ac) off when associating with this network.
++   * - DisableHE
++     - Values: true, **false**
++
++       If enabled, forces HE (802.11ax) off when associating with this network.
++   * - DisableEHT
++     - Values: true, **false**
++
++       If enabled, forces EHT (802.11be) off when associating with this network.
+ 
+ Network Authentication Settings
+ -------------------------------
+diff --git a/src/knownnetworks.c b/src/knownnetworks.c
+index 886f8145..edec565c 100644
+--- a/src/knownnetworks.c
++++ b/src/knownnetworks.c
+@@ -135,6 +135,26 @@ void __network_config_parse(const struct l_settings *settings,
+ 					NET_USE_DEFAULT_ECC_GROUP);
+ 	} else
+ 		config->ecc_group = KNOWN_NETWORK_ECC_GROUP_AUTO;
++
++	if (!l_settings_get_bool(settings, NET_DISABLE_HT, &b))
++		b = false;
++
++	config->disable_ht = b;
++
++	if (!l_settings_get_bool(settings, NET_DISABLE_VHT, &b))
++		b = false;
++
++	config->disable_vht = b;
++
++	if (!l_settings_get_bool(settings, NET_DISABLE_HE, &b))
++		b = false;
++
++	config->disable_he = b;
++
++	if (!l_settings_get_bool(settings, NET_DISABLE_EHT, &b))
++		b = false;
++
++	config->disable_eht = b;
+ }
+ 
+ void __network_info_init(struct network_info *info,
+diff --git a/src/knownnetworks.h b/src/knownnetworks.h
+index a117ded5..4fcba97e 100644
+--- a/src/knownnetworks.h
++++ b/src/knownnetworks.h
+@@ -30,6 +30,10 @@
+ #define NET_TRANSITION_DISABLE SETTINGS, "TransitionDisable"
+ #define NET_TRANSITION_DISABLE_MODES SETTINGS, "DisabledTransitionModes"
+ #define NET_USE_DEFAULT_ECC_GROUP SETTINGS, "UseDefaultEccGroup"
++#define NET_DISABLE_HT SETTINGS, "DisableHT"
++#define NET_DISABLE_VHT SETTINGS, "DisableVHT"
++#define NET_DISABLE_HE SETTINGS, "DisableHE"
++#define NET_DISABLE_EHT SETTINGS, "DisableEHT"
+ 
+ enum security;
+ struct scan_freq_set;
+@@ -82,6 +86,10 @@ struct network_config {
+ 	bool have_transition_disable : 1;
+ 	uint8_t transition_disable;
+ 	enum known_network_ecc_group ecc_group;
++	bool disable_ht:1;
++	bool disable_vht:1;
++	bool disable_he:1;
++	bool disable_eht:1;
+ };
+ 
+ struct network_info {
 diff --git a/src/netdev.c b/src/netdev.c
-index e639a1f8..fdf3695f 100644
+index e639a1f8..ff6e896f 100644
 --- a/src/netdev.c
 +++ b/src/netdev.c
-@@ -4079,6 +4079,13 @@ static int netdev_handshake_state_setup_connection_type(
- 	/*
- 	 * Sanity check that any FT AKMs are set only on softmac or on
- 	 * devices that support firmware roam
-+	 *
-+	 * XXX: is this the right condition?
-+	 *      This can be reworded as `IE_AKM_IS_FT() && !(softmac || canroam)`,
-+	 *      i.e. allow if `softmac OR support roam offload`. Should we also
-+	 *      check for SAE offload in the second arm, i.e. allow if
-+	 *      `softmac OR (support roam offload AND support SAE offload)`?
-+	 *      See comment in wiphy.c:wiphy_select_akm().
- 	 */
- 	if (L_WARN_ON(IE_AKM_IS_FT(hs->akm_suite) && !softmac && !canroam))
- 		return -ENOTSUP;
-diff --git a/src/wiphy.c b/src/wiphy.c
-index b6774f69..1e18685d 100644
---- a/src/wiphy.c
-+++ b/src/wiphy.c
-@@ -288,6 +288,8 @@ enum ie_rsn_akm_suite wiphy_select_akm(struct wiphy *wiphy,
- {
- 	bool psk_offload = wiphy_has_ext_feature(wiphy,
- 				NL80211_EXT_FEATURE_4WAY_HANDSHAKE_STA_PSK);
-+	bool softmac = wiphy_supports_cmds_auth_assoc(wiphy);
-+	bool roam_offload = wiphy_supports_firmware_roam(wiphy);
+@@ -2647,6 +2647,18 @@ static struct l_genl_msg *netdev_build_cmd_connect(struct netdev *netdev,
+ 
+ 	l_genl_msg_append_attr(msg, NL80211_ATTR_SOCKET_OWNER, 0, NULL);
+ 
++	if (hs->disable_ht)
++		l_genl_msg_append_attr(msg, NL80211_ATTR_DISABLE_HT, 0, NULL);
++
++	if (hs->disable_vht)
++		l_genl_msg_append_attr(msg, NL80211_ATTR_DISABLE_VHT, 0, NULL);
++
++	if (hs->disable_he)
++		l_genl_msg_append_attr(msg, NL80211_ATTR_DISABLE_HE, 0, NULL);
++
++	if (hs->disable_eht)
++		l_genl_msg_append_attr(msg, NL80211_ATTR_DISABLE_EHT, 0, NULL);
++
+ 	if (is_rsn) {
+ 		nl80211_append_rsn_attributes(msg, hs);
+ 		c_iov = iov_ie_append(iov, n_iov, c_iov, hs->supplicant_ie,
+@@ -2989,6 +3001,18 @@ static struct l_genl_msg *netdev_build_cmd_associate_common(
+ 	l_genl_msg_append_attr(msg, NL80211_ATTR_SSID, hs->ssid_len, hs->ssid);
+ 	l_genl_msg_append_attr(msg, NL80211_ATTR_SOCKET_OWNER, 0, NULL);
+ 
++	if (hs->disable_ht)
++		l_genl_msg_append_attr(msg, NL80211_ATTR_DISABLE_HT, 0, NULL);
++
++	if (hs->disable_vht)
++		l_genl_msg_append_attr(msg, NL80211_ATTR_DISABLE_VHT, 0, NULL);
++
++	if (hs->disable_he)
++		l_genl_msg_append_attr(msg, NL80211_ATTR_DISABLE_HE, 0, NULL);
++
++	if (hs->disable_eht)
++		l_genl_msg_append_attr(msg, NL80211_ATTR_DISABLE_EHT, 0, NULL);
++
+ 	if (is_rsn)
+ 		nl80211_append_rsn_attributes(msg, hs);
+ 
+diff --git a/src/network.c b/src/network.c
+index a5a2375a..b2735fb6 100644
+--- a/src/network.c
++++ b/src/network.c
+@@ -536,6 +536,10 @@ int network_handshake_setup(struct network *network, struct scan_bss *bss,
+ 	}
+ 
+ 	hs->force_default_ecc_group = network->force_default_ecc_group;
++	hs->disable_ht = info && info->config.disable_ht;
++	hs->disable_vht = info && info->config.disable_vht;
++	hs->disable_he = info && info->config.disable_he;
++	hs->disable_eht = info && info->config.disable_eht;
  
  	/*
- 	 * If FT is available, use FT authentication to keep the door open
-@@ -339,8 +341,19 @@ enum ie_rsn_akm_suite wiphy_select_akm(struct wiphy *wiphy,
- 				goto wpa2_personal;
- 			}
- 
--			if (info->akm_suites &
--					IE_RSN_AKM_SUITE_FT_OVER_SAE_SHA256)
-+			/*
-+			 * XXX: this replicates the condition in netdev.c:netdev_handshake_state_setup_connection_type():
-+			 *      `IE_AKM_IS_FT() && !softmac && !canroam` -> ENOTSUP.
-+			 *      Thus, unlike condition for WPA2-FT below, we do not check for psk_offload.
-+			 *
-+			 *      Should this instead be `softmac || (sae_offload && roam_offload)`?
-+			 *
-+			 *      Or, conservatively, just `softmac` (like FT check for 802.1x above)?
-+			 *      FT check for WPA2 below was loosened to allow offload in
-+			 *      f5c5efa ("wiphy: allow FT AKM to be used if Auth/Assoc is not supported").
-+			 */
-+			if ((info->akm_suites & IE_RSN_AKM_SUITE_FT_OVER_SAE_SHA256) &&
-+				(softmac || roam_offload))
- 				return IE_RSN_AKM_SUITE_FT_OVER_SAE_SHA256;
- 
- 			if (info->akm_suites & IE_RSN_AKM_SUITE_SAE_SHA256)
-@@ -355,8 +368,7 @@ wpa2_personal:
- 		 */
- 		if ((info->akm_suites & IE_RSN_AKM_SUITE_FT_USING_PSK) &&
- 					bss->rsne && bss->mde_present) {
--			if (wiphy->support_cmds_auth_assoc ||
--					(psk_offload && wiphy->support_fw_roam))
-+			if (softmac || (psk_offload && roam_offload))
- 				return IE_RSN_AKM_SUITE_FT_USING_PSK;
- 		}
- 
-
----
-base-commit: d003d0e593323b3de427f01284ede81ba61e9dcc
-change-id: 20260816-brcmfmac-ft-12fe2dfeb3ef
-
-Best regards,
---  
-Ivan Shapovalov <intelfx@intelfx.name>
+ 	 * The randomization options in the provisioning file are dependent on
+-- 
+2.55.0
 
