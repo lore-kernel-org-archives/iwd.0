@@ -1,124 +1,189 @@
-Received: from mail-lf1-f48.google.com (mail-lf1-f48.google.com [209.85.167.48])
+Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63F343E7145
-	for <iwd@lists.linux.dev>; Wed, 12 Aug 2026 09:18:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5572D37EFE7
+	for <iwd@lists.linux.dev>; Sun, 16 Aug 2026 00:13:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786526282; cv=none; b=oJX9XBVRh5++hzhGqmwX4fpFsuy2kW+7VABzgzGhMieOg40xWlIcDmDWKEg7MPqTQzWt1t1aSkNFwfadnbzq65Gx5HlEBrhHPxlhq8iVI/fV1zPnJRyag69XssgubvKfGcqIuixfCXWDFYssMraHqE2JJ/ZoGo1BUThvWC/fwpg=
+	t=1786839238; cv=none; b=uuhvtlL1FxWm6inXa6vRviL+212CgICYv15AjeDt9YF36wm/E+8kv899kgUGS/tPocskq1JKbwogmOR4dxCxGJHyLrTFyLQlCLpWcKzEkucHS+gyb+ECTqrUPEC0ee7tT5oXp5zaemOhbkytruca579IKJDKTVZbuSvRHf6ATzo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786526282; c=relaxed/simple;
-	bh=D8ckAbtrM4DQFL1kZPQ4gMPH6tSfa1cMo+40rbxRx1E=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=eMptyGaGct4HdVDDF3MGo7276ErEMyFn7LPfWViO9a2d/vNSOBroovXLjYSSVHEbXEZP5GI7X3/AZraQWadTwP94PiYxbfzEmqcyTwEjNrPe8ZZ5JZLm2xvLxCYFfase7KOxFAB/pN4CuYEKCojPEqoU6SwkGuV97bHE3P6jeOc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=K2hKrS6B; arc=none smtp.client-ip=209.85.167.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1786839238; c=relaxed/simple;
+	bh=y1XkHJIfBOVGA+VVJe2COeQS/aJGYtVD+5KGI+pao+s=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=tLQ4SGLZcb9FhoGvU/kkAf7yLRn/UQUOsFaD9rVfu4YnBA+JKN9b7mM5+imvGrnmhTWXlSi56iitNEFOGkMy9QYLK6B+TvG+/SlwYNxs3Kulf0h31bDi4mhtLg3IUKazispJSKMiGaYO13HfZqRGXPRO/EUssTYmZqyGvVVtRfU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=intelfx.name; spf=pass smtp.mailfrom=intelfx.name; dkim=pass (1024-bit key) header.d=intelfx.name header.i=@intelfx.name header.b=HYzTF6nQ; arc=none smtp.client-ip=209.85.128.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=intelfx.name
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intelfx.name
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="K2hKrS6B"
-Received: by mail-lf1-f48.google.com with SMTP id 2adb3069b0e04-5b00d083818so1837759e87.1
-        for <iwd@lists.linux.dev>; Wed, 12 Aug 2026 02:18:00 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=intelfx.name header.i=@intelfx.name header.b="HYzTF6nQ"
+Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-4980dc26022so22598905e9.1
+        for <iwd@lists.linux.dev>; Sat, 15 Aug 2026 17:13:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1786526278; x=1787131078; darn=lists.linux.dev;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=X9wgKy5b8MH11NC4ssO3AjplBG7D2cRynYRYBEkC60U=;
-        b=K2hKrS6B+8DczmuHO4pv5W3u1uGbEErdCXtH9eqOUI3GqtGm20Tmo9ppv4TcV/8Y47
-         eYJMD/CVkEdjGHtBpa1MPssCGOajJS9zb/ts3Tz7EbhK8gKK3EnPv/tqZWNhlQx1+nCp
-         0/TMf6bh/iv9oWACHak1As3nXLhr7j+b46faIcU+/9YjZ9xnwA/F4fzSVG1xnztdYY8Z
-         S7UMT6pdv/hAAkQCx1cDinSJ3cHB/aBvnFj0RNVsEJHDTKi84bwn18WkhPHpglBmQAXP
-         g3YXwEL1npBAALgQL+COrYVR3Fi/zrpB0rHLW7bNAL+E4he14ivf6PY2/wx+6c07InjV
-         UryQ==
+        d=intelfx.name; s=google; t=1786839232; x=1787444032; darn=lists.linux.dev;
+        h=cc:to:message-id:content-transfer-encoding:content-type
+         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=Swu5QdUkrrKXwrAFsBoUnTgKdipzzWtjz8TKQO49fxk=;
+        b=HYzTF6nQ0BXdlMfHoFdyAFkT2KUC2hjUyxZsuDzZMBMcW6KoUue580QOZLj1kgtvX4
+         nZoyW2RMUF+RdoIN9BEul8IVe63ZMWSideusiT5sCtE6Y0sWsDWYoHy+w1RuTOsTDXRL
+         wrn4y4iEGBgspU1h39INmrTAT3Gi9gkuIK6rk=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1786526278; x=1787131078;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=X9wgKy5b8MH11NC4ssO3AjplBG7D2cRynYRYBEkC60U=;
-        b=HbMO3neKqlYECc8mlEEUpo53TqpB+PaAFxWnQ6A9ltyBLMfPubrSRIlcAtu8PJv3fm
-         h12mQMIGVgwNOxYdOk0ddDYfT9Th5ChCJsoPSHgQeS2AZTB+njTMkS5J782RzZuGK2Tb
-         LVRyuobz9UU498Y5dNxDi0+SgaSx6uvmWHOQabDMl1dM3h1oi1o79QKEXY8iPVUsGgYJ
-         WITmYaCk46+19Yr8FQBr4p3o180meRMq6vbEtk6CFfJlOnRcoED67ov9F4+dWiEna5Jl
-         j+cZxIA/XpYaAXJ1rKOVt7GE8x7Ff2ighu7rPBu2QHUm1aOjFWExPFmCJKlg4Tgenjhw
-         Bu9w==
-X-Gm-Message-State: AOJu0YzPZ6VEG6WIvbhQXVh/4flrLfDTMQ8wKKUan01RHy8RH0wP37W2
-	Mt8iydVO89dnuXcO4CPyoilxnNfpbGGeurG+2sSMoyXP+A5EXJ/VVWjxRH4UAzwW
-X-Gm-Gg: AR+sD13VaU7YkEjaSEcNijy4Rr26DyptW2/9Og2pwx/b6AsqbJ3jrcOg4nyve0PAjeR
-	BxPlx3M6NFTCiaSvZByrSY+9gLzbGiMfy7y508CgXHuflRb9vgJvIJIWZT23xgNc6Pg2B1xuft4
-	akixaF0p+XeP+EFW1UuYOTa7HDOqwRM2Ji25Bpvi0s+ELpdu9JlhYotZCoBuDnAawNv5oNimJey
-	IKgLYtiCMcpU3xcoqXXrl4MV2ThB9HUo5qfIvuHNu0d6KBfOGa4EnUbAhNmNBH6b70KDvoiVusz
-	IMvIX6wLXLg6BLF8fPudoaiquqMkOVV9WL+jpoGCtdewjq0nJ28DeDiYK3K9+RW+0YZzQ1sOlbc
-	ere8YlUDoxniRW98+FsHF6p13kSizjgyVw+3HDmn3IB1UKhcg8UJMmmoGu6iVdttsjeJPuooJAa
-	bSJ4slRB6GZUJR4YI+3F5t4CMS8HqAtr7DuUKdnOwY/+2ptjnc75rUG4uYSWkzLybhFWhhu2UmM
-	zswEK+Xx/0Fxw==
-X-Received: by 2002:a05:6512:2903:b0:5ae:b62b:68b2 with SMTP id 2adb3069b0e04-5b44b8e661cmr1048103e87.2.1786526278311;
-        Wed, 12 Aug 2026 02:17:58 -0700 (PDT)
-Received: from aai01 (dtuguest20.nat.net.dtu.dk. [130.226.71.20])
-        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-5b44d024cfesm370474e87.45.2026.08.12.02.17.56
+        d=1e100.net; s=20251104; t=1786839232; x=1787444032;
+        h=cc:to:message-id:content-transfer-encoding:content-type
+         :mime-version:subject:date:from:x-gm-gg:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to:content-type;
+        bh=Swu5QdUkrrKXwrAFsBoUnTgKdipzzWtjz8TKQO49fxk=;
+        b=KcDKEEJlnXLVLFPdcsznEisX7jeZ+Bz0Xo5oj4w+68As3ZWKnf7khL2dpOLS9lFzuN
+         kqHZ8qBXAevh+GhOJTagxVOVXWvFnaJlJQnNs2DZ57pWSwohNbOgohXAeXKr4Zx5dsbM
+         b0TI85ASVVcYFIiZ0aaCSKYmaRoGHwA7Hg4d3GYu9BA7ksCFooQE5fmMCs3hGD5vQWxO
+         Kt8IG6GVd0UPdncU8DyaG/274WJZRhwp6syNflbBvqrivqjnfLTVfrs/yU9EV0EL7WOO
+         f7oicI0cQxgl3Z5kbcB4ssWrtQx7HnUSqqPYhBsTF8vlVW+ejmJ0I20+//m4++jVF4wN
+         D0Cg==
+X-Gm-Message-State: AOJu0YxK3QvaB2qEBAkhWNP5m7YZrXb6CK5PsMcfWM2IJcnlyqATx/3t
+	pmUe1lgIOUev6ZFlH5A6AAtI6Wy62H6T97EzODSZBH9XONzZ2sIaYoozc0/0z8SE/OLc15aVQT0
+	szIzsDGU=
+X-Gm-Gg: AR+sD13d3pUtdsTrPdMG8s1mLfW93h4Z07e1ODk7npFc6Cq6LrQe3/RiB6ajh/KM/TW
+	vtWdCAjts1k203X4oc0aki4ttk1THZcy+NLL2/pakBZIyk/k5t7aRBUxmy/hepy0elvYFtiS/3J
+	j/jvc+rVoiAU/d1NTnkwJW8jo8DWJSGC2gV3AnmVG3vt9Xk8LTutQungkJ5Cd3BM+8A5GpfrRHo
+	wEhL2P+Kpo2NMs61+umsp3w1mzKdTGOp+iPvxQUpQE2kZR5VN55jOyrfGh2CstZJoBpTARTjbYf
+	eN1FuwDC2q/uPHppbLlUpCBCsVD31ayNcniv07j8v2uB00Eyf78yC7M5ySzJBRRhmpgRQyUGjuc
+	TzWcOnejDZ3Jqrlb6NwAgDq960mCHXu6BsMJuyipeXEJMBlq7Kb1W3U6z4Vl2fTXdoJB+Ca613u
+	/m94egLHUaXVca0iItDUvslUBPW6rxeaU8+fnSc64Ov36YhLI=
+X-Received: by 2002:a05:600c:1395:b0:499:872b:abd4 with SMTP id 5b1f17b1804b1-4998797684cmr207086525e9.6.1786839232497;
+        Sat, 15 Aug 2026 17:13:52 -0700 (PDT)
+Received: from localhost ([2a00:1358:e0ce:6800::3db])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4998777d428sm104904495e9.0.2026.08.15.17.13.51
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 12 Aug 2026 02:17:57 -0700 (PDT)
-From: Inti Manuel Yabar-Pagaza <intimyp@gmail.com>
-To: iwd@lists.linux.dev
-Cc: Inti Manuel Yabar-Pagaza <intimyp@gmail.com>
-Subject: [PATCH 2/2] agent: clear pending_id on request timeout
-Date: Wed, 12 Aug 2026 11:16:52 +0200
-Message-ID: <5033e58b9c9305efe61f91b1757a4337f0424c33.1786525748.git.intimyp@gmail.com>
-X-Mailer: git-send-email 2.55.0
-In-Reply-To: <cover.1786525748.git.intimyp@gmail.com>
-References: <cover.1786525748.git.intimyp@gmail.com>
+        Sat, 15 Aug 2026 17:13:51 -0700 (PDT)
+From: Ivan Shapovalov <intelfx@intelfx.name>
+Date: Sun, 16 Aug 2026 03:13:45 +0300
+Subject: [PATCH] wiphy: do not select FT AKMs if we are going to reject
+ them later
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20260816-brcmfmac-ft-v1-1-6a87b3453173@intelfx.name>
+X-B4-Tracking: v=1; b=H4sIAAAAAAAC/yXMzQpAQBSG4VvRWZsyoyS3IgszvsNRfppBSu7dY
+ Pks3veiAC8IVCUXeRwSZJkjdJqQG9q5h5IumkxmiqzUhbLeTTy1TvGmtGGYjmFzMMVi9WA5v1v
+ d/A67HeG2d0H3/QDajE4DbwAAAA==
+X-Change-ID: 20260816-brcmfmac-ft-12fe2dfeb3ef
+To: iwd@lists.linux.dev
+Cc: Ivan Shapovalov <intelfx@intelfx.name>
+X-Mailer: b4 0.15.2
+X-Developer-Signature: v=1; a=openpgp-sha256; l=4189; i=intelfx@intelfx.name;
+ h=from:subject:message-id; bh=y1XkHJIfBOVGA+VVJe2COeQS/aJGYtVD+5KGI+pao+s=;
+ b=LS0tLS1CRUdJTiBQR1AgTUVTU0FHRS0tLS0tCgpvd0did012TXdDVVdHM2x2aGVTbFF6Mk1wO
+ VdTR0xJYUdmWVdUQTdNSzAwV2ZSbDcvbkhJdml2eHU2ZDdiSjNnCmR2REJTcjI4M2pzenBsejcx
+ RkhLd2lER3hTQXJwc2l5Ky82MHNFZHpKeWdkOHR5UUN6T0hsUWxrQ0FNWHB3Qk0KUkdVanczLy8
+ 4cVJXNmNlUG1CWmMzMXQ5dlhySmR4ZUpueHpkWDgrZVY5NVc4T3ZFNG9XWEdmNnBQWG5rN2lPZA
+ oyV0pzRzlHNVZ0VENtZTJheXpISDROb3JSbTgveVZ6NmY1d2RBQT09Cj0zdHN0Ci0tLS0tRU5EI
+ FBHUCBNRVNTQUdFLS0tLS0K
+X-Developer-Key: i=intelfx@intelfx.name; a=openpgp;
+ fpr=04DEA27EEF682F17083D892295D5D5F5A5A5E5E5
 
-request_timeout() cancels the outstanding call but leaves
-agent->pending_id set. agent_finalize_pending() pops the last request
-and agent_send_next_request() returns early on the empty queue, so the
-stale id survives with nothing queued.
+The condition for choosing a FT AKM for SAE does not match the condition
+used further down the line to validate the permissibility of an FT AKM.
 
-When the agent later drops off the bus, agent_disconnect() tests that
-id and calls agent_finalize_pending() again, which pops NULL off the
-empty queue and dereferences it:
+Make a minimal change to bring the two in line, just to prevent choosing
+a FT AKM that we are going to reject anyway.
 
-  #0  agent_finalize_pending (agent=0x..., reply=0x0) at src/agent.c:187
-  #1  agent_disconnect (...) at src/agent.c:511
-  #2  _dbus_name_cache_notify (...) at ell/dbus-name-cache.c:188
-  #4  name_owner_changed_cb (...) at ell/dbus.c:861
+Tested on a BCM43455 (brcmfmac) device, firmware 7.45.265 (28bca26 CY),
+where this change [among others] allows to associate with a network that
+advertises WPA3-Personal+FT (w/o FT actually being used). Without this
+change, the FT AKM is selected, subsequently triggering an assertion
+and failing the association.
 
-agent_receive_reply() and agent_request_cancel() already clear
-pending_id in this situation. Do the same on timeout, and guard
-agent_finalize_pending() against an empty queue.
-
-Fixes: d04ab5ad96b4 ("agent: call back even if agent disconnects")
+See: f5c5efa0 ("wiphy: allow FT AKM to be used if Auth/Assoc is not supported")
+Signed-off-by: Ivan Shapovalov <intelfx@intelfx.name>
 ---
- src/agent.c | 3 +++
- 1 file changed, 3 insertions(+)
+Note that the resulting condition (which I wrote to mirror condition in
+netdev_handshake_state_setup_connection_type()) differs from the similar
+condition for WPA2-FT just below, which also checks for 4-way handshake
+offload in the !softmac arm:
 
-diff --git a/src/agent.c b/src/agent.c
-index 0f718b87..5adee5dc 100644
---- a/src/agent.c
-+++ b/src/agent.c
-@@ -183,6 +183,8 @@ static void agent_finalize_pending(struct agent *agent,
- 	}
+WPA3-FT: (IE_AKM_IS_FT() && (softmac || roam_offload))
+WPA2-FT: (IE_AKM_IS_FT() && (softmac || (psk_offload && roam_offload))
+
+I do not have enough knowledge to tell if this is an omission or a
+deliberate asymmetry between WPA2 and WPA3 implementations.
+---
+ src/netdev.c |  7 +++++++
+ src/wiphy.c  | 20 ++++++++++++++++----
+ 2 files changed, 23 insertions(+), 4 deletions(-)
+
+diff --git a/src/netdev.c b/src/netdev.c
+index e639a1f8..fdf3695f 100644
+--- a/src/netdev.c
++++ b/src/netdev.c
+@@ -4079,6 +4079,13 @@ static int netdev_handshake_state_setup_connection_type(
+ 	/*
+ 	 * Sanity check that any FT AKMs are set only on softmac or on
+ 	 * devices that support firmware roam
++	 *
++	 * XXX: is this the right condition?
++	 *      This can be reworded as `IE_AKM_IS_FT() && !(softmac || canroam)`,
++	 *      i.e. allow if `softmac OR support roam offload`. Should we also
++	 *      check for SAE offload in the second arm, i.e. allow if
++	 *      `softmac OR (support roam offload AND support SAE offload)`?
++	 *      See comment in wiphy.c:wiphy_select_akm().
+ 	 */
+ 	if (L_WARN_ON(IE_AKM_IS_FT(hs->akm_suite) && !softmac && !canroam))
+ 		return -ENOTSUP;
+diff --git a/src/wiphy.c b/src/wiphy.c
+index b6774f69..1e18685d 100644
+--- a/src/wiphy.c
++++ b/src/wiphy.c
+@@ -288,6 +288,8 @@ enum ie_rsn_akm_suite wiphy_select_akm(struct wiphy *wiphy,
+ {
+ 	bool psk_offload = wiphy_has_ext_feature(wiphy,
+ 				NL80211_EXT_FEATURE_4WAY_HANDSHAKE_STA_PSK);
++	bool softmac = wiphy_supports_cmds_auth_assoc(wiphy);
++	bool roam_offload = wiphy_supports_firmware_roam(wiphy);
  
- 	pending = l_queue_pop_head(agent->requests);
-+	if (!pending)
-+		return;
+ 	/*
+ 	 * If FT is available, use FT authentication to keep the door open
+@@ -339,8 +341,19 @@ enum ie_rsn_akm_suite wiphy_select_akm(struct wiphy *wiphy,
+ 				goto wpa2_personal;
+ 			}
  
- 	switch (pending->type) {
- 	case AGENT_REQUEST_TYPE_PASSPHRASE:
-@@ -230,6 +232,7 @@ static void request_timeout(struct l_timeout *timeout, void *user_data)
- 	struct agent *agent = user_data;
+-			if (info->akm_suites &
+-					IE_RSN_AKM_SUITE_FT_OVER_SAE_SHA256)
++			/*
++			 * XXX: this replicates the condition in netdev.c:netdev_handshake_state_setup_connection_type():
++			 *      `IE_AKM_IS_FT() && !softmac && !canroam` -> ENOTSUP.
++			 *      Thus, unlike condition for WPA2-FT below, we do not check for psk_offload.
++			 *
++			 *      Should this instead be `softmac || (sae_offload && roam_offload)`?
++			 *
++			 *      Or, conservatively, just `softmac` (like FT check for 802.1x above)?
++			 *      FT check for WPA2 below was loosened to allow offload in
++			 *      f5c5efa ("wiphy: allow FT AKM to be used if Auth/Assoc is not supported").
++			 */
++			if ((info->akm_suites & IE_RSN_AKM_SUITE_FT_OVER_SAE_SHA256) &&
++				(softmac || roam_offload))
+ 				return IE_RSN_AKM_SUITE_FT_OVER_SAE_SHA256;
  
- 	l_dbus_cancel(dbus_get_bus(), agent->pending_id);
-+	agent->pending_id = 0;
+ 			if (info->akm_suites & IE_RSN_AKM_SUITE_SAE_SHA256)
+@@ -355,8 +368,7 @@ wpa2_personal:
+ 		 */
+ 		if ((info->akm_suites & IE_RSN_AKM_SUITE_FT_USING_PSK) &&
+ 					bss->rsne && bss->mde_present) {
+-			if (wiphy->support_cmds_auth_assoc ||
+-					(psk_offload && wiphy->support_fw_roam))
++			if (softmac || (psk_offload && roam_offload))
+ 				return IE_RSN_AKM_SUITE_FT_USING_PSK;
+ 		}
  
- 	send_cancel_request(agent, -ETIMEDOUT);
- 
--- 
-2.55.0
+
+---
+base-commit: d003d0e593323b3de427f01284ede81ba61e9dcc
+change-id: 20260816-brcmfmac-ft-12fe2dfeb3ef
+
+Best regards,
+--  
+Ivan Shapovalov <intelfx@intelfx.name>
 
