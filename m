@@ -1,474 +1,261 @@
-Received: from mout.gmx.net (mout.gmx.net [212.227.15.18])
+Received: from mout.gmx.net (mout.gmx.net [212.227.17.20])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42C97632
-	for <iwd@lists.linux.dev>; Sat, 29 Aug 2026 05:13:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.15.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81F5936A343
+	for <iwd@lists.linux.dev>; Sat, 29 Aug 2026 07:44:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.17.20
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787980423; cv=none; b=nF6ClBkv5G94pLsuxOau5KCUvSixMpc9H9K0WGuJFLcq5/s9Gssk9SDlAXrmV0xp36LYUxteh3u6hkngec+WMeDmaC9eXQkuFDIV5uif9soMxx//pIiPmr1/nYuwE3qvIzlpds+NEPLYNPawzPEoXz5Ekp2Y7foSubdzPJ/+Xrw=
+	t=1787989484; cv=none; b=E4Rtk5Dj1qUD6b/bp3mwth0PQXpgbnElQLV9twNWUI04HntEAqouXC93hR7xcTvPka66aFYUAsNG8qZavSSOd7efl94jb0uBDZvcXhg6kDmPVJtYH+7LEUJ7AtcHLt2oP8cCjw2/LSg4aUpfurA94e4dY3xM5m4eOf5JVpCbhQs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787980423; c=relaxed/simple;
-	bh=K74xWL0m0zEoZGm30hGxBNeniFQexC1MdDhdGzh80Aw=;
-	h=Mime-Version:Content-Type:Date:Message-Id:Subject:From:To; b=flQSPUj6OUNDq2p6u/5dwpfxDE0SHSOckMExLwokfPcQXC3+iti4B13EW1JmXlxYrx4hBXE2llstG/WWJLAQ1l6xnZ4yygKyRqOm9CV4Zsti0ZyLbk9/fE87tqD4+ucZ9O9XAtjSmA6Kmc6tuTXwpIDfn3Bl7AI6NCMqsF5a+Sc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.com; spf=pass smtp.mailfrom=gmx.com; dkim=pass (2048-bit key) header.d=gmx.com header.i=serenium@gmx.com header.b=FJESHhbr; arc=none smtp.client-ip=212.227.15.18
+	s=arc-20240116; t=1787989484; c=relaxed/simple;
+	bh=kx7iFd4kffx4dKdWPeEk8fICJzU2EHvCFt5JMKGz85s=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=bD8qbUQ7bB5xTwSiBPSbGzgFgFn8pUZePmudrkpIh5IX+5LzFuqTa+ghgt2EEYoVqhtmvMc9wmreu6Anc6oT4++xDXJMWKIBJWQVGZC7KU/OoWXmfvfWK/57M8u5/yUqxF5TEgJZrSdiNqy8VcX0BoKHwgjpVuv0Y/n5pOnOf94=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.com; spf=pass smtp.mailfrom=gmx.com; dkim=pass (2048-bit key) header.d=gmx.com header.i=serenium@gmx.com header.b=ZMoPFZHl; arc=none smtp.client-ip=212.227.17.20
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmx.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmx.com header.i=serenium@gmx.com header.b="FJESHhbr"
+	dkim=pass (2048-bit key) header.d=gmx.com header.i=serenium@gmx.com header.b="ZMoPFZHl"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmx.com;
-	s=s31663417; t=1787980419; x=1788585219; i=serenium@gmx.com;
-	bh=LiUkxytWgBOINQ2IFzyE5uNDYtpwODm75Uk28RWim2o=;
-	h=X-UI-Sender-Class:Mime-Version:Content-Transfer-Encoding:
-	 Content-Type:Date:Message-Id:Subject:From:To:cc:
-	 content-transfer-encoding:content-type:date:from:message-id:
-	 mime-version:reply-to:subject:to;
-	b=FJESHhbrDebIm/Un1FpUhHtXa7g7MNRGgdj39Y+hkQQdp7G1coDZqc3KYx3YQP1l
-	 aUT7xaxWFUPQDJbBW6nUAzgjHwnPjMBY4IxZQ/A1jd5mfZLv3hP5xg+gh05/Znldm
-	 b5wv/83VZQsYlZOQUBouHjTzuxfGy0pilB4NoswbbKLIElOXobVUTj6gwtaonpXPg
-	 6qsnyLmWiXJrof3pE35UXz1zlIozPrcA5llw+pyTfNGolph0B8UQenu0m37ceARmI
-	 qgURac3p28eWjSjIfseqxxxPe2eQq1Hw5x2bK+NxngchyvIkQjfPe7PCFzR+ApqWc
-	 Dayj3JCWnMTXV43lnw==
+	s=s31663417; t=1787989480; x=1788594280; i=serenium@gmx.com;
+	bh=6ZQbnNDaqrOgrT+4lFuEPhSaLtarvnmgZ4d6W9uAGRw=;
+	h=X-UI-Sender-Class:From:To:Subject:Date:Message-ID:MIME-Version:
+	 Content-Transfer-Encoding:cc:content-transfer-encoding:
+	 content-type:date:from:message-id:mime-version:reply-to:subject:
+	 to;
+	b=ZMoPFZHlBfCNxSkw8zuuTFfpgZtlaq3rnfW50oid6TGmm8A5KyFTw2w48wVvsio1
+	 RXOfy7VUdjmoRueEcLvLH+wkLi2s/37tp04wdCB5UUk3Ti3rHY9JWyoSWPr124IGM
+	 u+F5k3oPRkS4ELt2O7egLh5RG+f0rQhuX743HNOJt45SFkOOh5KHdTrt9soHA5Nzx
+	 bm/vA70+YNJOfX66Q2kLxxjZPp7jCliLVzO6HfNzOjLPbsQkFA4BWP7nxRL1UNaYq
+	 eJA1uKKh17hxTYtu+Skm+2bX7Serv5GTn/ZpdPcQtSRstobORcG2AGwSW5tR6LWUf
+	 8XxGGvWEjrhJRaHVQA==
 X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
-Received: from client.hidden.invalid by mail.gmx.net (mrgmx004
- [212.227.17.184]) with ESMTPSA (Nemesis) id 1MulqD-1wiNNp2VM3-00xkgf for
- <iwd@lists.linux.dev>; Sat, 29 Aug 2026 07:13:39 +0200
+Received: from client.hidden.invalid by mail.gmx.net (mrgmx105
+ [212.227.17.174]) with ESMTPSA (Nemesis) id 1MzQkK-1weAaN2cDY-013Xvn for
+ <iwd@lists.linux.dev>; Sat, 29 Aug 2026 09:44:40 +0200
+From: Serenium <serenium@gmx.com>
+To: iwd@lists.linux.dev
+Subject: [PATCH v2] ap: pass HT and WME station capabilities to kernel
+Date: Sat, 29 Aug 2026 17:44:34 +1000
+Message-ID: <20260829074434.11115-1-serenium@gmx.com>
+X-Mailer: git-send-email 2.55.0
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
+MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Sat, 29 Aug 2026 15:13:35 +1000
-Message-Id: <DL165RCXD4PO.1EH5BPELX2Y1Q@gmx.com>
-Subject: [PATCH] ap: pass HT and WME station capabilities
-From: "Serenium" <serenium@gmx.com>
-To: <iwd@lists.linux.dev>
-X-Mailer: aerc 0.22.0
-X-Provags-ID: V03:K1:iIKytQiNn4SMCtWPq5VwpQuxTVhFNWpR/rF8y7MOYGgtBo/Tcb9
- F/2vJkF7E7mHlxD+hgx2OrpDl/Z3AcaMFmlcE5sqiFtR0ECk8t2N37br5Rq3nNeZmlftTVS
- pEMp3KGzPxoX8lKxBZ+ph7gWtfxP2/UxhnYEtHQTdqUoA9K7qLYWmQAm8DenAF+rYh8tgqt
- 8673lh770P5/gvkX5rsKg==
+X-Provags-ID: V03:K1:rv57tmdYV4aLFiPTSLk7QkuquwnZ8fen4YNpF/C9bOlDWYz566z
+ QNX8G/UnfPgRLwSLzPiwsSetTDKEUk/sAh92WGbQTGMgX3aziqksJPUA2PlJ1Gae724Am5t
+ hin2VKNx0gI/O+YNO/iAwxwrl+eG5unXxWx3eBuHI+LTdMg34wbp35nYBfh2QUNJfTWdKWd
+ Adu+aXl+uGTuV1kNF0snA==
 X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:AIeK9Lxr/rg=;uKmKsAYoceZKV3DtqGi3kft5Cgk
- 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
- sl03e6fg==
+UI-OutboundReport: notjunk:1;M01:P0:tXdTJqH9bKM=;hlBXYHV2ev02VIgDTxZ2x7tPLpF
+ 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
+ gGnO3hXs45nUbOyhGu/4=
 
-Greetings,
+The AP advertises HT capabilities and a WMM parameter element, but
+the association path discards the station HT capability element and does
+not pass WME state to the kernel when creating the station.
 
-iwd 3.12 and current upstream master silently install HT/WMM-capable AP cli=
-ents into mac80211 as legacy, non-WME stations.
+Consequently, mac80211 treats associated stations as non-HT and non-WME,
+restricting traffic to legacy rates even though both the AP and stations
+advertise HT and WMM support.
 
-This was reproduced on Intel's own AX200 hardware.
+Retain the HT capability and WMM information elements from the association
+request. Pass the HT capability, WME parameters, and WME station flag in
+NL80211_CMD_NEW_STATION.
 
-Test system:
+Tested with iwd 3.12 and an Intel AX200 in AP mode. Before this change,
+associated stations reported WMM/WME: no and used 5.5 or 11 Mbit/s legacy
+rates. Afterwards, all tested stations reported WMM/WME: yes, selected HT
+MCS rates, and sustained approximately 100 Mbit/s in a 256 MiB transfer.
 
-* iwd 3.12
-* Intel AX200
-* Linux 7.1.5
-* Alpine Linux Edge
-* channel 6, 2437 MHz
-* 40 MHz AP channel width
-* three independently associated clients
-
-Before this patch, every client reported:
-
-```
-WMM/WME: no
-tx bitrate: 5.5 MBit/s
-```
-
-or:
-
-```
-WMM/WME: no
-tx bitrate: 11.0 MBit/s
-```
-
-Measured transfer performance was approximately 788 kB/s.
-
-This is not a driver capability, regulatory-domain, beacon-generation, or c=
-lient problem.
-
-An iwmon netlink PCAP proves that:
-
-1. iwd correctly parses the AX200's 2.4 GHz HT40 capabilities.
-
-2. iwd's probe response contains HT Capabilities, HT Operation, and a WMM P=
-arameter IE.
-
-3. The client association request contains a valid 26-byte HT Capability IE=
-.
-
-4. The client association request contains a valid WMM Information IE:
-
-   ```
-   dd 07 00 50 f2 02 00 01 00
-   ```
-
-5. iwd's association response contains HT Capabilities, HT Operation, and W=
-MM.
-
-The failure occurs when iwd constructs NL80211_CMD_NEW_STATION.
-
-The existing AP code retains only a Boolean indication that the station sup=
-ports HT. It discards the station's actual HT Capability element, does not =
-parse its WMM Information element, and does not provide the corresponding s=
-tation state to mac80211.
-
-Specifically, it omits:
-
-* NL80211_ATTR_HT_CAPABILITY
-* nested NL80211_ATTR_STA_WME
-* NL80211_STA_FLAG_WME in NL80211_ATTR_STA_FLAGS2
-
-The missing WME station flag is decisive. Without it, mac80211 records the =
-station as non-WME and does not enable HT operation.
-
-After applying the patch below, all three clients report:
-
-```
-WMM/WME: yes
-tx bitrate: 26.0 MBit/s MCS 3
-```
-
-MCS varies normally under rate control.
-
-The same 256 MiB transfer test then produced:
-
-```
-268435456 bytes copied, 21.5456 s, 12.5 MB/s
-```
-
-That is approximately 100 Mbit/s and around sixteen times the previous meas=
-ured throughput.
-
-The patched daemon has been built, packaged as iwd-3.12-r1, installed under=
- normal OpenRC management, and verified with three simultaneous clients.
-
-The defect is also present on current upstream master. There are no post-3.=
-12 src/ap.c commits addressing it, and current master does not use NL80211_=
-ATTR_HT_CAPABILITY or NL80211_ATTR_STA_WME in the AP station-install path.
-
-Patch follows.
-
----
-
-src/ap.c | 45 +++++++++++++++++++++++++++++++++++++++++++++
-1 file changed, 45 insertions(+)
+Signed-off-by: Serenium <serenium@gmx.com>
+=2D--
+ src/ap.c | 45 +++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 45 insertions(+)
 
 diff --git a/src/ap.c b/src/ap.c
---- a/src/ap.c
+index 416e1104..3857d82e 100644
+=2D-- a/src/ap.c
 +++ b/src/ap.c
 @@ -127,6 +127,9 @@ struct sta_state {
-bool rsna;
-uint16_t aid;
-struct mmpdu_field_capability capability;
-
-* uint8_t ht_capabilities[26];
-* uint8_t wmm_uapsd_queues;
-* uint8_t wmm_max_sp;
-  uint16_t listen_interval;
-  struct l_uintset *rates;
-  uint32_t assoc_resp_cmd_id;
-  @@ -147,6 +150,7 @@ struct sta_state {
-
-  bool ht_support : 1;
-  bool ht_greenfield : 1;
-* bool wmm_support : 1;
-  };
-
-struct ap_wsc_pbc_probe_record {
-@@ -1683,6 +1687,11 @@ static struct l_genl_msg *ap_build_cmd_new_station(s=
-truct sta_state *sta)
-NL80211_STA_FLAG_AUTHENTICATED);
-
-* if (sta->wmm_support) {
-
-* ```
-    flags.mask |=3D 1 << NL80211_STA_FLAG_WME;
-  ```
-
-* ```
-    flags.set |=3D 1 << NL80211_STA_FLAG_WME;
-  ```
-
-* }
-
-* msg =3D l_genl_msg_new_sized(NL80211_CMD_NEW_STATION, 300);
-
-  l_genl_msg_append_attr(msg, NL80211_ATTR_IFINDEX, 4, &ifindex);
-  @@ -1835,6 +1844,21 @@ static void ap_associate_sta(struct ap_state *ap, =
+ 	bool rsna;
+ 	uint16_t aid;
+ 	struct mmpdu_field_capability capability;
++	uint8_t ht_capabilities[26];
++	uint8_t wmm_uapsd_queues;
++	uint8_t wmm_max_sp;
+ 	uint16_t listen_interval;
+ 	struct l_uintset *rates;
+ 	uint32_t assoc_resp_cmd_id;
+@@ -147,6 +150,7 @@ struct sta_state {
+=20
+ 	bool ht_support : 1;
+ 	bool ht_greenfield : 1;
++	bool wmm_support : 1;
+ };
+=20
+ struct ap_wsc_pbc_probe_record {
+@@ -1683,6 +1687,11 @@ static struct l_genl_msg *ap_build_cmd_new_station(=
 struct sta_state *sta)
-  rates[count++] =3D r;
-
-  l_genl_msg_append_attr(msg, NL80211_ATTR_STA_AID, 2, &sta->aid);
-
-*
-
-* if (sta->ht_support)
-
-* ```
-    l_genl_msg_append_attr(msg, NL80211_ATTR_HT_CAPABILITY,
-  ```
-
-* ```
-    			sizeof(sta->ht_capabilities),
-  ```
-
-* ```
-    			sta->ht_capabilities);
-  ```
-
-*
-
-* if (sta->wmm_support) {
-
-* ```
-    l_genl_msg_enter_nested(msg, NL80211_ATTR_STA_WME);
-  ```
-
-* ```
-    l_genl_msg_append_attr(msg,
-  ```
-
-* ```
-    			NL80211_STA_WME_UAPSD_QUEUES, 1,
-  ```
-
-* ```
-    			&sta->wmm_uapsd_queues);
-  ```
-
-* ```
-    l_genl_msg_append_attr(msg, NL80211_STA_WME_MAX_SP, 1,
-  ```
-
-* ```
-    			&sta->wmm_max_sp);
-  ```
-
-* ```
-    l_genl_msg_leave_nested(msg);
-  ```
-
-* }
-
-* l_genl_msg_append_attr(msg, NL80211_ATTR_STA_SUPPORTED_RATES,
-  count, &rates);
-  l_genl_msg_append_attr(msg, NL80211_ATTR_STA_LISTEN_INTERVAL, 2,
-  @@ -2173,7 +2197,28 @@ static void ap_assoc_reassoc(struct sta_state *sta=
-, bool reassoc,
-  if (test_bit(ie_tlv_iter_get_data(&iter), 4))
-  sta->ht_greenfield =3D true;
-
-* ```
-    	memcpy(sta->ht_capabilities,
-  ```
-
-* ```
-    			ie_tlv_iter_get_data(&iter),
-  ```
-
-* ```
-    			sizeof(sta->ht_capabilities));
-    	sta->ht_support =3D true;
-    	break;
-  ```
-
-* ```
-    case IE_TYPE_VENDOR_SPECIFIC: {
-  ```
-
-* ```
-    	const uint8_t *vendor =3D
-  ```
-
-* ```
-    			ie_tlv_iter_get_data(&iter);
-  ```
-
-* ```
-    	uint8_t qos_info;
-  ```
-
-*
-
-* ```
-    	if (ie_tlv_iter_get_length(&iter) !=3D 7 ||
-  ```
-
-* ```
-    			memcmp(vendor, microsoft_oui, 3) ||
-  ```
-
-* ```
-    			vendor[3] !=3D 2 ||
-  ```
-
-* ```
-    			vendor[4] !=3D 0 ||
-  ```
-
-* ```
-    			vendor[5] !=3D 1)
-  ```
-
-* ```
-    		break;
-  ```
-
-*
-
-* ```
-    	qos_info =3D vendor[6];
-  ```
-
-* ```
-    	sta->wmm_uapsd_queues =3D qos_info & 0x0f;
-  ```
-
-* ```
-    	sta->wmm_max_sp =3D (qos_info >> 5) & 0x03;
-  ```
-
-* ```
-    	sta->wmm_support =3D true;
-  ```
-
-* ```
-    	break;
-  ```
-
-* ```
-    }
-    }
-  ```
-
-  }
-
-Tested-by: Saarin <serenium@gmx.com>
-
-## Independent engineering statement
-
-Defect isolation, source tracing, netlink capture, patch development,
-Alpine packaging, deployment, and performance validation consumed
-approximately three days of independent, unpaid engineering work.
-
-Compensation provided by Intel: AUD $0.00
-
-Mock invoice:
-
-```
-Client: Intel / iwd project
-Service: Completion of AP HT/WME station installation
-Hardware: Intel AX200
-Investigation: 3 days
-Demonstrated performance recovery: approximately 16x
-Amount paid: AUD $0.00
-Balance: one conspicuously unfinished AP code path
-```
-
-If Intel does not compensate independent users who complete and validate
-its wireless stack, an appropriate alternative would be a public donation
-to Alpine Linux or another community Linux project, accompanied by a
-receipt to this list.
-
-The technical evidence, before/after station dumps, signed Alpine package,
-packaging commit, and full iwmon PCAP are available.
-
-Regards,
-
-Saarin
+ 		flags.mask |=3D (1 << NL80211_STA_FLAG_ASSOCIATED) |
+ 				(1 << NL80211_STA_FLAG_AUTHENTICATED);
+=20
++	if (sta->wmm_support) {
++		flags.mask |=3D 1 << NL80211_STA_FLAG_WME;
++		flags.set |=3D 1 << NL80211_STA_FLAG_WME;
++	}
++
+ 	msg =3D l_genl_msg_new_sized(NL80211_CMD_NEW_STATION, 300);
+=20
+ 	l_genl_msg_append_attr(msg, NL80211_ATTR_IFINDEX, 4, &ifindex);
+@@ -1835,6 +1844,21 @@ static void ap_associate_sta(struct ap_state *ap, s=
+truct sta_state *sta)
+ 			rates[count++] =3D r;
+=20
+ 	l_genl_msg_append_attr(msg, NL80211_ATTR_STA_AID, 2, &sta->aid);
++	if (sta->ht_support)
++		l_genl_msg_append_attr(msg, NL80211_ATTR_HT_CAPABILITY,
++					sizeof(sta->ht_capabilities),
++					sta->ht_capabilities);
++
++	if (sta->wmm_support) {
++		l_genl_msg_enter_nested(msg, NL80211_ATTR_STA_WME);
++		l_genl_msg_append_attr(msg,
++					NL80211_STA_WME_UAPSD_QUEUES, 1,
++					&sta->wmm_uapsd_queues);
++		l_genl_msg_append_attr(msg, NL80211_STA_WME_MAX_SP, 1,
++					&sta->wmm_max_sp);
++		l_genl_msg_leave_nested(msg);
++	}
++
+ 	l_genl_msg_append_attr(msg, NL80211_ATTR_STA_SUPPORTED_RATES,
+ 				count, &rates);
+ 	l_genl_msg_append_attr(msg, NL80211_ATTR_STA_LISTEN_INTERVAL, 2,
+@@ -2173,8 +2197,29 @@ static void ap_assoc_reassoc(struct sta_state *sta,=
+ bool reassoc,
+ 			if (test_bit(ie_tlv_iter_get_data(&iter), 4))
+ 				sta->ht_greenfield =3D true;
+=20
++			memcpy(sta->ht_capabilities,
++					ie_tlv_iter_get_data(&iter),
++					sizeof(sta->ht_capabilities));
+ 			sta->ht_support =3D true;
+ 			break;
++		case IE_TYPE_VENDOR_SPECIFIC: {
++			const uint8_t *vendor =3D
++					ie_tlv_iter_get_data(&iter);
++			uint8_t qos_info;
++
++			if (ie_tlv_iter_get_length(&iter) !=3D 7 ||
++					memcmp(vendor, microsoft_oui, 3) ||
++					vendor[3] !=3D 2 ||
++					vendor[4] !=3D 0 ||
++					vendor[5] !=3D 1)
++				break;
++
++			qos_info =3D vendor[6];
++			sta->wmm_uapsd_queues =3D qos_info & 0x0f;
++			sta->wmm_max_sp =3D (qos_info >> 5) & 0x03;
++			sta->wmm_support =3D true;
++			break;
++		}
+ 		}
+=20
+ 	if (!rates || !ssid || (!wsc_data && !rsn) ||
+=2D-=20
+2.55.0
 
