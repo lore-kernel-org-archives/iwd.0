@@ -1,69 +1,69 @@
-Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
+Received: from mail-qk1-f181.google.com (mail-qk1-f181.google.com [209.85.222.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE240401A18
-	for <iwd@lists.linux.dev>; Wed, 14 Oct 2026 16:30:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1C1C4DE717
+	for <iwd@lists.linux.dev>; Mon, 19 Oct 2026 12:07:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791995418; cv=none; b=Du/cJGllZuOShxQykhTK0H91OGxasW/1T6uBJ/8PeQxWOsk+bcPAOEpW/B9Q4Gx2bZrJ60ZZdmnDLiFEhqzzrlpazOsyV7Eq5bbGkOt1izObqH9uFQRmJgFtxtD2/YDtOG6tec8coFQff6hJskNFUcrSkuAkWmVjSbG5aUgRlCc=
+	t=1792411643; cv=none; b=DtFqMV7ACZGESyyDpWZibm62Z6722zgzyJFnWO3B6zIpjJuB3tTMrgjkc5jM52emNM0Ur7UcHyB/Bw/UGNDvTpHmYV29swYQLUXFKWR/KUiySHJMRnNYlCIFyBC6krqjddBa9LrgiADV7E0sf2t05RSwHVLQRk/3i86z9ybF2zs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791995418; c=relaxed/simple;
-	bh=nbKlJcWVD/6lkGmGzm/lxxdKsmGdcpwJ/9FNaoY9L+Q=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=rb8BFW/4wFmfwKTEbBme7DW/DbnvvR3azvINNsO404OIsEMzGajM+2qcCfAU6cHmJMtinrHMqKS4x6L+OVz9kvp+JnPwPgrq4Ha7DEnzWsALRGzdBS98PiynDRpQbO/+Ia5DDjAe+ptKm+2AcJnFxjyh1jEH763XQqhz1BPAgYQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mind.be; spf=pass smtp.mailfrom=essensium.com; dkim=pass (2048-bit key) header.d=mind.be header.i=@mind.be header.b=FI2AKhjg; arc=none smtp.client-ip=209.85.128.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mind.be
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=essensium.com
+	s=arc-20240116; t=1792411643; c=relaxed/simple;
+	bh=nSMmsMKAgW+AGxsn1CWl75Ts6osYiEhHhmh6GHQTYhM=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=Zdmc6nA9z6ceiENOIAhXsh/peHGFnqJ5FYNz9qvOHiRARygOxfa8sOuR8IrVF0oPpUGeXJdXbFgxkLa3iyV3OtUZxjQrruZ2b9vK5BtsgTzyCrShgB7QlWAy9uAxnKIVjxuhtz/mjUHjPCpcP54tE9ItXDeqss7JXJq0Il0ZR4A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=M6uPmzgT; arc=none smtp.client-ip=209.85.222.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mind.be header.i=@mind.be header.b="FI2AKhjg"
-Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-4a01933b584so38160925e9.0
-        for <iwd@lists.linux.dev>; Wed, 14 Oct 2026 09:30:13 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="M6uPmzgT"
+Received: by mail-qk1-f181.google.com with SMTP id af79cd13be357-93cb1c0e851so147608885a.0
+        for <iwd@lists.linux.dev>; Mon, 19 Oct 2026 05:07:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mind.be; s=google; t=1791995412; x=1792600212; darn=lists.linux.dev;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=GF5vpBK2WMbTJXFTO4I1aPmMc39E49npYNfNYPMeizQ=;
-        b=FI2AKhjgD63Uz8zfne4ndMK9puIBsLUjXCg5F99a0nlB0Tbmz1Iz+CkJwNDl/A01/K
-         LNzMZ5ZVd5o88V5R86jhs8dGxnBuDbCRp9qdpJ4HlbU3n5R5Y46savdgvRGXbVT8umOZ
-         M4won+MuA9PFXOPgjwpKsYEswFV83T747shsxOoy35VuXEmy9sBa/e3B4No9eQLHO7IQ
-         9cqU+H1vbB5f9DqWVGt7KHQhRn14vjrAiV9XclZ/+dgbvljo+PPmrIBGxhfnTsjrBTru
-         6+RHzphKjktn8Zz2IIm835myElsHGaoeRU+Z6afkv8cOwsVmMPfPd/5fjGMG5keNIlKp
-         +5bA==
+        d=gmail.com; s=20251104; t=1792411641; x=1793016441; darn=lists.linux.dev;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=lUj6q5s1WDc9AFZb5SWsQPDWxqL9DgEgcCXot6A5zFw=;
+        b=M6uPmzgTpBdJsBwC9HZvXAjx84k1+/gB3k9UbNpZ2KliJWUw6CglshzoDunEOqIZ8X
+         hjwiEZdrLS0wgDnSWN5y6hOV/6ZodlaMn8mE+2wGufx05CXrPKmEQlIgrrueDMhB3k3d
+         wFIlELWPc5ktxioP2cOzWOGvbo5EUmTyzC1d0A3Y8V9zBng53CxTPIs/cjPs7+YK+ili
+         +lWBn2gUTioDanO3dj8rKKCEI+lCC1b/weqvLlLLbdlHO+K2m1nVRqKlxjC1f6bMhRXz
+         4m1dlr40+LBE44XDT307WG0whIgSwDSuees40pRk5Zmiro+fLQc2hEKTgKkOEEqBwvOd
+         tbbg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1791995412; x=1792600212;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=GF5vpBK2WMbTJXFTO4I1aPmMc39E49npYNfNYPMeizQ=;
-        b=hjcxppVKxopHk9sLvLmd7NkFHpuDm5SyxU6jljGyl392CBTKkEhkKCpchRxn7R0qjQ
-         z4o4Mxrm+6mQZKeN6CZGiirUiI76G1DmrmeuaHekXIdd+l12zwjvhsrbZlPPDbqWVa8V
-         24U2ZiZ2gggbbomnYzPqEWIw+N4xsXm5KZL2NyzAXWq0+jKiyYN8eUtdBvGqQVCfoFG4
-         +M82AzZByJCAVlcbH/vmWf7bP2Z4l4Xv50HNemOoPnf1a2tjVSWyE1cGQleYXbNWK4wg
-         T7HPKmBtrc9a2IGVlYWFBZqKCSCIGEKWeA2M7I9LA2vuwqiCuF70iEAkaeQrTqIM6Dw6
-         D+iw==
-X-Gm-Message-State: AFq9FYKzSZgyjFRn/t7k6pFKW2XgNZPr2TLFPBKM2J+9s6zUU3vr0JRc
-	tP64hrSw4beZolV5obtS8esz9xOgIapXBxoCG670+s5Fz3c4vJEtDZiJvY1O2pAm+Htbvzn0Dfd
-	2apifNGFN8w==
-X-Gm-Gg: AYBFou0yRFvFA8/j7DcJWJSaS19idTJatAMQuhZlo/++5kRR89+g62aZM0e1Kxhc/3L
-	yqvgKIokDQgErKTMYmOKCL7FpdlR9lPtdLQ+QXrtmxfS0MLXRmh+iZKhT07d0uvmrxkLcrqSnuS
-	oEPbpXg0fUY0re1iPAij6D+87zcQQnULlA/mBfheuGORbC7GFvkkjnmBpYADAz6OQKX/x44LtY5
-	FyCRcX4QHR726/cse4wVs3aOg0pMmjfX7gcubOMBnn84yB4OZZMNCz3DUjiQx6CYE+HrsMbuUpi
-	0e5ypmN4cwcMw6NkctNYvPIUXRh3Mj5db8C1hiQocETxsEtO3eAFngoyCakRiYknnyqCjp/HMG0
-	kfSMSeqjaEZl++WDNcyzGy1AJNGzoK6xume4H5NOEP2gIsEdKke4FHZjiqr0gws4hsNlLSFEhor
-	eXuZ3/iR5u/6N2JBB1UiaA1pDkklW5c0+YTQUXXWqWRlMgyUIj3AcmdP+ICHB4TLydfV4cysO7r
-	LcSjmoLeTKGyg==
-X-Received: by 2002:a05:600c:a0d:b0:4a1:b187:1314 with SMTP id 5b1f17b1804b1-4a1b1871350mr74747955e9.7.1791995411722;
-        Wed, 14 Oct 2026 09:30:11 -0700 (PDT)
-Received: from debian-hp-1.fritz.box ([212.233.51.18])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-48de0967affsm11641747f8f.1.2026.10.14.09.30.11
+        d=1e100.net; s=20260707; t=1792411641; x=1793016441;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=lUj6q5s1WDc9AFZb5SWsQPDWxqL9DgEgcCXot6A5zFw=;
+        b=CKglRgH4G1ne+u5qi+T/LO3Ub2EaYufnhLHec7HVVihDbEFoouWcqWSkumrSe4Zv7z
+         eNy2Q84A+GE8I6QpfCwHfTP/L/JQf7dxwpuj2tDKI8+Xazg2g1FXdO1+iukG8S27GiLc
+         MncoWlvQT7bbDf0HzhflSf327/zhAvIswrVqjweMdrgKvzFWwWXijxT/pJ+sj7qcX4Tw
+         Ys6fZezNT04y/W+FxeEzdpLcL28CvnZM34/OKAQjh8f+35Il7V/TyDaqzupXDJoa4YVx
+         DDnalS18aNuG9fa7eVnz2rfGi9KPwchtRpoI1HfCLTON5lRQ+m0eq28dOZ4zcsdN+WI+
+         /stg==
+X-Gm-Message-State: AFq9FYI41KkR1U+EqOSZTRTYf9E6uBLIg0FXGhyu5BVYGlWbGKw1UMZG
+	ZYKnatjydmKEaUl8GAyTz9PytlZ8sSYl6tADDsHmsW9h8sjn1OdficmIGdGEACNo
+X-Gm-Gg: AYBFou2E0DL6zTKUntCebuSdWCF77nJRUjZpHuYomhXaePySkmKB8TXdw3uwBcb5F8X
+	MY4lEvGD90s122B/NBZ0ufgimc8pMSZkCbNHjpvPrhzPnnkGPpb75xYITjsQPqPX/CCp/ZtkbTk
+	7NpE0jlkU9f9JQamS/5S6FfX9zsSkatf+ffMtpd9CNGDZRcJ53bnpnrlBRHkEplpgURDPdi/TIk
+	LhWkisM0cZVuSW9WacvW0Ijn+bZnpzyKRYFdGLu6bZY/0DSwNsbr72NRfPTXtRQQRxDvsDeEJr7
+	A8LH1sCA5QQ2od9DVSePmZr5hki4hKhBdNIdn6x24N7SvcnctyOkF86mkqCWi9EUT/reOO+mx43
+	5p/NU4IZPnwX6BDuf7q5H/eSFM8df+MOWw6IkyWeDzieI5F3mnDl1p1siA8vCz5XidX4iM3LQoz
+	sNWh9Lbiu5FUAMHdMwi6rbNVOIhpmsf72syY/LKQj+8lJSFs+j2ijmPak8PA+xxeOH0Q206zXZU
+	NKiA/sBC+pD5QTb2K77AgGQ7wOSzvs6vAqfT37w8tQH6TX3G3HFxWxwaqYWKgOLSmd2Z+xb3kMD
+	caNz+YHhX+vZdSbK
+X-Received: by 2002:a05:620a:25c6:b0:939:6c31:2318 with SMTP id af79cd13be357-93f29ce44a6mr1166750385a.34.1792411640522;
+        Mon, 19 Oct 2026 05:07:20 -0700 (PDT)
+Received: from framie ([2603:7000:8a00:daf::1553])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-93f2f045ca4sm596377685a.29.2026.10.19.05.07.19
+        for <iwd@lists.linux.dev>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 14 Oct 2026 09:30:11 -0700 (PDT)
-From: =?UTF-8?q?Rapha=C3=ABl=20M=C3=A9lotte?= <raphael.melotte@mind.be>
+        Mon, 19 Oct 2026 05:07:19 -0700 (PDT)
+From: John Rinehart <johnrichardrinehart@gmail.com>
 To: iwd@lists.linux.dev
-Cc: =?UTF-8?q?Rapha=C3=ABl=20M=C3=A9lotte?= <raphael.melotte@mind.be>
-Subject: [PATCH] hwsim: tolerate a third wiphy address (NAN)
-Date: Wed, 14 Oct 2026 18:30:00 +0200
-Message-ID: <20261014163000.692565-1-raphael.melotte@mind.be>
-X-Mailer: git-send-email 2.54.0
+Subject: [PATCH] manager: create P2P device after default iface
+Date: Mon, 19 Oct 2026 08:07:18 -0400
+Message-ID: <20261019120718.159767-1-johnrichardrinehart@gmail.com>
+X-Mailer: git-send-email 2.56.0
 Precedence: bulk
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
@@ -72,44 +72,65 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-parse_addresses() reads the per-radio addresses from
-/sys/class/ieee80211/<phy>/addresses and fails with "too many
-addresses listed in sysfs - only 2 supported" whenever a radio
-exposed more than two.
+With [DriverQuirks].DefaultInterface, iwd can set up a wiphy before the
+driver creates its default interface. This happens when iwd starts while
+mac80211 registers the card, for example during boot. The interface
+dump is then empty, so manager_use_default() sets state->retry and
+waits for a NEW_INTERFACE event.
 
-Since kernel commit a37a6f54439b ("wifi: mac80211_hwsim: Add
-simulation support for NAN device", first in v6.18) every
-mac80211_hwsim radio sets wiphy->n_addresses = 3, the third address
-being for the NAN device. As a result parse_addresses() rejects every
-radio, CreateRadio call fails with net.connman.hwsim.Failed, and
-the hwsim-based autotest suite cannot run.
+manager_create_interfaces() still creates the P2P device in this case.
+The NEW_INTERFACE event for that P2P device arrives first and clears
+state->retry. The P2P device is not a default interface, so setup
+finishes without a station device. The driver's NEW_INTERFACE event
+arrives next, finds no pending setup, and is ignored. The wiphy has no
+station until iwd restarts or the driver reloads:
 
-The hwsim tool only uses the first two addresses, so read those and
-stop at the third instead of failing. At least two addresses are still
-required.
+  iwd: Wiphy phy0 will only use the default interface
+  iwd: No default interface for wiphy 0
+  kernel: iwlwifi 0000:aa:00.0 wlp170s0: renamed from wlan0
+
+iwmon shows the order: an empty GET_INTERFACE dump, the NEW_INTERFACE
+request for wlan0-p2p and its event, then the NEW_INTERFACE event for
+the driver's wlan0.
+
+Return from manager_create_interfaces() when manager_use_default()
+fails. The retry calls manager_create_interfaces() again after the
+default interface appears, and that pass creates the P2P device.
+
+This patch does not change the path without DefaultInterface. There,
+an EBUSY from the station NEW_INTERFACE also sets state->retry while
+the P2P device is created, so the P2P event can clear the retry in the
+same way. I could not reproduce EBUSY on this hardware, so the patch
+leaves that path alone.
+
+Tested on an Intel AX210 (iwlmvm) with kernel 7.2.9. Reloading the
+driver under rtnl_lock contention and starting iwd during registration
+reproduces the stuck wiphy with 3.12. With this patch, iwd logs
+"No default interface" and then sets up the station and connects.
 ---
- tools/hwsim.c | 8 +++-----
- 1 file changed, 3 insertions(+), 5 deletions(-)
+ src/manager.c | 9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
 
-diff --git a/tools/hwsim.c b/tools/hwsim.c
-index b7d637ca..45c57d3f 100644
---- a/tools/hwsim.c
-+++ b/tools/hwsim.c
-@@ -593,11 +593,9 @@ static bool parse_addresses(const uint8_t *buf, size_t len,
- 		memcpy(addr, buf + start_pos, pos - start_pos);
- 		addr[pos - start_pos] = '\0';
+diff --git a/src/manager.c b/src/manager.c
+index 436daa56..48c0acc6 100644
+--- a/src/manager.c
++++ b/src/manager.c
+@@ -203,7 +203,14 @@ static void manager_create_interfaces(struct wiphy_setup_state *state)
+ 		return;
  
--		if (addr_idx >= 2) {
--			l_error("Hwsim wiphy %s has too many addresses listed "
--				" in sysfs - only 2 supported", rec->name);
--			return false;
--		}
-+		/* Only the first two addresses are used, ignore others (e.g. NAN) */
-+		if (addr_idx >= 2)
-+			break;
+ 	if (state->use_default) {
+-		manager_use_default(state);
++		/*
++		 * If the default interface does not exist yet, wait for its
++		 * NEW_INTERFACE event before creating the P2P device.  The
++		 * event for our own P2P device would otherwise end the wait,
++		 * and the default interface would never be set up.
++		 */
++		if (!manager_use_default(state))
++			return;
  
- 		if (!util_string_to_address(addr, rec->addrs[addr_idx])) {
- 			l_error("Can't parse hwsim wiphy %s address from sysfs",
+ 		/*
+ 		 * Some drivers don't let us touch the default interface
 -- 
-2.54.0
+2.56.0
 
