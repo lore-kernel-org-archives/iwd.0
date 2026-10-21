@@ -1,136 +1,149 @@
-Received: from mail-qk1-f181.google.com (mail-qk1-f181.google.com [209.85.222.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.210.42
+ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
+	t=1792621425;
+	b=AxUXHYxvCD8qjq7JzmU337wS7FBl4yKGbBR83OMiwtF6XDQ11ydvYQ4tL16nw18Cy5oI
+	 BxHvTH8c8RLxdzmSITsC8nQ4bYxmR4Os0ulUpnEYXPWQ1Qk440KGKI/ctTd/Sv9TwkbVK
+	 xcMwkKPGHb36l4zPp770V6CypHbU/oz6+Z4VD/wXJNreOYUmky/bEEuAcQEPJHbsmIDJF
+	 znfgGEjnA9xknAjI5sMDRQ8fosn/FxiYBQE//gd021mqO2Uqhc9DTvxStvGbyJWAN6VNi
+	 QdXZnDCqKvqVb9g+tD91W3OzGo1AyyeeLPPibmd4A3D7Sk97Lrv6Ll3JGHhda1V3VKw==
+ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1792621425;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Cc:Subject:
+	 Date:Message-ID:X-Mailer:MIME-Version:Content-Transfer-Encoding;
+	bh=94eGL8YcbOD74GTvLEcM6uZ9hYr75YXgDFNbaSqOkBA=;
+	b=3+hRXBUlF/5eJMvR3Dfdr5bCT06VIBG2OFJ44QsGsFwJUYZkneCOwevgOnNDoPGNj83w
+	 3fq1IGJn768H1uPlG1b16vBGXOgDnzwsob9RfZNQzEuDjPof5xh0fFkX0SJ34lchfwUXy
+	 nbR0mUJXoAZgx49xVB8ZXS3avuwlkkZ00+kPX/L9shRsDj0/oOWx1+rY5nxABf8kzgjBP
+	 GCPM2KGBmalGe8D+1N627Y2tw2xplUs42f3WPLSGKG4qpbME3Fjh7qWeyh3J0RXFSfdxc
+	 +J986TNny1eifcyGKIHR3jfSVBHOvP+xPUTF0AXL6iZ+do+VCrKIUyX4P2DpR8k1pjA==
+ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
+	dmarc=pass header.from=blender.org;
+	spf=pass smtp.mailfrom=blender.org;
+	dkim=pass header.d=blender.org header.i=@blender.org header.a=rsa-sha256 header.s=google header.b=ec73ppcA;
+	arc=none smtp.remote-ip=209.85.210.42
+Received: from mail-ot1-f42.google.com (mail-ot1-f42.google.com [209.85.210.42])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1C1C4DE717
-	for <iwd@lists.linux.dev>; Mon, 19 Oct 2026 12:07:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.181
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792411643; cv=none; b=DtFqMV7ACZGESyyDpWZibm62Z6722zgzyJFnWO3B6zIpjJuB3tTMrgjkc5jM52emNM0Ur7UcHyB/Bw/UGNDvTpHmYV29swYQLUXFKWR/KUiySHJMRnNYlCIFyBC6krqjddBa9LrgiADV7E0sf2t05RSwHVLQRk/3i86z9ybF2zs=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792411643; c=relaxed/simple;
-	bh=nSMmsMKAgW+AGxsn1CWl75Ts6osYiEhHhmh6GHQTYhM=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version; b=Zdmc6nA9z6ceiENOIAhXsh/peHGFnqJ5FYNz9qvOHiRARygOxfa8sOuR8IrVF0oPpUGeXJdXbFgxkLa3iyV3OtUZxjQrruZ2b9vK5BtsgTzyCrShgB7QlWAy9uAxnKIVjxuhtz/mjUHjPCpcP54tE9ItXDeqss7JXJq0Il0ZR4A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=M6uPmzgT; arc=none smtp.client-ip=209.85.222.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE94B606A319
+	for <iwd@lists.linux.dev>; Wed, 21 Oct 2026 22:23:44 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org DE94B606A319
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=blender.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=blender.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="M6uPmzgT"
-Received: by mail-qk1-f181.google.com with SMTP id af79cd13be357-93cb1c0e851so147608885a.0
-        for <iwd@lists.linux.dev>; Mon, 19 Oct 2026 05:07:21 -0700 (PDT)
+	dkim=pass (2048-bit key, unprotected) header.d=blender.org header.i=@blender.org header.a=rsa-sha256 header.s=google header.b=ec73ppcA
+Received: by mail-ot1-f42.google.com with SMTP id 46e09a7af769-8439fe796ebso808163a34.3
+        for <iwd@lists.linux.dev>; Wed, 21 Oct 2026 15:23:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1792411641; x=1793016441; darn=lists.linux.dev;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=lUj6q5s1WDc9AFZb5SWsQPDWxqL9DgEgcCXot6A5zFw=;
-        b=M6uPmzgTpBdJsBwC9HZvXAjx84k1+/gB3k9UbNpZ2KliJWUw6CglshzoDunEOqIZ8X
-         hjwiEZdrLS0wgDnSWN5y6hOV/6ZodlaMn8mE+2wGufx05CXrPKmEQlIgrrueDMhB3k3d
-         wFIlELWPc5ktxioP2cOzWOGvbo5EUmTyzC1d0A3Y8V9zBng53CxTPIs/cjPs7+YK+ili
-         +lWBn2gUTioDanO3dj8rKKCEI+lCC1b/weqvLlLLbdlHO+K2m1nVRqKlxjC1f6bMhRXz
-         4m1dlr40+LBE44XDT307WG0whIgSwDSuees40pRk5Zmiro+fLQc2hEKTgKkOEEqBwvOd
-         tbbg==
+        d=blender.org; s=google; t=1792621424; x=1793226224; darn=lists.linux.dev;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=94eGL8YcbOD74GTvLEcM6uZ9hYr75YXgDFNbaSqOkBA=;
+        b=ec73ppcAvVT4eyLBZvHdUsDT6NgAq/XdyqalKBH+gozBKv671SUpvY4meVsx85DpY2
+         NiqWFkHZUviy5+gok5tCdwS2meP70fbHtrd4O7ubaie9bWcphnohGWUN8yjUwV/qt2FT
+         Leo/dcXMqrRlUvc+2Ug9u+F3vnTv8ZJjkPV5UkzDG9UGp7o5+hmwHDQUEM8UmgT5UZer
+         XVHBO//kOM558gddfDfsTEkK2d2MkRSVAbhVwmEyAGb8vczijoC5PqEa4ovNhbAfLA9Q
+         QbmNnvvnugMQaL1wvsoCRL26Zh7WaUVu/Ebvz5RiDforNaG6KYnzoVQsNUr27i9Xl8pI
+         Aa7g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1792411641; x=1793016441;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=lUj6q5s1WDc9AFZb5SWsQPDWxqL9DgEgcCXot6A5zFw=;
-        b=CKglRgH4G1ne+u5qi+T/LO3Ub2EaYufnhLHec7HVVihDbEFoouWcqWSkumrSe4Zv7z
-         eNy2Q84A+GE8I6QpfCwHfTP/L/JQf7dxwpuj2tDKI8+Xazg2g1FXdO1+iukG8S27GiLc
-         MncoWlvQT7bbDf0HzhflSf327/zhAvIswrVqjweMdrgKvzFWwWXijxT/pJ+sj7qcX4Tw
-         Ys6fZezNT04y/W+FxeEzdpLcL28CvnZM34/OKAQjh8f+35Il7V/TyDaqzupXDJoa4YVx
-         DDnalS18aNuG9fa7eVnz2rfGi9KPwchtRpoI1HfCLTON5lRQ+m0eq28dOZ4zcsdN+WI+
-         /stg==
-X-Gm-Message-State: AFq9FYI41KkR1U+EqOSZTRTYf9E6uBLIg0FXGhyu5BVYGlWbGKw1UMZG
-	ZYKnatjydmKEaUl8GAyTz9PytlZ8sSYl6tADDsHmsW9h8sjn1OdficmIGdGEACNo
-X-Gm-Gg: AYBFou2E0DL6zTKUntCebuSdWCF77nJRUjZpHuYomhXaePySkmKB8TXdw3uwBcb5F8X
-	MY4lEvGD90s122B/NBZ0ufgimc8pMSZkCbNHjpvPrhzPnnkGPpb75xYITjsQPqPX/CCp/ZtkbTk
-	7NpE0jlkU9f9JQamS/5S6FfX9zsSkatf+ffMtpd9CNGDZRcJ53bnpnrlBRHkEplpgURDPdi/TIk
-	LhWkisM0cZVuSW9WacvW0Ijn+bZnpzyKRYFdGLu6bZY/0DSwNsbr72NRfPTXtRQQRxDvsDeEJr7
-	A8LH1sCA5QQ2od9DVSePmZr5hki4hKhBdNIdn6x24N7SvcnctyOkF86mkqCWi9EUT/reOO+mx43
-	5p/NU4IZPnwX6BDuf7q5H/eSFM8df+MOWw6IkyWeDzieI5F3mnDl1p1siA8vCz5XidX4iM3LQoz
-	sNWh9Lbiu5FUAMHdMwi6rbNVOIhpmsf72syY/LKQj+8lJSFs+j2ijmPak8PA+xxeOH0Q206zXZU
-	NKiA/sBC+pD5QTb2K77AgGQ7wOSzvs6vAqfT37w8tQH6TX3G3HFxWxwaqYWKgOLSmd2Z+xb3kMD
-	caNz+YHhX+vZdSbK
-X-Received: by 2002:a05:620a:25c6:b0:939:6c31:2318 with SMTP id af79cd13be357-93f29ce44a6mr1166750385a.34.1792411640522;
-        Mon, 19 Oct 2026 05:07:20 -0700 (PDT)
-Received: from framie ([2603:7000:8a00:daf::1553])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-93f2f045ca4sm596377685a.29.2026.10.19.05.07.19
-        for <iwd@lists.linux.dev>
+        d=1e100.net; s=20260707; t=1792621424; x=1793226224;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=94eGL8YcbOD74GTvLEcM6uZ9hYr75YXgDFNbaSqOkBA=;
+        b=zPhMT+J8PHWJgraNEwNBrkopAuAm5QURqneyesKxnTbgHRlVhAI0FXnYWmsi8dYQTH
+         XoTy0q93R4Fvqo1w9NqT4jjepSm9SO4xZGvzuy6a1mskz3T7ihtQNYi8KZ3vBCw+QXS/
+         sBkTlglREmunRpVjNDemfsvCC2kfbwvJH5kWkGDjdYW3qiK/uD3iQACJm8y7O9VkmOC5
+         SGmRLaG+oD0qKgq8/7qnoxAAmik4PbMUrSSqQipAEzs/LMzYYfZwQ4vHvB9vmvQQ3SIe
+         IvT7JMs1rE7yRPFfSHqbyZccchWULD0kfnp+H3GvPHhQ9vcLGzVntiqsYDRZ/saAHkYf
+         PzUg==
+X-Gm-Message-State: AFq9FYJ2sj/cTQ6jrbaf5Crax2jCyCqjpqpcgvZwOd4ntRu8aTpj/lAH
+	1cGzPPd6L/xYKTq0Bn3lR3Er199CT+tKWxOMXRYVva6PckTK0sQZbviQu8b3y3A7RDC6xLoY6pu
+	SPUcZ
+X-Gm-Gg: AYBFou3TumYK6C6DW8STDmNtLWFYyaclIZ5RUlWddwsfQqhCp7mRkwGM3J/h9wvP7hz
+	vBUL7BYpa+KzRSLtTxCrwvo/Ax1X9KaV3bGn3+Vro2MFwlqfv4xm3brmAVmw6JK1qC32SbH92kf
+	jciNaDxtTabpJtZR8bpNhX2jsbxZLoXAnF1COJEXRINApHo30jFxf+P0PDRf8uJp2ki2Hw4hX6G
+	EM/0D+0FXMit5nHbCwMwxE2NNq3lX0KgUd4iu2vuYA2V42UfG/TNL0+BZDHlIHtPbgOuRFgEzJl
+	IINK0IQapyJ9EtWgHdHFm+aJOE8vypO/QbMhUObmu1EA9TfG1Pa5rQ6i2oxUuUxt7c6luyt6/ah
+	u+0C3tgFr/uuFB6EeAHuUOlPlL9elJO7cu7NFDyjrxveRSNnR5Fqr8tAYpzw8K0FwY9sydeHfje
+	Qpf8WxvvjzXqB8s6g5aOVw92HDpXQy8IgMAhYSCn4ckrJaPBIR+GMqXIclWIHOfvtzhhNX+PMKl
+	vpeHMZSq8bAH95RulBdKjqdITucwKdVc3Ig5+KbgnvnpRHSTzKSgFZEJtwC/PkMpCIS0VIJF9s1
+	phqaSuJ2UcsXfFbrUhQum4ph
+X-Received: by 2002:a05:6830:917:b0:81b:9d18:75a with SMTP id 46e09a7af769-84d08d01f5amr2657461a34.21.1792621423895;
+        Wed, 21 Oct 2026 15:23:43 -0700 (PDT)
+Received: from kii.uchicago.edu ([192.5.85.175])
+        by smtp.gmail.com with ESMTPSA id 46e09a7af769-84cba7d46fbsm3504882a34.3.2026.10.21.15.23.43
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 19 Oct 2026 05:07:19 -0700 (PDT)
-From: John Rinehart <johnrichardrinehart@gmail.com>
+        Wed, 21 Oct 2026 15:23:43 -0700 (PDT)
+From: John Kiril Swenson <john@blender.org>
 To: iwd@lists.linux.dev
-Subject: [PATCH] manager: create P2P device after default iface
-Date: Mon, 19 Oct 2026 08:07:18 -0400
-Message-ID: <20261019120718.159767-1-johnrichardrinehart@gmail.com>
-X-Mailer: git-send-email 2.56.0
-Precedence: bulk
+Cc: John Kiril Swenson <john@blender.org>
+Subject: [PATCH] eap-peap: Fix misdetection of EAP-Extensions
+Date: Wed, 21 Oct 2026 17:22:38 -0500
+Message-ID: <20261021222238.10363-1-john@blender.org>
+X-Mailer: git-send-email 2.55.0
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
+List-Post: <mailto:iwd@lists.linux.dev>
+List-Help: <mailto:iwd+help@lists.linux.dev>
 List-Subscribe: <mailto:iwd+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
+List-Owner: <mailto:iwd+owner@lists.linux.dev>
+Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-With [DriverQuirks].DefaultInterface, iwd can set up a wiphy before the
-driver creates its default interface. This happens when iwd starts while
-mac80211 registers the card, for example during boot. The interface
-dump is then empty, so manager_use_default() sets state->retry and
-waits for a NEW_INTERFACE event.
+In PEAPv0, only EAP-Extensions requests carry a full header, the rest
+are headerless. This code only detected EAP-Extensions by checking
+pkt[4] which did not consider some headerless cases.
 
-manager_create_interfaces() still creates the P2P device in this case.
-The NEW_INTERFACE event for that P2P device arrives first and clears
-state->retry. The P2P device is not a default interface, so setup
-finishes without a station device. The driver's NEW_INTERFACE event
-arrives next, finds no pending setup, and is ignored. The wiphy has no
-station until iwd restarts or the driver reloads:
+For instance, a headerless MSCHAPv2 Challenge has the low byte of
+MS-Length at this byte. With a 12 character Name field MS-Length ends up
+being exactly 33 = 0x21, the same as EAP_TYPE_EXTENSIONS, so this code
+is fooled and drops the packet when it sees there is no matching
+EAP_CODE_REQUEST.
 
-  iwd: Wiphy phy0 will only use the default interface
-  iwd: No default interface for wiphy 0
-  kernel: iwlwifi 0000:aa:00.0 wlp170s0: renamed from wlan0
-
-iwmon shows the order: an empty GET_INTERFACE dump, the NEW_INTERFACE
-request for wlan0-p2p and its event, then the NEW_INTERFACE event for
-the driver's wlan0.
-
-Return from manager_create_interfaces() when manager_use_default()
-fails. The retry calls manager_create_interfaces() again after the
-default interface appears, and that pass creates the P2P device.
-
-This patch does not change the path without DefaultInterface. There,
-an EBUSY from the station NEW_INTERFACE also sets state->retry while
-the P2P device is created, so the P2P event can clear the retry in the
-same way. I could not reproduce EBUSY on this hardware, so the patch
-leaves that path alone.
-
-Tested on an Intel AX210 (iwlmvm) with kernel 7.2.9. Reloading the
-driver under rtnl_lock contention and starting iwd during registration
-reproduces the stuck wiphy with 3.12. With this patch, iwd logs
-"No default interface" and then sets up the station and connects.
+To fix, _only_ treat the packet as EAP-Extensions if ALL code, length
+and type match. This happens to do the same thing that wpa_supplicant
+does (which works correctly).
 ---
- src/manager.c | 9 ++++++++-
- 1 file changed, 8 insertions(+), 1 deletion(-)
+Ran into this connecting to eduroam at UChicago with my alma mater's
+(UMN) account where wpa_supplicant worked but iwd didn't. 
 
-diff --git a/src/manager.c b/src/manager.c
-index 436daa56..48c0acc6 100644
---- a/src/manager.c
-+++ b/src/manager.c
-@@ -203,7 +203,14 @@ static void manager_create_interfaces(struct wiphy_setup_state *state)
- 		return;
+ src/eap-peap.c | 19 ++++++++-----------
+ 1 file changed, 8 insertions(+), 11 deletions(-)
+
+diff --git a/src/eap-peap.c b/src/eap-peap.c
+index 4559066..8d71bc1 100644
+--- a/src/eap-peap.c
++++ b/src/eap-peap.c
+@@ -507,17 +507,14 @@ static bool eap_peap_tunnel_handle_request(struct eap_state *eap,
+ 	struct peap_state *peap_state;
+ 	uint8_t id;
  
- 	if (state->use_default) {
--		manager_use_default(state);
-+		/*
-+		 * If the default interface does not exist yet, wait for its
-+		 * NEW_INTERFACE event before creating the P2P device.  The
-+		 * event for our own P2P device would otherwise end the wait,
-+		 * and the default interface would never be set up.
-+		 */
-+		if (!manager_use_default(state))
-+			return;
+-	if (len > 4 && pkt[4] == EAP_TYPE_EXTENSIONS) {
+-		uint16_t pkt_len;
+-		uint8_t code = pkt[0];
+-
+-		if (code != EAP_CODE_REQUEST)
+-			return false;
+-
+-		pkt_len = l_get_be16(pkt + 2);
+-		if (pkt_len != len)
+-			return false;
+-
++	/*
++	 * A headerless PEAPv0 packet, e.g. an MSCHAPv2 Challenge, can also
++	 * have EAP_TYPE_EXTENSIONS at offset 4 by sheer coincidence,
++	 * so check the whole header.
++	 */
++	if (len > 4 && pkt[4] == EAP_TYPE_EXTENSIONS &&
++			pkt[0] == EAP_CODE_REQUEST &&
++			l_get_be16(pkt + 2) == len) {
+ 		id = pkt[1];
  
- 		/*
- 		 * Some drivers don't let us touch the default interface
+ 		eap_extensions_handle_request(eap, id,
 -- 
-2.56.0
+2.55.0
 
