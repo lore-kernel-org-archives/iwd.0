@@ -1,88 +1,53 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.210.42
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=95.143.172.20
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1792621425;
-	b=AxUXHYxvCD8qjq7JzmU337wS7FBl4yKGbBR83OMiwtF6XDQ11ydvYQ4tL16nw18Cy5oI
-	 BxHvTH8c8RLxdzmSITsC8nQ4bYxmR4Os0ulUpnEYXPWQ1Qk440KGKI/ctTd/Sv9TwkbVK
-	 xcMwkKPGHb36l4zPp770V6CypHbU/oz6+Z4VD/wXJNreOYUmky/bEEuAcQEPJHbsmIDJF
-	 znfgGEjnA9xknAjI5sMDRQ8fosn/FxiYBQE//gd021mqO2Uqhc9DTvxStvGbyJWAN6VNi
-	 QdXZnDCqKvqVb9g+tD91W3OzGo1AyyeeLPPibmd4A3D7Sk97Lrv6Ll3JGHhda1V3VKw==
+	t=1793096871;
+	b=RdsZJ/oIvLX5u3YXh3XvKvsRSwHeOfU2yMUos4AvDQjrVu2yw9aTjCQutB8TS/69m3mI
+	 kT83sTsBRo/t7ErAEMtRGVCwf0U2Ul7di5D8O0t0nY74b0RVev6VVEDOvF+UDbRZcbDc6
+	 AGymxBXJ1lJbRpcw2uJRW6JFL5Y2e0cCYTmWhAAyjSQCEICTg6BT8dOk0MclbKxBan92D
+	 Sw4EvxgXJAwvDMqZAarNN7uaYIkYiMzgoP8TDWOcFnaipOwU8r4I/x8OzZTLYR9bPeYnm
+	 jlXDrmd61U21hOSch6IkqdzieUPfK2hVwhgeOQRxePaQUqUrHp4+fr1+TETNDbtjHzg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792621425;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Cc:Subject:
-	 Date:Message-ID:X-Mailer:MIME-Version:Content-Transfer-Encoding;
-	bh=94eGL8YcbOD74GTvLEcM6uZ9hYr75YXgDFNbaSqOkBA=;
-	b=3+hRXBUlF/5eJMvR3Dfdr5bCT06VIBG2OFJ44QsGsFwJUYZkneCOwevgOnNDoPGNj83w
-	 3fq1IGJn768H1uPlG1b16vBGXOgDnzwsob9RfZNQzEuDjPof5xh0fFkX0SJ34lchfwUXy
-	 nbR0mUJXoAZgx49xVB8ZXS3avuwlkkZ00+kPX/L9shRsDj0/oOWx1+rY5nxABf8kzgjBP
-	 GCPM2KGBmalGe8D+1N627Y2tw2xplUs42f3WPLSGKG4qpbME3Fjh7qWeyh3J0RXFSfdxc
-	 +J986TNny1eifcyGKIHR3jfSVBHOvP+xPUTF0AXL6iZ+do+VCrKIUyX4P2DpR8k1pjA==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793096871;
+	h=DMARC-Filter:Received:Received:Received:From:To:Cc:Subject:Date:
+	 Message-ID:X-Mailer:MIME-Version:Content-Transfer-Encoding:
+	 X-Rspamd-Bar:X-Rspamd-Report:X-Rspamd-Score:DKIM-Signature;
+	bh=3rYbp0to0As9+qHJyXYnjeDVAcY7hnB8k1kM0na5DB8=;
+	b=Zzoq4H8+bRcQITT7G1NNiFGX1leB7x4HUZzTSuR30nx0yAqgcqqne4MD6c69YR0dNnJW
+	 137wL8tWgrYIybZVnIVZY/POAKIAY3Eb8wOXsTR373h7sMnTcGDwQ/MO76xex5fRmMNk1
+	 x2IUlRxFEG30FxHgYwdAhrs+MAvXimt3DsTr18J/1DtN7XAmt7TJfVeb6MQmP5x6/U0+K
+	 Np4zbfoUPje/YIqRLBRGIDIS+D4CJC3EJ3572m/Iz7sR/mA41wa6lTM9euQ9aa6Dybj4R
+	 cb+sTH6M5ucnIEDfDam0hVrk4rHfJQPVWLY/NCRKhyEWUiEYeh1t67TBN221wDPZ/qA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=blender.org;
-	spf=pass smtp.mailfrom=blender.org;
-	dkim=pass header.d=blender.org header.i=@blender.org header.a=rsa-sha256 header.s=google header.b=ec73ppcA;
-	arc=none smtp.remote-ip=209.85.210.42
-Received: from mail-ot1-f42.google.com (mail-ot1-f42.google.com [209.85.210.42])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	dmarc=none header.from=jhbruhn.de;
+	spf=pass smtp.mailfrom=jhbruhn.de;
+	dkim=pass header.d=jhbruhn.de header.i=@jhbruhn.de header.a=rsa-sha256 header.s=uberspace header.b=tbGgcUqY;
+	arc=none smtp.remote-ip=95.143.172.20
+Received: from mailgate01.uberspace.is (mailgate01.uberspace.is [95.143.172.20])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE94B606A319
-	for <iwd@lists.linux.dev>; Wed, 21 Oct 2026 22:23:44 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org DE94B606A319
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=blender.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=blender.org
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1A23606A31A
+	for <iwd@lists.linux.dev>; Tue, 27 Oct 2026 10:27:49 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org B1A23606A31A
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jhbruhn.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=jhbruhn.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=blender.org header.i=@blender.org header.a=rsa-sha256 header.s=google header.b=ec73ppcA
-Received: by mail-ot1-f42.google.com with SMTP id 46e09a7af769-8439fe796ebso808163a34.3
-        for <iwd@lists.linux.dev>; Wed, 21 Oct 2026 15:23:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=blender.org; s=google; t=1792621424; x=1793226224; darn=lists.linux.dev;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=94eGL8YcbOD74GTvLEcM6uZ9hYr75YXgDFNbaSqOkBA=;
-        b=ec73ppcAvVT4eyLBZvHdUsDT6NgAq/XdyqalKBH+gozBKv671SUpvY4meVsx85DpY2
-         NiqWFkHZUviy5+gok5tCdwS2meP70fbHtrd4O7ubaie9bWcphnohGWUN8yjUwV/qt2FT
-         Leo/dcXMqrRlUvc+2Ug9u+F3vnTv8ZJjkPV5UkzDG9UGp7o5+hmwHDQUEM8UmgT5UZer
-         XVHBO//kOM558gddfDfsTEkK2d2MkRSVAbhVwmEyAGb8vczijoC5PqEa4ovNhbAfLA9Q
-         QbmNnvvnugMQaL1wvsoCRL26Zh7WaUVu/Ebvz5RiDforNaG6KYnzoVQsNUr27i9Xl8pI
-         Aa7g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1792621424; x=1793226224;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=94eGL8YcbOD74GTvLEcM6uZ9hYr75YXgDFNbaSqOkBA=;
-        b=zPhMT+J8PHWJgraNEwNBrkopAuAm5QURqneyesKxnTbgHRlVhAI0FXnYWmsi8dYQTH
-         XoTy0q93R4Fvqo1w9NqT4jjepSm9SO4xZGvzuy6a1mskz3T7ihtQNYi8KZ3vBCw+QXS/
-         sBkTlglREmunRpVjNDemfsvCC2kfbwvJH5kWkGDjdYW3qiK/uD3iQACJm8y7O9VkmOC5
-         SGmRLaG+oD0qKgq8/7qnoxAAmik4PbMUrSSqQipAEzs/LMzYYfZwQ4vHvB9vmvQQ3SIe
-         IvT7JMs1rE7yRPFfSHqbyZccchWULD0kfnp+H3GvPHhQ9vcLGzVntiqsYDRZ/saAHkYf
-         PzUg==
-X-Gm-Message-State: AFq9FYJ2sj/cTQ6jrbaf5Crax2jCyCqjpqpcgvZwOd4ntRu8aTpj/lAH
-	1cGzPPd6L/xYKTq0Bn3lR3Er199CT+tKWxOMXRYVva6PckTK0sQZbviQu8b3y3A7RDC6xLoY6pu
-	SPUcZ
-X-Gm-Gg: AYBFou3TumYK6C6DW8STDmNtLWFYyaclIZ5RUlWddwsfQqhCp7mRkwGM3J/h9wvP7hz
-	vBUL7BYpa+KzRSLtTxCrwvo/Ax1X9KaV3bGn3+Vro2MFwlqfv4xm3brmAVmw6JK1qC32SbH92kf
-	jciNaDxtTabpJtZR8bpNhX2jsbxZLoXAnF1COJEXRINApHo30jFxf+P0PDRf8uJp2ki2Hw4hX6G
-	EM/0D+0FXMit5nHbCwMwxE2NNq3lX0KgUd4iu2vuYA2V42UfG/TNL0+BZDHlIHtPbgOuRFgEzJl
-	IINK0IQapyJ9EtWgHdHFm+aJOE8vypO/QbMhUObmu1EA9TfG1Pa5rQ6i2oxUuUxt7c6luyt6/ah
-	u+0C3tgFr/uuFB6EeAHuUOlPlL9elJO7cu7NFDyjrxveRSNnR5Fqr8tAYpzw8K0FwY9sydeHfje
-	Qpf8WxvvjzXqB8s6g5aOVw92HDpXQy8IgMAhYSCn4ckrJaPBIR+GMqXIclWIHOfvtzhhNX+PMKl
-	vpeHMZSq8bAH95RulBdKjqdITucwKdVc3Ig5+KbgnvnpRHSTzKSgFZEJtwC/PkMpCIS0VIJF9s1
-	phqaSuJ2UcsXfFbrUhQum4ph
-X-Received: by 2002:a05:6830:917:b0:81b:9d18:75a with SMTP id 46e09a7af769-84d08d01f5amr2657461a34.21.1792621423895;
-        Wed, 21 Oct 2026 15:23:43 -0700 (PDT)
-Received: from kii.uchicago.edu ([192.5.85.175])
-        by smtp.gmail.com with ESMTPSA id 46e09a7af769-84cba7d46fbsm3504882a34.3.2026.10.21.15.23.43
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 21 Oct 2026 15:23:43 -0700 (PDT)
-From: John Kiril Swenson <john@blender.org>
+	dkim=pass (4096-bit key, unprotected) header.d=jhbruhn.de header.i=@jhbruhn.de header.a=rsa-sha256 header.s=uberspace header.b=tbGgcUqY
+Received: from boethin.uberspace.de (boethin.uberspace.de [185.26.156.96])
+	by mailgate01.uberspace.is (Postfix) with ESMTPS id 40069615E3
+	for <iwd@lists.linux.dev>; Tue, 27 Oct 2026 11:27:42 +0100 (CET)
+Received: (qmail 14450 invoked by uid 990); 27 Oct 2026 10:27:42 -0000
+Authentication-Results: boethin.uberspace.de;
+	auth=pass (plain)
+Received: from unknown (HELO unknown) (::1)
+	by boethin.uberspace.de (Haraka/3.1.1) with ESMTPSA; Tue, 27 Oct 2026 11:27:41 +0100
+From: Jan-Henrik Bruhn <git@jhbruhn.de>
 To: iwd@lists.linux.dev
-Cc: John Kiril Swenson <john@blender.org>
-Subject: [PATCH] eap-peap: Fix misdetection of EAP-Extensions
-Date: Wed, 21 Oct 2026 17:22:38 -0500
-Message-ID: <20261021222238.10363-1-john@blender.org>
-X-Mailer: git-send-email 2.55.0
+Cc: Jan-Henrik Bruhn <kernel@jhbruhn.de>
+Subject: [PATCH 1/2] vendor_quirks: add PMKID mismatch quirk
+Date: Tue, 27 Oct 2026 11:27:34 +0100
+Message-ID: <20261027102735.140381-1-git@jhbruhn.de>
+X-Mailer: git-send-email 2.56.0
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Post: <mailto:iwd@lists.linux.dev>
@@ -93,57 +58,84 @@ List-Owner: <mailto:iwd+owner@lists.linux.dev>
 Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-Rspamd-Bar: /
+X-Rspamd-Report: MID_CONTAINS_FROM(1) BAYES_HAM(-1.469619) MIME_GOOD(-0.1) R_MISSING_CHARSET(0.5)
+X-Rspamd-Score: -0.069619
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+	d=jhbruhn.de; s=uberspace;
+	h=from:to:cc:subject:date;
+	bh=xKBRrCtOc/uZ7l3CaMik2q55L4bLAMJ7WnhKXDjXF3A=;
+	b=tbGgcUqYjsz4SZQRf0yqM+ad1KjqSrkxvzZDkpcKlxSGeLTbXXkGtzLcLGSYMT6i4TrqVEhHY1
+	iOHWVFwpHyDDqTSUvbIjv9pwFDZae4a+y/CnynobeNNDbIx5AdkvdwogdP7dvOIBL4eKqdugYotq
+	7GAozsCOI/5x5iGABeS6hf7Y4GijfdyA3q4qaK8UsK5zWB54FoQMwFDyD9LktycOc+DM8+DCFtww
+	ua5Omk8CH3nKZY41YzMwQUNwiyZh42CBv0VavNDoUph900vj4AzqvU+e9nayjxHZ+FEFCCqWvaQf
+	AO7l6bnagAcvwKIbWYobgMPeDWxL6gfmKkexnBJCmH0x/S0BkEn2PCjFeeBH6Ozp8GQTcJ7dUybL
+	HuQ4YeQS3mgkwizTAJwVUzM/fOgtzQufbSWbIb6OO3FZOkhDqbXGxhu6Gz9yAm+At3DCdtnKE7yx
+	2VLsnqt+IGxPdqstlwKpXjEXnFz9g2cnFFTEA3vEXogJQieyi2ehC1Yk3aTMvYyBO9Hf+DNneNUo
+	LCIPEtNWLZviJ3lcvcAcYAQJBNtcba6SpAMhUmInUU5rXHRtKQMHTPgYko3bcNHp2X9mUKlN6MXl
+	6KIoZkQYey7qz+VrOw4cmyA8hwDkF0afpFp3MlDCFE6zQGuuXbLB6ftZhdnIH2svgEYF46xKezKZ
+	0=
 
-In PEAPv0, only EAP-Extensions requests carry a full header, the rest
-are headerless. This code only detected EAP-Extensions by checking
-pkt[4] which did not consider some headerless cases.
+From: Jan-Henrik Bruhn <kernel@jhbruhn.de>
 
-For instance, a headerless MSCHAPv2 Challenge has the low byte of
-MS-Length at this byte. With a 12 character Name field MS-Length ends up
-being exactly 33 = 0x21, the same as EAP_TYPE_EXTENSIONS, so this code
-is fooled and drops the packet when it sees there is no matching
-EAP_CODE_REQUEST.
+pmkid_mismatch:
+  Extreme Networks APs running WiNG include a PMKID in message 1/4
+  of the FT-8021X 4-way handshake which does not match any PMKID IWD
+  derives, even directly after a full EAP authentication. This quirk
+  is intended to relax the PMKID check for these APs. They are
+  identified by the Zebra Technologies OUI in their vendor IE.
 
-To fix, _only_ treat the packet as EAP-Extensions if ALL code, length
-and type match. This happens to do the same thing that wpa_supplicant
-does (which works correctly).
 ---
-Ran into this connecting to eduroam at UChicago with my alma mater's
-(UMN) account where wpa_supplicant worked but iwd didn't. 
+ src/vendor_quirks.c | 9 +++++++++
+ src/vendor_quirks.h | 1 +
+ 2 files changed, 10 insertions(+)
 
- src/eap-peap.c | 19 ++++++++-----------
- 1 file changed, 8 insertions(+), 11 deletions(-)
-
-diff --git a/src/eap-peap.c b/src/eap-peap.c
-index 4559066..8d71bc1 100644
---- a/src/eap-peap.c
-+++ b/src/eap-peap.c
-@@ -507,17 +507,14 @@ static bool eap_peap_tunnel_handle_request(struct eap_state *eap,
- 	struct peap_state *peap_state;
- 	uint8_t id;
+diff --git a/src/vendor_quirks.c b/src/vendor_quirks.c
+index 4fba0c3..accd6b8 100644
+--- a/src/vendor_quirks.c
++++ b/src/vendor_quirks.c
+@@ -45,6 +45,11 @@ static const struct {
+ 		{ 0x00, 0x0b, 0x86 },
+ 		{ .replay_counter_mismatch = true },
+ 	},
++	{
++		/* Zebra Technologies, WiNG APs now owned by Extreme */
++		{ 0x00, 0xa0, 0xf8 },
++		{ .pmkid_mismatch = true },
++	},
+ };
  
--	if (len > 4 && pkt[4] == EAP_TYPE_EXTENSIONS) {
--		uint16_t pkt_len;
--		uint8_t code = pkt[0];
--
--		if (code != EAP_CODE_REQUEST)
--			return false;
--
--		pkt_len = l_get_be16(pkt + 2);
--		if (pkt_len != len)
--			return false;
--
-+	/*
-+	 * A headerless PEAPv0 packet, e.g. an MSCHAPv2 Challenge, can also
-+	 * have EAP_TYPE_EXTENSIONS at offset 4 by sheer coincidence,
-+	 * so check the whole header.
-+	 */
-+	if (len > 4 && pkt[4] == EAP_TYPE_EXTENSIONS &&
-+			pkt[0] == EAP_CODE_REQUEST &&
-+			l_get_be16(pkt + 2) == len) {
- 		id = pkt[1];
+ void vendor_quirks_append_for_oui(const uint8_t *oui,
+@@ -62,6 +67,7 @@ void vendor_quirks_append_for_oui(const uint8_t *oui,
+ 				quirk->ignore_bss_tm_candidates;
+ 		quirks->replay_counter_mismatch |=
+ 				quirk->replay_counter_mismatch;
++		quirks->pmkid_mismatch |= quirk->pmkid_mismatch;
+ 	}
+ }
  
- 		eap_extensions_handle_request(eap, id,
+@@ -77,6 +83,9 @@ const char *vendor_quirks_to_string(struct vendor_quirk quirks)
+ 	if (quirks.replay_counter_mismatch)
+ 		s += snprintf(pos, sizeof(out) - s, "ReplayCounterMismatch");
+ 
++	if (quirks.pmkid_mismatch)
++		s += snprintf(pos, sizeof(out) - s, "PmkidMismatch");
++
+ 	if (!s)
+ 		return NULL;
+ 
+diff --git a/src/vendor_quirks.h b/src/vendor_quirks.h
+index b5d726c..ab45c28 100644
+--- a/src/vendor_quirks.h
++++ b/src/vendor_quirks.h
+@@ -29,6 +29,7 @@
+ struct vendor_quirk {
+ 	bool ignore_bss_tm_candidates : 1;
+ 	bool replay_counter_mismatch : 1;
++	bool pmkid_mismatch : 1;
+ };
+ 
+ void vendor_quirks_append_for_oui(const uint8_t *oui,
 -- 
-2.55.0
+2.43.0
 
