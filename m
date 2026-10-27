@@ -1,56 +1,56 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=95.143.172.20
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=79.135.106.116
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793096873;
-	b=iUp1v8rq+MTGtyS5rgyiEZSPk/4yCgU1DcaIvyUwRFzI5L7MQ3cPZpg74g+69I5ZBgMD
-	 +RRPic6YeZxu5snMr1glwUN8D1TQOicwrpoZAZReWoC/ik+5pwJZaY121qLAjkZ3fuYM4
-	 ndd+ZZyy0/uXgC45Yl33gHZMy4J6w34dirEAUpDLZZ+0T4vy4p24IWsUHS0fjthtwNcQX
-	 jT1FqZ5vcoKBOKgunHyxOGlACaA9qYAL/7w/L7gt6qiUWSRc0Qe3L2E20X/pAKQwfcN6a
-	 LlIK19NB/mtGtcCBqEfHJZvyt1deKVClXtTH2MUaeNCKprkRw37OHuyf2b69S5lcnAw==
+	t=1793112428;
+	b=L9BzGFsp4/h1cRNmS2xZOSKOpfRDWS735THlmXkwHLyyArWv+7G4O6rOP22p4mavb0ak
+	 BdajfjnhFV1Xb6VmAQzhCfiFJ5qvLgctG5Ts0Etva4klzmFH0JlLRGSJe+PKCl2bjy2zZ
+	 Y0SrgK8HW9mc/bkkBOFhbi5ofLLyB8zE1HDj6kVaj65R1IT9QMeyoHt5jjeYb1V76l+VA
+	 jQjur/ThpQoVzWdpQ6O0/aEqK5JBQhSCgsFxohFgvTsGcTBxvjo7OMoV/XDoUXneFVVKL
+	 OK9jz7p3iYiC4c5/y4HbRn3NzEBl5waf4F0h/U1w0u1l4A1M9QXGb78kA2WrdqPqsFg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793096873;
-	h=DMARC-Filter:Received:Received:Received:From:To:Cc:Subject:Date:
-	 Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
-	 Content-Transfer-Encoding:X-Rspamd-Bar:X-Rspamd-Report:X-Rspamd-Score:
-	 DKIM-Signature;
-	bh=sWhDcMhHaMg66KUR+NsXWPZjnzGmZxWSIi3kBql4ZEA=;
-	b=d721Ako1QNStH7W1KPWOF2FRhvPj1haNk9kfFmnDwPPU1WH57BKCMdZmPBIvdCgqyxZy
-	 98hnOhWxqOIBbGt3R6Qs8y3gRv1XeyO0DSHAIFZw5NNPy++d9pHw+ZDkJ0uPFthostVE4
-	 8pm8rwSd89whMmfvEZsdcAwv+at4EfovJZSr+cO+l0N34TZfcnAP5od8P3Czur+0ppSDh
-	 uTPGrmvTjrN8P8YBM2lFiQitmIZr5U0iPz+ftPiv4FLSx0lvWKeWWlNmxb0KyHB3G1Uqz
-	 y8YMcBcjF9uA5QmqvwRVnsnL6MiOSabcHF9a+hQJLBVX547DcN+NrKmW8F9k4ab7V6Q==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793112428;
+	h=DMARC-Filter:DKIM-Signature:Date:To:From:Subject:Message-ID:
+	 Feedback-ID:X-Pm-Message-ID:MIME-Version:Content-Type:
+	 Content-Transfer-Encoding;
+	bh=MR/cWII7SUw+GDeHhO6xiKH3Z8/h1PceUbVKc5VKRy8=;
+	b=pBAa8DuGtf9Wo+f0LKn574ZtWdFc7E6dyWUZqwCe8jmnG9c2hZGSJrJ0THM4htgFNLwA
+	 1Lo6Y1Nv151D45ssXEYjoPe+petW4WUU5iQUWa4c+Pq7zXA7dhdVA3uqSvNJLdIeNKzEk
+	 n/uzNohVHw76J/v8k9qLbwEouAj75kXVOosT/5WomLC/tkycO1cxiZJRJ9ix05KA0Y9h4
+	 Vq2I3Ta0hvdY7AYGDiCpFbfzewUJsmE05uBSFFlCuTIe9qLQW4g6NNLYvmo+pmH+sGBtP
+	 0iLDYQQmsT7+8o4mch3T8i0ehlvD6G3CYVVLWhcQJ7obxhX9kV1Qk3/6W1MYfgtMCHw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=none header.from=jhbruhn.de;
-	spf=pass smtp.mailfrom=jhbruhn.de;
-	dkim=pass header.d=jhbruhn.de header.i=@jhbruhn.de header.a=rsa-sha256 header.s=uberspace header.b=CzNr4tLa;
-	arc=none smtp.remote-ip=95.143.172.20
-Received: from mailgate01.uberspace.is (mailgate01.uberspace.is [95.143.172.20])
+	dmarc=pass header.from=wiesner.com.br;
+	spf=fail smtp.mailfrom=wiesner.com.br;
+	dkim=pass header.d=wiesner.com.br header.i=@wiesner.com.br header.a=rsa-sha256 header.s=protonmail3 header.b=bWM+gQ2W;
+	arc=none smtp.remote-ip=79.135.106.116
+Received: from mail-106116.protonmail.ch (mail-106116.protonmail.ch [79.135.106.116])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32FF9606A31A
-	for <iwd@lists.linux.dev>; Tue, 27 Oct 2026 10:27:52 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 32FF9606A31A
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jhbruhn.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=jhbruhn.de
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A301C606A31A
+	for <iwd@lists.linux.dev>; Tue, 27 Oct 2026 14:47:07 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org A301C606A31A
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wiesner.com.br
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=wiesner.com.br
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key, unprotected) header.d=jhbruhn.de header.i=@jhbruhn.de header.a=rsa-sha256 header.s=uberspace header.b=CzNr4tLa
-Received: from boethin.uberspace.de (boethin.uberspace.de [185.26.156.96])
-	by mailgate01.uberspace.is (Postfix) with ESMTPS id ECEBE615BE
-	for <iwd@lists.linux.dev>; Tue, 27 Oct 2026 11:27:44 +0100 (CET)
-Received: (qmail 14578 invoked by uid 990); 27 Oct 2026 10:27:44 -0000
-Authentication-Results: boethin.uberspace.de;
-	auth=pass (plain)
-Received: from unknown (HELO unknown) (::1)
-	by boethin.uberspace.de (Haraka/3.1.1) with ESMTPSA; Tue, 27 Oct 2026 11:27:44 +0100
-From: Jan-Henrik Bruhn <git@jhbruhn.de>
-To: iwd@lists.linux.dev
-Cc: Jan-Henrik Bruhn <kernel@jhbruhn.de>
-Subject: [PATCH 2/2] eapol: use vendor quirk to relax PMKID check
-Date: Tue, 27 Oct 2026 11:27:35 +0100
-Message-ID: <20261027102735.140381-2-git@jhbruhn.de>
-X-Mailer: git-send-email 2.56.0
-In-Reply-To: <20261027102735.140381-1-git@jhbruhn.de>
-References: <20261027102735.140381-1-git@jhbruhn.de>
+	dkim=pass (2048-bit key, unprotected) header.d=wiesner.com.br header.i=@wiesner.com.br header.a=rsa-sha256 header.s=protonmail3 header.b=bWM+gQ2W
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wiesner.com.br;
+	s=protonmail3; t=1793112424; x=1793371624;
+	bh=MR/cWII7SUw+GDeHhO6xiKH3Z8/h1PceUbVKc5VKRy8=;
+	h=Date:To:From:Subject:Message-ID:Feedback-ID:From:To:Cc:Date:
+	 Subject:Reply-To:Feedback-ID:Message-ID:BIMI-Selector;
+	b=bWM+gQ2WnqzoGsCVbi8YK4fzjQ/FFoy8V8EEbayUqRpHm8I3q9K/V+hIONp56UVE9
+	 cmtXC+L9f2rhIHKPnE6RzTw8tpw0Yx/igPpEFjvtvq1LgFtrP+yC8sStScbJUH356t
+	 Jfpv52IZe6AoZMPc9iUS39GPf3BAY9ugnxJdwNDg6uJQHRw8wbgdE9gz59LLTEL/rS
+	 biJ9/ZvdrMzkz7GbRxxu6mph+ttyCJIZDwp/jt2rNM+SyOE9Dc7lVHxFSg/lr5IQZk
+	 1eO5bsYtF3B65fEKho1PAo4f5Z3v9f1mfA+r4ulTOtWfPrQzMH6Lx1JITLf28gi9x8
+	 oxWIDU/YaqG7Q==
+Date: Tue, 27 Oct 2026 14:47:01 +0000
+To: "iwd@lists.linux.dev" <iwd@lists.linux.dev>
+From: Misc <misc@wiesner.com.br>
+Subject: eap-peap: fix phase 2 abort on MSCHAPv2 challenge
+Message-ID: <HsrMm4wWopIj8Xhva2FSiGWA-ZSErQQeeagi9cx-ZOeP_Qh7q5WQlbXNMHD4i2asnWbEeBiqqWWIApGBTh8MNX5MaNmqqI3Sk71oDYBk09E=@wiesner.com.br>
+Feedback-ID: 148803267:user:proton
+X-Pm-Message-ID: cd1b2e4cc2b6392aced2168e1a9a7668403795f4
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
 List-Post: <mailto:iwd@lists.linux.dev>
@@ -60,93 +60,154 @@ List-Unsubscribe: <mailto:iwd+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:iwd+owner@lists.linux.dev>
 Precedence: list
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Bar: /
-X-Rspamd-Report: MID_CONTAINS_FROM(1) BAYES_HAM(-2.087496) MIME_GOOD(-0.1) R_MISSING_CHARSET(0.5)
-X-Rspamd-Score: -0.687496
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-	d=jhbruhn.de; s=uberspace;
-	h=from:to:cc:subject:date;
-	bh=7y/p3/JqfmBQxWmfPuQu84CNOjPyFKXcb0sUZj9ROQ8=;
-	b=CzNr4tLauIcYm415AjzN0FrYpsXfePtYpcI8WcgBOuwq+Ht7uBiZWFisahgdbH7csocEdnOBF3
-	HIHuIfjUO7QIzd+wMlwjmZmVmQtqN5Y8L5Ow5AmBzJmI/B0OD3HjlyrgKQJWBddzV18pbUl4fPRQ
-	8s0SEgmMfHujXn7eSpOBl59iWJQkESsQutV+Hn6OgB07KsKHnjq9XSdYqmevuop5jk3WsevIJP6/
-	IOXxtttj8GVv7xl9SFeRsbATXVoCChd2j9UUcipIoQsowpS5ndqpAsHds44XotArZUxWplwyHcd3
-	89nHqqjy7gtYjdypCjCDpk1F5D37ezIIydDqDJCV9KDAQxwVBUjBcfB45kHOBQmNS66tp3RwrWsD
-	IH7CVMClDSlfL9ELFtQYtAfOSmbgaa7/ml9oYaYq+HFlh032b3Vb1qvH/SrCNU5H//xo077cEyCX
-	CfU0NWqvI0y/QoO0CkFFZk/u5QZQr+JbUfRsqC3p2lTUznlI8G8cTYsRmhlTaoVaAcw+spd86CFV
-	H5jJgXoHrwQmNpuA87W4rrcl0lfG8fqUav3EVjn+DTbS295o/ZYpjEogg3zfKOkdkQ4fr4rM75cj
-	/FsZK7BlVR3SxtXTHMQmZgz+dqK/pixUE9ZxxTP5XEOatqd87lV0aXcI6h8sAcTQH5Na0qhz80E5
-	s=
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-From: Jan-Henrik Bruhn <kernel@jhbruhn.de>
+Hi,
+I'd like to report a bug in EAP-PEAP that makes iwd unable to=C2=A0authenti=
+cate on my university's eduroam network. First, a note on=C2=A0provenance: =
+the debugging, root-cause analysis and the proposed patch=C2=A0below were p=
+roduced with the help of an AI coding assistant working on=C2=A0my behalf. =
+I directed the investigation and can attest that the=C2=A0evidence quoted b=
+elow is genuine and that the fix works on the real=C2=A0network as describe=
+d, but I don't have the C/wireless expertise to=C2=A0independently review t=
+he code change, so I'm submitting this as a bug=C2=A0report with a proposed=
+ patch rather than a formal contribution. I'm happy to run=C2=A0further tes=
+ts or collect additional traces on this network if useful.
 
-Extreme Networks APs running WiNG include a PMKID in message 1/4 of
-the FT-8021X handshake which IWD cannot validate. It does not match
-the PMKID derived from either half of the MSK (SHA1 or SHA256), nor
-PMKR0Name/PMKR1Name, and changes on every attempt. IWD treats this
-as a PMKSA mismatch and restarts EAP, which only results in another
-mismatch until the AP deauthenticates the station.
+-- The bug --
 
-If EAP was just completed the PMK is fresh, so restarting EAP cannot
-help. The PMKID in 1/4 is also not covered by a MIC, whereas the
-PMKR1Name in 3/4 is, and is already validated. For APs with the
-pmkid_mismatch quirk, continue the handshake in this case.
+On eduroam networks whose RADIUS server negotiates PEAP version 0 with EAP-=
+MSCHAPv2 as the phase 2 method (observed with Cisco ISE at the University o=
+f Warwick), iwd never completes authentication: the TLS tunnel is closed wi=
+th a close_notify alert right after the tunneled identity exchange, the AP =
+deauths with reason 23 (802.1X authentication failed) and the log prints th=
+e (misleading) diagnostic:
 
----
-Notes:
+=C2=A0 =C2=A0 PEAP: Tunnel has disconnected with alert: close_notify
+=C2=A0 =C2=A0 Received Deauthentication event, reason: 23, from_ap: true
+=C2=A0 =C2=A0 EAP negotiation stopped after the Identity exchange, this can
+=C2=A0 =C2=A0 happen when the EAP-PEAP-Phase2-Identity value is not what th=
+e
+=C2=A0 =C2=A0 authenticator expects
 
-Seen with Extreme Networks APs (BSSID OUI 00:dc:b2, vendor IE OUI
-00:a0:f8 type 5), FT-8021X and PEAPv0/MSCHAPv2 with Crypto-Binding.
-wpa_supplicant connects fine.
+The same network and credentials authenticate fine with wpa_supplicant 2.12=
+, which is what makes this look like a credentials/identity problem and, I =
+suspect, why it is easy to misdiagnose.
 
-Without this patch (iwd 3.12), every attempt looks like this:
+-- Root cause --
 
-  EAP completed with eapSuccess
-  eapol_handle_ptk_1_of_4() ifindex=9
-  handshake_state_pmkid_matches() PMKID did not match, trying SHA1 derivation
-  eapol_handle_ptk_1_of_4() Authenticator sent a PMKID that didn't match
-  PEAP: tls_tx_handshake:1244 Sending a TLS_CLIENT_HELLO of 172 bytes
-  ...
-  Received Deauthentication event, reason: 32770, from_ap: true
+eap_peap_tunnel_handle_request() detects the EAP-Extensions (result TLV) pa=
+ckets - which arrive with a full EAP header even in PEAPv0 mode - by checki=
+ng only pkt[4] =3D=3D EAP_TYPE_EXTENSIONS before the version dispatch:
 
-A debug build logged the received PMKIDs (fe890a12..., b7936fa1...,
-d3531a44...). With this patch 3/4 is accepted and the connection
-completes.
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 if (len > 4 && pkt[4] =3D=3D EAP_TYPE_EXTENSION=
+S) {
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 uint8_t code =3D pk=
+t[0];
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 if (code !=3D EAP_C=
+ODE_REQUEST)
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 return false;
 
-With FT-8021X removed from AKM selection (same APs, no patch) there
-is no PMKID mismatch and 802.1X connects fine, so this is specific to
-the FT-8021X implementation on these APs.
+In PEAPv0 the tunneled phase 2 data is headerless, so byte 4 belongs to the=
+ inner method's data, not to an EAP header. =C2=A0An EAP-MSCHAPv2 challenge=
+ carries MSCHAPOpCode 0x0021 (Challenge), placing 0x21 - which equals EAP_T=
+YPE_EXTENSIONS (33) - at byte 4. =C2=A0Every tunneled MSCHAPv2 challenge is=
+ therefore misclassified as an Extensions packet; the code check then fails=
+ (0x1a is the EAP-MSCHAPv2 type, not EAP_CODE_REQUEST) and the function ret=
+urns false, which makes eap-tls-common close the tunnel. =C2=A0The challeng=
+e never reaches the phase 2 state machine, which is why the log blames the =
+identity exchange.
 
- src/eapol.c | 9 +++++++--
- 1 file changed, 7 insertions(+), 2 deletions(-)
+An iwmon capture of the failing exchange (iwd 3.12) and a wpa_supplicant -d=
+d reference trace of a successful one show the exact same server behaviour =
+up to the point of the failure:
 
-diff --git a/src/eapol.c b/src/eapol.c
-index 372549c..d802adc 100644
---- a/src/eapol.c
-+++ b/src/eapol.c
-@@ -1256,14 +1256,19 @@ static void eapol_handle_ptk_1_of_4(struct eapol_sm *sm,
- 			goto error_unspecified;
- 	} else if (pmkid) {
- 		if (!handshake_state_pmkid_matches(sm->handshake, pmkid)) {
-+			bool ignore = sm->eap_exchanged &&
-+				sm->handshake->vendor_quirks.pmkid_mismatch;
-+
- 			l_debug("Authenticator sent a PMKID that didn't match");
- 
- 			/*
- 			 * If the AP has a different PMKSA from ours and we
- 			 * have means to create a new PMKSA through EAP then
--			 * try that, otherwise give up.
-+			 * try that, otherwise give up.  Some APs send a PMKID
-+			 * we can't derive even after a fresh EAP exchange, in
-+			 * which case restarting EAP won't help.
- 			 */
--			if (sm->eap) {
-+			if (sm->eap && !ignore) {
- 				__send_eapol_start(sm, unencrypted);
- 				return;
- 			}
--- 
-2.43.0
+=C2=A0 - tunneled EAP-Request/Identity, 1 byte of headerless data (0x01)
+=C2=A0 - client responds, 23 bytes of headerless data (0x01 || identity)
+=C2=A0 - server sends the MSCHAPv2 challenge, 34 bytes of headerless data
+=C2=A0 =C2=A0 (1a 01 5b 00 21 ...)
 
+after which wpa_supplicant replies with an MSCHAPv2 response while iwd send=
+s a TLS close_notify alert instead.
+
+wpa_supplicant never aborts on such data because its skip_change logic in e=
+ap_peap_decrypt() requires hdr->code =3D=3D EAP_CODE_REQUEST together with =
+the type check before treating tunneled data as a full EAP packet, and fall=
+s through otherwise.
+
+-- Proposed fix --
+
+Only take the EAP-Extensions path when all header fields match (code, lengt=
+h consistency); otherwise fall through to the normal version dispatch so he=
+aderless phase 2 method data is processed normally.
+
+Verified against the same network: iwd 3.12 with this patch applied authent=
+icates immediately and gets an IP, where stock 3.12 fails with reason 23 as=
+ described above. =C2=A0(My locally built test binary carries this patch; t=
+he iwmon/wpa_supplicant traces are from the same machine, same credentials,=
+ same AP.)
+
+=C2=A0src/eap-peap.c | 15 ++++++++-------
+=C2=A01 file changed, 8 insertions(+), 7 deletions(-)
+
+diff --git a/src/eap-peap.c b/src/eap-peap.c
+--- a/src/eap-peap.c
++++ b/src/eap-peap.c
+@@ -507,17 +507,18 @@ static bool eap_peap_tunnel_handle_request(struct eap=
+_state *eap,
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 struct peap_state *peap_state;
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 uint8_t id;
+
+- =C2=A0 =C2=A0 =C2=A0 if (len > 4 && pkt[4] =3D=3D EAP_TYPE_EXTENSIONS) {
+- =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 uint16_t pkt_len;
+- =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 uint8_t code =3D pkt[0];
+-
+- =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 if (code !=3D EAP_CODE_R=
+EQUEST)
+- =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 return false;
+-
+- =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 pkt_len =3D l_get_be16(p=
+kt + 2);
+- =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 if (pkt_len !=3D len)
+- =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 return false;
+-
++ =C2=A0 =C2=A0 =C2=A0 /*
++ =C2=A0 =C2=A0 =C2=A0 =C2=A0* EAP-Extensions (result TLV) packets arrive w=
+ith a full EAP
++ =C2=A0 =C2=A0 =C2=A0 =C2=A0* header even in PEAPv0 mode. =C2=A0Match all =
+header fields before
++ =C2=A0 =C2=A0 =C2=A0 =C2=A0* treating tunneled data as Extensions: in PEA=
+Pv0 headerless
++ =C2=A0 =C2=A0 =C2=A0 =C2=A0* mode byte 4 is part of the inner method data=
+, and an
++ =C2=A0 =C2=A0 =C2=A0 =C2=A0* EAP-MSCHAPv2 challenge (opcode 0x0021) would=
+ otherwise be
++ =C2=A0 =C2=A0 =C2=A0 =C2=A0* mistaken for an Extensions packet (type 33 =
+=3D=3D 0x21), fail
++ =C2=A0 =C2=A0 =C2=A0 =C2=A0* the code check and needlessly close the tunn=
+el.
++ =C2=A0 =C2=A0 =C2=A0 =C2=A0*/
++ =C2=A0 =C2=A0 =C2=A0 if (len > 4 && pkt[4] =3D=3D EAP_TYPE_EXTENSIONS &&
++ =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 pkt[0] =3D=3D EAP_CODE_REQUEST &&
++ =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 l_get_be16(pkt + 2) =3D=3D len) {
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 id =3D pkt[1];
+
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 eap_extensions_hand=
+le_request(eap, id,
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 pkt +=
+ EAP_EXTENSIONS_HEADER_LEN,
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 len -=
+ EAP_EXTENSIONS_HEADER_LEN);
+
+Thanks for maintaining iwd, and please let me know if any additional traces=
+ or tests would help.
+
+Alexander Wiesner
