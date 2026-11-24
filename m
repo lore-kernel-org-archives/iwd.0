@@ -1,11 +1,11 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=52.101.65.88
+Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=40.107.130.82
 ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
 	t=1795521123;
-	b=DBcFL7Zk7TT5YcQ07WQgRijosUtiq7Tuy21MOZAj5FR2OsMnQVQEjqAl9m3wDZmStgJ+
-	 nSotpod6gU2vjC1lI4G/qivXEFxjpkfwUAw9xyFWoE/I525KnDhYodNnLtKMyilDLJrY9
-	 Wrzgoz3Tov4G4P3Ihl9Vu6V7yj8ffzLgeqVgOxRzsa6yGNDG/T7AVddx0uZXNSnwGBRmU
-	 6JxGj9PMqMfl2tdexR7gcwg4e65GH2hnEEX1do8u/KmNsBV74Wbil3W/D1oglUqOW4LKp
-	 jC9qoCAEWoV0ivjpQ1N2iODnBb+B7zh23tHvZCqhnwD1rk5Lx6Gn2q86kg2jlAFqKGw==
+	b=KLweocCi/LJf0Ns78NvVdpNyoJFasjUeHfv5MTCORQRspJUNR+CY+/jTwNbDvfgFlfgM
+	 GaezA15h2hIylWhhN9h8MuFbp416qL0haS6K7JqURE3HQRAH6fyEOacCKHnWhna0E2VMB
+	 CVKASei79hbnLyR/OSl0bVSJxRcMdRe5HppetmdFeDNb+4hwKqfn6PE1mMoh8fjhRG+0r
+	 JZetkghdLWPfU+TNToDmaOanMQCuvqraIHbL4W/ln35y1fMf/1FVHF5wr32LlZNj2A4zj
+	 SPDsbGTIuFCdqcYd3OvubGKw6l/AD9mejtMaGLXwYMlRibPJGSwnHhYU8r2TxIq5jgQ==
 ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
 	a=rsa-sha256; c=relaxed/relaxed; t=1795521123;
 	h=DMARC-Filter:DKIM-Signature:Received:Received:From:To:Cc:Subject:
@@ -24,70 +24,70 @@ ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
 	 X-MS-Exchange-CrossTenant-Id:X-MS-Exchange-CrossTenant-MailboxType:
 	 X-MS-Exchange-CrossTenant-UserPrincipalName:
 	 X-MS-Exchange-Transport-CrossTenantHeadersStamped;
-	bh=/LCr5LBZtYEFL5/7CzGy3AExVDvLsuTojMolkKpW/p4=;
-	b=WtAUbU6XGSuf/HTtikn6B1p/P2cXYDVgWvViICPjiib60RprJjZ5d3dGE4ltYq2XRMYP
-	 nG+l5iE4msZBq2TUJMrFRE+bClXMZVocsqcfbqU/Gwrs1Ta8Kh7JtlmzIcD/k2vr1mRYv
-	 0juNEj30/3C0N/LCKioc+F9ckNtd1XsdZ5PvpNygWiZAWOxm1KpAR8BHha9P6c4bP1YAB
-	 J8fTwuhRdXT93ynEb7aWMGhQF5kYIesfbyY5HXphJL6E48AINq4LJyIuBxS3gTMC5wDI5
-	 IYwQyGdSWpFYvF/qM9mHOnVwE9Qd1lCOxoVN1HbGWHxE23X2pj0XS/T2Zg3wQtEya/g==
+	bh=c2wn4tFGkr0873wLbiHmDxcLhI5Zm7QUj1dpUrgdeEc=;
+	b=z+VFMZsMBna9WFQCU8KFiDfJhM1o22DZOHIdqGNthR2E0t4picEvgi41rKxMg13QbPoY
+	 eUGQjurAiEvoo4elRCrXYfvF7DVZpvJ2z+VuEBKJ1O4I/7pj3L/Ay+mhuglDByEgTcgTu
+	 8ExQCKR2wDNbmogzz1wppfV+gZKa56BoN6qGQZfYpDHFVQ0jND6UwgWXMiYc5LUy9yqdu
+	 qpX7gKuHCavF7fxawiS/mvfWxHEziQ0GmWZlJhjEHhOs6ZqYs9ORx2ekg9qWqbfdRV9Yq
+	 CsW4d/QrO4oL/CdZBd4dNh5BXxflMvK7D0w559JKDQuKsT2MGV+9npR0IverXu6gGFw==
 ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=kuleuven.be;
 	spf=pass smtp.mailfrom=kuleuven.be;
-	dkim=pass header.d=kuleuven.be header.i=@kuleuven.be header.a=rsa-sha256 header.s=selector1 header.b=sfis1IJA;
-	arc=pass header.oldest-pass=0 smtp.remote-ip=52.101.65.88
-Received: from DU2PR03CU002.outbound.protection.outlook.com (mail-northeuropeazon11021088.outbound.protection.outlook.com [52.101.65.88])
+	dkim=pass header.d=kuleuven.be header.i=@kuleuven.be header.a=rsa-sha256 header.s=selector1 header.b=JSjGik82;
+	arc=pass header.oldest-pass=0 smtp.remote-ip=40.107.130.82
+Received: from MRWPR03CU001.outbound.protection.outlook.com (mail-francesouthazon11021082.outbound.protection.outlook.com [40.107.130.82])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange ECDHE (secp384r1) server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E96A606A327
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D258606A32C
 	for <iwd@lists.linux.dev>; Tue, 24 Nov 2026 11:52:02 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 7E96A606A327
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 8D258606A32C
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=kuleuven.be
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kuleuven.be
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=kuleuven.be header.i=@kuleuven.be header.a=rsa-sha256 header.s=selector1 header.b=sfis1IJA
+	dkim=pass (1024-bit key, unprotected) header.d=kuleuven.be header.i=@kuleuven.be header.a=rsa-sha256 header.s=selector1 header.b=JSjGik82
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=RRr4ml6RsJbmMzcD4t5y/ayMr3jWd79BTQpJNWpUD5sYP6aYram5lcy/e17DDjBAPAJsoNrN2R+2mercusi12+AMbBbEKj4a3lnD7jXYPRKNvK4MoLTYPh0byJBWLy045s0N7e2ARIvjPW5Ixaix3vAqtMf82TfpXmInXNL0i7CRLjVShHlPYdYm/orXx8oJKEqvHCD3OfhHfW5zsl3eS62H+Y2lboFUiLvMt7bD8uj+zLs3rNvicp1mHxS21ZfiididQPDLWc/1t/z5ZZrmc3lxJB4ej6ZCc+zFG3xnLaSavNmQ7grN6N902/4pMMmg93S8EbT4A+chL5tRU1HYfw==
+ b=QSy9hlYOloQAItBV01FCAL/aQM2TX1wCUT/4011dIsgKwIGHBF9bLE0O/4vUm++otwSlXJ6wsMqiPwKi/IBSTfuGR+Ixwc2Lq195NjID4DOiSIRURarhetFp51koHHQqQXd3dIpBnQo1I1vyHGZ48V7RuY6NSj709v3uRexKuU4DJV6j/lbWOe/8HKuV/qh2nb/uw0fy8mHSfD23mlYaf26WJpkasNtLUDlICBzdcDJ3cPDcYdcM40W72WW6R0E38h/92IgyhgtfvB/vueVUKZ6GDFvYAZD6F5elN+DZw6rCkD3nJtXRro/whrqDUHcQIqq0QSsk4W2BOIU4eSfrNA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=/LCr5LBZtYEFL5/7CzGy3AExVDvLsuTojMolkKpW/p4=;
- b=bgyB79URBM0/qZU6J45FjbMBwQE9NT5ic1fRynlwnN6P1cz20Uh2YMXCryrH4OIkjnRTFbKyFFRDYwhXMZESgVV9M7rHHOmR/KQ3eKenu86kf5WY5Cc/a6zyHT0X1LVGBDXGKwICZZRP1PV4/EX8jFV/EMgnqnvkwPw8yukB1OyYYEDkJHAytdHs5qjAWUi+qtVMKk1cuaHyUdBVCPjBJUdU/rIm0hHH/njogu/HyeH4/vp7B1G8xMctLfl8gvYEwd51lLJyeFeYlW+Fln19454K+C3zGsQZnFuk8RrHRFJU6D6CEheAqZVrDwd4DP0W7+B8AJlAisW/p9BHMfqkRg==
+ bh=c2wn4tFGkr0873wLbiHmDxcLhI5Zm7QUj1dpUrgdeEc=;
+ b=hrnss6erkBV0DfhKFbZV1ieyCoajBLaOMQryVD2Ec0f7Ei5UY9l/WsqeIHlJ96TAVfCG80Voodww/o7CevrHkILkbo+mBHwimC6WLXFloie5Rj87ZJiJ7teuBt2zKmJh0ErMWVNsJeOBBQhF9uog//iWnR7qw0YiIPsyGyOf+aus5EXkekiuUOTSFQ1MEGMRu7wKPPbRmeceK1P7tjia6+p7V6yJcQKrZUU52mW95/guwfZ8bgqZ7pNA9f2GEIt7Bn4kgydxwUPeZDEG9LsD38EHhiaDUPx9nadjYvKIgSbo5EkSTyAY0q6SdwrGSqcTerUSH1WaFfVk6rGVW/MumA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=kuleuven.be; dmarc=pass action=none header.from=kuleuven.be;
  dkim=pass header.d=kuleuven.be; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kuleuven.be;
  s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=/LCr5LBZtYEFL5/7CzGy3AExVDvLsuTojMolkKpW/p4=;
- b=sfis1IJABzxVz+E9FuU6ltB9Q2tFrCIB0vYyuEFg7S1fFWR8wga842ZsUMWwBuUDVnFYk4Lawmj9sW+uzh7XzP2y8MoHsk59oNQM1PR4X5egbq3J+C9j0TMNGhiS3zpR3ldcNeH1w9xhIExoJJ43hCDexqDSVQSEvak7pT6sjGk=
+ bh=c2wn4tFGkr0873wLbiHmDxcLhI5Zm7QUj1dpUrgdeEc=;
+ b=JSjGik82kvKsxyEiynPTDCTqebH0K4KoS/S5R9G3HFdObXjfSTaIhjjMEUpg2Jc2qtXvAoXIIhFmR+N/Zvh69QHLhM1mC6411I/36C+WvFkejkUMQU1vgosKPNCj3hpxRSXeB7XvB82Yil/9JWXdvNXIj0VyNQ+JdhFDuVzKKgU=
 Authentication-Results: mx.microsoft.com 1; dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=kuleuven.be;
 Received: from MI9PR08MB763857.eurprd08.prod.outlook.com
- (2603:10a6:290:c0::16) by AS8PR08MB6616.eurprd08.prod.outlook.com
- (2603:10a6:20b:319::20) with Microsoft SMTP Server (version=TLS1_2,
+ (2603:10a6:290:c0::16) by VI0PR08MB10711.eurprd08.prod.outlook.com
+ (2603:10a6:800:20c::18) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.639.14; Tue, 24 Nov
- 2026 11:51:59 +0000
+ 2026 11:51:58 +0000
 Received: from MI9PR08MB763857.eurprd08.prod.outlook.com
  ([fe80::4f1d:a35e:c1b6:8b48]) by MI9PR08MB763857.eurprd08.prod.outlook.com
  ([fe80::4f1d:a35e:c1b6:8b48%7]) with mapi id 15.21.0639.012; Tue, 24 Nov 2026
- 11:51:59 +0000
+ 11:51:58 +0000
 From: Mathy Vanhoef <Mathy.Vanhoef@kuleuven.be>
 To: iwd@lists.linux.dev
 Cc: denkenz@gmail.com,
 	marcel@holtmann.org,
 	prestwoj@gmail.com,
 	Mathy Vanhoef <Mathy.Vanhoef@kuleuven.be>
-Subject: [PATCH 7/7] unit: check EAP-TLS server certificate events
-Date: Tue, 24 Nov 2026 12:51:46 +0100
-Message-ID: <20261124115146.1281715-8-Mathy.Vanhoef@kuleuven.be>
+Subject: [PATCH 5/7] station: add Certification signal
+Date: Tue, 24 Nov 2026 12:51:44 +0100
+Message-ID: <20261124115146.1281715-6-Mathy.Vanhoef@kuleuven.be>
 X-Mailer: git-send-email 2.56.1
 In-Reply-To: <20261124115146.1281715-1-Mathy.Vanhoef@kuleuven.be>
 References: <20261124115146.1281715-1-Mathy.Vanhoef@kuleuven.be>
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: AM9P250CA0014.EURP250.PROD.OUTLOOK.COM
- (2603:10a6:20b:21c::19) To MI9PR08MB763857.eurprd08.prod.outlook.com
+X-ClientProxiedBy: AM8P189CA0006.EURP189.PROD.OUTLOOK.COM
+ (2603:10a6:20b:218::11) To MI9PR08MB763857.eurprd08.prod.outlook.com
  (2603:10a6:290:c0::16)
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
@@ -99,147 +99,206 @@ List-Owner: <mailto:iwd+owner@lists.linux.dev>
 Precedence: list
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MI9PR08MB763857:EE_|AS8PR08MB6616:EE_
-X-MS-Office365-Filtering-Correlation-Id: 750e56d9-fd60-4456-49b2-08df4a2158ce
+X-MS-TrafficTypeDiagnostic: MI9PR08MB763857:EE_|VI0PR08MB10711:EE_
+X-MS-Office365-Filtering-Correlation-Id: 7b57dd27-2529-437f-de50-08df4a215762
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|786006|10070799003|376014|366016|23010399003|1800799024|10067099003|11063799006|261102123227099003|56012099006|261022105027099003|261026121527099003|261021121427099003|261009223027099003|261028144727099003|261026140227099003|22082099003|18002099003;
+	BCL:0;ARA:13230040|10070799003|23010399003|1800799024|786006|376014|366016|261026140227099003|261028144727099003|261021121427099003|261021123027099003|261022105027099003|261022075727099003|261102123227099003|11063799006|56012099006|10067099003|261009223027099003|22082099003|6133799003|18002099003;
 X-Microsoft-Antispam-Message-Info:
-	qcTeJghjHyGi9V+V05W/atviRlIX2j/8ARFhDQwsRD2vgfKBU+yESaNb97VKfdvBXjFBPdB3oeITAZZjG7X5t1O7BWRs0tJKLAqEXlYrzLMFv40yDDrM0eQ9yHeozklp+QUqdBYooeBUONg4GB6dz8F/lMgorHAGNE0mONiehrtTHKLBK7QVzNM09fU1cupAkArdiiLfKGuvEauzDFMW12m/8ILvK+q4MdgS+X1+CGkWUyHFR/3wPZmqW+wTdXMZ6MoIM43zqLOMmoN/l2RY9f0IpKjb+KOn6qkMEwbwfbFuK22IJXHk7In6hHzJGzm8TVs5X3jLBrmKjQEIaIKrdfKa9ReCkmQaMY0+5VF49fGf/uj5LVhQQiShD1+VZ3D9RPMHKEfkdbKT9az3Gs8WAIJfu4OvHd+1i3ipRs+ggYej0QNgf2Ds/1tTl6FszRm6sgylglRe8IZYKI4DzDEwTgamTBC4lvBOURHXzRt65fj7hDXbzhk+yy9BK/Plo/gG0y1W1tv/vVonhS7+ZWybIUNV0NZIOHHqJvvuRs4UwCyFg7buRCRWgA12GBr9SEjCjPV1K16F1QxWQ36nYUxMASlOuicvQkDfXGPUpJngUM1HzUDJmDORoGLBWqMKlAcbYdRvUf9nYRsZ1bggaXUjYqNNTh7dI9EXmSswqRSIXEE=
+	rlfX/edpyhR23zpfY2s68G/ITzTPoah0sTeYAXW3ObwapvCaIbZuOPOAyxIqXi51dXDddXeURp3h6FX95Ez3R3Jgo2ibkIpJyhTs9II657CC6Nf9GoJManhlZiiSYHTDpXDjnevbllpPkVFbFS6OHy4CWtIKMxM07RcjqUJ7Rm8A92AgbOSl0FIdzolRXHShCAxH/6GNLRVox+N+VV/HNWsc1UiaXrH7Mb8SbyiBs60v3tsenKXsq4FT7i00ltNhhYt56JG4kAX+pqifthKk7T5LtQmNVOcpjid1r2jOSNk0IZwrf/VYUL/50mdtlGLah2kP/uvgZ2dGt3vaavURBjldI7nFCyzEkhOb8il+h+rW6M9jO/pQO2aLee8TNzmB4PFP3tXb0wSZtrv63MaX54MVuc1Lb1gnKtlZWB6bwLF1QVWQdD8cl3likCosYkBo8LlnflwtyhzWkd1ocixE9NX0MLmXM2v/05cGkPHKbbGDC0FNIUiYhR3q1/LLJRQXVF5xJeP/WnhGLxlTfwvn4z77D7L11sJndWdYMHgiAJzQDm3+Pjyt9gmhzHapcwAeFiwvPHm4FTNULmwpK+h0s1WuRCuUpBXyZkSxqIRcbgKSPNY9kpmE+BZrGoqiBcUEncqb4hitnOoav99jit3Sn4Hzm4icWxtEjOVbTJhoVsU=
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MI9PR08MB763857.eurprd08.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(786006)(10070799003)(376014)(366016)(23010399003)(1800799024)(10067099003)(11063799006)(261102123227099003)(56012099006)(261022105027099003)(261026121527099003)(261021121427099003)(261009223027099003)(261028144727099003)(261026140227099003)(22082099003)(18002099003);DIR:OUT;SFP:1102;
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MI9PR08MB763857.eurprd08.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(10070799003)(23010399003)(1800799024)(786006)(376014)(366016)(261026140227099003)(261028144727099003)(261021121427099003)(261021123027099003)(261022105027099003)(261022075727099003)(261102123227099003)(11063799006)(56012099006)(10067099003)(261009223027099003)(22082099003)(6133799003)(18002099003);DIR:OUT;SFP:1102;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?69JHA7GDK2Fh4Ots0BNFYeiP57AYnmVC9Bjok22RI4HwQXLyBjKKmH1bp+sy?=
- =?us-ascii?Q?Tu7wHk7vGWZZMY9phbP+GsB1oF7mKAvwAmJJJYqAfhoMIXmftsrsunjAQvX3?=
- =?us-ascii?Q?i2KTSRMxNqVMw7Lsc02Hw/K715Jo42c4kNKKJd6GgceMpD5M529gjl0zq/5N?=
- =?us-ascii?Q?7g6JvMnu5q7Q+qgrmlJ2mtdDtLoVbbiYkkmJxkeqWtudlTk8dn3vBb6mSxxN?=
- =?us-ascii?Q?j6GiK5KwmBOeVnYVtjrYgvELkU7TwXOWqIxri5Gat1x4Qoj3dt1mKHf6PFmk?=
- =?us-ascii?Q?NytwEEtZtoBK2AORBbzchIgYmEp2KDTODyibCWXyJsoqlgAAqNzmMf1+5T4b?=
- =?us-ascii?Q?c3Tk1pzXUJ0H3IFcc8Ae1WharS6fHY7d/v93bngANtS0wPbUdkMlBSHWWluO?=
- =?us-ascii?Q?NfHARqX1xfH61J5CxSIrhNa3p+1bs2QZ4wMAUvkIJ8/kfOrOJgQkRGs4C8M9?=
- =?us-ascii?Q?QIXsoO7IDcbCSqJfIl53Uq5YL0mTwfyK3x6qABFcirOULGKKBx1ktoQ5u85R?=
- =?us-ascii?Q?/8AwVVgJ3qaq0yKTCi95IY5TBpmVR1+dFhGJ6vNeCIbxm2ltG77NBpJWKGD0?=
- =?us-ascii?Q?rnLOONq24vC8R02i9nEX6fWf1aZYRqI4cFxHoMlXe2IKP9oqkjaQu4jn6VKd?=
- =?us-ascii?Q?wr5oUW6Zg7RthbggGV/Fjyn3AA+rCgS81bS4LBLcu4FUfapCWw4tJ6B7Dolk?=
- =?us-ascii?Q?slCqshs9uss/tD/KhvIJs9AJnmGYBCnT9gkrOPDm+2nrzfHOKLDJWjiqQS2x?=
- =?us-ascii?Q?7FugxYW5quVUUOMS/D9uPPkegh2mZA3DS8fR93PajymoqFgyVMd0+5Niw1zI?=
- =?us-ascii?Q?BlPOyCHV3pVoKcp/KWX75ywH6aFSTHOqo38oDOXB05OJrF3YduXwCY0aGxOX?=
- =?us-ascii?Q?poa9zcBDr73mmdUQ8CV0twDXZiDaMIR2deLG2SmNSFPAR3ZPMzX9oUIX81PY?=
- =?us-ascii?Q?dPywGBTbi3IcGDDKjdOwkK80tSDkOYnus3/NYO7EFkhqDm2C1fWAiDs4eYYJ?=
- =?us-ascii?Q?6OQnAgaMKEl66ihm6+9MocMSWD0jOr5fB9QsnHZ+KzdiQfBnrMu9o5y4IZHj?=
- =?us-ascii?Q?5bM8bkviNv7JqC3lSVVxrKz7udw9Z+icHcB7ygcXt9ZjuiGDXIo9s0qrT6DU?=
- =?us-ascii?Q?kN7OtoDYiqehs4qovRcSXr62r45qxl4GBM6RRZmKjOV/F/22T3hdL3P6fekw?=
- =?us-ascii?Q?kKGdymVXyDnnXjE0Yqyn31Dl8LuuSFQVGHNk8Gw6nk3T8tU8050xzwd/K02i?=
- =?us-ascii?Q?16mZJ61wUqwlJJKTpWJ2L8kJxNDVOetTvaw/KHCTsMEItKRueX4O0juk0Frf?=
- =?us-ascii?Q?b3KY0z29QBRL/2eVktjvo1zABKRCLP/NtN+oNqGeIr8lGv0/RYyeQP2gQb2L?=
- =?us-ascii?Q?AufDym25uNVJ84LfOsETHYjq2v5Wsj5nc0wljCg4XwhproY4iMQ+3VMrLlON?=
- =?us-ascii?Q?6tFL0b7q3vWanA7hOS2lVBwSdPDzGQEkrovBeowRLtJm4IroGZhW+w/RueaS?=
- =?us-ascii?Q?jf6oCizyhzjxZvAQMqJFk4n+A5Klo+GSIFrRT4mQUhz0aNe+512MoWwDEEQs?=
- =?us-ascii?Q?QS289l4Y/T1xJAdE5twa2WjEO0hDzf3492eRsadBir8UDqCOcSythmUmXno9?=
- =?us-ascii?Q?bUH7xt4tb2eMqJxMuLp0EoBKDCTjhO956wiqcP+1xSer89GDvZ+ZSh4wLImA?=
- =?us-ascii?Q?feuPlFDVDIYFzmocrDdyOCGbLQSWIlkSFxNn6+HjeEBYJH6TaSyTwEKn5eSe?=
- =?us-ascii?Q?MP01+9hunaWMlnbm+KUgd5WOqscEqxKf521QnFasEjT4POa2bsya?=
+	=?us-ascii?Q?OeriLlngJPSaYurXq/zUaehCZgQASqBXEAyz2GH6kupJopOyMW498eGZD5p1?=
+ =?us-ascii?Q?BtfapewLqyY3PQfB7BfIw8KAhFBhCZ3fCucNM03HdsJ3XtAd8ulUS7Qgfsq+?=
+ =?us-ascii?Q?5lG77GacFHfBy6WMF74E6jaQYQosdLk55X0nZM8S8DGEj1ETfQPrEjKIbUEw?=
+ =?us-ascii?Q?bL1pcaw+n7xrx34WO3ii6oKAMeQjSeT6gNRCHY5N8Bs0G6MTg5KqfxzQQV9S?=
+ =?us-ascii?Q?JE4fGvKJWO8QGicGAssApRp1SJ9KhbD77CIGd7T7iD9+lrR6n62+L3g9Fkzc?=
+ =?us-ascii?Q?zJmuyc2cma6bKUcfoJ9N3iqhpZGpCxehWa4gOFPW4N3JD4kMAF+tT/KsKpvX?=
+ =?us-ascii?Q?3k7p5WCwucLaInZC35R5/H2eT2s4woqH3FQXkW7oddTii+ICmOTiqJ5qRQ9J?=
+ =?us-ascii?Q?evsv+Lo0quBFg+K53DW2vGTT+xuv8c0O7OWaLDmkxKIy/Pz6uDb6wJgvjzgQ?=
+ =?us-ascii?Q?zAVKN3PjtDaFyAiJm8cwMXlJvb97prwc9wRqcSZWrhKVXgpWVaIRVQLeVgsY?=
+ =?us-ascii?Q?vVnQsUCK1/otNinyYpqXLnyBPRM5L1Z+3QekLp63W+g60wB5pIkHsyoldDpk?=
+ =?us-ascii?Q?UFOHHnCsJ92VYaDbm13iqXxnWPrSjcwWCLXQ9ql4qHIV+x0QLhgGcul63PKK?=
+ =?us-ascii?Q?hSmUXoC9d9T6aFRBTdStS2CLEQmy7hmnj/LQchwC95gKoToylRG0SdGQotjL?=
+ =?us-ascii?Q?9mewLDGFhq4zkT4GYVmwoSlsaBoxhhP+dbs7MzP686+RgTUCWYe247djA5AO?=
+ =?us-ascii?Q?19LwGPcR9L6kDKROh5XF9ZFbOOMDibsFIXcZHAp28OKJdFYF3JwT1Vhfznl4?=
+ =?us-ascii?Q?Zl3psjhhqtwMccnw+8KkwJt1D6FPKVStAp7a0f1ZG8aYVvT9arUD4Z/iHX9R?=
+ =?us-ascii?Q?uGfUOJzomib+PxyOH0D8Nx9jZHxw/eY2gp6/cfN/NsEI4Smg7+wqu5a5DOo4?=
+ =?us-ascii?Q?j3SnXB7ggRgH950A6ZyPxvcJN/yBnU0GhIypdJg3aLCQGYbUTEPUS1HSB9qI?=
+ =?us-ascii?Q?ofzxH0ETSmt/2myak85cRn7pFsStLpppu2kjY43kWMAJmar7hzZTJIJCgSQB?=
+ =?us-ascii?Q?G8JnH21BJkaXD7eB0jA1SULJ90sh5B+6aQ+OGUXQ9CiWpTacr0YcK98f2HLE?=
+ =?us-ascii?Q?cHct/QLV5p+YXE2lVKQSYtkmoBjdV5Eo6n+GY/U2VV1AQZPnHn6+kBjsLvLI?=
+ =?us-ascii?Q?vXh3i+auIDQLwS7OnO8K9oQfIMrDqhxoMgRxPc38x25EGT+WnlYEwhKbf7NZ?=
+ =?us-ascii?Q?Yih0eHC7C/dbdGQ7NptPYlHNiM8XkXo5SjBK5zISAYzNoX8OtkwwXQfhlGTP?=
+ =?us-ascii?Q?WDKKK6gIhe8Ea+Jv9gzIJxRmurZYRbEiBxB/YHvqQT6tlVBdcnnbprH6W65h?=
+ =?us-ascii?Q?DdLmVCHYpWGUFErTNCENCEvXYICZT8slnd6Fiy5cJr/o+5FtoCkZo2WXFrRe?=
+ =?us-ascii?Q?xsYES0N37p4W9OokUR8s3roEvA2mHh4vnF0nfDr/lPTJNsol73N0POvqWHMN?=
+ =?us-ascii?Q?BKCcXPuVJCYtgV/t8tnMh49trkQdPlRDrjvVlciUygvZTpO+0evw2RhywrJS?=
+ =?us-ascii?Q?ggOeyEl3VPFd/ZJMsfJud3mfPcLdhIslY10b4HkeWJVlUQ1oyCwK1AoKpd0F?=
+ =?us-ascii?Q?ksSZo8mc9HbCerZW6kA7t18ZeNVT8Xh8qSd205N2Lz3Hd/q0Vp1i3V44U16k?=
+ =?us-ascii?Q?+riMtQYBsohIh+UUpRs6vG4JcG0W39RY5dkWN6unr0YGrj8hqWVAQmPnwliI?=
+ =?us-ascii?Q?NyBwMZdkZti93TOXeehbBz9bzeP3H0SSzhO6cHfZkZ7UzKIXqBWu?=
 X-OriginatorOrg: kuleuven.be
-X-MS-Exchange-CrossTenant-Network-Message-Id: 750e56d9-fd60-4456-49b2-08df4a2158ce
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7b57dd27-2529-437f-de50-08df4a215762
 X-MS-Exchange-CrossTenant-AuthSource: MI9PR08MB763857.eurprd08.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Nov 2026 11:51:59.5110
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Nov 2026 11:51:57.1063
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 3973589b-9e40-4eb5-800e-b0b6383d1621
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: x0Aq+XK2xS+lMcdHFBE1Xvyt4TH917XhCaSQd691NzdOdzL89KZHqSQB8SpeqJGhNx6D36SAlMy+SUwiD9cInFj+kugvCJU9qB5Gl2fMCmE=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS8PR08MB6616
+X-MS-Exchange-CrossTenant-UserPrincipalName: oG7hk+ju1pXldAhEUa+/NNyqr3DWD9dL7ct8pTwljLQwda8SwDaKTnLO2fMGdMWLeRH0B5q+l9kYRBXjwP/RXEtK+xeTQO5jGulvcU871MM=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI0PR08MB10711
 
-Check that the EAP-TLS handshake tests receive a server certificate
-event for every certificate, that the server's own certificate comes
-last and that its subject and SubjectAltName entries are correct.
+Emit the certificates of the server's chain, as reported during
+EAP-TLS, EAP-TTLS and EAP-PEAP authentication, with a Certification
+signal.  The signal has the same name, keys and order as the
+Certification signal of wpa_supplicant, so that network managers can
+use the same code for both.
+
+This allows a network manager to show the server's certificate to the
+user and to pin it on first use (TOFU), for example with the
+ServerCertHash setting.
+
+station_append_byte_array() is moved up, so that the signal can be
+emitted without a forward declaration.
 
 Co-authored-by: Rathan Appana <rathan.appana@kuleuven.be>
 ---
- unit/test-eapol.c | 31 +++++++++++++++++++++++++++++++
- 1 file changed, 31 insertions(+)
+ src/station.c | 94 ++++++++++++++++++++++++++++++++++++++++-----------
+ 1 file changed, 74 insertions(+), 20 deletions(-)
 
-diff --git a/unit/test-eapol.c b/unit/test-eapol.c
-index b3c291c3..b8ab1164 100644
---- a/unit/test-eapol.c
-+++ b/unit/test-eapol.c
-@@ -25,6 +25,7 @@
- #endif
- 
- #include <stdio.h>
-+#include <stdarg.h>
- #include <string.h>
- #include <assert.h>
- #include <sys/stat.h>
-@@ -37,6 +38,7 @@
- #include "src/ie.h"
- #include "src/eap.h"
- #include "src/eap-private.h"
-+#include "src/eap-tls-common.h"
- #include "src/handshake.h"
- 
- /* Our nonce to use + its size */
-@@ -77,6 +79,7 @@ struct test_handshake_state {
- 	struct handshake_state super;
- 	const uint8_t *tk;
- 	bool handshake_failed;
-+	bool server_cert_seen;
- };
- 
- static void test_handshake_state_free(struct handshake_state *hs)
-@@ -2878,14 +2881,41 @@ static void test_handshake_event(struct handshake_state *hs,
- {
- 	struct test_handshake_state *ths =
- 			l_container_of(hs, struct test_handshake_state, super);
-+	const struct eap_tls_server_cert *cert;
-+	va_list args;
-+
-+	va_start(args, user_data);
- 
- 	switch (event) {
- 	case HANDSHAKE_EVENT_FAILED:
- 		ths->handshake_failed = true;
- 		break;
-+	case HANDSHAKE_EVENT_EAP_NOTIFY:
-+		if (va_arg(args, unsigned int) != EAP_TLS_EVENT_SERVER_CERT)
-+			break;
-+
-+		cert = va_arg(args, const struct eap_tls_server_cert *);
-+
-+		/* The server's own certificate (depth 0) must come last */
-+		assert(!ths->server_cert_seen);
-+		assert(cert->cert && cert->cert_len);
-+		assert(cert->cert_hash && strlen(cert->cert_hash) == 64);
-+
-+		if (cert->depth)
-+			break;
-+
-+		assert(!strcmp(cert->subject, "/O=Foo Example Organization"
-+				"/CN=Foo Example Organization"
-+				"/emailAddress=foo@mail.example"));
-+		assert(cert->altsubject &&
-+			!strcmp(cert->altsubject[0], "DNS:foo.example.org"));
-+		ths->server_cert_seen = true;
-+		break;
- 	default:
- 		break;
- 	}
-+
-+	va_end(args);
+diff --git a/src/station.c b/src/station.c
+index 8fcf8c70..c3579d34 100644
+--- a/src/station.c
++++ b/src/station.c
+@@ -1149,6 +1149,72 @@ void station_set_scan_results(struct station *station,
+ 	station_autoconnect_start(station);
  }
  
- static void eapol_sm_test_tls(struct eapol_8021x_tls_test_state *s,
-@@ -3138,6 +3168,7 @@ static void eapol_sm_test_tls(struct eapol_8021x_tls_test_state *s,
- 	assert(verify_install_tk_called);
++static void station_append_byte_array(struct l_dbus_message_builder *builder,
++					const char *name,
++					const uint8_t *bytes, size_t len)
++{
++	size_t i;
++
++	l_dbus_message_builder_enter_dict(builder, "sv");
++	l_dbus_message_builder_append_basic(builder, 's', name);
++	l_dbus_message_builder_enter_variant(builder, "ay");
++	l_dbus_message_builder_enter_array(builder, "y");
++
++	for (i = 0; i < len; i++)
++		l_dbus_message_builder_append_basic(builder, 'y', &bytes[i]);
++
++	l_dbus_message_builder_leave_array(builder);
++	l_dbus_message_builder_leave_variant(builder);
++	l_dbus_message_builder_leave_dict(builder);
++}
++
++/* Same name and dictionary keys as wpa_supplicant's Certification signal */
++static void station_emit_certification(struct station *station,
++				const struct eap_tls_server_cert *cert)
++{
++	struct l_dbus_message *signal;
++	struct l_dbus_message_builder *builder;
++	char **name;
++
++	signal = l_dbus_message_new_signal(dbus_get_bus(),
++					netdev_get_path(station->netdev),
++					IWD_STATION_INTERFACE, "Certification");
++	builder = l_dbus_message_builder_new(signal);
++
++	l_dbus_message_builder_enter_array(builder, "{sv}");
++
++	dbus_append_dict_basic(builder, "depth", 'u', &cert->depth);
++
++	if (cert->subject)
++		dbus_append_dict_basic(builder, "subject", 's', cert->subject);
++
++	dbus_append_dict_basic(builder, "cert_hash", 's', cert->cert_hash);
++	station_append_byte_array(builder, "cert", cert->cert,
++					cert->cert_len);
++
++	if (cert->altsubject) {
++		l_dbus_message_builder_enter_dict(builder, "sv");
++		l_dbus_message_builder_append_basic(builder, 's',
++							"altsubject");
++		l_dbus_message_builder_enter_variant(builder, "as");
++		l_dbus_message_builder_enter_array(builder, "s");
++
++		for (name = cert->altsubject; *name; name++)
++			l_dbus_message_builder_append_basic(builder, 's',
++								*name);
++
++		l_dbus_message_builder_leave_array(builder);
++		l_dbus_message_builder_leave_variant(builder);
++		l_dbus_message_builder_leave_dict(builder);
++	}
++
++	l_dbus_message_builder_leave_array(builder);
++	l_dbus_message_builder_finalize(builder);
++	l_dbus_message_builder_destroy(builder);
++
++	l_dbus_send(dbus_get_bus(), signal);
++}
++
+ static void station_reconnect(struct station *station);
  
- done:
-+	assert(ths->server_cert_seen);
- 	__handshake_set_install_tk_func(NULL);
+ static void station_handshake_event(struct handshake_state *hs,
+@@ -1187,9 +1253,13 @@ static void station_handshake_event(struct handshake_state *hs,
+ 		network_set_transition_disable(network, td, len);
+ 		break;
+ 	}
++	case HANDSHAKE_EVENT_EAP_NOTIFY:
++		if (va_arg(args, unsigned int) == EAP_TLS_EVENT_SERVER_CERT)
++			station_emit_certification(station,
++				va_arg(args, const struct eap_tls_server_cert *));
++		break;
+ 	case HANDSHAKE_EVENT_COMPLETE:
+ 	case HANDSHAKE_EVENT_SETTING_KEYS_FAILED:
+-	case HANDSHAKE_EVENT_EAP_NOTIFY:
+ 	case HANDSHAKE_EVENT_P2P_IP_REQUEST:
+ 	case HANDSHAKE_EVENT_REKEY_COMPLETE:
+ 		/*
+@@ -5315,6 +5385,9 @@ static void station_setup_interface(struct l_dbus_interface *interface)
+ 				station_dbus_signal_agent_unregister,
+ 				"", "o", "path");
  
- 	if (sm)
++	l_dbus_interface_signal(interface, "Certification", 0, "a{sv}",
++				"certification");
++
+ 	l_dbus_interface_property(interface, "ConnectedNetwork", 0, "o",
+ 					station_property_get_connected_network,
+ 					NULL);
+@@ -5788,25 +5861,6 @@ static struct l_dbus_message *station_property_set_autoconnect(
+ 	return l_dbus_message_new_method_return(message);
+ }
+ 
+-static void station_append_byte_array(struct l_dbus_message_builder *builder,
+-					const char *name,
+-					const uint8_t *bytes, size_t len)
+-{
+-	size_t i;
+-
+-	l_dbus_message_builder_enter_dict(builder, "sv");
+-	l_dbus_message_builder_append_basic(builder, 's', name);
+-	l_dbus_message_builder_enter_variant(builder, "ay");
+-	l_dbus_message_builder_enter_array(builder, "y");
+-
+-	for (i = 0; i < len; i++)
+-		l_dbus_message_builder_append_basic(builder, 'y', &bytes[i]);
+-
+-	l_dbus_message_builder_leave_array(builder);
+-	l_dbus_message_builder_leave_variant(builder);
+-	l_dbus_message_builder_leave_dict(builder);
+-}
+-
+ static void station_append_bss_list(struct l_dbus_message_builder *builder,
+ 					const struct l_queue_entry *entry)
+ {
 -- 
 2.53.0
 
