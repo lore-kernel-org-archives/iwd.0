@@ -1,13 +1,13 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=40.107.130.82
+Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=52.101.65.88
 ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
-	t=1795521122;
-	b=r/m7nVILBLlNzwRLEGF72E44upogPbBwusSChTdHag86IOX42Bwt9J84u9GduLTdJhAg
-	 l//slA+dGew601oTReR+7YKuP+oDWMvL+Fr//HiW8coufxcQeCqS71rvbmryith2Okh7u
-	 F4G/cFyhXhdudtRQoITjfHczCMqHTuyBpV0mURpCffn2B9QRG0wuUogxmjCdDY896R8B8
-	 Z9NABv6wep9kz7xStifaKoHtXE149i0oyHke/twQyvsGnPxmT8EduCBJJW2nQwPpVCwuy
-	 E8A/xG6JOPXyYb1ktOk4gapsEN0PBBJ34oArczWlf/QDhFL3rijwqnoBAr9BRQBn2IQ==
+	t=1795521123;
+	b=DBcFL7Zk7TT5YcQ07WQgRijosUtiq7Tuy21MOZAj5FR2OsMnQVQEjqAl9m3wDZmStgJ+
+	 nSotpod6gU2vjC1lI4G/qivXEFxjpkfwUAw9xyFWoE/I525KnDhYodNnLtKMyilDLJrY9
+	 Wrzgoz3Tov4G4P3Ihl9Vu6V7yj8ffzLgeqVgOxRzsa6yGNDG/T7AVddx0uZXNSnwGBRmU
+	 6JxGj9PMqMfl2tdexR7gcwg4e65GH2hnEEX1do8u/KmNsBV74Wbil3W/D1oglUqOW4LKp
+	 jC9qoCAEWoV0ivjpQ1N2iODnBb+B7zh23tHvZCqhnwD1rk5Lx6Gn2q86kg2jlAFqKGw==
 ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795521122;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795521123;
 	h=DMARC-Filter:DKIM-Signature:Received:Received:From:To:Cc:Subject:
 	 Date:Message-ID:X-Mailer:In-Reply-To:References:
 	 Content-Transfer-Encoding:Content-Type:X-ClientProxiedBy:MIME-Version:
@@ -24,70 +24,70 @@ ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
 	 X-MS-Exchange-CrossTenant-Id:X-MS-Exchange-CrossTenant-MailboxType:
 	 X-MS-Exchange-CrossTenant-UserPrincipalName:
 	 X-MS-Exchange-Transport-CrossTenantHeadersStamped;
-	bh=Cn4kMwp5bzfORbT1hgf9tbHxFfpZv9Z5e2MWm+aBl5o=;
-	b=ZOjUmcOHE38gWo/uBb1fidyDA0czcwaFbbw6KhTXn/7gUjPbCdYUu4YJuRh521+95QqX
-	 pQSPY/tUw+lr+f5zPiagisk21M3NdNxZ8dfbpV2G96NkVv/pwSDmdGjPf2eNi0Akcb5aD
-	 rGhrZkUoZQkWg3vGYobETcxY2wBpMkJSLBEpkVNwoLhOWJ9YH4P4pU5zCdfnWr1JpOzDf
-	 +CzWvaXcJhuw2rajhM14mW9t0KQXtIe8bbhRBDnk5ytaIlNmZAnEEV5m5Cdi/rDZTD9Nd
-	 Fq1t8F+MdB8/PqSnLLHuFcGcv0s2uLDkep8hc/xgpVK1cE8EcTU6bOIBWeXVZdhtK4g==
+	bh=/LCr5LBZtYEFL5/7CzGy3AExVDvLsuTojMolkKpW/p4=;
+	b=WtAUbU6XGSuf/HTtikn6B1p/P2cXYDVgWvViICPjiib60RprJjZ5d3dGE4ltYq2XRMYP
+	 nG+l5iE4msZBq2TUJMrFRE+bClXMZVocsqcfbqU/Gwrs1Ta8Kh7JtlmzIcD/k2vr1mRYv
+	 0juNEj30/3C0N/LCKioc+F9ckNtd1XsdZ5PvpNygWiZAWOxm1KpAR8BHha9P6c4bP1YAB
+	 J8fTwuhRdXT93ynEb7aWMGhQF5kYIesfbyY5HXphJL6E48AINq4LJyIuBxS3gTMC5wDI5
+	 IYwQyGdSWpFYvF/qM9mHOnVwE9Qd1lCOxoVN1HbGWHxE23X2pj0XS/T2Zg3wQtEya/g==
 ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=kuleuven.be;
 	spf=pass smtp.mailfrom=kuleuven.be;
-	dkim=pass header.d=kuleuven.be header.i=@kuleuven.be header.a=rsa-sha256 header.s=selector1 header.b=F2isDaFs;
-	arc=pass header.oldest-pass=0 smtp.remote-ip=40.107.130.82
-Received: from MRWPR03CU001.outbound.protection.outlook.com (mail-francesouthazon11021082.outbound.protection.outlook.com [40.107.130.82])
+	dkim=pass header.d=kuleuven.be header.i=@kuleuven.be header.a=rsa-sha256 header.s=selector1 header.b=sfis1IJA;
+	arc=pass header.oldest-pass=0 smtp.remote-ip=52.101.65.88
+Received: from DU2PR03CU002.outbound.protection.outlook.com (mail-northeuropeazon11021088.outbound.protection.outlook.com [52.101.65.88])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange ECDHE (secp384r1) server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA3C5606A322
-	for <iwd@lists.linux.dev>; Tue, 24 Nov 2026 11:52:01 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org BA3C5606A322
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E96A606A327
+	for <iwd@lists.linux.dev>; Tue, 24 Nov 2026 11:52:02 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 7E96A606A327
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=kuleuven.be
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kuleuven.be
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=kuleuven.be header.i=@kuleuven.be header.a=rsa-sha256 header.s=selector1 header.b=F2isDaFs
+	dkim=pass (1024-bit key, unprotected) header.d=kuleuven.be header.i=@kuleuven.be header.a=rsa-sha256 header.s=selector1 header.b=sfis1IJA
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=Jg7Z545owe9RDx+M4Q8sQCTpTbTH/zTABJv47pqVg0BdZDF0L6wmsYwv/CMX/frtg5bwbUU7xeV4hy8poCbyrWe3+71f9wUTvZyLFsaJSxr/wyNfIE2KKs0XcTF5IMlYofInwNty0uMwYBgcy3zjf8BL0hDXEBgSgKC7HvrYHLwYq5AJY8dwi26/MUark0NDaGDGO0ul//MtUYb6dgrsuQzLaHVcD/YLr2N5HWwivhu6JIOxpB+O77UqpGcZ6vi1t4USUzDtPQnOyuMd2f/+1zA2wO2bjrqYiFw13ymXwxoTwRe+oozq04haXdcAVTvDI3eHuMHQXbZvAa/Z9QLWuw==
+ b=RRr4ml6RsJbmMzcD4t5y/ayMr3jWd79BTQpJNWpUD5sYP6aYram5lcy/e17DDjBAPAJsoNrN2R+2mercusi12+AMbBbEKj4a3lnD7jXYPRKNvK4MoLTYPh0byJBWLy045s0N7e2ARIvjPW5Ixaix3vAqtMf82TfpXmInXNL0i7CRLjVShHlPYdYm/orXx8oJKEqvHCD3OfhHfW5zsl3eS62H+Y2lboFUiLvMt7bD8uj+zLs3rNvicp1mHxS21ZfiididQPDLWc/1t/z5ZZrmc3lxJB4ej6ZCc+zFG3xnLaSavNmQ7grN6N902/4pMMmg93S8EbT4A+chL5tRU1HYfw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Cn4kMwp5bzfORbT1hgf9tbHxFfpZv9Z5e2MWm+aBl5o=;
- b=IlhvkGoy5XLIBKs5EkYcEvHPNyld08E46cxWUUHWhpWQnYbiv2EVPrW/GEUGQScDegth6u//Ay1UpubW72iLTn0wiuwSRn6aNV7zi8iRm00TlWaxwzh/KAAp1LtnSP75fhbJ6UrjCLvkDScPWbDmwiCLc+SD9lZl+Wg8UGTdmKQHiDMOap1ZlbEfJvBisU74BnfdZH2ZqcSMxsY8mVm+KI8zhQWI5XueV5gdftY6Hf9TOYI4EVWfj9RgOcuXyEUmCZ8exWPmNXRdwWu88MzuSIcuXnVWp1zag7wvy9ozlhZR3LcIWZBWGAbQZeCeu58AbDYwjZVYSNqJWip5rX1WPg==
+ bh=/LCr5LBZtYEFL5/7CzGy3AExVDvLsuTojMolkKpW/p4=;
+ b=bgyB79URBM0/qZU6J45FjbMBwQE9NT5ic1fRynlwnN6P1cz20Uh2YMXCryrH4OIkjnRTFbKyFFRDYwhXMZESgVV9M7rHHOmR/KQ3eKenu86kf5WY5Cc/a6zyHT0X1LVGBDXGKwICZZRP1PV4/EX8jFV/EMgnqnvkwPw8yukB1OyYYEDkJHAytdHs5qjAWUi+qtVMKk1cuaHyUdBVCPjBJUdU/rIm0hHH/njogu/HyeH4/vp7B1G8xMctLfl8gvYEwd51lLJyeFeYlW+Fln19454K+C3zGsQZnFuk8RrHRFJU6D6CEheAqZVrDwd4DP0W7+B8AJlAisW/p9BHMfqkRg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=kuleuven.be; dmarc=pass action=none header.from=kuleuven.be;
  dkim=pass header.d=kuleuven.be; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kuleuven.be;
  s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Cn4kMwp5bzfORbT1hgf9tbHxFfpZv9Z5e2MWm+aBl5o=;
- b=F2isDaFsD8BHfwVFp7Ysva6EVKhNM/G4W8CqeBu137ObuyCE5HbdXmzTTWa1Ns7koMVmsZ9KYd7kgR30B44hZn2HaR+HfGypWQBlwRbDj53NVxdjxgTjm/JjZ8Z1kdYiRTbyk70IqkNcAu1ypel6xWZC8zgfQvS3+fWrT0YVq8M=
+ bh=/LCr5LBZtYEFL5/7CzGy3AExVDvLsuTojMolkKpW/p4=;
+ b=sfis1IJABzxVz+E9FuU6ltB9Q2tFrCIB0vYyuEFg7S1fFWR8wga842ZsUMWwBuUDVnFYk4Lawmj9sW+uzh7XzP2y8MoHsk59oNQM1PR4X5egbq3J+C9j0TMNGhiS3zpR3ldcNeH1w9xhIExoJJ43hCDexqDSVQSEvak7pT6sjGk=
 Authentication-Results: mx.microsoft.com 1; dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=kuleuven.be;
 Received: from MI9PR08MB763857.eurprd08.prod.outlook.com
- (2603:10a6:290:c0::16) by VI0PR08MB10711.eurprd08.prod.outlook.com
- (2603:10a6:800:20c::18) with Microsoft SMTP Server (version=TLS1_2,
+ (2603:10a6:290:c0::16) by AS8PR08MB6616.eurprd08.prod.outlook.com
+ (2603:10a6:20b:319::20) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.639.14; Tue, 24 Nov
- 2026 11:51:58 +0000
+ 2026 11:51:59 +0000
 Received: from MI9PR08MB763857.eurprd08.prod.outlook.com
  ([fe80::4f1d:a35e:c1b6:8b48]) by MI9PR08MB763857.eurprd08.prod.outlook.com
  ([fe80::4f1d:a35e:c1b6:8b48%7]) with mapi id 15.21.0639.012; Tue, 24 Nov 2026
- 11:51:58 +0000
+ 11:51:59 +0000
 From: Mathy Vanhoef <Mathy.Vanhoef@kuleuven.be>
 To: iwd@lists.linux.dev
 Cc: denkenz@gmail.com,
 	marcel@holtmann.org,
 	prestwoj@gmail.com,
 	Mathy Vanhoef <Mathy.Vanhoef@kuleuven.be>
-Subject: [PATCH 4/7] eap-tls: report the server certificate chain
-Date: Tue, 24 Nov 2026 12:51:43 +0100
-Message-ID: <20261124115146.1281715-5-Mathy.Vanhoef@kuleuven.be>
+Subject: [PATCH 7/7] unit: check EAP-TLS server certificate events
+Date: Tue, 24 Nov 2026 12:51:46 +0100
+Message-ID: <20261124115146.1281715-8-Mathy.Vanhoef@kuleuven.be>
 X-Mailer: git-send-email 2.56.1
 In-Reply-To: <20261124115146.1281715-1-Mathy.Vanhoef@kuleuven.be>
 References: <20261124115146.1281715-1-Mathy.Vanhoef@kuleuven.be>
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: AS4P192CA0022.EURP192.PROD.OUTLOOK.COM
- (2603:10a6:20b:5e1::20) To MI9PR08MB763857.eurprd08.prod.outlook.com
+X-ClientProxiedBy: AM9P250CA0014.EURP250.PROD.OUTLOOK.COM
+ (2603:10a6:20b:21c::19) To MI9PR08MB763857.eurprd08.prod.outlook.com
  (2603:10a6:290:c0::16)
 X-Mailing-List: iwd@lists.linux.dev
 List-Id: <iwd.lists.linux.dev>
@@ -99,179 +99,147 @@ List-Owner: <mailto:iwd+owner@lists.linux.dev>
 Precedence: list
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MI9PR08MB763857:EE_|VI0PR08MB10711:EE_
-X-MS-Office365-Filtering-Correlation-Id: de5aa53d-fa41-417d-dcd6-08df4a2156a6
+X-MS-TrafficTypeDiagnostic: MI9PR08MB763857:EE_|AS8PR08MB6616:EE_
+X-MS-Office365-Filtering-Correlation-Id: 750e56d9-fd60-4456-49b2-08df4a2158ce
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|10070799003|23010399003|1800799024|786006|376014|366016|261026140227099003|261026121527099003|261028144727099003|261021121427099003|261022105027099003|261102123227099003|11063799006|56012099006|10067099003|261009223027099003|22082099003|18002099003;
+	BCL:0;ARA:13230040|786006|10070799003|376014|366016|23010399003|1800799024|10067099003|11063799006|261102123227099003|56012099006|261022105027099003|261026121527099003|261021121427099003|261009223027099003|261028144727099003|261026140227099003|22082099003|18002099003;
 X-Microsoft-Antispam-Message-Info:
-	R0zLIHqQB82RAWQyKnjX5eXeQyHlM8cNbYR3WzZysnQ3rnNAEC55urxRSKOJpEp5/sS2FC3uUCNYfRqcCFq4c94uBIhAKLabVN5dc0ndkhUaWCmxKMl6CAI8O0Yzh8XjAFx4XgkeIn3ExZulBxXaC1U5I+sGg1LJY0XZCJXoX0nZtJdQIiaEDKewObDPVGJxjDISjG5cO2EJvfqMbXorOwWuAXpcEGvOU5/SxaEf/x/0Vw9DqhYI56hSrPxDzMfTdJ4L4pJCD6jWgLvaoDTT5AKwlzhM8g8JtE93UhFKSLasnHH5cteCUcONU8Q+E/7EBdvX4C8kspUXwq41Xy3MhuQu3xEM+ZzVszWpRfkhFzEVnpCu2I1TkMALiUw34EalcUaJp6HdDB/XiXoNn+ObtNm0V6kNWb4TeMA+/bSTCLZ03v87NPC8ZgmGTVmY/4cuUm2ajKayk3ox/DJrApOlmkJTleQPg5UegeYAR9WIS80TlBi66zxNTHMCG7IjIID7V7Z3xgPKzXQnw4hUxdlCzHAqEPREsf0jBusu65AeqSdGqZ8mfE5MF/jqgnt2DiOdqlTaZjrb4KVWky8kysv1LAjfdltQTDPF936mH2fI+H5DMtv2UpuzTR+MeJMhf9VKmriBw2zwip/x91sX7U5LcELeKlZUtm1Uitks0vh4P5M=
+	qcTeJghjHyGi9V+V05W/atviRlIX2j/8ARFhDQwsRD2vgfKBU+yESaNb97VKfdvBXjFBPdB3oeITAZZjG7X5t1O7BWRs0tJKLAqEXlYrzLMFv40yDDrM0eQ9yHeozklp+QUqdBYooeBUONg4GB6dz8F/lMgorHAGNE0mONiehrtTHKLBK7QVzNM09fU1cupAkArdiiLfKGuvEauzDFMW12m/8ILvK+q4MdgS+X1+CGkWUyHFR/3wPZmqW+wTdXMZ6MoIM43zqLOMmoN/l2RY9f0IpKjb+KOn6qkMEwbwfbFuK22IJXHk7In6hHzJGzm8TVs5X3jLBrmKjQEIaIKrdfKa9ReCkmQaMY0+5VF49fGf/uj5LVhQQiShD1+VZ3D9RPMHKEfkdbKT9az3Gs8WAIJfu4OvHd+1i3ipRs+ggYej0QNgf2Ds/1tTl6FszRm6sgylglRe8IZYKI4DzDEwTgamTBC4lvBOURHXzRt65fj7hDXbzhk+yy9BK/Plo/gG0y1W1tv/vVonhS7+ZWybIUNV0NZIOHHqJvvuRs4UwCyFg7buRCRWgA12GBr9SEjCjPV1K16F1QxWQ36nYUxMASlOuicvQkDfXGPUpJngUM1HzUDJmDORoGLBWqMKlAcbYdRvUf9nYRsZ1bggaXUjYqNNTh7dI9EXmSswqRSIXEE=
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MI9PR08MB763857.eurprd08.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(10070799003)(23010399003)(1800799024)(786006)(376014)(366016)(261026140227099003)(261026121527099003)(261028144727099003)(261021121427099003)(261022105027099003)(261102123227099003)(11063799006)(56012099006)(10067099003)(261009223027099003)(22082099003)(18002099003);DIR:OUT;SFP:1102;
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MI9PR08MB763857.eurprd08.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(786006)(10070799003)(376014)(366016)(23010399003)(1800799024)(10067099003)(11063799006)(261102123227099003)(56012099006)(261022105027099003)(261026121527099003)(261021121427099003)(261009223027099003)(261028144727099003)(261026140227099003)(22082099003)(18002099003);DIR:OUT;SFP:1102;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?2uzAWjDGoAtwkIrPstm6O3+K2FC2AJk7a7R318q8FsS/zTEiVGJAa1epi3t/?=
- =?us-ascii?Q?DUS3pBRo/wh7Az1698aO+M0g70Eu6Ff5sYgM7ANQABaKJhao+rP7sz2bLrNN?=
- =?us-ascii?Q?oZRZiR3OOckk+14jD+AlyNoDeLDiu2b/i/XjMFjQnx3LU7ty2YmcJXvBm0Ub?=
- =?us-ascii?Q?oEDvqdpC9Bn753pK4R2JUgwffqY3WqMouK/YEgqE+Gl8rrgRQg4aQu+hIA3k?=
- =?us-ascii?Q?kbnhXsKmaD2cDezhLPE87yNR5lwhB+aYgLgN4roqGTuAm9S23O7oJf4uW5b+?=
- =?us-ascii?Q?0fvCpmqP+q1wAgAK7r75bH0lVADJ+S1kSsb+z+kPKR6dwBl4Sh5IcoNcCrhI?=
- =?us-ascii?Q?kEHvcn4bN9tcBXw8VRiXD5cNd5wB3jeNyJTMCAXB8jgAruRuYvgAETF0xuC3?=
- =?us-ascii?Q?6nKmnMt4q9h8cIzPIin/BkXtAgB8asvl4sx+FsX3XXJM3TZSWjb4fY9e6Xto?=
- =?us-ascii?Q?fIQPx9IG7quDQEYR7aNzKkWCi5pShnA8O86EiR9crKNgjGFok4cQAkpVY7Yn?=
- =?us-ascii?Q?dCz3R+CEq568xXOBZHXmuJsmucyvBAkDFzT9uxbSB8aO4gtc4kTbY4P1kZ0D?=
- =?us-ascii?Q?J56pygAce0p7OTy4vY/Rjx9BikBhzh4ob/ghnb5SaE5ZoRO6cduOmH/2lSXn?=
- =?us-ascii?Q?oASCV3r7fTdGl9+V441faJBbKTM3YESJTeXAYnPPmoZsNicnqzEK9mwJbC4G?=
- =?us-ascii?Q?zemZoNmPza4vMDeRE7pJk2GH7818Awfso+hUhsB6kvNp73EkybqyfNiLZchG?=
- =?us-ascii?Q?hmFc2cBDb3ohSOuOsn20JaIEmpxGsbR1yIUPFBHLi3b+VBGx0XhF2b7LGiDz?=
- =?us-ascii?Q?pQp4q5Kvh+2ch3ImX+/Xj3mprB83C47L3M6l6dgkdTzL5JPu9s2Lo9DEp4O5?=
- =?us-ascii?Q?1rGp07pWQ8xydJSSXLzbSBsMMt8SmcJMsNeC/qejZ623+8iGbiOJCrtWvlU1?=
- =?us-ascii?Q?ZBhWUbmj4aZlit41wGZIabNzP12uimjceeUMNG8ASVLfxrPAImkpbq4+1Fjm?=
- =?us-ascii?Q?Kk0gy5+v6553Hoexx6jhfkASSJW2IYUHLTUTim5GFz9KksGQcUCDJVpxIvIp?=
- =?us-ascii?Q?k3KrVdGRwQ5DPYRJEeZmVe/n5w5JOamwcgt8TS5xu1RxHPe3d3HvOYrVUAc9?=
- =?us-ascii?Q?4hGfC3O3T9M7AhrMBdkB4Dd/AR1Z4E1QAZ8zZlgD8y6YaSLmgvob+5ackT3C?=
- =?us-ascii?Q?7++LROfxXYMusIIEnMao8mqNvazhX9+pGrPSfrKGaPxP7YBKJJw/adxiMw1R?=
- =?us-ascii?Q?gXn00Yqo6HFnlHeNI4KLTFytqj10HxJ2YSAclc4XDs6q9QrhNCJMzecZPfJr?=
- =?us-ascii?Q?/yBtldJfXXKXajWIhyYJ5nLw4U0ebaRje4WFNPT+5wemdvmRPkWgFgM/Nuxr?=
- =?us-ascii?Q?o9nCxfWboKprkuCwRe14Lz9dN+uJjr1xUfz9SCyPL1Bof/r3FN9w/a6r49uH?=
- =?us-ascii?Q?0T3Z3deqweiurgkvEt/f0kQGxEOvC/KLLDNVst678TfSWSL/OcDipI/ePK6o?=
- =?us-ascii?Q?oLl4SWjhfkMpkK8dO7q760dxXYgUvYCDe6iQZQ7o0XWJH05vvGQ6YeAVmPWg?=
- =?us-ascii?Q?3vWFd5c7cf90xug6Y4c8/sbb4dR+1WIH6nrjXRgqXXftYfuREDw6osRi12lT?=
- =?us-ascii?Q?ZL5jyTrUT3BZC47OVgXZ2T0rDzL6y6PBDqvIj6ADoiF97LTFmnZxEZ0/MTiQ?=
- =?us-ascii?Q?jLIiE3s2VNxsu6FXjIJ7AbclLscD41Nl3Nkh/mxH2Cxi2GV0YVvnv9x/VUYM?=
- =?us-ascii?Q?wTsAzJg+Vf+ZFdBI5P0HtgPCVVVJ4yAKBWZmlq9RwTEBeYB5WGz8?=
+	=?us-ascii?Q?69JHA7GDK2Fh4Ots0BNFYeiP57AYnmVC9Bjok22RI4HwQXLyBjKKmH1bp+sy?=
+ =?us-ascii?Q?Tu7wHk7vGWZZMY9phbP+GsB1oF7mKAvwAmJJJYqAfhoMIXmftsrsunjAQvX3?=
+ =?us-ascii?Q?i2KTSRMxNqVMw7Lsc02Hw/K715Jo42c4kNKKJd6GgceMpD5M529gjl0zq/5N?=
+ =?us-ascii?Q?7g6JvMnu5q7Q+qgrmlJ2mtdDtLoVbbiYkkmJxkeqWtudlTk8dn3vBb6mSxxN?=
+ =?us-ascii?Q?j6GiK5KwmBOeVnYVtjrYgvELkU7TwXOWqIxri5Gat1x4Qoj3dt1mKHf6PFmk?=
+ =?us-ascii?Q?NytwEEtZtoBK2AORBbzchIgYmEp2KDTODyibCWXyJsoqlgAAqNzmMf1+5T4b?=
+ =?us-ascii?Q?c3Tk1pzXUJ0H3IFcc8Ae1WharS6fHY7d/v93bngANtS0wPbUdkMlBSHWWluO?=
+ =?us-ascii?Q?NfHARqX1xfH61J5CxSIrhNa3p+1bs2QZ4wMAUvkIJ8/kfOrOJgQkRGs4C8M9?=
+ =?us-ascii?Q?QIXsoO7IDcbCSqJfIl53Uq5YL0mTwfyK3x6qABFcirOULGKKBx1ktoQ5u85R?=
+ =?us-ascii?Q?/8AwVVgJ3qaq0yKTCi95IY5TBpmVR1+dFhGJ6vNeCIbxm2ltG77NBpJWKGD0?=
+ =?us-ascii?Q?rnLOONq24vC8R02i9nEX6fWf1aZYRqI4cFxHoMlXe2IKP9oqkjaQu4jn6VKd?=
+ =?us-ascii?Q?wr5oUW6Zg7RthbggGV/Fjyn3AA+rCgS81bS4LBLcu4FUfapCWw4tJ6B7Dolk?=
+ =?us-ascii?Q?slCqshs9uss/tD/KhvIJs9AJnmGYBCnT9gkrOPDm+2nrzfHOKLDJWjiqQS2x?=
+ =?us-ascii?Q?7FugxYW5quVUUOMS/D9uPPkegh2mZA3DS8fR93PajymoqFgyVMd0+5Niw1zI?=
+ =?us-ascii?Q?BlPOyCHV3pVoKcp/KWX75ywH6aFSTHOqo38oDOXB05OJrF3YduXwCY0aGxOX?=
+ =?us-ascii?Q?poa9zcBDr73mmdUQ8CV0twDXZiDaMIR2deLG2SmNSFPAR3ZPMzX9oUIX81PY?=
+ =?us-ascii?Q?dPywGBTbi3IcGDDKjdOwkK80tSDkOYnus3/NYO7EFkhqDm2C1fWAiDs4eYYJ?=
+ =?us-ascii?Q?6OQnAgaMKEl66ihm6+9MocMSWD0jOr5fB9QsnHZ+KzdiQfBnrMu9o5y4IZHj?=
+ =?us-ascii?Q?5bM8bkviNv7JqC3lSVVxrKz7udw9Z+icHcB7ygcXt9ZjuiGDXIo9s0qrT6DU?=
+ =?us-ascii?Q?kN7OtoDYiqehs4qovRcSXr62r45qxl4GBM6RRZmKjOV/F/22T3hdL3P6fekw?=
+ =?us-ascii?Q?kKGdymVXyDnnXjE0Yqyn31Dl8LuuSFQVGHNk8Gw6nk3T8tU8050xzwd/K02i?=
+ =?us-ascii?Q?16mZJ61wUqwlJJKTpWJ2L8kJxNDVOetTvaw/KHCTsMEItKRueX4O0juk0Frf?=
+ =?us-ascii?Q?b3KY0z29QBRL/2eVktjvo1zABKRCLP/NtN+oNqGeIr8lGv0/RYyeQP2gQb2L?=
+ =?us-ascii?Q?AufDym25uNVJ84LfOsETHYjq2v5Wsj5nc0wljCg4XwhproY4iMQ+3VMrLlON?=
+ =?us-ascii?Q?6tFL0b7q3vWanA7hOS2lVBwSdPDzGQEkrovBeowRLtJm4IroGZhW+w/RueaS?=
+ =?us-ascii?Q?jf6oCizyhzjxZvAQMqJFk4n+A5Klo+GSIFrRT4mQUhz0aNe+512MoWwDEEQs?=
+ =?us-ascii?Q?QS289l4Y/T1xJAdE5twa2WjEO0hDzf3492eRsadBir8UDqCOcSythmUmXno9?=
+ =?us-ascii?Q?bUH7xt4tb2eMqJxMuLp0EoBKDCTjhO956wiqcP+1xSer89GDvZ+ZSh4wLImA?=
+ =?us-ascii?Q?feuPlFDVDIYFzmocrDdyOCGbLQSWIlkSFxNn6+HjeEBYJH6TaSyTwEKn5eSe?=
+ =?us-ascii?Q?MP01+9hunaWMlnbm+KUgd5WOqscEqxKf521QnFasEjT4POa2bsya?=
 X-OriginatorOrg: kuleuven.be
-X-MS-Exchange-CrossTenant-Network-Message-Id: de5aa53d-fa41-417d-dcd6-08df4a2156a6
+X-MS-Exchange-CrossTenant-Network-Message-Id: 750e56d9-fd60-4456-49b2-08df4a2158ce
 X-MS-Exchange-CrossTenant-AuthSource: MI9PR08MB763857.eurprd08.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Nov 2026 11:51:55.8693
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Nov 2026 11:51:59.5110
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 3973589b-9e40-4eb5-800e-b0b6383d1621
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: JnV+WDnfl61qQqvh4POMj231jOkoxt9EZWLVExu5biBH49xA+fl7LCZUHfvIoH1P2fFCGBafIp2yrZk023wSiGgfmDSw6Riww2lzOK5cJeA=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI0PR08MB10711
+X-MS-Exchange-CrossTenant-UserPrincipalName: x0Aq+XK2xS+lMcdHFBE1Xvyt4TH917XhCaSQd691NzdOdzL89KZHqSQB8SpeqJGhNx6D36SAlMy+SUwiD9cInFj+kugvCJU9qB5Gl2fMCmE=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS8PR08MB6616
 
-Send an EAP_TLS_EVENT_SERVER_CERT event for every certificate in the
-chain received from the authentication server, from the highest depth
-down to the server's own certificate (depth 0).  The certificates are
-reported before the chain is verified, so they are also reported when
-the verification then fails.
-
-Each event carries the certificate, its SHA256 hash in the same form as
-the ServerCertHash setting takes, its subject and its SubjectAltName
-entries.
+Check that the EAP-TLS handshake tests receive a server certificate
+event for every certificate, that the server's own certificate comes
+last and that its subject and SubjectAltName entries are correct.
 
 Co-authored-by: Rathan Appana <rathan.appana@kuleuven.be>
 ---
- src/eap-tls-common.c | 56 ++++++++++++++++++++++++++++++++++++++++++++
- src/eap-tls-common.h | 18 ++++++++++++++
- 2 files changed, 74 insertions(+)
+ unit/test-eapol.c | 31 +++++++++++++++++++++++++++++++
+ 1 file changed, 31 insertions(+)
 
-diff --git a/src/eap-tls-common.c b/src/eap-tls-common.c
-index e7c3cb17..f34f892c 100644
---- a/src/eap-tls-common.c
-+++ b/src/eap-tls-common.c
-@@ -260,6 +260,59 @@ static void eap_tls_tunnel_debug(const char *str, void *user_data)
- 	l_info("%s: %s", eap_get_method_name(eap), str);
+diff --git a/unit/test-eapol.c b/unit/test-eapol.c
+index b3c291c3..b8ab1164 100644
+--- a/unit/test-eapol.c
++++ b/unit/test-eapol.c
+@@ -25,6 +25,7 @@
+ #endif
+ 
+ #include <stdio.h>
++#include <stdarg.h>
+ #include <string.h>
+ #include <assert.h>
+ #include <sys/stat.h>
+@@ -37,6 +38,7 @@
+ #include "src/ie.h"
+ #include "src/eap.h"
+ #include "src/eap-private.h"
++#include "src/eap-tls-common.h"
+ #include "src/handshake.h"
+ 
+ /* Our nonce to use + its size */
+@@ -77,6 +79,7 @@ struct test_handshake_state {
+ 	struct handshake_state super;
+ 	const uint8_t *tk;
+ 	bool handshake_failed;
++	bool server_cert_seen;
+ };
+ 
+ static void test_handshake_state_free(struct handshake_state *hs)
+@@ -2878,14 +2881,41 @@ static void test_handshake_event(struct handshake_state *hs,
+ {
+ 	struct test_handshake_state *ths =
+ 			l_container_of(hs, struct test_handshake_state, super);
++	const struct eap_tls_server_cert *cert;
++	va_list args;
++
++	va_start(args, user_data);
+ 
+ 	switch (event) {
+ 	case HANDSHAKE_EVENT_FAILED:
+ 		ths->handshake_failed = true;
+ 		break;
++	case HANDSHAKE_EVENT_EAP_NOTIFY:
++		if (va_arg(args, unsigned int) != EAP_TLS_EVENT_SERVER_CERT)
++			break;
++
++		cert = va_arg(args, const struct eap_tls_server_cert *);
++
++		/* The server's own certificate (depth 0) must come last */
++		assert(!ths->server_cert_seen);
++		assert(cert->cert && cert->cert_len);
++		assert(cert->cert_hash && strlen(cert->cert_hash) == 64);
++
++		if (cert->depth)
++			break;
++
++		assert(!strcmp(cert->subject, "/O=Foo Example Organization"
++				"/CN=Foo Example Organization"
++				"/emailAddress=foo@mail.example"));
++		assert(cert->altsubject &&
++			!strcmp(cert->altsubject[0], "DNS:foo.example.org"));
++		ths->server_cert_seen = true;
++		break;
+ 	default:
+ 		break;
+ 	}
++
++	va_end(args);
  }
  
-+struct eap_tls_certchain_walk {
-+	struct eap_state *eap;
-+	unsigned int depth;
-+};
-+
-+static bool eap_tls_count_cert(struct l_cert *cert, void *user_data)
-+{
-+	struct eap_tls_certchain_walk *walk = user_data;
-+
-+	walk->depth++;
-+	return false;
-+}
-+
-+static bool eap_tls_report_server_cert(struct l_cert *cert, void *user_data)
-+{
-+	struct eap_tls_certchain_walk *walk = user_data;
-+	struct eap_tls_server_cert info = { .depth = --walk->depth };
-+	_auto_(l_free) char *subject = l_cert_get_subject_str(cert);
-+	_auto_(l_free) char *cert_hash = NULL;
-+	_auto_(l_strv_free) char **altsubject = l_cert_get_altnames(cert);
-+	struct l_checksum *sha256 = l_checksum_new(L_CHECKSUM_SHA256);
-+	uint8_t hash[32];
-+
-+	info.cert = l_cert_get_der_data(cert, &info.cert_len);
-+
-+	if (!sha256 || !l_checksum_update(sha256, info.cert, info.cert_len) ||
-+			l_checksum_get_digest(sha256, hash, 32) != 32) {
-+		l_checksum_free(sha256);
-+		return false;
-+	}
-+
-+	l_checksum_free(sha256);
-+
-+	/* Same form as wpa_supplicant: lowercase hex, no separators */
-+	cert_hash = l_util_hexstring(hash, 32);
-+
-+	info.subject = subject;
-+	info.cert_hash = cert_hash;
-+	info.altsubject = altsubject;
-+
-+	eap_method_event(walk->eap, EAP_TLS_EVENT_SERVER_CERT, &info);
-+	return false;
-+}
-+
-+static void eap_tls_tunnel_certchain(struct l_certchain *chain,
-+					void *user_data)
-+{
-+	struct eap_tls_certchain_walk walk = { .eap = user_data };
-+
-+	l_certchain_walk_from_leaf(chain, eap_tls_count_cert, &walk);
-+	l_certchain_walk_from_ca(chain, eap_tls_report_server_cert, &walk);
-+}
-+
- static void eap_tls_tunnel_data_send(const uint8_t *data, size_t data_len,
- 								void *user_data)
- {
-@@ -653,6 +706,9 @@ static bool eap_tls_tunnel_init(struct eap_state *eap)
- 		return false;
- 	}
+ static void eapol_sm_test_tls(struct eapol_8021x_tls_test_state *s,
+@@ -3138,6 +3168,7 @@ static void eapol_sm_test_tls(struct eapol_8021x_tls_test_state *s,
+ 	assert(verify_install_tk_called);
  
-+	l_tls_set_peer_certchain_cb(eap_tls->tunnel, eap_tls_tunnel_certchain,
-+					eap);
-+
- 	if (getenv("IWD_TLS_DEBUG")) {
- 		l_tls_set_debug(eap_tls->tunnel, eap_tls_tunnel_debug, eap,
- 									NULL);
-diff --git a/src/eap-tls-common.h b/src/eap-tls-common.h
-index bfc23c08..722f7fff 100644
---- a/src/eap-tls-common.h
-+++ b/src/eap-tls-common.h
-@@ -23,6 +23,24 @@
- typedef struct l_settings *(*eap_tls_session_cache_load_func_t)(void);
- typedef void (*eap_tls_session_cache_sync_func_t)(const struct l_settings *);
+ done:
++	assert(ths->server_cert_seen);
+ 	__handshake_set_install_tk_func(NULL);
  
-+enum eap_tls_event {
-+	EAP_TLS_EVENT_SERVER_CERT	= 0x000d0001,
-+};
-+
-+/*
-+ * Sent once per certificate of the server's chain, highest depth (closest
-+ * to the CA) first and the server's own certificate (depth 0) last, like
-+ * wpa_supplicant's Certification signal.
-+ */
-+struct eap_tls_server_cert {
-+	unsigned int depth;
-+	const char *subject;
-+	const char *cert_hash;
-+	const uint8_t *cert;
-+	size_t cert_len;
-+	char **altsubject;
-+};
-+
- enum eap_tls_version {
- 	EAP_TLS_VERSION_0               = 0x00,
- 	EAP_TLS_VERSION_1               = 0x01,
+ 	if (sm)
 -- 
 2.53.0
 
